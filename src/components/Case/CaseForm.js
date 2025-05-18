@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { addCase } from '../../firebase/firestore';
 import { uploadImage } from '../../lib/cloudinary';
-
+import styles from '../../styles/caseForm.module.css';
 import { auth } from '../../firebase/config';
 
 export default function CaseForm() {
@@ -17,10 +17,14 @@ export default function CaseForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!auth.currentUser) {
+      setError('You must be logged in to submit a case.');
+      return;
+    }
     try {
       let imageUrl = '';
       if (image) {
-        imageUrl = await uploadImage(image);
+        imageUrl = await uploadImage(image, auth.currentUser.uid);
       }
       await addCase({
         title,
@@ -30,6 +34,8 @@ export default function CaseForm() {
         management,
         imageUrl,
         createdAt: new Date(),
+        userId: auth.currentUser.uid,
+        userName: auth.currentUser.displayName,
       });
       router.push('/cases');
     } catch (err) {
@@ -38,7 +44,7 @@ export default function CaseForm() {
   };
 
   return (
-    <div className="case-form">
+    <div className={styles.caseForm}>
       <h2>Add New Case</h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -78,7 +84,7 @@ export default function CaseForm() {
           onChange={(e) => setImage(e.target.files[0])}
         />
         <button type="submit">Submit Case</button>
-        {error && <p className="error">{error}</p>}
+        {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
   );
