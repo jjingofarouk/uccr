@@ -1,7 +1,6 @@
-import { auth } from './config';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile as updateAuthProfile } from 'firebase/auth';
+import { auth, db } from './config';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile as updateAuthProfile, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from './config';
 
 export const login = async (email, password) => {
   await signInWithEmailAndPassword(auth, email, password);
@@ -18,4 +17,13 @@ export const updateProfile = async (user, name, photoUrl) => {
 
 export const updateUserProfile = async (userId, profileData) => {
   await setDoc(doc(db, 'profiles', userId), profileData, { merge: true });
+};
+
+export const logout = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error('Firebase signOut error:', error);
+    throw new Error('Unable to sign out');
+  }
 };
