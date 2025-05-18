@@ -1,8 +1,8 @@
 .card {
   background-color: #ffffff;
   border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
 }
 
@@ -11,13 +11,15 @@
 }
 
 .card h2 {
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
 }
 
 .card p {
   font-size: 1rem;
   margin-bottom: 0.5rem;
+  color: #34495e;
 }
 
 .media {
@@ -40,14 +42,36 @@
   color: #3498db;
   text-decoration: none;
   font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .link:hover {
+  background-color: #eaf4ff;
   color: #2980b9;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .card h2 {
+    font-size: 1.25rem;
+  }
+
+  .card p {
+    font-size: 0.95rem;
+  }
+
+  .image {
+    max-height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
   .card {
     padding: 0.75rem;
   }
@@ -61,24 +85,6 @@
   }
 
   .image {
-    max-height: 150px;
-  }
-}
-
-@media (max-width: 480px) {
-  .card {
-    padding: 0.5rem;
-  }
-
-  .card h2 {
-    font-size: 1rem;
-  }
-
-  .card p {
-    font-size: 0.85rem;
-  }
-
-  .image {
     max-height: 120px;
   }
 }
@@ -89,10 +95,19 @@
   color: #ffffff;
 }
 
+:global(body.dark-mode) .card h2 {
+  color: #ecf0f1;
+}
+
+:global(body.dark-mode) .card p {
+  color: #bdc3c7;
+}
+
 :global(body.dark-mode) .link {
   color: #66b3ff;
 }
 
 :global(body.dark-mode) .link:hover {
+  background-color: #34495e;
   color: #4d94ff;
 }
