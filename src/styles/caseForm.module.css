@@ -23,7 +23,7 @@
   color: #34495e;
 }
 
-input, textarea, select {
+.inputField, .textareaField, .selectField {
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 1rem;
@@ -33,7 +33,7 @@ input, textarea, select {
   box-sizing: border-box;
 }
 
-textarea {
+.textareaField {
   min-height: 100px;
   resize: vertical;
 }
@@ -96,7 +96,7 @@ button[type="submit"]:disabled {
     font-size: 1.1rem;
   }
 
-  input, textarea, select {
+  .inputField, .textareaField, .selectField {
     padding: 0.5rem;
   }
 }
@@ -126,9 +126,9 @@ button[type="submit"]:disabled {
   color: #ecf0f1;
 }
 
-:global(body.dark-mode) input,
-:global(body.dark-mode) textarea,
-:global(body.dark-mode) select {
+:global(body.dark-mode) .inputField,
+:global(body.dark-mode) .textareaField,
+:global(body.dark-mode) .selectField {
   background-color: #34495e;
   border-color: #7f8c8d;
   color: #ffffff;
