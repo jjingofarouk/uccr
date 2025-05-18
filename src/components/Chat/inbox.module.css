@@ -107,21 +107,73 @@
   color: #ffffff;
 }
 
-.select {
+.searchContainer {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.searchInput {
   width: 100%;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #cccccc;
   border-radius: 4px;
-  margin-bottom: 16px;
   background: #ffffff;
   color: #333333;
 }
 
-.dark-mode .select {
+.dark-mode .searchInput {
   background: #444444;
   border-color: #666666;
   color: #ffffff;
+}
+
+.userList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 2100;
+  margin-top: 4px;
+}
+
+.dark-mode .userList {
+  background: #444444;
+  border-color: #666666;
+}
+
+.userItem {
+  padding: 10px;
+  font-size: 16px;
+  color: #333333;
+  cursor: pointer;
+}
+
+.userItem:hover {
+  background: #f0f0f0;
+}
+
+.dark-mode .userItem {
+  color: #ffffff;
+}
+
+.dark-mode .userItem:hover {
+  background: #555555;
+}
+
+.selectedUser {
+  font-size: 14px;
+  color: #333333;
+  margin-bottom: 16px;
+}
+
+.dark-mode .selectedUser {
+  color: #e0e0e0;
 }
 
 .textarea {
@@ -163,12 +215,21 @@
   background: #0056b3;
 }
 
+.sendButton:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
 .dark-mode .sendButton {
   background: #66b0ff;
 }
 
 .dark-mode .sendButton:hover {
   background: #3385ff;
+}
+
+.dark-mode .sendButton:disabled {
+  background: #666666;
 }
 
 .cancelButton {
@@ -191,4 +252,83 @@
 
 .dark-mode .cancelButton:hover {
   background: #cc5252;
+}
+
+.messages {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.message {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  max-width: 70%;
+}
+
+.sent {
+  background: #007bff;
+  color: #ffffff;
+  margin-left: auto;
+}
+
+.received {
+  background: #e0e0e0;
+  color: #333333;
+  margin-right: auto;
+}
+
+.dark-mode .sent {
+  background: #66b0ff;
+}
+
+.dark-mode .received {
+  background: #444444;
+  color: #e0e0e0;
+}
+
+.message p {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+}
+
+.message small {
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.dark-mode .message small {
+  color: #999999;
+}
+
+.messageForm {
+  display: flex;
+  gap: 8px;
+}
+
+.messageInput {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #333333;
+}
+
+.dark-mode .messageInput {
+  background: #444444;
+  border-color: #666666;
+  color: #ffffff;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.dark-mode .error {
+  color: #ff6b6b;
 }
