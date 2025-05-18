@@ -1,79 +1,76 @@
 .navbar-header {
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
   position: fixed;
   width: 100%;
   top: 0;
-  z-index: 50;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .dark-mode .navbar-header {
-  background-color: #1f2937;
+  background: linear-gradient(90deg, #1f2937, #4b5563);
 }
 
 .navbar-content {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 4rem;
+  height: 64px;
 }
 
 .navbar-logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2563eb;
+  font-family: 'Inter', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
   text-decoration: none;
+  letter-spacing: 1px;
 }
 
-.dark-mode .navbar-logo {
-  color: #60a5fa;
+.navbar-logo:hover {
+  color: #dbeafe;
 }
 
 .navbar-controls {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 24px;
 }
 
 .navbar-link {
-  color: #374151;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
   font-weight: 500;
+  color: #ffffff;
   text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
 }
 
 .navbar-link:hover {
-  color: #2563eb;
-}
-
-.dark-mode .navbar-link {
-  color: #e5e7eb;
-}
-
-.dark-mode .navbar-link:hover {
-  color: #60a5fa;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #dbeafe;
 }
 
 .navbar-theme-toggle {
-  padding: 0.5rem;
-  border-radius: 9999px;
   background: none;
   border: none;
+  padding: 8px;
   cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
 }
 
 .navbar-theme-toggle:hover {
-  background-color: #f3f4f6;
-}
-
-.dark-mode .navbar-theme-toggle:hover {
-  background-color: #374151;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .navbar-theme-toggle svg {
-  color: #4b5563;
+  color: #ffffff;
 }
 
 .dark-mode .navbar-theme-toggle svg {
@@ -81,54 +78,68 @@
 }
 
 .navbar-user-button {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  background-color: #2563eb;
-  color: #ffffff;
-  font-weight: 500;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #1e3a8a;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dark-mode .navbar-user-button {
+  background-color: #d1d5db;
+  color: #1f2937;
 }
 
 .navbar-user-button:hover {
-  background-color: #1d4ed8;
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
 }
 
 .navbar-sidebar {
   position: fixed;
-  top: 4rem;
+  top: 64px;
   right: 0;
-  width: 16rem;
-  height: calc(100vh - 4rem);
-  background-color: #ffffff;
-  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+  width: 240px;
+  height: calc(100vh - 64px);
+  background: #ffffff;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
 }
 
 .dark-mode .navbar-sidebar {
-  background-color: #1f2937;
+  background: #374151;
 }
 
 .navbar-sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  gap: 0.5rem;
+  padding: 16px;
+  gap: 8px;
 }
 
 .navbar-sidebar-link {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  color: #374151;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
   text-decoration: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .navbar-sidebar-link:hover {
   background-color: #eff6ff;
-  color: #2563eb;
+  color: #3b82f6;
 }
 
 .dark-mode .navbar-sidebar-link {
@@ -136,18 +147,22 @@
 }
 
 .dark-mode .navbar-sidebar-link:hover {
-  background-color: #1e40af;
-  color: #60a5fa;
+  background-color: #4b5563;
+  color: #93c5fd;
 }
 
 .navbar-sidebar-button {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #dc2626;
   background: none;
   border: none;
   text-align: left;
-  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .navbar-sidebar-button:hover {
@@ -159,5 +174,5 @@
 }
 
 .dark-mode .navbar-sidebar-button:hover {
-  background-color: #7f1d1d;
+  background-color: #991b1b;
 }
