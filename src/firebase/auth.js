@@ -8,7 +8,20 @@ export const login = async (email, password) => {
 
 export const signup = async (email, password, name) => {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  await updateAuthProfile(userCredential.user, { displayName: name });
+  const user = userCredential.user;
+  await updateAuthProfile(user, { displayName: name });
+  // Create users document for inbox search
+  await setDoc(doc(db, 'users', user.uid), {
+    displayName: name,
+    email,
+    uid: user.uid,
+    createdAt: new Date().toISOString(),
+  }, { merge: true });
+  // Create profiles document (as before)
+  await setDoc(doc(db, 'profiles', user.uid), {
+    displayName: name,
+    email,
+  }, { merge: true });
 };
 
 export const updateProfile = async (user, name, photoUrl) => {
