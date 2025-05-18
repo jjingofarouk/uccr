@@ -9,8 +9,10 @@ export default function Inbox() {
   const { user } = useAuth();
   const [threads, setThreads] = useState([]);
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null);
   const [messageText, setMessageText] = useState('');
 
   // Fetch message threads
@@ -23,17 +25,35 @@ export default function Inbox() {
     fetchThreads();
   }, [user]);
 
-  // Fetch users for recipient selection
+  // Fetch users
   useEffect(() => {
     if (!user) return;
     const fetchUsers = async () => {
       const allUsers = await getUsers();
-      // Exclude current user
       const filteredUsers = allUsers.filter(u => u.uid !== user.uid);
       setUsers(filteredUsers);
+      setFilteredUsers(filteredUsers);
     };
     fetchUsers();
   }, [user]);
+
+  // Filter users based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredUsers(users);
+    } else {
+      const lowerQuery = searchQuery.toLowerCase();
+      setFilteredUsers(
+        users.filter(u => u.displayName.toLowerCase().includes(lowerQuery))
+      );
+    }
+  }, [searchQuery, users]);
+
+  const handleSelectUser = (user) => {
+    setSelectedUser(user);
+    setSearchQuery(user.displayName);
+    setFilteredUsers([]);
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -42,15 +62,15 @@ export default function Inbox() {
     try {
       await sendMessage({
         senderId: user.uid,
-        recipientId: selectedUser,
+        recipientId: selectedUser.uid,
         senderName: user.displayName || 'User',
-        recipientName: users.find(u => u.uid === selectedUser)?.displayName || 'User',
+        recipientName: selectedUser.displayName || 'User',
         text: messageText.trim(),
       });
       setMessageText('');
-      setSelectedUser('');
+      setSelectedUser(null);
+      setSearchQuery('');
       setIsModalOpen(false);
-      // Refresh threads
       const messages = await getMessages(user.uid);
       setThreads(messages);
     } catch (error) {
@@ -87,19 +107,33 @@ export default function Inbox() {
             <div className={styles.modalContent}>
               <h3>Compose Message</h3>
               <form onSubmit={handleSendMessage}>
-                <select
-                  value={selectedUser}
-                  onChange={(e) => setSelectedUser(e.target.value)}
-                  className={styles.select}
-                  required
-                >
-                  <option value="">Select a user</option>
-                  {users.map((u) => (
-                    <option key={u.uid} value={u.uid}>
-                      {u.displayName || 'User'}
-                    </option>
-                  ))}
-                </select>
+                <div className={styles.searchContainer}>
+                  <input
+                    type="text"
+                    placeholder="Search users by name..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                  {filteredUsers.length > 0 && (
+                    <ul className={styles.userList}>
+                      {filteredUsers.map((u) => (
+                        <li
+                          key={u.uid}
+                          onClick={() => handleSelectUser(u)}
+                          className={styles.userItem}
+                        >
+                          {u.displayName}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {selectedUser && (
+                  <p className={styles.selectedUser}>
+                    Sending to: {selectedUser.displayName}
+                  </p>
+                )}
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
@@ -108,12 +142,20 @@ export default function Inbox() {
                   required
                 />
                 <div className={styles.modalActions}>
-                  <button type="submit" className={styles.sendButton}>
+                  <button 
+                    type="submit" 
+                    className={styles.sendButton}
+                    disabled={!selectedUser}
+                  >
                     Send
                   </button>
                   <button 
                     type="button" 
-                    onClick={() => setIsModalOpen(false)} 
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setSearchQuery('');
+                      setSelectedUser(null);
+                    }} 
                     className={styles.cancelButton}
                   >
                     Cancel
