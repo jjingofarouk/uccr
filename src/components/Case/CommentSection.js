@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { addComment, getComments } from '../../firebase/firestore';
-import styles from '../../styles/globals.css';
+
 
 export default function CommentSection({ caseId }) {
   const { user } = useAuth();
