@@ -14,11 +14,11 @@ export default function CaseForm() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  console.log('CaseForm: Auth state', { user, loading, authError });
+  console.log('CaseForm: Auth state', { user: user ? { uid: user.uid, displayName: user.displayName } : null, loading, authError });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('CaseForm: handleSubmit called', { user, loading });
+    console.log('CaseForm: handleSubmit called', { user: user ? { uid: user.uid } : null, loading });
     if (loading) {
       setError('Authentication is still loading. Please wait.');
       console.log('CaseForm: Submission blocked due to loading');
@@ -30,8 +30,7 @@ export default function CaseForm() {
       return;
     }
     try {
-      console.log('CaseForm: Submitting case', { userId: user.uid, userName: user.displayName });
-      await addCase({
+      const caseData = {
         title,
         presentingComplaint: complaint,
         history,
@@ -40,7 +39,9 @@ export default function CaseForm() {
         createdAt: new Date(),
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
-      });
+      };
+      console.log('CaseForm: Submitting case', caseData);
+      await addCase(caseData);
       console.log('CaseForm: Case submitted successfully');
       router.push('/cases');
     } catch (err) {
