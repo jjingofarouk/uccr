@@ -220,7 +220,7 @@ export default function CaseForm() {
             </div>
           )}
         </div>
-        <button type="submit" disabled={!user}>Submit Case Report</button>
+        <button type="submit" className={styles.submitButton} disabled={!user}>Submit Case Report</button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
