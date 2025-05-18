@@ -10,14 +10,22 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log('AuthProvider: Setting up onAuthStateChanged');
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log('AuthProvider: onAuthStateChanged fired', {
+        currentUser: currentUser ? { uid: currentUser.uid, displayName: currentUser.displayName } : null,
+      });
       setUser(currentUser);
       setLoading(false);
     }, (err) => {
+      console.error('AuthProvider: onAuthStateChanged error', err);
       setError(err.message);
       setLoading(false);
     });
-    return () => unsubscribe();
+    return () => {
+      console.log('AuthProvider: Cleaning up onAuthStateChanged');
+      unsubscribe();
+    };
   }, []);
 
   return (
