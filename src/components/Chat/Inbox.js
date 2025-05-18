@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getMessages } from '../../firebase/firestore';
 import Link from 'next/link';
-import styles from '../../styles/globals.css';
+
 
 export default function Inbox() {
   const { user } = useAuth();
