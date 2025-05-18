@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCases } from '../../hooks/useCases';
 import CommentSection from './CommentSection';
-import styles from '../../styles/globals.css';
+
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
 
