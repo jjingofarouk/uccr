@@ -39,12 +39,12 @@ export default function Inbox() {
 
   // Filter users based on search query
   useEffect(() => {
-    if (searchQuery.trim() === '') {
+    if (!searchQuery.trim()) {
       setFilteredUsers(users);
     } else {
       const lowerQuery = searchQuery.toLowerCase();
       setFilteredUsers(
-        users.filter(u => u.displayName.toLowerCase().includes(lowerQuery))
+        users.filter(u => u.displayName?.toLowerCase().includes(lowerQuery))
       );
     }
   }, [searchQuery, users]);
@@ -52,7 +52,7 @@ export default function Inbox() {
   const handleSelectUser = (user) => {
     setSelectedUser(user);
     setSearchQuery(user.displayName);
-    setFilteredUsers([]);
+    setFilteredUsers([]); // Clear list after selection
   };
 
   const handleSendMessage = async (e) => {
@@ -114,8 +114,9 @@ export default function Inbox() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className={styles.searchInput}
+                    autoFocus
                   />
-                  {filteredUsers.length > 0 && (
+                  {searchQuery && filteredUsers.length > 0 && (
                     <ul className={styles.userList}>
                       {filteredUsers.map((u) => (
                         <li
@@ -123,10 +124,13 @@ export default function Inbox() {
                           onClick={() => handleSelectUser(u)}
                           className={styles.userItem}
                         >
-                          {u.displayName}
+                          {u.displayName || 'User'}
                         </li>
                       ))}
                     </ul>
+                  )}
+                  {searchQuery && filteredUsers.length === 0 && (
+                    <p className={styles.noResults}>No users found</p>
                   )}
                 </div>
                 {selectedUser && (
@@ -155,6 +159,7 @@ export default function Inbox() {
                       setIsModalOpen(false);
                       setSearchQuery('');
                       setSelectedUser(null);
+                      setFilteredUsers(users);
                     }} 
                     className={styles.cancelButton}
                   >
