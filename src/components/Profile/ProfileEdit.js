@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { updateProfile, updateUserProfile } from '../../firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { updateProfile } from '../../firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import styles from '../../styles/profileEdit.module.css';
 
@@ -24,7 +24,6 @@ export default function ProfileEdit() {
     if (user) {
       setName(user.displayName || '');
       setPhotoUrl(user.photoURL || '');
-      // Fetch additional profile data from Firestore
       const fetchProfile = async () => {
         try {
           const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
@@ -83,10 +82,7 @@ export default function ProfileEdit() {
       return;
     }
     try {
-      // Update Firebase Authentication profile
       await updateProfile(user, name, photoUrl);
-
-      // Update Firestore profile
       await setDoc(doc(db, 'profiles', user.uid), {
         title,
         education,
@@ -95,7 +91,6 @@ export default function ProfileEdit() {
         bio,
         updatedAt: new Date(),
       }, { merge: true });
-
       router.push('/profile');
     } catch (err) {
       setError(err.message);
@@ -113,6 +108,7 @@ export default function ProfileEdit() {
         <div className={styles.section}>
           <h3>Personal Information</h3>
           <input
+            className={styles.inputField}
             type="text"
             placeholder="Full Name *"
             value={name}
@@ -120,6 +116,7 @@ export default function ProfileEdit() {
             required
           />
           <input
+            className={styles.inputField}
             type="text"
             placeholder="Professional Title (e.g., Dr., Prof., Medical Student)"
             value={title}
@@ -129,17 +126,20 @@ export default function ProfileEdit() {
         <div className={styles.section}>
           <h3>Education & Affiliation</h3>
           <textarea
+            className={styles.textareaField}
             placeholder="Education (e.g., MBChB, MSc, PhD)"
             value={education}
             onChange={(e) => setEducation(e.target.value)}
           />
           <input
+            className={styles.inputField}
             type="text"
             placeholder="Institution (e.g., Makerere University, Mulago Hospital)"
             value={institution}
             onChange={(e) => setInstitution(e.target.value)}
           />
           <select
+            className={styles.selectField}
             value={specialty}
             onChange={(e) => setSpecialty(e.target.value)}
           >
@@ -168,10 +168,10 @@ export default function ProfileEdit() {
         <div className={styles.section}>
           <h3>Bio</h3>
           <textarea
+            className={`${styles.textareaField} ${styles.bio}`}
             placeholder="Brief bio (e.g., research interests, professional experience)"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className={styles.bio}
           />
         </div>
         <button type="submit">Save Changes</button>
