@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { addCase } from '../../firebase/firestore';
 import { uploadImage } from '../../lib/cloudinary';
-import styles from '../../styles/globals.css';
+
 import { auth } from '../../firebase/config';
 
 export default function CaseForm() {
