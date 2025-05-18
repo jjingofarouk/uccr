@@ -10,11 +10,23 @@ export default function Navbar() {
   const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [error, setError] = useState('');
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     document.body.classList.toggle('dark-mode');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toggleSidebar();
+      setError('');
+    } catch (err) {
+      console.error('Logout error:', err);
+      setError('Failed to log out. Please try again.');
+    }
   };
 
   const userInitials = user ? 
@@ -52,7 +64,7 @@ export default function Navbar() {
               {user && <Link href="/profile" onClick={toggleSidebar} className={styles.navLink}>Profile</Link>}
               {user && <Link href="/inbox" onClick={toggleSidebar} className={styles.navLink}>Inbox</Link>}
               {user ? (
-                <button onClick={() => { logout(); toggleSidebar(); }} className={styles.sidebarButton}>Logout</button>
+                <button onClick={handleLogout} className={styles.sidebarButton}>Logout</button>
               ) : (
                 <>
                   <Link href="/login" onClick={toggleSidebar} className={styles.navLink}>Login</Link>
@@ -60,6 +72,7 @@ export default function Navbar() {
                 </>
               )}
             </nav>
+            {error && <p className={styles.error}>{error}</p>}
           </motion.aside>
         )}
       </AnimatePresence>
