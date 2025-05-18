@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import styles from '../styles/globals.css';
+
 
 export default function Navbar() {
   const { user } = useAuth();
