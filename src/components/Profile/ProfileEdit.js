@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { updateProfile } from '../../firebase/auth';
 import { uploadImage } from '../../lib/cloudinary';
-import { auth } from '../../firebase/config';
+import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
   const { user } = useAuth();
@@ -14,10 +14,14 @@ export default function ProfileEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      setError('You must be logged in to update your profile.');
+      return;
+    }
     try {
       let photoURL = user?.photoURL;
       if (photo) {
-        photoURL = await uploadImage(photo, `profiles/${user.uid}`);
+        photoURL = await uploadImage(photo, user.uid, `profiles/${user.uid}`);
       }
       await updateProfile(user, name, photoURL);
       router.push('/profile');
@@ -27,7 +31,7 @@ export default function ProfileEdit() {
   };
 
   return (
-    <div className="profile-edit">
+    <div className={styles.profileEdit}>
       <h2>Edit Profile</h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -43,7 +47,7 @@ export default function ProfileEdit() {
           onChange={(e) => setPhoto(e.target.files[0])}
         />
         <button type="submit">Save Changes</button>
-        {error && <p className="error">{error}</p>}
+        {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
   );
