@@ -11,6 +11,9 @@
   "dependencies": {
     "cloudinary": "^2.5.0",
     "firebase": "^10.12.2",
+    "formidable": "^3.5.1",
+    "framer-motion": "^11.11.1",
+    "lucide-react": "^0.441.0",
     "next": "14.2.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
