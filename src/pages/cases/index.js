@@ -2,7 +2,6 @@ import CaseCard from '../../components/Case/CaseCard';
 import { useCases } from '../../hooks/useCases';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import styles from '../../styles/globals.css';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 
 export default function Cases() {
