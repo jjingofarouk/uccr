@@ -1,7 +1,6 @@
 import CaseCard from '../components/Case/CaseCard';
 import { useCases } from '../hooks/useCases';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 
 
 export default function Home() {
@@ -16,7 +15,6 @@ export default function Home() {
           <CaseCard key={caseData.id} caseData={caseData} />
         ))}
       </div>
-      <Footer />
     </div>
   );
 }
