@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { signup } from '../../firebase/auth';
-
+import { User, Mail, Lock } from 'lucide-react';
+import styles from './signup.module.css';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -21,32 +22,44 @@ export default function Signup() {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Sign Up</h2>
+    <div className={styles.authContainer}>
+      <h2>
+        <User size={24} />
+        Sign Up
+      </h2>
       <form onSubmit={handleSignup}>
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className={styles.inputWrapper}>
+          <User className={styles.inputIcon} size={20} />
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+        <div className={styles.inputWrapper}>
+          <Mail className={styles.inputIcon} size={20} />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className={styles.inputWrapper}>
+          <Lock className={styles.inputIcon} size={20} />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
         <button type="submit">Sign Up</button>
-        {error && <p className="error">{error}</p>}
+        {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
   );
