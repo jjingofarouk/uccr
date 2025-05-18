@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { addCase } from '../../firebase/firestore';
 import styles from '../../styles/caseForm.module.css';
@@ -11,43 +11,8 @@ export default function CaseForm() {
   const [history, setHistory] = useState('');
   const [investigations, setInvestigations] = useState('');
   const [management, setManagement] = useState('');
-  const [mediaUrls, setMediaUrls] = useState([]);
   const [error, setError] = useState('');
-  const cloudinaryRef = useRef();
-  const widgetRef = useRef();
   const router = useRouter();
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      cloudinaryRef.current = window.cloudinary;
-      widgetRef.current = cloudinaryRef.current.createUploadWidget(
-        {
-          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-          folder: 'cases',
-          sources: ['local', 'camera'],
-          multiple: true,
-          resourceType: 'auto', // Supports images and videos
-        },
-        (error, result) => {
-          if (!error && result && result.event === 'success') {
-            setMediaUrls((prev) => [...prev, result.info.secure_url]);
-          } else if (error) {
-            setError('Media upload failed: ' + error.message);
-          }
-        }
-      );
-    };
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,7 +31,6 @@ export default function CaseForm() {
         history,
         investigations,
         management,
-        mediaUrls, // Store array of image/video URLs
         createdAt: new Date(),
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
@@ -117,25 +81,6 @@ export default function CaseForm() {
           onChange={(e) => setManagement(e.target.value)}
           required
         />
-        <button
-          type="button"
-          onClick={() => widgetRef.current?.open()}
-          className={styles.uploadButton}
-        >
-          Upload Images/Videos
-        </button>
-        {mediaUrls.length > 0 && (
-          <div>
-            <p>Uploaded media:</p>
-            <ul>
-              {mediaUrls.map((url, index) => (
-                <li key={index}>
-                  <a href={url} target="_blank">View {url.includes('video') ? 'Video' : 'Image'} {index + 1}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
         <button type="submit" disabled={!user}>Submit Case</button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
