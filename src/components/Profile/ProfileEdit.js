@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { updateProfile } from '../../firebase/auth';
-import { uploadImage } from '../../firebase/storage';
+import { uploadImage } from '../../lib/cloudinary';
 import styles from '../../styles/globals.css';
+import { auth } from '../../firebase/config';
 
 export default function ProfileEdit() {
   const { user } = useAuth();
