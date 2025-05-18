@@ -5,13 +5,13 @@ import styles from '../../styles/caseForm.module.css';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function CaseForm() {
-  const { user, loading } = useAuth();
+  const { user, loading, error: authError } = useAuth();
   const [title, setTitle] = useState('');
   const [complaint, setComplaint] = useState('');
   const [history, setHistory] = useState('');
   const [investigations, setInvestigations] = useState('');
   const [management, setManagement] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [mediaUrls, setMediaUrls] = useState([]);
   const [error, setError] = useState('');
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
@@ -29,16 +29,16 @@ export default function CaseForm() {
         {
           cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
           uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-          folder: user ? `cases/${user.uid}` : 'cases',
+          folder: 'cases',
           sources: ['local', 'camera'],
-          multiple: false,
-          resourceType: 'image',
+          multiple: true,
+          resourceType: 'auto', // Supports images and videos
         },
         (error, result) => {
           if (!error && result && result.event === 'success') {
-            setImageUrl(result.info.secure_url);
+            setMediaUrls((prev) => [...prev, result.info.secure_url]);
           } else if (error) {
-            setError('Image upload failed: ' + error.message);
+            setError('Media upload failed: ' + error.message);
           }
         }
       );
@@ -47,10 +47,14 @@ export default function CaseForm() {
     return () => {
       document.body.removeChild(script);
     };
-  }, [user]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) {
+      setError('Authentication is still loading. Please wait.');
+      return;
+    }
     if (!user) {
       setError('You must be logged in to submit a case.');
       return;
@@ -62,7 +66,7 @@ export default function CaseForm() {
         history,
         investigations,
         management,
-        imageUrl,
+        mediaUrls, // Store array of image/video URLs
         createdAt: new Date(),
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
@@ -80,6 +84,7 @@ export default function CaseForm() {
   return (
     <div className={styles.caseForm}>
       <h2>Add New Case</h2>
+      {authError && <p className={styles.error}>Auth Error: {authError}</p>}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -117,10 +122,21 @@ export default function CaseForm() {
           onClick={() => widgetRef.current?.open()}
           className={styles.uploadButton}
         >
-          Upload Image
+          Upload Images/Videos
         </button>
-        {imageUrl && <p>Image uploaded: <a href={imageUrl} target="_blank">View</a></p>}
-        <button type="submit">Submit Case</button>
+        {mediaUrls.length > 0 && (
+          <div>
+            <p>Uploaded media:</p>
+            <ul>
+              {mediaUrls.map((url, index) => (
+                <li key={index}>
+                  <a href={url} target="_blank">View {url.includes('video') ? 'Video' : 'Image'} {index + 1}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <button type="submit" disabled={!user}>Submit Case</button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
