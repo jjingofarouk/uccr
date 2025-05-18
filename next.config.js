@@ -5,6 +5,10 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
+        crypto: false,
+        events: false,
+        os: false,
+        'fs/promises': false,
       };
     }
     return config;
