@@ -111,6 +111,7 @@ export default function CaseForm() {
         <div className={styles.section}>
           <h3>Case Overview</h3>
           <input
+            className={styles.inputField}
             type="text"
             placeholder="Case Title *"
             value={title}
@@ -118,12 +119,14 @@ export default function CaseForm() {
             required
           />
           <textarea
+            className={styles.textareaField}
             placeholder="Presenting Complaint *"
             value={presentingComplaint}
             onChange={(e) => setPresentingComplaint(e.target.value)}
             required
           />
           <select
+            className={styles.selectField}
             value={specialty}
             onChange={(e) => setSpecialty(e.target.value)}
             required
@@ -142,21 +145,25 @@ export default function CaseForm() {
         <div className={styles.section}>
           <h3>Clinical Details</h3>
           <textarea
+            className={styles.textareaField}
             placeholder="History of Presenting Complaint"
             value={history}
             onChange={(e) => setHistory(e.target.value)}
           />
           <textarea
+            className={styles.textareaField}
             placeholder="Investigations"
             value={investigations}
             onChange={(e) => setInvestigations(e.target.value)}
           />
           <textarea
+            className={styles.textareaField}
             placeholder="Management"
             value={management}
             onChange={(e) => setManagement(e.target.value)}
           />
           <input
+            className={styles.inputField}
             type="text"
             placeholder="Provisional Diagnosis"
             value={provisionalDiagnosis}
@@ -166,12 +173,14 @@ export default function CaseForm() {
         <div className={styles.section}>
           <h3>Case Context</h3>
           <input
+            className={styles.inputField}
             type="text"
             placeholder="Hospital Name"
             value={hospital}
             onChange={(e) => setHospital(e.target.value)}
           />
           <input
+            className={styles.inputField}
             type="text"
             placeholder="Referral Center (if applicable)"
             value={referralCenter}
@@ -181,10 +190,10 @@ export default function CaseForm() {
         <div className={styles.section}>
           <h3>Discussion</h3>
           <textarea
+            className={`${styles.textareaField} ${styles.discussion}`}
             placeholder="Discussion (e.g., clinical implications, challenges, learning points)"
             value={discussion}
             onChange={(e) => setDiscussion(e.target.value)}
-            className={styles.discussion}
           />
         </div>
         <div className={styles.section}>
