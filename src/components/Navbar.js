@@ -2,9 +2,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { Menu, X, Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import '../styles/navbar.module.css';
+import './navbar.module.css';
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -18,13 +18,13 @@ export default function Navbar() {
   };
 
   const userInitials = user ? 
-    (user.displayName ? user.displayName.split(' ').map(n => n[0]).join('') : 'U') : 'G';
+    (user.displayName ? user.displayName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U') : 'G';
 
   return (
     <header className="navbar-header">
       <div className="navbar-content">
         <Link href="/" className="navbar-logo">UCCR</Link>
-        <div className="navbar-controls">
+        <nav className="navbar-controls">
           <Link href="/" className="navbar-link">Home</Link>
           {user && (
             <Link href="/cases/new" className="navbar-link">Add Case</Link>
@@ -43,7 +43,7 @@ export default function Navbar() {
           >
             {userInitials}
           </button>
-        </div>
+        </nav>
       </div>
       <AnimatePresence>
         {isSidebarOpen && (
