@@ -47,7 +47,7 @@ export const addReaction = async (caseId, userId, type) => {
   await setDoc(doc(db, `cases/${caseId}/reactions`, userId), { type });
 };
 
-// Fetch all users (for recipient selection)
+// Fetch all users
 export const getUsers = async () => {
   try {
     const usersSnapshot = await getDocs(collection(db, 'users'));
@@ -61,21 +61,18 @@ export const getUsers = async () => {
   }
 };
 
-// Send a message (create or update a thread)
+// Send a message
 export const sendMessage = async ({ senderId, recipientId, senderName, recipientName, text }) => {
   try {
-    // Create a unique thread ID by sorting user IDs
     const threadId = [senderId, recipientId].sort().join('_');
     const threadRef = doc(db, 'messages', threadId);
 
-    // Add message to subcollection
     await addDoc(collection(threadRef, 'messages'), {
       senderId,
       text,
       timestamp: serverTimestamp(),
     });
 
-    // Update thread metadata
     await setDoc(threadRef, {
       participants: [senderId, recipientId],
       userNames: {
@@ -113,6 +110,24 @@ export const getMessages = async (userId) => {
     return threads;
   } catch (error) {
     console.error('Error fetching messages:', error);
+    return [];
+  }
+};
+
+// Get messages for a specific thread
+export const getThreadMessages = async (threadId) => {
+  try {
+    const q = query(
+      collection(db, `messages/${threadId}/messages`),
+      orderBy('timestamp', 'asc')
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error('Error fetching thread messages:', error);
     return [];
   }
 };
