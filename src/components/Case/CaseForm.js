@@ -7,10 +7,15 @@ import { useAuth } from '../../hooks/useAuth';
 export default function CaseForm() {
   const { user, loading, error: authError } = useAuth();
   const [title, setTitle] = useState('');
-  const [complaint, setComplaint] = useState('');
+  const [presentingComplaint, setPresentingComplaint] = useState('');
   const [history, setHistory] = useState('');
   const [investigations, setInvestigations] = useState('');
   const [management, setManagement] = useState('');
+  const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
+  const [hospital, setHospital] = useState('');
+  const [referralCenter, setReferralCenter] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [discussion, setDiscussion] = useState('');
   const [mediaUrls, setMediaUrls] = useState([]);
   const [error, setError] = useState('');
   const cloudinaryRef = useRef();
@@ -69,10 +74,15 @@ export default function CaseForm() {
     try {
       const caseData = {
         title,
-        presentingComplaint: complaint,
+        presentingComplaint,
         history,
         investigations,
         management,
+        provisionalDiagnosis,
+        hospital,
+        referralCenter,
+        specialty,
+        discussion,
         mediaUrls,
         createdAt: new Date(),
         userId: user.uid,
@@ -95,65 +105,115 @@ export default function CaseForm() {
 
   return (
     <div className={styles.caseForm}>
-      <h2>Add New Case</h2>
+      <h2>Submit Case Report</h2>
       {authError && <p className={styles.error}>Auth Error: {authError}</p>}
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Case Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Presenting Complaint"
-          value={complaint}
-          onChange={(e) => setComplaint(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="History of Presenting Complaint"
-          value={history}
-          onChange={(e) => setHistory(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Investigations"
-          value={investigations}
-          onChange={(e) => setInvestigations(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Management"
-          value={management}
-          onChange={(e) => setManagement(e.target.value)}
-          required
-        />
-        <button
-          type="button"
-          onClick={() => widgetRef.current?.open()}
-          className={styles.uploadButton}
-        >
-          Upload Images
-        </button>
-        {mediaUrls.length > 0 && (
-          <div>
-            <p>Uploaded images:</p>
-            <ul>
-              {mediaUrls.map((url, index) => (
-                <li key={index}>
-                  <a href={url} target="_blank" rel="noopener noreferrer">
-                    View Image {index + 1}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <button type="submit" disabled={!user}>Submit Case</button>
+        <div className={styles.section}>
+          <h3>Case Overview</h3>
+          <input
+            type="text"
+            placeholder="Case Title *"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <textarea
+            placeholder="Presenting Complaint *"
+            value={presentingComplaint}
+            onChange={(e) => setPresentingComplaint(e.target.value)}
+            required
+          />
+          <select
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+            required
+          >
+            <option value="">Select Specialty *</option>
+            <option value="Internal Medicine">Internal Medicine</option>
+            <option value="Surgery">Surgery</option>
+            <option value="Pediatrics">Pediatrics</option>
+            <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Neurology">Neurology</option>
+            <option value="Orthopedics">Orthopedics</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div className={styles.section}>
+          <h3>Clinical Details</h3>
+          <textarea
+            placeholder="History of Presenting Complaint"
+            value={history}
+            onChange={(e) => setHistory(e.target.value)}
+          />
+          <textarea
+            placeholder="Investigations"
+            value={investigations}
+            onChange={(e) => setInvestigations(e.target.value)}
+          />
+          <textarea
+            placeholder="Management"
+            value={management}
+            onChange={(e) => setManagement(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Provisional Diagnosis"
+            value={provisionalDiagnosis}
+            onChange={(e) => setProvisionalDiagnosis(e.target.value)}
+          />
+        </div>
+        <div className={styles.section}>
+          <h3>Case Context</h3>
+          <input
+            type="text"
+            placeholder="Hospital Name"
+            value={hospital}
+            onChange={(e) => setHospital(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Referral Center (if applicable)"
+            value={referralCenter}
+            onChange={(e) => setReferralCenter(e.target.value)}
+          />
+        </div>
+        <div className={styles.section}>
+          <h3>Discussion</h3>
+          <textarea
+            placeholder="Discussion (e.g., clinical implications, challenges, learning points)"
+            value={discussion}
+            onChange={(e) => setDiscussion(e.target.value)}
+            className={styles.discussion}
+          />
+        </div>
+        <div className={styles.section}>
+          <h3>Images</h3>
+          <button
+            type="button"
+            onClick={() => widgetRef.current?.open()}
+            className={styles.uploadButton}
+          >
+            Upload Images
+          </button>
+          {mediaUrls.length > 0 && (
+            <div>
+              <p>Uploaded images:</p>
+              <ul>
+                {mediaUrls.map((url, index) => (
+                  <li key={index}>
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      View Image {index + 1}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        <button type="submit" disabled={!user}>Submit Case Report</button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
   );
 }
-
