@@ -1,9 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
-import formidable from 'formidable';
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: {
+      sizeLimit: '4mb',
+    },
   },
 };
 
@@ -24,18 +25,15 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'User ID is required' });
     }
 
-    const form = formidable({ multiples: false });
-    const [fields, files] = await form.parse(req);
-    const file = files.file?.[0];
-
+    const { file } = req.body;
     if (!file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
-        file.filepath,
-        { folder: `cases/${userId}` },
+        file,
+        { folder: `cases/${userId}`, resource_type: 'image' },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
