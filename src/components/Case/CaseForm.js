@@ -3,9 +3,10 @@ import { useRouter } from 'next/router';
 import { addCase } from '../../firebase/firestore';
 import { uploadImage } from '../../lib/cloudinary';
 import styles from '../../styles/caseForm.module.css';
-import { auth } from '../../firebase/config';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function CaseForm() {
+  const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [complaint, setComplaint] = useState('');
   const [history, setHistory] = useState('');
@@ -17,14 +18,14 @@ export default function CaseForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!auth.currentUser) {
+    if (!user) {
       setError('You must be logged in to submit a case.');
       return;
     }
     try {
       let imageUrl = '';
       if (image) {
-        imageUrl = await uploadImage(image, auth.currentUser.uid);
+        imageUrl = await uploadImage(image, user.uid);
       }
       await addCase({
         title,
@@ -34,8 +35,8 @@ export default function CaseForm() {
         management,
         imageUrl,
         createdAt: new Date(),
-        userId: auth.currentUser.uid,
-        userName: auth.currentUser.displayName,
+        userId: user.uid,
+        userName: user.displayName || 'Anonymous',
       });
       router.push('/cases');
     } catch (err) {
