@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { signup } from '../../firebase/auth';
-import { User, Mail, Lock } from 'lucide-react';
+import { User, Mail, Lock, AlertCircle } from 'lucide-react';
 import styles from './signup.module.css';
 
 export default function Signup() {
@@ -13,11 +13,13 @@ export default function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       await signup(email, password, name);
       router.push('/profile/edit');
     } catch (err) {
-      setError(err.message);
+      console.error('Signup error in component:', err);
+      setError(err.message || 'Failed to sign up. Please try again.');
     }
   };
 
@@ -36,6 +38,7 @@ export default function Signup() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            aria-label="Full Name"
           />
         </div>
         <div className={styles.inputWrapper}>
@@ -46,6 +49,7 @@ export default function Signup() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            aria-label="Email"
           />
         </div>
         <div className={styles.inputWrapper}>
@@ -56,10 +60,18 @@ export default function Signup() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            aria-label="Password"
           />
         </div>
-        <button type="submit">Sign Up</button>
-        {error && <p className={styles.error}>{error}</p>}
+        <button type="submit" className={styles.submitButton}>
+          Sign Up
+        </button>
+        {error && (
+          <div className={styles.error}>
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
       </form>
     </div>
   );
