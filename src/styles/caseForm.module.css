@@ -57,7 +57,7 @@
   background-color: #2980b9;
 }
 
-button[type="submit"] {
+.submitButton {
   background-color: #2ecc71;
   color: #ffffff;
   padding: 0.75rem 1.5rem;
@@ -67,11 +67,11 @@ button[type="submit"] {
   font-size: 1rem;
 }
 
-button[type="submit"]:hover {
+.submitButton:hover {
   background-color: #27ae60;
 }
 
-button[type="submit"]:disabled {
+.submitButton:disabled {
   background-color: #95a5a6;
   cursor: not-allowed;
 }
@@ -142,15 +142,15 @@ button[type="submit"]:disabled {
   background-color: #4d94ff;
 }
 
-:global(body.dark-mode) button[type="submit"] {
+:global(body.dark-mode) .submitButton {
   background-color: #27ae60;
 }
 
-:global(body.dark-mode) button[type="submit"]:hover {
+:global(body.dark-mode) .submitButton:hover {
   background-color: #219653;
 }
 
-:global(body.dark-mode) button[type="submit"]:disabled {
+:global(body.dark-mode) .submitButton:disabled {
   background-color: #7f8c8d;
 }
 
