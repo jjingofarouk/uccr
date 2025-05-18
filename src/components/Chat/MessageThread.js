@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { sendMessage, getMessages } from '../../firebase/firestore';
-import styles from '../../styles/globals.css';
 
 export default function MessageThread({ threadId, otherUserName }) {
   const { user } = useAuth();
