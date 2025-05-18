@@ -55,7 +55,7 @@ export default function Navbar() {
                 <button onClick={() => { logout(); toggleSidebar(); }} className={styles.sidebarButton}>Logout</button>
               ) : (
                 <>
-                  <Link href="/login" onClick={toggleSidebar}  className={styles.navLink}>Login</Link>
+                  <Link href="/login" onClick={toggleSidebar} className={styles.navLink}>Login</Link>
                   <Link href="/signup" onClick={toggleSidebar} className={styles.navLink}>Sign Up</Link>
                 </>
               )}
