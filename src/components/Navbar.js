@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
 import { Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import './navbar.module.css';
+import '../styles/navbar.module.css';
 
 export default function Navbar() {
   const { user } = useAuth();
