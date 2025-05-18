@@ -57,7 +57,7 @@
   background-color: #2980b9;
 }
 
-button[type="submit"] {
+.submitButton {
   background-color: #2ecc71;
   color: #ffffff;
   padding: 0.75rem 1.5rem;
@@ -67,7 +67,7 @@ button[type="submit"] {
   font-size: 1rem;
 }
 
-button[type="submit"]:hover {
+.submitButton:hover {
   background-color: #27ae60;
 }
 
@@ -137,11 +137,11 @@ button[type="submit"]:hover {
   background-color: #4d94ff;
 }
 
-:global(body.dark-mode) button[type="submit"] {
+:global(body.dark-mode) .submitButton {
   background-color: #27ae60;
 }
 
-:global(body.dark-mode) button[type="submit"]:hover {
+:global(body.dark-mode) .submitButton:hover {
   background-color: #219653;
 }
 
