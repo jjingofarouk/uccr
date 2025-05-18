@@ -1,13 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { updateProfile } from '../../firebase/auth';
+import { updateProfile, updateUserProfile } from '../../firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
   const { user, loading } = useAuth();
   const [name, setName] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [education, setEducation] = useState('');
+  const [institution, setInstitution] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [bio, setBio] = useState('');
   const [error, setError] = useState('');
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
@@ -17,6 +24,23 @@ export default function ProfileEdit() {
     if (user) {
       setName(user.displayName || '');
       setPhotoUrl(user.photoURL || '');
+      // Fetch additional profile data from Firestore
+      const fetchProfile = async () => {
+        try {
+          const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
+          if (profileDoc.exists()) {
+            const data = profileDoc.data();
+            setTitle(data.title || '');
+            setEducation(data.education || '');
+            setInstitution(data.institution || '');
+            setSpecialty(data.specialty || '');
+            setBio(data.bio || '');
+          }
+        } catch (err) {
+          console.error('Profile fetch error:', err);
+        }
+      };
+      fetchProfile();
     }
   }, [user]);
 
@@ -59,7 +83,19 @@ export default function ProfileEdit() {
       return;
     }
     try {
+      // Update Firebase Authentication profile
       await updateProfile(user, name, photoUrl);
+
+      // Update Firestore profile
+      await setDoc(doc(db, 'profiles', user.uid), {
+        title,
+        education,
+        institution,
+        specialty,
+        bio,
+        updatedAt: new Date(),
+      }, { merge: true });
+
       router.push('/profile');
     } catch (err) {
       setError(err.message);
@@ -74,21 +110,70 @@ export default function ProfileEdit() {
     <div className={styles.profileEdit}>
       <h2>Edit Profile</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <button
-          type="button"
-          onClick={() => widgetRef.current?.open()}
-          className={styles.uploadButton}
-        >
-          Upload Profile Photo
-        </button>
-        {photoUrl && <p>Photo uploaded: <a href={photoUrl} target="_blank">View</a></p>}
+        <div className={styles.section}>
+          <h3>Personal Information</h3>
+          <input
+            type="text"
+            placeholder="Full Name *"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Professional Title (e.g., Dr., Prof., Medical Student)"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div className={styles.section}>
+          <h3>Education & Affiliation</h3>
+          <textarea
+            placeholder="Education (e.g., MBChB, MSc, PhD)"
+            value={education}
+            onChange={(e) => setEducation(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Institution (e.g., Makerere University, Mulago Hospital)"
+            value={institution}
+            onChange={(e) => setInstitution(e.target.value)}
+          />
+          <select
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+          >
+            <option value="">Select Specialty (Optional)</option>
+            <option value="Internal Medicine">Internal Medicine</option>
+            <option value="Surgery">Surgery</option>
+            <option value="Pediatrics">Pediatrics</option>
+            <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Neurology">Neurology</option>
+            <option value="Orthopedics">Orthopedics</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div className={styles.section}>
+          <h3>Profile Photo</h3>
+          <button
+            type="button"
+            onClick={() => widgetRef.current?.open()}
+            className={styles.uploadButton}
+          >
+            Upload Profile Photo
+          </button>
+          {photoUrl && <p>Photo uploaded: <a href={photoUrl} target="_blank">View</a></p>}
+        </div>
+        <div className={styles.section}>
+          <h3>Bio</h3>
+          <textarea
+            placeholder="Brief bio (e.g., research interests, professional experience)"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className={styles.bio}
+          />
+        </div>
         <button type="submit">Save Changes</button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
