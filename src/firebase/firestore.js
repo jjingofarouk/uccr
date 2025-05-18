@@ -1,44 +1,118 @@
 import { db } from './config';
-import { collection, addDoc, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  serverTimestamp, 
+  query, 
+  where, 
+  orderBy 
+} from 'firebase/firestore';
 
+// Add a case
 export const addCase = async (caseData) => {
   console.log('addCase: Received caseData', caseData);
   await addDoc(collection(db, 'cases'), caseData);
 };
 
+// Get all cases
 export const getCases = async () => {
   const querySnapshot = await getDocs(collection(db, 'cases'));
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+// Get a case by ID
 export const getCaseById = async (id) => {
   const docRef = doc(db, 'cases', id);
   const docSnap = await getDoc(docRef);
   return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
 };
 
+// Add a comment to a case
 export const addComment = async (caseId, comment) => {
   await addDoc(collection(db, `cases/${caseId}/comments`), comment);
 };
 
+// Get comments for a case
 export const getComments = async (caseId) => {
   const querySnapshot = await getDocs(collection(db, `cases/${caseId}/comments`));
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+// Add a reaction to a case
 export const addReaction = async (caseId, userId, type) => {
   await setDoc(doc(db, `cases/${caseId}/reactions`, userId), { type });
 };
 
-export const sendMessage = async (threadId, senderId, text) => {
-  await addDoc(collection(db, `messages/${threadId}/messages`), {
-    senderId,
-    text,
-    createdAt: new Date(),
-  });
+// Fetch all users (for recipient selection)
+export const getUsers = async () => {
+  try {
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    return usersSnapshot.docs.map(doc => ({
+      uid: doc.id,
+      displayName: doc.data().displayName || 'User',
+    }));
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
 };
 
+// Send a message (create or update a thread)
+export const sendMessage = async ({ senderId, recipientId, senderName, recipientName, text }) => {
+  try {
+    // Create a unique thread ID by sorting user IDs
+    const threadId = [senderId, recipientId].sort().join('_');
+    const threadRef = doc(db, 'messages', threadId);
+
+    // Add message to subcollection
+    await addDoc(collection(threadRef, 'messages'), {
+      senderId,
+      text,
+      timestamp: serverTimestamp(),
+    });
+
+    // Update thread metadata
+    await setDoc(threadRef, {
+      participants: [senderId, recipientId],
+      userNames: {
+        [senderId]: senderName,
+        [recipientId]: recipientName,
+      },
+      lastMessage: text,
+      timestamp: serverTimestamp(),
+    }, { merge: true });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    throw error;
+  }
+};
+
+// Get message threads for a user
 export const getMessages = async (userId) => {
-  const querySnapshot = await getDocs(collection(db, 'messages'));
-  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  try {
+    const threads = [];
+    const q = query(
+      collection(db, 'messages'),
+      where('participants', 'array-contains', userId),
+      orderBy('timestamp', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const otherUserId = data.participants.find(id => id !== userId);
+      threads.push({
+        id: doc.id,
+        otherUserName: data.userNames[otherUserId] || 'User',
+        lastMessage: data.lastMessage || '',
+      });
+    });
+    return threads;
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    return [];
+  }
 };
