@@ -39,7 +39,6 @@ export const sendMessage = async (threadId, senderId, text) => {
 };
 
 export const getMessages = async (userId) => {
-  // Simplified: Fetch threads where user is involved
   const querySnapshot = await getDocs(collection(db, 'messages'));
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
