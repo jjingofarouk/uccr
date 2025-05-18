@@ -2,11 +2,8 @@ import { db } from './config';
 import { collection, addDoc, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 
 export const addCase = async (caseData) => {
-  await addDoc(collection(db, 'cases'), {
-    ...caseData,
-    userId: auth.currentUser.uid,
-    userName: auth.currentUser.displayName,
-  });
+  console.log('addCase: Received caseData', caseData);
+  await addDoc(collection(db, 'cases'), caseData);
 };
 
 export const getCases = async () => {
