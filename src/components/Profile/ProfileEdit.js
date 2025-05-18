@@ -174,7 +174,7 @@ export default function ProfileEdit() {
             onChange={(e) => setBio(e.target.value)}
           />
         </div>
-        <button type="submit">Save Changes</button>
+        <button type="submit" className={styles.submitButton}>Save Changes</button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
