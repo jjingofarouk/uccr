@@ -1,4 +1,5 @@
-How would I update this import { db } from './config';
+
+import { db } from './config';
 import { collection, addDoc, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 
 export const addCase = async (caseData) => {
