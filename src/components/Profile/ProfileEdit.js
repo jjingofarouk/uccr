@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../../hooks/useAuth';
-import { updateProfile } from '../../firebase/auth';
+import { useAuth } from '../hooks/useAuth';
+import { updateProfile } from '../firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import styles from '../../styles/profileEdit.module.css';
+import { db } from '../firebase/config';
+import { v4 as uuidv4 } from 'uuid';
+import styles from '../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
   const { user, loading } = useAuth();
@@ -36,7 +37,7 @@ export default function ProfileEdit() {
             setBio(data.bio || '');
           }
         } catch (err) {
-          console.error('Profile fetch error:', err);
+          setError('Failed to load profile.');
         }
       };
       fetchProfile();
@@ -44,35 +45,38 @@ export default function ProfileEdit() {
   }, [user]);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
-    script.async = true;
-    document.body.appendChild(script);
+    if (typeof window !== 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
+      script.async = true;
+      document.body.appendChild(script);
 
-    script.onload = () => {
-      cloudinaryRef.current = window.cloudinary;
-      widgetRef.current = cloudinaryRef.current.createUploadWidget(
-        {
-          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-          folder: user ? `profiles/${user.uid}` : 'profiles',
-          sources: ['local', 'camera'],
-          multiple: false,
-          resourceType: 'image',
-        },
-        (error, result) => {
-          if (!error && result && result.event === 'success') {
-            setPhotoUrl(result.info.secure_url);
-          } else if (error) {
-            setError('Image upload failed: ' + error.message);
+      script.onload = () => {
+        cloudinaryRef.current = window.cloudinary;
+        widgetRef.current = cloudinaryRef.current.createUploadWidget(
+          {
+            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+            uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+            folder: `profiles/${user?.uid || 'anonymous'}`,
+            sources: ['local', 'camera'],
+            multiple: false,
+            resourceType: 'image',
+            public_id: `profile_${uuidv4()}`,
+          },
+          (error, result) => {
+            if (!error && result && result.event === 'success') {
+              setPhotoUrl(result.info.secure_url);
+            } else if (error) {
+              setError('Image upload failed.');
+            }
           }
-        }
-      );
-    };
+        );
+      };
 
-    return () => {
-      document.body.removeChild(script);
-    };
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
   }, [user]);
 
   const handleSubmit = async (e) => {
@@ -83,17 +87,21 @@ export default function ProfileEdit() {
     }
     try {
       await updateProfile(user, name, photoUrl);
-      await setDoc(doc(db, 'profiles', user.uid), {
-        title,
-        education,
-        institution,
-        specialty,
-        bio,
-        updatedAt: new Date(),
-      }, { merge: true });
+      await setDoc(
+        doc(db, 'profiles', user.uid),
+        {
+          title,
+          education,
+          institution,
+          specialty,
+          bio,
+          updatedAt: new Date(),
+        },
+        { merge: true }
+      );
       router.push('/profile');
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to update profile.');
     }
   };
 
@@ -163,7 +171,11 @@ export default function ProfileEdit() {
           >
             Upload Profile Photo
           </button>
-          {photoUrl && <p>Photo uploaded: <a href={photoUrl} target="_blank">View</a></p>}
+          {photoUrl && (
+            <p>
+              Photo uploaded: <a href={photoUrl} target="_blank" rel="noopener noreferrer">View</a>
+            </p>
+          )}
         </div>
         <div className={styles.section}>
           <h3>Bio</h3>
