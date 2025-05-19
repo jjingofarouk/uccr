@@ -115,8 +115,11 @@ export const getUsers = async () => {
 
 export const sendMessage = async ({ senderId, recipientId, senderName, recipientName, text }) => {
   try {
-    if (!senderId || !recipientId || !text.trim()) {
+    if (!senderId || !recipientId || !text?.trim()) {
       throw new Error('Missing required fields: senderId, recipientId, or text');
+    }
+    if (senderId === recipientId) {
+      throw new Error('Cannot send message to self');
     }
     const threadId = [senderId, recipientId].sort().join('_');
     const threadRef = doc(db, 'messages', threadId);
@@ -143,7 +146,7 @@ export const sendMessage = async ({ senderId, recipientId, senderName, recipient
 
     return messageRef.id;
   } catch (error) {
-    console.error('Error sending message:', error.message, error);
+    console.error('Error sending message:', error.message, error.code, error);
     throw new Error(error.message || 'Failed to send message');
   }
 };
