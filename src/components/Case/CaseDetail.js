@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
 import { Award } from 'lucide-react';
@@ -31,15 +32,19 @@ export default function CaseDetail({ caseData }) {
         <h1 className={styles.title}>{caseData.title || 'Untitled Case'}</h1>
         <div className={styles.meta}>
           <div className={styles.author}>
-            <Image
-              src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
-              alt={caseData.userName || 'Contributor'}
-              width={40}
-              height={40}
-              className={styles.avatar}
-              onError={(e) => console.error('Author image error:', caseData.photoURL)}
-            />
-            <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
+            <Link href={`/profile/view/${caseData.userId}`}>
+              <Image
+                src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
+                alt={caseData.userName || 'Contributor'}
+                width={40}
+                height={40}
+                className={styles.avatar}
+                onError={(e) => console.error('Author image error:', caseData.photoURL)}
+              />
+            </Link>
+            <Link href={`/profile/view/${caseData.userId}`}>
+              <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
+            </Link>
           </div>
           <time className={styles.date}>
             {caseData.createdAt
@@ -89,7 +94,7 @@ export default function CaseDetail({ caseData }) {
         </div>
         <div className={styles.section}>
           <h2>Provisional Diagnosis</h2>
-          <p>{caseData.presentingComplaint || 'Not specified'}</p>
+          <p>{caseData.provisionalDiagnosis || 'Not specified'}</p>
         </div>
         <div className={styles.section}>
           <h2>Hospital</h2>
