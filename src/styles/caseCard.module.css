@@ -123,3 +123,10 @@
   }
 
   .concern {
+    font-size: 0.9rem;
+  }
+
+  .contributor {
+    font-size: 0.85rem;
+  }
+}
