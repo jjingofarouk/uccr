@@ -181,6 +181,49 @@
   color: #e2e8f0;
 }
 
+.voteButtons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.voteButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.voteButton:hover:not(:disabled) {
+  background: #edf2f7;
+  color: #2d3748;
+}
+
+.dark-mode .voteButton {
+  color: #a0aec0;
+}
+
+.dark-mode .voteButton:hover:not(:disabled) {
+  background: #4a5568;
+  color: #e2e8f0;
+}
+
+.voteButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.voteCount {
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+}
+
 .replyButton {
   background: none;
   border: none;
