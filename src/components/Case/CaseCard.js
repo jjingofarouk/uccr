@@ -4,7 +4,7 @@ import Image from 'next/image';
 import styles from '../../styles/caseCard.module.css';
 
 export default function CaseCard({ caseData }) {
-  const defaultImage = '/placeholder-case-image.jpg'; // Fallback image if none provided
+  const defaultImage = '/images/doctor-avatar.jpeg';
 
   return (
     <Link href={`/cases/${caseData.id}`} className={styles.card}>
@@ -12,8 +12,8 @@ export default function CaseCard({ caseData }) {
         <Image
           src={caseData.mediaUrls?.[0] || defaultImage}
           alt={caseData.title}
-          width={200}
-          height={150}
+          width={280}
+          height={180}
           className={styles.image}
           objectFit="cover"
         />
@@ -23,9 +23,16 @@ export default function CaseCard({ caseData }) {
         <p className={styles.concern}>
           <strong>Chief Concern:</strong> {caseData.presentingComplaint || 'Not specified'}
         </p>
-        <p className={styles.contributor}>
-          <strong>By:</strong> {caseData.userName || 'Anonymous'}
-        </p>
+        <div className={styles.contributor}>
+          <Image
+            src={caseData.userPhoto || '/images/doctor-avatar.jpeg'}
+            alt={caseData.userName || 'Contributor'}
+            width={24}
+            height={24}
+            className={styles.contributorAvatar}
+          />
+          <span>{caseData.userName || 'Anonymous'}</span>
+        </div>
       </div>
     </Link>
   );
