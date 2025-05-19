@@ -1,3 +1,4 @@
+/* src/styles/caseCard.module.css */
 .card {
   background: #ffffff;
   border-radius: 12px;
@@ -22,6 +23,10 @@
 
 .dark-mode .card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.noImageCard {
+  padding-top: 16px;
 }
 
 .imageContainer {
@@ -92,6 +97,13 @@
   object-fit: cover;
 }
 
+.error {
+  padding: 16px;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 8px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
   .card {
@@ -102,15 +114,12 @@
     height: 150px;
   }
 
+  .noImageCard {
+    padding-top: 12px;
+  }
+
   .title {
     font-size: 1.1rem;
   }
 
   .concern {
-    font-size: 0.9rem;
-  }
-
-  .contributor {
-    font-size: 0.85rem;
-  }
-}
