@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getMessages, getUsers, sendMessage, getThreadMessages, getProfile } from '../../firebase/firestore';
 import Navbar from '../../components/Navbar';
 import { Search, Send, AlertCircle } from 'lucide-react';
-import styles from './styles/inbox.module.css';
+import styles from './inbox.module.css';
 
 export default function Inbox() {
   const { user } = useAuth();
