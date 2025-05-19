@@ -1,122 +1,109 @@
+/* components/navbar.module.css */
+
 .header {
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   width: 100%;
-  z-index: 1000;
+  background-color: #ffffff;
+  border-bottom: 1px solid #d1d5db;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .dark-mode .header {
-  background: #1a202c;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: #1f232a;
+  border-bottom: 1px solid #4b5563;
 }
 
 .headerContent {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 64px;
+  box-sizing: border-box;
 }
 
 .logo {
-  font-family: 'Inter', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #007bff;
+  color: #3b82f6;
   text-decoration: none;
-  letter-spacing: -0.025em;
 }
 
 .dark-mode .logo {
-  color: #4299e1;
+  color: #60a5fa;
 }
 
 .headerControls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1rem;
 }
 
-.themeToggle {
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease;
-}
-
-.themeToggle:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.dark-mode .themeToggle:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.themeToggle svg {
-  color: #2d3748;
-}
-
-.dark-mode .themeToggle svg {
-  color: #e2e8f0;
-}
-
+.themeToggle,
 .userButton {
   background: none;
   border: none;
-  padding: 0;
+  padding: 0.5rem;
   cursor: pointer;
+  color: #1a202c;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.themeToggle:hover,
+.userButton:hover {
+  background-color: #f3f4f6;
+}
+
+.dark-mode .themeToggle,
+.dark-mode .userButton {
+  color: #e2e8f0;
+}
+
+.dark-mode .themeToggle:hover,
+.dark-mode .userButton:hover {
+  background-color: #2a2e35;
+}
+
+.userButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .userAvatar {
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #e2e8f0;
-}
-
-.dark-mode .userAvatar {
-  border-color: #4a5568;
 }
 
 .sidebar {
   position: fixed;
-  top: 64px;
+  top: 0;
   right: 0;
   width: 280px;
-  height: calc(100vh - 64px);
-  background: #ffffff;
-  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
-  border-left: 1px solid #e2e8f0;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
 }
 
 .dark-mode .sidebar {
-  background: #2d3748;
-  border-left-color: #4a5568;
+  background-color: #1f232a;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
 }
 
 .sidebarHeader {
-  padding: 20px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.dark-mode .sidebarHeader {
-  border-bottom-color: #4a5568;
+  margin-bottom: 2rem;
 }
 
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1rem;
 }
 
 .sidebarAvatar {
@@ -125,8 +112,7 @@
 }
 
 .userName {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: #1a202c;
 }
@@ -138,55 +124,187 @@
 .sidebarNav {
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  gap: 8px;
+  gap: 1rem;
 }
 
-.navLink {
-  font-family: 'Inter', sans-serif;
+.navLink,
+.sidebarButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
-  color: #2d3748;
+  font-weight: 500;
+  color: #1a202c;
   text-decoration: none;
-  padding: 12px 16px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.navLink:hover {
-  background: #edf2f7;
-  color: #007bff;
-}
-
-.dark-mode .navLink {
-  color: #e2e8f0;
-}
-
-.dark-mode .navLink:hover {
-  background: #4a5568;
-  color: #4299e1;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sidebarButton {
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  color: #e53e3e;
   background: none;
   border: none;
-  padding: 12px 16px;
-  text-align: left;
-  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  text-align: left;
 }
 
+.navLink:hover,
 .sidebarButton:hover {
-  background: #fef5f5;
+  background-color: #f3f4f6;
+  color: #3b82f6;
 }
 
+.dark-mode .navLink,
 .dark-mode .sidebarButton {
-  color: #f687b3;
+  color: #e2e8f0;
 }
 
+.dark-mode .navLink:hover,
 .dark-mode .sidebarButton:hover {
-  background: #742a2a;
+  background-color: #2a2e35;
+  color: #60a5fa;
+}
+
+.navIcon {
+  color: #6b7280;
+}
+
+.dark-mode .navIcon {
+  color: #9ca3af;
+}
+
+.navLink:hover .navIcon,
+.sidebarButton:hover .navIcon {
+  color: #3b82f6;
+}
+
+.dark-mode .navLink:hover .navIcon,
+.dark-mode .sidebarButton:hover .navIcon {
+  color: #60a5fa;
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    padding: 1rem;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+  }
+
+  .themeToggle,
+  .userButton {
+    padding: 0.4rem;
+  }
+
+  .sidebar {
+    width: 240px;
+    padding: 1rem;
+  }
+
+  .userName {
+    font-size: 1rem;
+  }
+
+  .navLink,
+  .sidebarButton {
+    font-size: 0.95rem;
+    padding: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerContent {
+    padding: 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.125rem;
+  }
+
+  .themeToggle,
+  .userButton {
+    padding: 0.3rem;
+  }
+
+  .userAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+
+  .sidebarAvatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .userName {
+    font-size: 0.9rem;
+  }
+
+  .navLink,
+  .sidebarButton {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .header {
+    background: #ffffff;
+    border-bottom: 2px solid #000000;
+  }
+
+  .dark-mode .header {
+    background: #000000;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  .logo,
+  .userName,
+  .navLink,
+  .sidebarButton {
+    color: #000000;
+  }
+
+  .dark-mode .logo,
+  .dark-mode .userName,
+  .dark-mode .navLink,
+  .dark-mode .sidebarButton {
+    color: #ffffff;
+  }
+
+  .themeToggle,
+  .userButton {
+    color: #000000;
+  }
+
+  .dark-mode .themeToggle,
+  .dark-mode .userButton {
+    color: #ffffff;
+  }
+
+  .navIcon {
+    color: #000000;
+  }
+
+  .dark-mode .navIcon {
+    color: #ffffff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .themeToggle,
+  .userButton,
+  .navLink,
+  .sidebarButton {
+    transition: none;
+  }
+
+  .sidebar {
+    transition: none;
+  }
 }
