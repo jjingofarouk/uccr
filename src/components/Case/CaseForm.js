@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { addCase } from '../../firebase/firestore';
-import styles from '../../styles/caseForm.module.css';
-import { useAuth } from '../../hooks/useAuth';
+import { addCase } from '../firebase/firestore';
+import { useAuth } from '../hooks/useAuth';
+import { v4 as uuidv4 } from 'uuid';
+import styles from '../styles/caseForm.module.css';
 
 export default function CaseForm() {
   const { user, loading, error: authError } = useAuth();
@@ -22,53 +23,49 @@ export default function CaseForm() {
   const widgetRef = useRef();
   const router = useRouter();
 
-  console.log('CaseForm: Auth state', { user: user ? { uid: user.uid, displayName: user.displayName } : null, loading, authError });
-
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
-    script.async = true;
-    document.body.appendChild(script);
+    if (typeof window !== 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
+      script.async = true;
+      document.body.appendChild(script);
 
-    script.onload = () => {
-      cloudinaryRef.current = window.cloudinary;
-      widgetRef.current = cloudinaryRef.current.createUploadWidget(
-        {
-          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-          folder: 'cases',
-          sources: ['local', 'camera'],
-          multiple: true,
-          resourceType: 'image',
-        },
-        (error, result) => {
-          if (!error && result && result.event === 'success') {
-            console.log('CaseForm: Image uploaded', result.info.secure_url);
-            setMediaUrls((prev) => [...prev, result.info.secure_url]);
-          } else if (error) {
-            console.error('CaseForm: Upload error', error);
-            setError('Image upload failed: ' + error.message);
+      script.onload = () => {
+        cloudinaryRef.current = window.cloudinary;
+        widgetRef.current = cloudinaryRef.current.createUploadWidget(
+          {
+            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+            uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+            folder: `cases/${user?.uid || 'anonymous'}`,
+            sources: ['local', 'camera'],
+            multiple: true,
+            resourceType: 'image',
+            public_id: `case_${uuidv4()}`,
+          },
+          (error, result) => {
+            if (!error && result && result.event === 'success') {
+              setMediaUrls((prev) => [...prev, result.info.secure_url]);
+            } else if (error) {
+              setError('Image upload failed.');
+            }
           }
-        }
-      );
-    };
+        );
+      };
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('CaseForm: handleSubmit called', { user: user ? { uid: user.uid } : null, loading });
     if (loading) {
-      setError('Authentication is still loading. Please wait.');
-      console.log('CaseForm: Submission blocked due to loading');
+      setError('Please wait, authentication is loading.');
       return;
     }
     if (!user) {
       setError('You must be logged in to submit a case.');
-      console.log('CaseForm: Submission blocked due to no user');
       return;
     }
     try {
@@ -88,18 +85,14 @@ export default function CaseForm() {
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
       };
-      console.log('CaseForm: Submitting case', caseData);
       await addCase(caseData);
-      console.log('CaseForm: Case submitted successfully');
       router.push('/cases');
     } catch (err) {
-      console.error('CaseForm: Submission error', err);
-      setError(err.message);
+      setError(err.message || 'Failed to submit case.');
     }
   };
 
   if (loading) {
-    console.log('CaseForm: Rendering loading state');
     return <p>Loading...</p>;
   }
 
@@ -220,7 +213,9 @@ export default function CaseForm() {
             </div>
           )}
         </div>
-        <button type="submit" className={styles.submitButton} disabled={!user}>Submit Case Report</button>
+        <button type="submit" className={styles.submitButton} disabled={!user}>
+          Submit Case Report
+        </button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
