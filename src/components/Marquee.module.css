@@ -1,0 +1,33 @@
+.marqueeContainer {
+  overflow: hidden;
+  width: 100%;
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  padding: 0.5rem 0;
+}
+
+.marquee {
+  white-space: nowrap;
+  display: inline-block;
+  animation: scroll var(--marquee-duration) linear infinite;
+  width: var(--marquee-width);
+  font-size: 0.95rem;
+  color: #333;
+  cursor: default;
+}
+
+.marquee span {
+  display: inline-block;
+  margin-right: 2rem;
+  font-weight: 500;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
