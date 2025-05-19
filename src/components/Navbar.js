@@ -6,7 +6,7 @@ import { logout } from '../firebase/auth';
 import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import styles from '.../styles/navbar.module.css';
+import styles from '../styles/navbar.module.css';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
