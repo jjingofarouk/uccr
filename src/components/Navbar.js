@@ -1,5 +1,5 @@
 // components/Navbar.jsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
@@ -12,8 +12,10 @@ export default function Navbar() {
   const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const sidebarRef = useRef(null);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     document.body.classList.toggle('dark-mode');
@@ -22,11 +24,27 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       await logout();
-      toggleSidebar();
+      setIsSidebarOpen(false);
     } catch (err) {
       console.error('Logout error:', err);
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    if (isSidebarOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isSidebarOpen]);
 
   return (
     <header className={styles.header}>
@@ -61,6 +79,7 @@ export default function Navbar() {
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.aside
+            ref={sidebarRef}
             className={styles.sidebar}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
