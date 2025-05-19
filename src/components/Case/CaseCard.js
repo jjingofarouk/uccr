@@ -1,30 +1,32 @@
+// components/Case/CaseCard.jsx
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '../../styles/caseCard.module.css';
 
 export default function CaseCard({ caseData }) {
+  const defaultImage = '/placeholder-case-image.jpg'; // Fallback image if none provided
+
   return (
-    <div className={styles.card}>
-      <h2>{caseData.title}</h2>
-      <p><strong>Specialty:</strong> {caseData.specialty || 'Not specified'}</p>
-      <p><strong>Complaint:</strong> {caseData.presentingComplaint}</p>
-      <p><strong>Provisional Diagnosis:</strong> {caseData.provisionalDiagnosis || 'Not specified'}</p>
-      <p><strong>Hospital:</strong> {caseData.hospital || 'Not specified'}</p>
-      <p><strong>Posted by:</strong> {caseData.userName || 'Anonymous'}</p>
-      {caseData.mediaUrls && caseData.mediaUrls.length > 0 && (
-        <div className={styles.media}>
-          {caseData.mediaUrls.map((url, index) => (
-            <img
-              key={index}
-              src={url}
-              alt={`${caseData.title} ${index + 1}`}
-              className={styles.image}
-            />
-          ))}
-        </div>
-      )}
-      <Link href={`/cases/${caseData.id}`} className={styles.link}>
-        View Full Report
-      </Link>
-    </div>
+    <Link href={`/cases/${caseData.id}`} className={styles.card}>
+      <div className={styles.imageContainer}>
+        <Image
+          src={caseData.mediaUrls?.[0] || defaultImage}
+          alt={caseData.title}
+          width={200}
+          height={150}
+          className={styles.image}
+          objectFit="cover"
+        />
+      </div>
+      <div className={styles.content}>
+        <h3 className={styles.title}>{caseData.title}</h3>
+        <p className={styles.concern}>
+          <strong>Chief Concern:</strong> {caseData.presentingComplaint || 'Not specified'}
+        </p>
+        <p className={styles.contributor}>
+          <strong>By:</strong> {caseData.userName || 'Anonymous'}
+        </p>
+      </div>
+    </Link>
   );
 }
