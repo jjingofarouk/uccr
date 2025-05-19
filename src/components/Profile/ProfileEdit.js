@@ -1,42 +1,43 @@
-// components/ProfileEdit.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { v4 as uuidv4 } from 'uuid';
+import Image from 'next/image';
 import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
-  const { user, loading } = useAuth();
-  const [name, setName] = useState('');
-  const [photoUrl, setPhotoUrl] = useState('');
-  const [title, setTitle] = useState('');
-  const [education, setEducation] = useState('');
-  const [institution, setInstitution] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [bio, setBio] = useState('');
+  const { user, loading, refreshProfile } = useAuth();
+  const [formData, setFormData] = useState({
+    name: '',
+    photoUrl: '',
+    title: '',
+    education: '',
+    institution: '',
+    specialty: '',
+    bio: '',
+  });
   const [error, setError] = useState('');
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
-      setName(user.displayName || '');
-      setPhotoUrl(user.photoURL || '');
+    if (user && !loading) {
       const fetchProfile = async () => {
         try {
           const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
-          if (profileDoc.exists()) {
-            const data = profileDoc.data();
-            setTitle(data.title || '');
-            setEducation(data.education || '');
-            setInstitution(data.institution || '');
-            setSpecialty(data.specialty || '');
-            setBio(data.bio || '');
-            setPhotoUrl(data.photoURL || user.photoURL || '');
-          }
+          const data = profileDoc.exists() ? profileDoc.data() : {};
+          setFormData({
+            name: user.displayName || data.displayName || '',
+            photoUrl: data.photoURL || user.photoURL || '',
+            title: data.title || '',
+            education: data.education || '',
+            institution: data.institution || '',
+            specialty: data.specialty || '',
+            bio: data.bio || '',
+          });
         } catch (err) {
           setError('Failed to load profile.');
           console.error('Profile fetch error:', err);
@@ -44,10 +45,10 @@ export default function ProfileEdit() {
       };
       fetchProfile();
     }
-  }, [user]);
+  }, [user, loading]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
       script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
       script.async = true;
@@ -67,11 +68,11 @@ export default function ProfileEdit() {
           },
           (error, result) => {
             if (!error && result && result.event === 'success') {
-              setPhotoUrl(result.info.secure_url);
-              console.log('Cloudinary URL:', result.info.secure_url); // Debug
+              setFormData(prev => ({ ...prev, photoUrl: result.info.secure_url }));
+              console.log('Cloudinary URL:', result.info.secure_url);
             } else if (error) {
               setError('Image upload failed.');
-              console.error('Cloudinary error:', error); // Debug
+              console.error('Cloudinary error:', error);
             }
           }
         );
@@ -83,6 +84,11 @@ export default function ProfileEdit() {
     }
   }, [user]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -90,21 +96,19 @@ export default function ProfileEdit() {
       return;
     }
     try {
-      await setDoc(
-        doc(db, 'profiles', user.uid),
-        {
-          displayName: name || user.displayName || 'User',
-          photoURL: photoUrl || user.photoURL || '/images/doctor-avatar.jpeg',
-          title,
-          education,
-          institution,
-          specialty,
-          bio,
-          updatedAt: new Date(),
-        },
-        { merge: true }
-      );
-      console.log('Profile updated with photoURL:', photoUrl); // Debug
+      const profileData = {
+        displayName: formData.name || 'User',
+        photoURL: formData.photoUrl || '/images/doctor-avatar.jpeg',
+        title: formData.title,
+        education: formData.education,
+        institution: formData.institution,
+        specialty: formData.specialty,
+        bio: formData.bio,
+        updatedAt: new Date(),
+      };
+      await setDoc(doc(db, 'profiles', user.uid), profileData, { merge: true });
+      console.log('Profile updated with photoURL:', formData.photoUrl);
+      await refreshProfile(user.uid);
       router.push('/profile');
     } catch (err) {
       setError('Failed to update profile: ' + err.message);
@@ -116,6 +120,10 @@ export default function ProfileEdit() {
     return <p>Loading...</p>;
   }
 
+  if (!user) {
+    return <p>Please log in to edit your profile.</p>;
+  }
+
   return (
     <div className={styles.profileEdit}>
       <h2>Edit Profile</h2>
@@ -125,38 +133,43 @@ export default function ProfileEdit() {
           <input
             className={styles.inputField}
             type="text"
+            name="name"
             placeholder="Full Name *"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.name}
+            onChange={handleChange}
             required
           />
           <input
             className={styles.inputField}
             type="text"
-            placeholder="Professional Title (e.g., Dr., Prof., Medical Student)"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            name="title"
+            placeholder="Professional Title (e.g., Dr., Prof.)"
+            value={formData.title}
+            onChange={handleChange}
           />
         </div>
         <div className={styles.section}>
           <h3>Education & Affiliation</h3>
           <textarea
             className={styles.textareaField}
-            placeholder="Education (e.g., MBChB, MSc, PhD)"
-            value={education}
-            onChange={(e) => setEducation(e.target.value)}
+            name="education"
+            placeholder="Education (e.g., MBChB, MSc)"
+            value={formData.education}
+            onChange={handleChange}
           />
           <input
             className={styles.inputField}
             type="text"
-            placeholder="Institution (e.g., Makerere University, Mulago Hospital)"
-            value={institution}
-            onChange={(e) => setInstitution(e.target.value)}
+            name="institution"
+            placeholder="Institution (e.g., Makerere University)"
+            value={formData.institution}
+            onChange={handleChange}
           />
           <select
             className={styles.selectField}
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
+            name="specialty"
+            value={formData.specialty}
+            onChange={handleChange}
           >
             <option value="">Select Specialty (Optional)</option>
             <option value="Internal Medicine">Internal Medicine</option>
@@ -178,16 +191,16 @@ export default function ProfileEdit() {
           >
             Upload Profile Photo
           </button>
-          {photoUrl && (
+          {formData.photoUrl && (
             <div>
               <p>
                 Photo uploaded:{' '}
-                <a href={photoUrl} target="_blank" rel="noopener noreferrer">
+                <a href={formData.photoUrl} target="_blank" rel="noopener noreferrer">
                   View
                 </a>
               </p>
               <Image
-                src={photoUrl}
+                src={formData.photoUrl}
                 alt="Profile preview"
                 width={100}
                 height={100}
@@ -200,9 +213,10 @@ export default function ProfileEdit() {
           <h3>Bio</h3>
           <textarea
             className={`${styles.textareaField} ${styles.bio}`}
-            placeholder="Brief bio (e.g., research interests, professional experience)"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            name="bio"
+            placeholder="Brief bio (e.g., research interests)"
+            value={formData.bio}
+            onChange={handleChange}
           />
         </div>
         <button type="submit" className={styles.submitButton}>
