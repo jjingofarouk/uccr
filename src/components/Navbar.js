@@ -3,10 +3,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { Moon, Sun } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import styles from '../styles/navbar.module.css';
+import styles from './navbar.module.css';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
@@ -32,7 +32,7 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={styles.headerContent}>
         <Link href="/" className={styles.logo}>
-          UCCR
+          <span>UCCR</span>
         </Link>
         <div className={styles.headerControls}>
           <button
@@ -83,39 +83,41 @@ export default function Navbar() {
             </div>
             <nav className={styles.sidebarNav}>
               <Link href="/" onClick={toggleSidebar} className={styles.navLink}>
+                <Home size={20} className={styles.navIcon} />
                 Home
               </Link>
               <Link href="/cases" onClick={toggleSidebar} className={styles.navLink}>
+                <Briefcase size={20} className={styles.navIcon} />
                 Cases
               </Link>
               {user && (
                 <Link href="/cases/new" onClick={toggleSidebar} className={styles.navLink}>
+                  <PlusCircle size={20} className={styles.navIcon} />
                   Add Case
                 </Link>
               )}
               {user && (
                 <Link href="/profile" onClick={toggleSidebar} className={styles.navLink}>
+                  <User size={20} className={styles.navIcon} />
                   Profile
                 </Link>
               )}
               {user && (
                 <Link href="/inbox" onClick={toggleSidebar} className={styles.navLink}>
+                  <Inbox size={20} className={styles.navIcon} />
                   Inbox
                 </Link>
               )}
               {user ? (
                 <button onClick={handleLogout} className={styles.sidebarButton}>
+                  <LogOut size={20} className={styles.navIcon} />
                   Logout
                 </button>
               ) : (
-                <>
-                  <Link href="/login" onClick={toggleSidebar} className={styles.navLink}>
-                    Login
-                  </Link>
-                  <Link href="/signup" onClick={toggleSidebar} className={styles.navLink}>
-                    Sign Up
-                  </Link>
-                </>
+                <Link href="/auth" onClick={toggleSidebar} className={styles.navLink}>
+                  <LogIn size={20} className={styles.navIcon} />
+                  Log In / Sign Up
+                </Link>
               )}
             </nav>
           </motion.aside>
