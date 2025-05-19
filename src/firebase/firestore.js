@@ -12,7 +12,6 @@ import {
   orderBy 
 } from 'firebase/firestore';
 
-// Add a case
 export const addCase = async (caseData) => {
   try {
     console.log('addCase: Received caseData', caseData);
@@ -28,7 +27,6 @@ export const addCase = async (caseData) => {
   }
 };
 
-// Get all cases
 export const getCases = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'cases'));
@@ -41,7 +39,6 @@ export const getCases = async () => {
   }
 };
 
-// Get a case by ID
 export const getCaseById = async (id) => {
   try {
     const docRef = doc(db, 'cases', id);
@@ -59,7 +56,6 @@ export const getCaseById = async (id) => {
   }
 };
 
-// Add a comment to a case
 export const addComment = async (caseId, comment) => {
   try {
     const commentData = {
@@ -75,7 +71,6 @@ export const addComment = async (caseId, comment) => {
   }
 };
 
-// Get comments for a case
 export const getComments = async (caseId) => {
   try {
     const q = query(
@@ -92,7 +87,6 @@ export const getComments = async (caseId) => {
   }
 };
 
-// Add a reaction to a case
 export const addReaction = async (caseId, userId, type) => {
   try {
     await setDoc(doc(db, `cases/${caseId}/reactions`, userId), { type, timestamp: serverTimestamp() });
@@ -103,7 +97,6 @@ export const addReaction = async (caseId, userId, type) => {
   }
 };
 
-// Fetch all users
 export const getUsers = async () => {
   try {
     const usersSnapshot = await getDocs(collection(db, 'users'));
@@ -120,39 +113,41 @@ export const getUsers = async () => {
   }
 };
 
-// Send a message
 export const sendMessage = async ({ senderId, recipientId, senderName, recipientName, text }) => {
   try {
+    if (!senderId || !recipientId || !text.trim()) {
+      throw new Error('Missing required fields: senderId, recipientId, or text');
+    }
     const threadId = [senderId, recipientId].sort().join('_');
     const threadRef = doc(db, 'messages', threadId);
 
     const messageData = {
       senderId,
-      text,
+      text: text.trim(),
       timestamp: serverTimestamp(),
     };
     const messageRef = await addDoc(collection(threadRef, 'messages'), messageData);
     console.log('Message sent in thread', threadId, ':', messageData);
 
-    await setDoc(threadRef, {
+    const threadData = {
       participants: [senderId, recipientId],
       userNames: {
-        [senderId]: senderName,
-        [recipientId]: recipientName,
+        [senderId]: senderName || 'User',
+        [recipientId]: recipientName || 'User',
       },
-      lastMessage: text,
+      lastMessage: text.trim(),
       timestamp: serverTimestamp(),
-    }, { merge: true });
+    };
+    await setDoc(threadRef, threadData, { merge: true });
+    console.log('Thread updated:', threadId, threadData);
 
-    console.log('Thread updated:', threadId);
     return messageRef.id;
   } catch (error) {
-    console.error('Error sending message:', error);
-    throw error;
+    console.error('Error sending message:', error.message, error);
+    throw new Error(error.message || 'Failed to send message');
   }
 };
 
-// Get message threads for a user
 export const getMessages = async (userId) => {
   try {
     const threads = [];
@@ -180,7 +175,6 @@ export const getMessages = async (userId) => {
   }
 };
 
-// Get messages for a specific thread
 export const getThreadMessages = async (threadId) => {
   try {
     const q = query(
