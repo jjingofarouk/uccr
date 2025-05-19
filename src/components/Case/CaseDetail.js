@@ -1,4 +1,3 @@
-
 // components/Case/CaseDetail.jsx
 import { useState } from 'react';
 import Image from 'next/image';
@@ -11,6 +10,8 @@ import styles from '../../styles/caseDetail.module.css';
 export default function CaseDetail({ caseData }) {
   const { user } = useAuth();
   const [error, setError] = useState('');
+
+  console.log('CaseDetail mediaUrls:', caseData.mediaUrls); // Debug
 
   const handleVote = async (type) => {
     if (!user) {
@@ -102,7 +103,7 @@ export default function CaseDetail({ caseData }) {
         </div>
       </section>
 
-      {caseData.mediaUrls?.length > 0 && (
+      {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 && (
         <section className={styles.media}>
           <h2>Media</h2>
           <div className={styles.mediaGrid}>
@@ -115,6 +116,7 @@ export default function CaseDetail({ caseData }) {
                 height={400}
                 className={styles.mediaImage}
                 objectFit="contain"
+                onError={(e) => console.error('Image load error:', url)} // Debug
               />
             ))}
           </div>
