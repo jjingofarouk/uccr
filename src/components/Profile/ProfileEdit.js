@@ -8,7 +8,7 @@ import Image from 'next/image';
 import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
-  const { user, loading, refreshProfile } = useAuth();
+  const { user, loading } = useAuth(); // Removed refreshProfile if not defined
   const [formData, setFormData] = useState({
     name: '',
     photoUrl: '',
@@ -38,6 +38,7 @@ export default function ProfileEdit() {
             specialty: data.specialty || '',
             bio: data.bio || '',
           });
+          console.log('Fetched profile photoURL:', data.photoURL); // Debug
         } catch (err) {
           setError('Failed to load profile.');
           console.error('Profile fetch error:', err);
@@ -56,30 +57,43 @@ export default function ProfileEdit() {
 
       script.onload = () => {
         cloudinaryRef.current = window.cloudinary;
-        widgetRef.current = cloudinaryRef.current.createUploadWidget(
-          {
-            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-            uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-            folder: `profiles/${user?.uid || 'anonymous'}`,
-            sources: ['local', 'camera'],
-            multiple: false,
-            resourceType: 'image',
-            public_id: `profile_${uuidv4()}`,
-          },
-          (error, result) => {
-            if (!error && result && result.event === 'success') {
-              setFormData(prev => ({ ...prev, photoUrl: result.info.secure_url }));
-              console.log('Cloudinary URL:', result.info.secure_url);
-            } else if (error) {
-              setError('Image upload failed.');
-              console.error('Cloudinary error:', error);
+        if (cloudinaryRef.current) {
+          widgetRef.current = cloudinaryRef.current.createUploadWidget(
+            {
+              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+              uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+              folder: `profiles/${user.uid}`,
+              sources: ['local', 'camera'],
+              multiple: false,
+              resourceType: 'image',
+              public_id: `profile_${uuidv4()}`,
+            },
+            (error, result) => {
+              if (!error && result && result.event === 'success') {
+                const newUrl = result.info.secure_url;
+                setFormData(prev => ({ ...prev, photoUrl: newUrl }));
+                console.log('Cloudinary uploaded URL:', newUrl); // Debug
+              } else if (error) {
+                setError('Image upload failed.');
+                console.error('Cloudinary error:', error);
+              }
             }
-          }
-        );
+          );
+        } else {
+          console.error('Cloudinary not initialized');
+          setError('Failed to initialize image uploader.');
+        }
+      };
+
+      script.onerror = () => {
+        console.error('Failed to load Cloudinary script');
+        setError('Failed to load image uploader.');
       };
 
       return () => {
-        document.body.removeChild(script);
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
       };
     }
   }, [user]);
@@ -107,8 +121,7 @@ export default function ProfileEdit() {
         updatedAt: new Date(),
       };
       await setDoc(doc(db, 'profiles', user.uid), profileData, { merge: true });
-      console.log('Profile updated with photoURL:', formData.photoUrl);
-      await refreshProfile(user.uid);
+      console.log('Profile saved with photoURL:', formData.photoUrl); // Debug
       router.push('/profile');
     } catch (err) {
       setError('Failed to update profile: ' + err.message);
@@ -188,6 +201,7 @@ export default function ProfileEdit() {
             type="button"
             onClick={() => widgetRef.current?.open()}
             className={styles.uploadButton}
+            disabled={!widgetRef.current}
           >
             Upload Profile Photo
           </button>
@@ -205,6 +219,7 @@ export default function ProfileEdit() {
                 width={100}
                 height={100}
                 className={styles.previewImage}
+                onError={(e) => console.error('Preview image error:', formData.photoUrl)} // Debug
               />
             </div>
           )}
