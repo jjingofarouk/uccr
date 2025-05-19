@@ -1,159 +1,228 @@
+/* caseForm.module.css */
+
+/* Container for the entire form */
 .caseForm {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #f9fafb;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.caseForm h2 {
-  font-size: 1.75rem;
-  margin-bottom: 1.5rem;
-  color: #2c3e50;
-}
-
-.section {
-  margin-bottom: 1.5rem;
-}
-
-.section h3 {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-  color: #34495e;
-}
-
-.inputField, .textareaField, .selectField {
+  max-width: 1200px; /* Maximum width for large screens */
   width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 1rem;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: calc(100vh - 4rem); /* Full viewport height minus padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f9fafb; /* Light background for contrast */
   box-sizing: border-box;
 }
 
-.textareaField {
-  min-height: 100px;
-  resize: vertical;
+/* Form heading */
+.caseForm h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937; /* Dark gray for text */
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.discussion {
-  min-height: 150px;
+/* Form element */
+.caseForm form {
+  width: 100%;
+  max-width: 800px; /* Constrain form width for readability */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Consistent spacing between form elements */
 }
 
-.uploadButton {
-  background-color: #3498db;
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+/* Input fields */
+.caseForm input,
+.caseForm textarea,
+.caseForm select {
+  width: 100%;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
-  margin-bottom: 1rem;
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db; /* Light gray border */
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.uploadButton:hover {
-  background-color: #2980b9;
+/* Focus state for inputs */
+.caseForm input:focus,
+.caseForm textarea:focus,
+.caseForm select:focus {
+  outline: none;
+  border-color: #3b82f6; /* Blue focus ring */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
-.submitButton {
-  background-color: #2ecc71;
-  color: #ffffff;
+/* Textarea specific styling */
+.caseForm textarea {
+  min-height: 120px;
+  resize: vertical; /* Allow vertical resizing only */
+}
+
+/* Select dropdown specific styling */
+.caseForm select {
+  appearance: none; /* Remove default browser styling */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231f2937' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.5rem;
+}
+
+/* Buttons */
+.caseForm button {
   padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #3b82f6; /* Blue primary button */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.submitButton:hover {
-  background-color: #27ae60;
+/* Button hover and active states */
+.caseForm button:hover {
+  background-color: #2563eb; /* Darker blue on hover */
 }
 
-.submitButton:disabled {
-  background-color: #95a5a6;
+.caseForm button:active {
+  transform: scale(0.98); /* Subtle press effect */
+}
+
+.caseForm button:disabled {
+  background-color: #9ca3af; /* Gray for disabled state */
   cursor: not-allowed;
 }
 
-.error {
-  color: #e74c3c;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+/* Media upload section */
+.caseForm div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-/* Responsive Design */
+/* Uploaded media preview */
+.caseForm div p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+/* Media grid for previews */
+.caseForm div > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+/* Image previews */
+.caseForm img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover; /* Ensure images fit nicely */
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Error message */
+.caseForm p[role="alert"] {
+  color: #dc2626; /* Red for errors */
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Responsive design for medium screens (tablets) */
 @media (max-width: 768px) {
   .caseForm {
     padding: 1.5rem;
+    min-height: calc(100vh - 3rem);
   }
 
   .caseForm h2 {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 
-  .section h3 {
-    font-size: 1.1rem;
+  .caseForm input,
+  .caseForm textarea,
+  .caseForm select {
+    padding: 0.65rem;
+    font-size: 0.95rem;
   }
 
-  .inputField, .textareaField, .selectField {
-    padding: 0.5rem;
+  .caseForm button {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.95rem;
   }
 }
 
+/* Responsive design for small screens (mobile) */
 @media (max-width: 480px) {
   .caseForm {
     padding: 1rem;
+    min-height: calc(100vh - 2rem);
   }
 
   .caseForm h2 {
-    font-size: 1.25rem;
+    font-size: 1.75rem;
   }
 
-  .section h3 {
-    font-size: 1rem;
+  .caseForm input,
+  .caseForm textarea,
+  .caseForm select {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .caseForm button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .caseForm img {
+    width: 80px;
+    height: 80px;
   }
 }
 
-/* Dark Mode Overrides */
-:global(body.dark-mode) .caseForm {
-  background-color: #2c2c2c;
-  color: #ffffff;
+/* High contrast mode for accessibility */
+@media (prefers-contrast: high) {
+  .caseForm {
+    background-color: #ffffff;
+  }
+
+  .caseForm input,
+  .caseForm textarea,
+  .caseForm select {
+    border: 2px solid #000000;
+  }
+
+  .caseForm button {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .caseForm button:hover {
+    background-color: #333333;
+  }
 }
 
-:global(body.dark-mode) .caseForm h2,
-:global(body.dark-mode) .section h3 {
-  color: #ecf0f1;
-}
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .caseForm button {
+    transition: none;
+  }
 
-:global(body.dark-mode) .inputField,
-:global(body.dark-mode) .textareaField,
-:global(body.dark-mode) .selectField {
-  background-color: #34495e;
-  border-color: #7f8c8d;
-  color: #ffffff;
-}
-
-:global(body.dark-mode) .uploadButton {
-  background-color: #66b3ff;
-}
-
-:global(body.dark-mode) .uploadButton:hover {
-  background-color: #4d94ff;
-}
-
-:global(body.dark-mode) .submitButton {
-  background-color: #27ae60;
-}
-
-:global(body.dark-mode) .submitButton:hover {
-  background-color: #219653;
-}
-
-:global(body.dark-mode) .submitButton:disabled {
-  background-color: #7f8c8d;
-}
-
-:global(body.dark-mode) .error {
-  color: #ff6b6b;
+  .caseForm input:focus,
+  .caseForm textarea:focus,
+  .caseForm select:focus {
+    transition: none;
+  }
 }
