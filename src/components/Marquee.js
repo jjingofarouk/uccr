@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import styles from './Marquee.module.css';
-import { researchFindings } from './researchFindings';
+import { researchFindings } from './ResearchFindings';
 
 export default function Marquee() {
   const marqueeRef = useRef(null);
