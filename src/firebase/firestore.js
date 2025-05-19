@@ -1,5 +1,4 @@
 
-```javascript
 // firebase/firestore.js
 import { db } from './config';
 import { 
