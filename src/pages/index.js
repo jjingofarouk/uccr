@@ -1,4 +1,4 @@
-// src/app/page.js
+// src/pages/index.js
 import { useState, useEffect, useMemo } from 'react';
 import { useCases } from '../hooks/useCases';
 import CaseCard from '../components/Case/CaseCard';
@@ -62,8 +62,8 @@ export default function Home() {
             <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
             <Link href="/cases/new" className={styles.ctaButtonSecondary}>
               Share a Case
-            </ personally
-            </section>
+            </Link>
+          </section>
         )}
 
         {!loading && !error && caseOfTheDay && (
