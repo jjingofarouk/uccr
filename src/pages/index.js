@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <>
-
+<Navbar />
       <Marquee />
       <main className={styles.container}>
         <h1 className={styles.title}>Uganda Medical Cases</h1>
