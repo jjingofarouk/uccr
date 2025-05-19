@@ -1,3 +1,4 @@
+
 // firebase/firestore.js
 import { db } from './config';
 import { 
@@ -10,7 +11,9 @@ import {
   serverTimestamp, 
   query, 
   where, 
-  orderBy 
+  orderBy,
+  updateDoc,
+  increment
 } from 'firebase/firestore';
 
 export const addCase = async (caseData) => {
@@ -19,6 +22,7 @@ export const addCase = async (caseData) => {
       ...caseData,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
+      awards: 0,
     });
     return docRef.id;
   } catch (error) {
@@ -63,6 +67,8 @@ export const addComment = async (caseId, commentData, parentCommentId = null) =>
       ...commentData,
       createdAt: serverTimestamp(),
       parentCommentId: parentCommentId,
+      upvotes: 0,
+      downvotes: 0,
     };
     const docRef = await addDoc(collection(db, `cases/${caseId}/comments`), comment);
     return docRef.id;
@@ -88,12 +94,30 @@ export const getComments = async (caseId) => {
   }
 };
 
-export const addReaction = async (caseId, userId, type) => {
+export const addReaction = async (caseId, userId, type, commentId = null) => {
   try {
-    await setDoc(doc(db, `cases/${caseId}/reactions`, userId), { 
-      type, 
-      timestamp: serverTimestamp() 
+    const isCaseReaction = !commentId;
+    const reactionPath = isCaseReaction 
+      ? `cases/${caseId}/reactions/${userId}`
+      : `cases/${caseId}/comments/${commentId}/reactions/${userId}`;
+    
+    await setDoc(doc(db, reactionPath), {
+      type,
+      timestamp: serverTimestamp(),
     });
+
+    if (isCaseReaction) {
+      const caseRef = doc(db, 'cases', caseId);
+      await updateDoc(caseRef, {
+        awards: increment(type === 'award' ? 1 : 0),
+      });
+    } else {
+      const commentRef = doc(db, `cases/${caseId}/comments`, commentId);
+      await updateDoc(commentRef, {
+        upvotes: increment(type === 'upvote' ? 1 : 0),
+        downvotes: increment(type === 'downvote' ? 1 : 0),
+      });
+    }
   } catch (error) {
     throw error;
   }
@@ -183,7 +207,7 @@ export const getThreadMessages = async (threadId) => {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate ? data.timestamp.toDate() : new Date(),
+      timestamp: doc.data().timestamp?.toDate ? doc.data().timestamp.toDate() : new Date(),
     }));
   } catch (error) {
     return [];
