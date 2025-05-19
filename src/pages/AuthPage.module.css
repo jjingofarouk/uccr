@@ -1,0 +1,319 @@
+/* pages/AuthPage.module.css */
+
+.container {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+.authCard {
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.dark-mode .authCard {
+  background: #1f232a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.stethoscope {
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.dark-mode .title {
+  color: #e2e8f0;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.dark-mode .subtitle {
+  color: #a0aec0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  color: #6b7280;
+}
+
+.dark-mode .inputIcon {
+  color: #9ca3af;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 1rem;
+  color: #1a202c;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dark-mode .input {
+  background-color: #2a2e35;
+  color: #e2e8f0;
+  border-color: #4b5563;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.submitButton:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+.submitButton:active {
+  transform: scale(0.98);
+}
+
+.dark-mode .submitButton {
+  background-color: #60a5fa;
+}
+
+.dark-mode .submitButton:hover {
+  background-color: #3b82f6;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin-top: 1rem;
+}
+
+.dark-mode .error {
+  color: #f87171;
+}
+
+.toggleText {
+  font-size: 0.875rem;
+  color: #4a5568;
+  margin-top: 1rem;
+}
+
+.dark-mode .toggleText {
+  color: #a0aec0;
+}
+
+.toggleButton {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggleButton:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.dark-mode .toggleButton {
+  color: #60a5fa;
+}
+
+.dark-mode .toggleButton:hover {
+  color: #3b82f6;
+}
+
+.forgotPassword {
+  display: block;
+  font-size: 0.875rem;
+  color: #3b82f6;
+  margin-top: 1rem;
+  text-decoration: none;
+}
+
+.forgotPassword:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.dark-mode .forgotPassword {
+  color: #60a5fa;
+}
+
+.dark-mode .forgotPassword:hover {
+  color: #3b82f6;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .authCard {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .input,
+  .submitButton {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem 0.75rem;
+  }
+
+  .authCard {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .input,
+  .submitButton {
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem 0.65rem 2.5rem;
+  }
+
+  .submitButton {
+    padding: 0.65rem 1rem;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .container,
+  .authCard {
+    background: #ffffff;
+  }
+
+  .dark-mode .container,
+  .dark-mode .authCard {
+    background: #000000;
+  }
+
+  .title,
+  .subtitle,
+  .toggleText {
+    color: #000000;
+  }
+
+  .dark-mode .title,
+  .dark-mode .subtitle,
+  .dark-mode .toggleText {
+    color: #ffffff;
+  }
+
+  .input {
+    border-color: #000000;
+    color: #000000;
+  }
+
+  .dark-mode .input {
+    border-color: #ffffff;
+    color: #ffffff;
+  }
+
+  .submitButton {
+    background: #000000;
+    color: #ffffff;
+  }
+
+  .dark-mode .submitButton {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .toggleButton,
+  .forgotPassword {
+    color: #000000;
+  }
+
+  .dark-mode .toggleButton,
+  .dark-mode .forgotPassword {
+    color: #ffffff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submitButton,
+  .toggleButton,
+  .forgotPassword {
+    transition: none;
+  }
+
+  .input:focus {
+    transition: none;
+  }
+}
