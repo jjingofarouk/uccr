@@ -32,7 +32,6 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <Navbar />
       <Marquee />
       <main className={styles.container}>
         <section className={styles.hero}>
