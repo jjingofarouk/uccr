@@ -1,15 +1,29 @@
-/* styles/commentSection.module.css */
 .commentSection {
-  margin-top: 32px;
+  margin-top: 40px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .commentSection {
+  background: #2d3748;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .commentSection h2 {
+  font-family: 'Inter', sans-serif;
   font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 16px;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 24px;
 }
 
-.commentForm {
+.dark-mode .commentSection h2 {
+  color: #e2e8f0;
+}
+
+.commentForm, .replyForm {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -18,8 +32,8 @@
 
 .inputGroup {
   display: flex;
-  align-items: flex-start;
   gap: 12px;
+  align-items: flex-start;
 }
 
 .avatar {
@@ -28,44 +42,75 @@
 }
 
 .textarea {
-  width: 100%;
-  min-height: 80px;
+  flex: 1;
   padding: 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #2d3748;
+  background: #ffffff;
+  min-height: 80px;
   resize: vertical;
 }
 
-.textarea:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
+.dark-mode .textarea {
+  border-color: #4a5568;
+  background: #3c4657;
+  color: #e2e8f0;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.dark-mode .textarea:focus {
+  border-color: #4299e1;
 }
 
 .submitButton {
-  align-self: flex-end;
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: #007bff;
-  color: #fff;
+  color: #ffffff;
   border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  align-self: flex-start;
+  transition: background 0.2s ease;
+}
+
+.submitButton:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.dark-mode .submitButton {
+  background: #4299e1;
+}
+
+.dark-mode .submitButton:disabled {
+  background: #718096;
 }
 
 .submitButton:hover:not(:disabled) {
   background: #0056b3;
 }
 
-.submitButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.dark-mode .submitButton:hover:not(:disabled) {
+  background: #2b6cb0;
 }
 
 .error {
-  color: #d32f2f;
+  color: #e53e3e;
   font-size: 0.9rem;
+}
+
+.dark-mode .error {
+  color: #f687b3;
 }
 
 .comments {
@@ -78,7 +123,16 @@
   display: flex;
   gap: 12px;
   padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #f7fafc;
+}
+
+.dark-mode .comment {
+  background: #3c4657;
+}
+
+.reply {
+  margin-left: 40px;
 }
 
 .commentAvatar {
@@ -94,27 +148,74 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .commentHeader strong {
-  color: #333;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #1a202c;
+}
+
+.dark-mode .commentHeader strong {
+  color: #e2e8f0;
 }
 
 .commentDate {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.dark-mode .commentDate {
+  color: #a0aec0;
 }
 
 .commentText {
-  font-size: 1rem;
-  color: #333;
-  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #2d3748;
+  margin: 0 0 8px;
+}
+
+.dark-mode .commentText {
+  color: #e2e8f0;
+}
+
+.replyButton {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.dark-mode .replyButton {
+  color: #4299e1;
+}
+
+.replyButton:hover {
+  color: #0056b3;
+}
+
+.dark-mode .replyButton:hover {
+  color: #2b6cb0;
+}
+
+.replies {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .noComments {
-  font-size: 1rem;
-  color: #666;
-  text-align: center;
-  padding: 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #718096;
+}
+
+.dark-mode .noComments {
+  color: #a0aec0;
 }
