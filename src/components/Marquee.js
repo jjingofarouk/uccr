@@ -28,7 +28,7 @@ export default function Marquee() {
     marquee.innerHTML = [...shuffled, ...shuffled]
       .map((msg) => `<span>${msg}</span>`)
       .join('');
-    
+
     const totalWidth = shuffled.length * 300;
     marquee.style.setProperty('--marquee-width', `${totalWidth}px`);
     marquee.style.setProperty('--marquee-duration', `${totalWidth / 60}s`);
