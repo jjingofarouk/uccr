@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../hooks/useAuth';
-import { updateProfile } from '../firebase/auth';
+import { useAuth } from '../../hooks/useAuth';
+import { updateProfile } from '../../firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db } from '../../firebase/config';
 import { v4 as uuidv4 } from 'uuid';
-import styles from '../styles/profileEdit.module.css';
+import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
   const { user, loading } = useAuth();
