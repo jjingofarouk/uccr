@@ -1,3 +1,5 @@
+
+```javascript
 // firebase/firestore.js
 import { db } from './config';
 import { 
@@ -13,13 +15,10 @@ import {
   orderBy 
 } from 'firebase/firestore';
 
-export const addCase = async (caseData, userId, userName, userPhoto) => {
+export const addCase = async (caseData) => {
   try {
     const docRef = await addDoc(collection(db, 'cases'), {
       ...caseData,
-      userId,
-      userName,
-      userPhoto: userPhoto || '/images/doctor-avatar.jpeg',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -199,8 +198,22 @@ export const getProfile = async (userId) => {
     return profileSnap.exists() ? {
       ...profileSnap.data(),
       photoURL: profileSnap.data().photoURL || '/images/doctor-avatar.jpeg',
-    } : null;
+    } : {
+      photoURL: '/images/doctor-avatar.jpeg',
+      title: '',
+      education: '',
+      institution: '',
+      specialty: '',
+      bio: '',
+    };
   } catch (error) {
-    return null;
+    return {
+      photoURL: '/images/doctor-avatar.jpeg',
+      title: '',
+      education: '',
+      institution: '',
+      specialty: '',
+      bio: '',
+    };
   }
 };
