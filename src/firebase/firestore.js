@@ -1,4 +1,3 @@
-
 // firebase/firestore.js
 import { db } from './config';
 import { 
@@ -58,13 +57,14 @@ export const getCaseById = async (id) => {
   }
 };
 
-export const addComment = async (caseId, comment) => {
+export const addComment = async (caseId, commentData, parentCommentId = null) => {
   try {
-    const commentData = {
-      ...comment,
+    const comment = {
+      ...commentData,
       createdAt: serverTimestamp(),
+      parentCommentId: parentCommentId,
     };
-    const docRef = await addDoc(collection(db, `cases/${caseId}/comments`), commentData);
+    const docRef = await addDoc(collection(db, `cases/${caseId}/comments`), comment);
     return docRef.id;
   } catch (error) {
     throw error;
@@ -183,7 +183,7 @@ export const getThreadMessages = async (threadId) => {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate ? doc.data().timestamp.toDate() : new Date(),
+      timestamp: doc.data().timestamp?.toDate ? data.timestamp.toDate() : new Date(),
     }));
   } catch (error) {
     return [];
