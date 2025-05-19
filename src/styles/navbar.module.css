@@ -1,86 +1,79 @@
-/* components/navbar.module.css */
+
 .header {
   width: 100%;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  border-bottom: 1px solid #d1d5db;
   position: sticky;
   top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(8px);
+  z-index: 1000; /* Increased to ensure navbar is above all content */
 }
 
 .dark-mode .header {
-  background: linear-gradient(180deg, #1f232a 0%, #111827 100%);
-  border-bottom: 1px solid #374151;
+  background-color: #1f232a;
+  border-bottom: 1px solid #4b5563;
 }
 
 .headerContent {
-  max-width: 1440px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .logo {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #2563eb;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
   text-decoration: none;
-  letter-spacing: -0.025em;
 }
 
 .dark-mode .logo {
-  color: #3b82f6;
+  color: #60a5fa;
 }
 
 .headerControls {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .themeToggle,
 .userButton {
   background: none;
   border: none;
-  padding: 0.75rem;
+  padding: 0.5rem;
   cursor: pointer;
-  color: #111827;
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #1a202c;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .themeToggle:hover,
 .userButton:hover {
-  background: #f1f5f9;
-  transform: translateY(-2px);
+  background-color: #f3f4f6;
 }
 
-.dark-mode .theme apertures,
+.dark-mode .themeToggle,
 .dark-mode .userButton {
-  color: #f3f4f6;
+  color: #e2e8f0;
 }
 
 .dark-mode .themeToggle:hover,
 .dark-mode .userButton:hover {
-  background: #374151;
+  background-color: #2a2e35;
 }
 
 .userButton:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .userAvatar {
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #e5e7eb;
-}
-
-.dark-mode .userAvatar {
-  border-color: #374151;
 }
 
 .sidebar {
@@ -89,74 +82,62 @@
   right: 0;
   width: 280px;
   height: 100%;
-  background: #ffffff;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.1);
-  z-index: 2000;
+  background-color: #ffffff;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+  z-index: 2000; /* Higher than header and marquee */
   display: flex;
   flex-direction: column;
-  padding: 2rem;
-  overflow-y: auto;
+  padding: 1.5rem;
 }
 
 .dark-mode .sidebar {
-  background: #1f232a;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.2);
+  background-color: #1f232a;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
 }
 
 .sidebarHeader {
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.dark-mode .sidebarHeader {
-  border-bottom-color: #374151;
+  margin-bottom: 2rem;
 }
 
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .sidebarAvatar {
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #e5e7eb;
-}
-
-.dark-mode .sidebarAvatar {
-  border-color: #374151;
 }
 
 .userName {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a202c;
 }
 
 .dark-mode .userName {
-  color: #f3f4f6;
+  color: #e2e8f0;
 }
 
 .sidebarNav {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .navLink,
 .sidebarButton {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  font-size: 1.1rem;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
   font-weight: 500;
-  color: #111827;
+  color: #1a202c;
   text-decoration: none;
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sidebarButton {
@@ -168,20 +149,19 @@
 
 .navLink:hover,
 .sidebarButton:hover {
-  background: #f1f5f9;
-  color: #2563eb;
-  transform: translateX(4px);
+  background-color: #f3f4f6;
+  color: #3b82f6;
 }
 
 .dark-mode .navLink,
 .dark-mode .sidebarButton {
-  color: #f3f4f6;
+  color: #e2e8f0;
 }
 
 .dark-mode .navLink:hover,
 .dark-mode .sidebarButton:hover {
-  background: #374151;
-  color: #3b82f6;
+  background-color: #2a2e35;
+  color: #60a5fa;
 }
 
 .navIcon {
@@ -194,47 +174,17 @@
 
 .navLink:hover .navIcon,
 .sidebarButton:hover .navIcon {
-  color: #2563eb;
+  color: #3b82f6;
 }
 
 .dark-mode .navLink:hover .navIcon,
 .dark-mode .sidebarButton:hover .navIcon {
-  color: #3b82f6;
+  color: #60a5fa;
 }
 
 @media (max-width: 768px) {
   .headerContent {
-    padding: 0.75rem 1.5rem;
-  }
-
-  .logo {
-    font-size: 1.5rem;
-  }
-
-  .themeToggle,
-  .userButton {
-    padding: 0.5rem;
-  }
-
-  .sidebar {
-    width: 260px;
-    padding: 1.5rem;
-  }
-
-  .userName {
-    font-size: 1.125rem;
-  }
-
-  .navLink,
-  .sidebarButton {
-    font-size: 1rem;
-    padding: 0.75rem 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .headerContent {
-    padding: 0.5rem 1rem;
+    padding: 1rem;
   }
 
   .logo {
@@ -246,18 +196,9 @@
     padding: 0.4rem;
   }
 
-  .userAvatar {
-    width: 32px;
-    height: 32px;
-  }
-
   .sidebar {
     width: 240px;
-  }
-
-  .sidebarAvatar {
-    width: 40px;
-    height: 40px;
+    padding: 1rem;
   }
 
   .userName {
@@ -267,7 +208,46 @@
   .navLink,
   .sidebarButton {
     font-size: 0.95rem;
-    padding: 0.65rem 0.75rem;
+    padding: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerContent {
+    padding: 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.125rem;
+  }
+
+  .themeToggle,
+  .userButton {
+    padding: 0.3rem;
+  }
+
+  .userAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+
+  .sidebarAvatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .userName {
+    font-size: 0.9rem;
+  }
+
+  .navLink,
+  .sidebarButton {
+    font-size: 0.9rem;
+    padding: 0.5rem;
   }
 }
 
@@ -313,16 +293,6 @@
   .dark-mode .navIcon {
     color: #ffffff;
   }
-
-  .userAvatar,
-  .sidebarAvatar {
-    border-color: #000000;
-  }
-
-  .dark-mode .userAvatar,
-  .dark-mode .sidebarAvatar {
-    border-color: #ffffff;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -337,3 +307,4 @@
     transition: none;
   }
 }
+
