@@ -1,20 +1,21 @@
 .container {
+  margin-top: 120px; /* 60px navbar + ~60px marquee height */
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 20px;
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #222;
-  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 20px;
 }
 
 .caseList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  padding-bottom: 3rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding-bottom: 20px;
 }
