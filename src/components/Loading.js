@@ -1,7 +1,7 @@
 // src/components/Loading.js
 import React from 'react';
 import Lottie from 'lottie-react';
-import loadingAnimation from './animations/loadingAnimation.json';
+import loadingAnimation from './loadingAnimation.json';
 import styles from './Loading.module.css';
 
 export default function Loading() {
