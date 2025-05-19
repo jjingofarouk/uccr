@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
 import { Award } from 'lucide-react';
 import CommentSection from './CommentSection';
-import styles from './caseDetail.module.css';
+import styles from '../../caseDetail.module.css';
 
 export default function CaseDetail({ caseData }) {
   const { user } = useAuth();
