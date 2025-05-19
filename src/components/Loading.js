@@ -1,11 +1,21 @@
-// src/components/Loading.js
-import styles from './Loading.module.css';
+import React from 'react';
+import Lottie from 'lottie-react';
+// Import your Lottie animation JSON file
+// Replace this path with the actual path to your JSON file
+import loadingAnimation from './loadingAnimation.json';
 
-export default function Loading() {
+const LoadingSpinner = () => {
   return (
-    <div className={styles.loaderContainer} role="status" aria-label="Loading cases">
-      <div className={styles.loader}></div>
-      <p className={styles.loaderText}>Loading cases...</p>
+    <div className="flex items-center justify-center p-4">
+      <div className="w-40 h-40">
+        <Lottie 
+          animationData={loadingAnimation} 
+          loop={true}
+          autoplay={true}
+        />
+      </div>
     </div>
   );
-}
+};
+
+export default LoadingSpinner;
