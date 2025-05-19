@@ -4,22 +4,22 @@ import Image from 'next/image';
 import styles from '../../styles/caseCard.module.css';
 
 export default function CaseCard({ caseData }) {
-  const defaultImage = '/images/doctor-avatar.jpeg';
-
   return (
     <Link href={`/cases/${caseData.id}`} className={styles.card}>
-      <div className={styles.imageContainer}>
-        <Image
-          src={caseData.mediaUrls?.[0] || defaultImage}
-          alt={caseData.title}
-          width={280}
-          height={180}
-          className={styles.image}
-          objectFit="cover"
-        />
-      </div>
+      {caseData.mediaUrls?.length > 0 && (
+        <div className={styles.imageContainer}>
+          <Image
+            src={caseData.mediaUrls[0]}
+            alt={caseData.title || 'Case image'}
+            width={280}
+            height={180}
+            className={styles.image}
+            objectFit="cover"
+          />
+        </div>
+      )}
       <div className={styles.content}>
-        <h3 className={styles.title}>{caseData.title}</h3>
+        <h3 className={styles.title}>{caseData.title || 'Untitled Case'}</h3>
         <p className={styles.concern}>
           <strong>Chief Concern:</strong> {caseData.presentingComplaint || 'Not specified'}
         </p>
