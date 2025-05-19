@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { getMessages, getUsers, sendMessage } from '../../firebase/firestore';
-import Link from 'next/link';
+import { getMessages, getUsers, sendMessage, getThreadMessages } from '../../firebase/firestore';
 import Navbar from '../../components/Navbar';
-import { Search, Plus, Send, X } from 'lucide-react';
+import { Search, Send, AlertCircle } from 'lucide-react';
 import styles from './inbox.module.css';
 
 export default function Inbox() {
@@ -11,36 +10,34 @@ export default function Inbox() {
   const [threads, setThreads] = useState([]);
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedThread, setSelectedThread] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // Fetch message threads
   useEffect(() => {
     if (!user) return;
     const fetchThreads = async () => {
-      const messages = await getMessages(user.uid);
-      setThreads(messages);
+      const fetchedThreads = await getMessages(user.uid);
+      setThreads(fetchedThreads);
     };
     fetchThreads();
   }, [user]);
 
-  // Fetch users
   useEffect(() => {
     if (!user) return;
     const fetchUsers = async () => {
       const allUsers = await getUsers();
-      const filteredUsers = allUsers.filter(u => u.uid !== user.uid);
-      console.log('Filtered users:', filteredUsers); // Debug log
-      setUsers(filteredUsers);
-      setFilteredUsers(filteredUsers);
+      const filtered = allUsers.filter(u => u.uid !== user.uid);
+      console.log('Filtered users:', filtered);
+      setUsers(filtered);
+      setFilteredUsers(filtered);
     };
     fetchUsers();
   }, [user]);
 
-  // Filter users based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredUsers(users);
@@ -50,43 +47,69 @@ export default function Inbox() {
         u.displayName?.toLowerCase().includes(lowerQuery) || 
         u.email?.toLowerCase().includes(lowerQuery)
       );
-      console.log('Search query:', searchQuery, 'Filtered users:', filtered); // Debug log
+      console.log('Search query:', searchQuery, 'Filtered users:', filtered);
       setFilteredUsers(filtered);
     }
   }, [searchQuery, users]);
 
-  const handleSelectUser = (user) => {
-    setSelectedUser(user);
-    setSearchQuery(user.displayName);
-    setFilteredUsers([]);
+  useEffect(() => {
+    if (!selectedThread) {
+      setMessages([]);
+      return;
+    }
+    const fetchMessages = async () => {
+      const threadMessages = await getThreadMessages(selectedThread.id);
+      setMessages(threadMessages);
+    };
+    fetchMessages();
+  }, [selectedThread]);
+
+  const handleSelectUser = async (recipient) => {
+    const threadId = [user.uid, recipient.uid].sort().join('_');
+    const existingThread = threads.find(t => t.id === threadId);
+    if (existingThread) {
+      setSelectedThread(existingThread);
+    } else {
+      setSelectedThread({
+        id: threadId,
+        otherUserName: recipient.displayName || 'User',
+        lastMessage: '',
+      });
+      setMessages([]);
+    }
+    setSearchQuery('');
     setError('');
+    setSuccess('');
   };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!user || !selectedUser || !messageText.trim()) {
+    if (!user || !selectedThread || !messageText.trim()) {
       setError('Please select a user and enter a message.');
       return;
     }
 
     try {
+      const recipientId = selectedThread.id.split('_').find(id => id !== user.uid);
       await sendMessage({
         senderId: user.uid,
-        recipientId: selectedUser.uid,
+        recipientId,
         senderName: user.displayName || 'User',
-        recipientName: selectedUser.displayName || 'User',
+        recipientName: selectedThread.otherUserName || 'User',
         text: messageText.trim(),
       });
       setMessageText('');
-      setSelectedUser(null);
-      setSearchQuery('');
-      setIsModalOpen(false);
+      setSuccess('Message sent!');
       setError('');
-      const messages = await getMessages(user.uid);
-      setThreads(messages);
+      setTimeout(() => setSuccess(''), 2000);
+      const updatedThreads = await getMessages(user.uid);
+      setThreads(updatedThreads);
+      const updatedMessages = await getThreadMessages(selectedThread.id);
+      setMessages(updatedMessages);
     } catch (error) {
-      console.error('Error sending message:', error);
-      setError('Failed to send message. Please try again.');
+      console.error('Send message error:', error);
+      setError(error.message || 'Failed to send message. Please try again.');
+      setSuccess('');
     }
   };
 
@@ -94,103 +117,79 @@ export default function Inbox() {
     <>
       <Navbar />
       <div className={styles.container}>
-        <h2 className={styles.title}>
-          <Search size={24} />
-          Inbox
-        </h2>
-        <button 
-          onClick={() => setIsModalOpen(true)} 
-          className={styles.newMessageButton}
-          disabled={!user}
-        >
-          <Plus size={20} />
-          New Message
-        </button>
-        {threads.length === 0 ? (
-          <p className={styles.noMessages}>No messages yet</p>
-        ) : (
-          <div className={styles.threadList}>
-            {threads.map((thread) => (
-              <Link key={thread.id} href={`/inbox/${thread.id}`} className={styles.thread}>
-                <p className={styles.threadName}>{thread.otherUserName}</p>
-                <p className={styles.threadMessage}>{thread.lastMessage}</p>
-              </Link>
-            ))}
-          </div>
-        )}
-        {isModalOpen && (
-          <div className={styles.modal}>
-            <div className={styles.modalContent}>
-              <button 
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setSearchQuery('');
-                  setSelectedUser(null);
-                  setFilteredUsers(users);
-                  setError('');
-                }} 
-                className={styles.closeButton}
-              >
-                <X size={20} />
-              </button>
-              <h3 className={styles.modalTitle}>
-                <Plus size={24} />
-                Compose Message
-              </h3>
-              <form onSubmit={handleSendMessage}>
-                <div className={styles.searchContainer}>
-                  <Search className={styles.searchIcon} size={20} />
-                  <input
-                    type="text"
-                    placeholder="Search users by name or email..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={styles.searchInput}
-                    autoFocus
-                  />
-                  {searchQuery && filteredUsers.length > 0 && (
-                    <ul className={styles.userList}>
-                      {filteredUsers.map((u) => (
-                        <li
-                          key={u.uid}
-                          onClick={() => handleSelectUser(u)}
-                          className={styles.userItem}
-                        >
-                          <span className={styles.userName}>{u.displayName || 'User'}</span>
-                          <span className={styles.userEmail}>{u.email}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {searchQuery && filteredUsers.length === 0 && (
-                    <p className={styles.noResults}>No users found</p>
-                  )}
-                </div>
-                {selectedUser && (
-                  <p className={styles.selectedUser}>
-                    Sending to: {selectedUser.displayName} ({selectedUser.email})
-                  </p>
-                )}
-                <textarea
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  placeholder="Type your message..."
-                  className={styles.textarea}
-                  required
-                />
-                {error && <p className={styles.error}>{error}</p>}
-                <button 
-                  type="submit" 
-                  className={styles.sendButton}
-                  disabled={!selectedUser || !messageText.trim()}
+        <div className={styles.inbox}>
+          <div className={styles.userList}>
+            <div className={styles.searchContainer}>
+              <Search className={styles.searchIcon} size={20} />
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
+            <div className={styles.users}>
+              {filteredUsers.map(u => (
+                <div
+                  key={u.uid}
+                  onClick={() => handleSelectUser(u)}
+                  className={`${styles.user} ${selectedThread?.id.includes(u.uid) ? styles.selected : ''}`}
                 >
-                  <Send size={20} />
-                  Send
-                </button>
-              </form>
+                  <span className={styles.userName}>{u.displayName}</span>
+                  <span className={styles.userEmail}>{u.email}</span>
+                </div>
+              ))}
+              {filteredUsers.length === 0 && searchQuery && (
+                <p className={styles.noResults}>No users found</p>
+              )}
             </div>
           </div>
-        )}
+          <div className={styles.chatArea}>
+            {selectedThread ? (
+              <>
+                <div className={styles.chatHeader}>
+                  <h3 className={styles.chatTitle}>{selectedThread.otherUserName}</h3>
+                </div>
+                <div className={styles.messages}>
+                  {messages.map(msg => (
+                    <div
+                      key={msg.id}
+                      className={`${styles.message} ${msg.senderId === user?.uid ? styles.sent : styles.received}`}
+                    >
+                      <p>{msg.text}</p>
+                    </div>
+                  ))}
+                </div>
+                <form onSubmit={handleSendMessage} className={styles.messageForm}>
+                  <textarea
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Type a message..."
+                    className={styles.messageInput}
+                    required
+                  />
+                  <button type="submit" className={styles.sendButton}>
+                    <Send size={20} />
+                  </button>
+                </form>
+                {error && (
+                  <div className={styles.error}>
+                    <AlertCircle size={16} />
+                    <span>{error}</span>
+                  </div>
+                )}
+                {success && (
+                  <div className={styles.success}>
+                    <span>{success}</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className={styles.noChat}>Select a user to start chatting</p>
+            )}
+          </div>
+        </div>
       </div>
     </>
   );
