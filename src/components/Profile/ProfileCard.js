@@ -18,13 +18,11 @@ export default function ProfileCard({ userData }) {
         </div>
         <div className={styles.onlineIndicator}></div>
       </div>
-      
       <div className={styles.cardContent}>
         <h3 className={styles.name}>{userData.displayName || 'User'}</h3>
         <p className={styles.email}>{userData.email || 'No email'}</p>
         <p className={styles.title}>{userData.title || 'No title'}</p>
         <p className={styles.specialty}>{userData.specialty || 'No specialty'}</p>
-        
         <div className={styles.stats}>
           <div className={styles.stat}>
             <span className={styles.statNumber}>24</span>
@@ -40,7 +38,6 @@ export default function ProfileCard({ userData }) {
           </div>
         </div>
       </div>
-      
       <div className={styles.actions}>
         <Link href="/profile/view" className={styles.viewButton}>View Profile</Link>
         <Link href="/profile/edit" className={styles.editButton}>Edit</Link>
