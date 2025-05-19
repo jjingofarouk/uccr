@@ -1,21 +1,25 @@
-/* Marquee.module.css */
-
+/* components/Marquee.module.css */
 .marqueeContainer {
   position: fixed;
-  top: 60px;
+  top: 64px;
   width: 100%;
-  height: 50px;
-  background: linear-gradient(90deg, rgba(240,249,255,0.97), rgba(224,242,254,0.97));
-  backdrop-filter: blur(8px);
+  height: 36px;
+  background: linear-gradient(90deg, rgba(245, 245, 245, 0.95), rgba(229, 231, 235, 0.95));
+  backdrop-filter: blur(10px);
   overflow: hidden;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 24px;
   box-sizing: border-box;
   z-index: 900;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(75, 85, 99, 0.1);
+}
+
+.dark-mode .marqueeContainer {
+  background: linear-gradient(90deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95));
+  border-bottom: 1px solid rgba(209, 213, 219, 0.15);
 }
 
 .visible {
@@ -35,21 +39,29 @@
 }
 
 .marquee span {
-  margin-right: 50px;
-  font-size: 15px;
+  margin-right: 40px;
+  font-size: 14px;
   font-weight: 500;
-  color: #2563eb;
+  color: #374151;
   position: relative;
   display: inline-flex;
   align-items: center;
 }
 
+.dark-mode .marquee span {
+  color: #d1d5db;
+}
+
 .marquee span::after {
   content: '•';
-  margin-left: 50px;
-  font-size: 16px;
-  color: #93c5fd;
-  opacity: 0.7;
+  margin-left: 40px;
+  font-size: 14px;
+  color: #9ca3af;
+  opacity: 0.6;
+}
+
+.dark-mode .marquee span::after {
+  color: #6b7280;
 }
 
 .marquee span:last-child::after {
@@ -58,23 +70,36 @@
 
 .highlight {
   font-weight: 600;
-  color: #1d4ed8;
-  background: linear-gradient(transparent 70%, rgba(147, 197, 253, 0.3) 100%);
-  padding: 2px 4px;
+  color: #1f2937;
+  background: linear-gradient(transparent 65%, rgba(209, 213, 219, 0.3) 100%);
+  padding: 1px 3px;
   margin: 0 2px;
-  border-radius: 3px;
+  border-radius: 4px;
+}
+
+.dark-mode .highlight {
+  color: #e5e7eb;
+  background: linear-gradient(transparent 65%, rgba(75, 85, 99, 0.3) 100%);
 }
 
 .category {
   font-weight: 600;
-  color: #1e40af;
+  color: #4b5563;
+}
+
+.dark-mode .category {
+  color: #9ca3af;
 }
 
 .source {
-  font-size: 13px;
-  color: #64748b;
+  font-size: 12px;
+  color: #6b7280;
   font-style: italic;
-  margin-left: 4px;
+  margin-left: 3px;
+}
+
+.dark-mode .source {
+  color: #9ca3af;
 }
 
 @keyframes scroll {
@@ -86,22 +111,108 @@
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .marqueeContainer {
-    height: 40px;
+    height: 32px;
+    padding: 0 16px;
   }
-  
+
   .marquee span {
-    font-size: 14px;
-    margin-right: 30px;
+    font-size: 13px;
+    margin-right: 24px;
   }
-  
+
   .marquee span::after {
-    margin-left: 30px;
+    margin-left: 24px;
+    font-size: 13px;
   }
-  
+
   .source {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marqueeContainer {
+    height: 28px;
+    padding: 0 12px;
+  }
+
+  .marquee span {
     font-size: 12px;
+    margin-right: 20px;
+  }
+
+  .marquee span::after {
+    margin-left: 20px;
+    font-size: 12px;
+  }
+
+  .source {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .marqueeContainer {
+    background: #ffffff;
+    border-bottom: 2px solid #000000;
+  }
+
+  .dark-mode .marqueeContainer {
+    background: #000000;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  .marquee span {
+    color: #000000;
+  }
+
+  .dark-mode .marquee span {
+    color: #ffffff;
+  }
+
+  .marquee span::after {
+    color: #000000;
+  }
+
+  .dark-mode .marquee span::after {
+    color: #ffffff;
+  }
+
+  .highlight {
+    color: #000000;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .dark-mode .highlight {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .category {
+    color: #000000;
+  }
+
+  .dark-mode .category {
+    color: #ffffff;
+  }
+
+  .source {
+    color: #000000;
+  }
+
+  .dark-mode .source {
+    color: #ffffff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marqueeContainer {
+    transition: none;
+  }
+
+  .marquee {
+    animation: none;
   }
 }
