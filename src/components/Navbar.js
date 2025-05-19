@@ -13,8 +13,12 @@ export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const sidebarRef = useRef(null);
+  const userButtonRef = useRef(null);
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleSidebar = (e) => {
+    e.stopPropagation();
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -32,7 +36,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        userButtonRef.current &&
+        !userButtonRef.current.contains(event.target)
+      ) {
         setIsSidebarOpen(false);
       }
     };
@@ -61,6 +70,7 @@ export default function Navbar() {
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
           <button
+            ref={userButtonRef}
             onClick={toggleSidebar}
             className={styles.userButton}
             aria-label="User menu"
