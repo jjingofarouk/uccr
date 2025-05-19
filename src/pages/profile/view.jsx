@@ -1,6 +1,6 @@
 // pages/profile/view.jsx
 import { useAuth } from '../../hooks/useAuth';
-import ProfileCard from '../../components/ProfileCard';
+import ProfileCard from '../../components/profile/ProfileCard';
 import Navbar from '../../components/Navbar';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 import styles from '../../styles/profile.module.css';
