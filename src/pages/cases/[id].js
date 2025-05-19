@@ -1,22 +1,37 @@
+
+// pages/cases/[id].jsx
 import { useRouter } from 'next/router';
 import { useCases } from '../../hooks/useCases';
 import CaseDetail from '../../components/Case/CaseDetail';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-
+import styles from '../../styles/casePage.module.css';
 
 export default function CasePage() {
   const router = useRouter();
   const { id } = router.query;
   const { getCaseById } = useCases();
-  const caseData = getCaseById(id);
 
-  if (!caseData) return <div>Loading...</div>;
+  const [caseData, setCaseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      const fetchCase = async () => {
+        const data = await getCaseById(id);
+        setCaseData(data);
+        setLoading(false);
+      };
+      fetchCase();
+    }
+  }, [id, getCaseById]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!caseData) return <div>Case not found</div>;
 
   return (
     <ProtectedRoute>
-      <div className="container">
+      <div className={styles.container}>
         <Navbar />
         <CaseDetail caseData={caseData} />
       </div>
