@@ -1,7 +1,8 @@
+// components/Marquee.jsx
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import styles from './Marquee.module.css';
-import { researchFindings } from './ResearchFindings'; // Replace with your data
+import { researchFindings } from './ResearchFindings';
 
 export default function Marquee() {
   const marqueeRef = useRef(null);
@@ -11,7 +12,7 @@ export default function Marquee() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setShow(currentScrollY < lastScrollY || currentScrollY < 100); // Show on scroll up or near top
+      setShow(currentScrollY < lastScrollY || currentScrollY < 100);
       setLastScrollY(currentScrollY);
     };
 
@@ -26,11 +27,11 @@ export default function Marquee() {
     const shuffled = [...researchFindings].sort(() => Math.random() - 0.5);
     marquee.innerHTML = [...shuffled, ...shuffled]
       .map((msg) => `<span>${msg}</span>`)
-      .join(' • ');
-
+      .join('');
+    
     const totalWidth = shuffled.length * 300;
     marquee.style.setProperty('--marquee-width', `${totalWidth}px`);
-    marquee.style.setProperty('--marquee-duration', `${totalWidth / 50}s`);
+    marquee.style.setProperty('--marquee-duration', `${totalWidth / 60}s`);
   }, []);
 
   return (
