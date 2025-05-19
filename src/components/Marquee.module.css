@@ -1,12 +1,16 @@
 .marqueeContainer {
+  position: fixed; /* If fixed, needs more margin */
+  top: 60px; /* Below navbar */
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: #eef7ff;
   overflow: hidden;
-  background-color: #fff;
-  padding: 0.5rem 0;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  position: sticky;
-  top: 0;
-  z-index: 999; /* above everything */
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .marquee {
