@@ -1,31 +1,33 @@
-// components/Case/CaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { addCase } from '../../firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import Image from 'next/image';
 import styles from '../../styles/caseForm.module.css';
 
 export default function CaseForm() {
-  const { user, loading } = useAuth();
-  const [title, setTitle] = useState('');
-  const [presentingComplaint, setPresentingComplaint] = useState('');
-  const [history, setHistory] = useState('');
-  const [investigations, setInvestigations] = useState('');
-  const [management, setManagement] = useState('');
-  const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
-  const [hospital, setHospital] = useState('');
-  const [referralCenter, setReferralCenter] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [discussion, setDiscussion] = useState('');
-  const [mediaUrls, setMediaUrls] = useState([]);
+  const { user } = useAuth();
+  const [formData, setFormData] = useState({
+    title: '',
+    presentingComplaint: '',
+    history: '',
+    investigations: '',
+    management: '',
+    provisionalDiagnosis: '',
+    hospital: '',
+    referralCenter: '',
+    specialty: '',
+    discussion: '',
+    mediaUrls: [],
+  });
   const [error, setError] = useState('');
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
       script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
       script.async = true;
@@ -33,184 +35,166 @@ export default function CaseForm() {
 
       script.onload = () => {
         cloudinaryRef.current = window.cloudinary;
-        widgetRef.current = cloudinaryRef.current.createUploadWidget(
-          {
-            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-            uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-            folder: `cases/${user?.uid || 'anonymous'}`,
-            sources: ['local', 'camera'],
-            multiple: true,
-            resourceType: 'image',
-            public_id: `case_${uuidv4()}`,
-          },
-          (error, result) => {
-            if (!error && result && result.event === 'success') {
-              setMediaUrls((prev) => [...prev, result.info.secure_url]);
-            } else if (error) {
-              setError('Image upload failed.');
+        if (cloudinaryRef.current) {
+          widgetRef.current = cloudinaryRef.current.createUploadWidget(
+            {
+              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+              uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+              folder: `cases/${user.uid}`,
+              sources: ['local', 'camera'],
+              multiple: true,
+              resourceType: 'image',
+              public_id: `case_${uuidv4()}`,
+            },
+            (error, result) => {
+              if (!error && result && result.event === 'success') {
+                setFormData(prev => ({
+                  ...prev,
+                  mediaUrls: [...prev.mediaUrls, result.info.secure_url],
+                }));
+                console.log('Cloudinary case URL:', result.info.secure_url);
+              } else if (error) {
+                setError('Image upload failed.');
+                console.error('Cloudinary error:', error);
+              }
             }
-          }
-        );
+          );
+        }
       };
 
       return () => {
-        document.body.removeChild(script);
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
       };
     }
   }, [user]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) {
-      setError('Please wait, authentication is loading.');
-      return;
-    }
     if (!user) {
-      setError('You must be logged in to submit a case.');
+      setError('You must be logged in to create a case.');
       return;
     }
     try {
       const caseData = {
-        title: title || 'Untitled Case',
-        presentingComplaint: presentingComplaint || 'Not specified',
-        history: history || 'Not provided',
-        investigations: investigations || 'Not provided',
-        management: management || 'Not provided',
-        provisionalDiagnosis: provisionalDiagnosis || 'Not specified',
-        hospital: hospital || 'Not specified',
-        referralCenter: referralCenter || 'Not specified',
-        specialty: specialty || 'Not specified',
-        discussion: discussion || 'Not provided',
-        mediaUrls,
+        ...formData,
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
-        userPhoto: user.photoURL || '/images/doctor-avatar.jpeg',
+        createdAt: new Date().toISOString(),
       };
+      console.log('Submitting case:', caseData); // Debug
       await addCase(caseData);
+      console.log('Case submitted with mediaUrls:', formData.mediaUrls);
       router.push('/cases');
     } catch (err) {
-      setError(err.message || 'Failed to submit case.');
+      setError('Failed to create case: ' + err.message);
+      console.error('Case creation error:', err);
     }
   };
 
   return (
     <div className={styles.caseForm}>
-      <h2>Submit Case Report</h2>
-      {error && <p className={styles.error}>{error}</p>}
+      <h2>Create Case</h2>
       <form onSubmit={handleSubmit}>
-        <div className={styles.section}>
-          <h3>Case Overview</h3>
-          <input
-            className={styles.inputField}
-            type="text"
-            placeholder="Case Title *"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-          <textarea
-            className={styles.textareaField}
-            placeholder="Chief Concern *"
-            value={presentingComplaint}
-            onChange={(e) => setPresentingComplaint(e.target.value)}
-            required
-          />
-          <select
-            className={styles.inputField}
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
-            required
-          >
-            <option value="">Select Specialty *</option>
-            <option value="Internal Medicine">Internal Medicine</option>
-            <option value="Surgery">Surgery</option>
-            <option value="Pediatrics">Pediatrics</option>
-            <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
-            <option value="Cardiology">Cardiology</option>
-            <option value="Neurology">Neurology</option>
-            <option value="Orthopedics">Orthopedics</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div className={styles.section}>
-          <h3>Clinical Details</h3>
-          <textarea
-            className={styles.textareaField}
-            placeholder="History of Presenting Complaint"
-            value={history}
-            onChange={(e) => setHistory(e.target.value)}
-          />
-          <textarea
-            className={styles.textareaField}
-            placeholder="Investigations"
-            value={investigations}
-            onChange={(e) => setInvestigations(e.target.value)}
-          />
-          <textarea
-            className={styles.textareaField}
-            placeholder="Management"
-            value={management}
-            onChange={(e) => setManagement(e.target.value)}
-          />
-          <input
-            className={styles.inputField}
-            type="text"
-            placeholder="Provisional Diagnosis"
-            value={provisionalDiagnosis}
-            onChange={(e) => setProvisionalDiagnosis(e.target.value)}
-          />
-        </div>
-        <div className={styles.section}>
-          <h3>Case Context</h3>
-          <input
-            className={styles.inputField}
-            type="text"
-            placeholder="Hospital Name"
-            value={hospital}
-            onChange={(e) => setHospital(e.target.value)}
-          />
-          <input
-            className={styles.inputField}
-            type="text"
-            placeholder="Referral Center (if applicable)"
-            value={referralCenter}
-            onChange={(e) => setReferralCenter(e.target.value)}
-          />
-        </div>
-        <div className={styles.section}>
-          <h3>Discussion</h3>
-          <textarea
-            className={`${styles.textareaField} ${styles.discussion}`}
-            placeholder="Discussion (e.g., clinical implications, challenges, learning points)"
-            value={discussion}
-            onChange={(e) => setDiscussion(e.target.value)}
-          />
-        </div>
-        <div className={styles.section}>
-          <h3>Images</h3>
-          <button
-            type="button"
-            onClick={() => widgetRef.current?.open()}
-            className={styles.uploadButton}
-          >
-            Upload Images
-          </button>
-          {mediaUrls.length > 0 && (
-            <div className={styles.mediaPreview}>
-              {mediaUrls.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`Uploaded image ${index + 1}`}
-                  className={styles.previewImage}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-        <button type="submit" className={styles.submitButton} disabled={loading || !user}>
-          Submit Case Report
+        <input
+          type="text"
+          name="title"
+          placeholder="Case Title"
+          value={formData.title}
+          onChange={handleChange}
+        />
+        <textarea
+          name="presentingComplaint"
+          placeholder="Presenting Complaint"
+          value={formData.presentingComplaint}
+          onChange={handleChange}
+        />
+        <textarea
+          name="history"
+          placeholder="History"
+          value={formData.history}
+          onChange={handleChange}
+        />
+        <textarea
+          name="investigations"
+          placeholder="Investigations"
+          value={formData.investigations}
+          onChange={handleChange}
+        />
+        <textarea
+          name="management"
+          placeholder="Management"
+          value={formData.management}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="provisionalDiagnosis"
+          placeholder="Provisional Diagnosis"
+          value={formData.provisionalDiagnosis}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="hospital"
+          placeholder="Hospital"
+          value={formData.hospital}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="referralCenter"
+          placeholder="Referral Center"
+          value={formData.referralCenter}
+          onChange={handleChange}
+        />
+        <select name="specialty" value={formData.specialty} onChange={handleChange}>
+          <option value="">Select Specialty</option>
+          <option value="Internal Medicine">Internal Medicine</option>
+          <option value="Surgery">Surgery</option>
+          <option value="Pediatrics">Pediatrics</option>
+          <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
+          <option value="Cardiology">Cardiology</option>
+          <option value="Neurology">Neurology</option>
+          <option value="Orthopedics">Orthopedics</option>
+          <option value="Other">Other</option>
+        </select>
+        <textarea
+          name="discussion"
+          placeholder="Discussion"
+          value={formData.discussion}
+          onChange={handleChange}
+        />
+        <button
+          type="button"
+          onClick={() => widgetRef.current?.open()}
+          disabled={!widgetRef.current}
+        >
+          Upload Media
         </button>
+        {formData.mediaUrls.length > 0 && (
+          <div>
+            <p>Uploaded media:</p>
+            {formData.mediaUrls.map((url, index) => (
+              <Image
+                key={index}
+                src={url}
+                alt={`Uploaded media ${index + 1}`}
+                width={100}
+                height={100}
+                onError={(e) => console.error('Form media error:', url)}
+              />
+            ))}
+          </div>
+        )}
+        <button type="submit">Submit Case</button>
+        {error && <p>{error}</p>}
       </form>
     </div>
   );
