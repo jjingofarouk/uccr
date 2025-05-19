@@ -146,8 +146,12 @@ export const sendMessage = async ({ senderId, recipientId, senderName, recipient
 
     return messageRef.id;
   } catch (error) {
-    console.error('Error sending message:', error.message, error.code, error);
-    throw new Error(error.message || 'Failed to send message');
+    console.error('Error sending message:', {
+      message: error.message,
+      code: error.code,
+      details: error.details
+    });
+    throw new Error(error.code === 'permission-denied' ? 'Missing or insufficient permissions' : error.message || 'Failed to send message');
   }
 };
 
