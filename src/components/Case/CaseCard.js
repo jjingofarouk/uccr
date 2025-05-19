@@ -1,33 +1,35 @@
+// src/components/Case/CaseCard.js
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from '../../styles/caseCard.module.css';
 
 export default function CaseCard({ caseData }) {
-  console.log('CaseCard caseData:', caseData); // Debug
+  console.log(`CaseCard caseData (ID: ${caseData?.id || 'unknown'}):`, caseData);
+
+  if (!caseData?.id) {
+    return <div className={styles.error}>Error: Invalid case data</div>;
+  }
+
+  const hasImage = caseData.mediaUrls?.length > 0 && caseData.mediaUrls[0];
 
   return (
-    <Link href={`/cases/${caseData.id}`} className={styles.card}>
-      {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 && caseData.mediaUrls[0] ? (
+    <Link
+      href={`/cases/${caseData.id}`}
+      className={`${styles.card} ${hasImage ? '' : styles.noImageCard}`}
+      aria-label={`View case: ${caseData.title || 'Untitled Case'}`}
+      role="article"
+    >
+      {hasImage && (
         <div className={styles.imageContainer}>
           <Image
             src={caseData.mediaUrls[0]}
-            alt={caseData.title || 'Case image'}
+            alt={`Image for ${caseData.title || 'case'}`}
             width={280}
             height={180}
             className={styles.image}
-            objectFit="cover"
-            onError={(e) => console.error('Case image error:', caseData.mediaUrls[0])}
-          />
-        </div>
-      ) : (
-        <div className={styles.imageContainer}>
-          <Image
-            src="/images/placeholder-case.jpg"
-            alt="No case image"
-            width={280}
-            height={180}
-            className={styles.image}
-            objectFit="cover"
+            sizes="(max-width: 640px) 100vw, 280px"
+            priority={false}
+            onError={(e) => console.error(`Image error for case ${caseData.id}:`, caseData.mediaUrls[0])}
           />
         </div>
       )}
@@ -39,11 +41,11 @@ export default function CaseCard({ caseData }) {
         <div className={styles.contributor}>
           <Image
             src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
-            alt={caseData.userName || 'Contributor'}
+            alt={`Avatar for ${caseData.userName || 'Contributor'}`}
             width={24}
             height={24}
             className={styles.contributorAvatar}
-            onError={(e) => console.error('Contributor image error:', caseData.photoURL)}
+            onError={(e) => console.error(`Contributor image error for case ${caseData.id}:`, caseData.photoURL)}
           />
           <span>{caseData.userName || 'Anonymous'}</span>
         </div>
