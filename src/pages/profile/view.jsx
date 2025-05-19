@@ -16,6 +16,6 @@ export default function ProfileView() {
         <Navbar />
         {user && <ProfileCard userData={user} />}
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
