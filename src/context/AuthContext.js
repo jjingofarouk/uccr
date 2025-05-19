@@ -17,9 +17,9 @@ export const AuthProvider = ({ children }) => {
         const profile = await getProfile(currentUser.uid);
         setUser({
           uid: currentUser.uid,
-          displayName: currentUser.displayName || 'User',
+          displayName: currentUser.displayName || profile.displayName || 'User',
           email: currentUser.email || '',
-          photoURL: profile?.photoURL || currentUser.photoURL || '/images/doctor-avatar.jpeg',
+          photoURL: profile.photoURL || currentUser.photoURL || '/images/doctor-avatar.jpeg',
           ...profile,
         });
       } else {
