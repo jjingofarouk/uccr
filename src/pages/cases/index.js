@@ -17,7 +17,6 @@ export default function Cases() {
             <CaseCard key={caseData.id} caseData={caseData} />
           ))}
         </div>
-        <Footer />
       </div>
     </ProtectedRoute>
   );
