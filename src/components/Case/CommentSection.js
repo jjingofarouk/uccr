@@ -1,8 +1,9 @@
 // components/Case/CommentSection.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { addComment, getComments } from '../../firebase/firestore';
+import { addComment, getComments, addReaction } from '../../firebase/firestore';
 import Image from 'next/image';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import styles from './commentSection.module.css';
 
 export default function CommentSection({ caseId }) {
@@ -36,6 +37,8 @@ export default function CommentSection({ caseId }) {
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
         userPhoto: user.photoURL || '/images/doctor-avatar.jpeg',
+        upvotes: 0,
+        downvotes: 0,
       }, parentCommentId);
       if (parentCommentId) {
         setReplyComment('');
@@ -53,6 +56,25 @@ export default function CommentSection({ caseId }) {
       );
     } catch (err) {
       setError('Failed to post comment. Please try again.');
+    }
+  };
+
+  const handleVote = async (commentId, type) => {
+    if (!user) {
+      setError('You must be logged in to vote.');
+      return;
+    }
+    try {
+      await addReaction(caseId, user.uid, type, commentId);
+      const updatedComments = await getComments(caseId);
+      setComments(
+        updatedComments.map((comment) => ({
+          ...comment,
+          createdAt: comment.createdAt?.toDate ? comment.createdAt.toDate() : new Date(comment.createdAt),
+        }))
+      );
+    } catch (err) {
+      setError('Failed to record vote. Please try again.');
     }
   };
 
@@ -104,6 +126,24 @@ export default function CommentSection({ caseId }) {
           </span>
         </p>
         <p className={styles.commentText}>{comment.text}</p>
+        <div className={styles.voteButtons}>
+          <button
+            onClick={() => handleVote(comment.id, 'upvote')}
+            className={styles.voteButton}
+            disabled={!user}
+          >
+            <ThumbsUp size={16} />
+            <span className={styles.voteCount}>{comment.upvotes || 0}</span>
+          </button>
+          <button
+            onClick={() => handleVote(comment.id, 'downvote')}
+            className={styles.voteButton}
+            disabled={!user}
+          >
+            <ThumbsDown size={16} />
+            <span className={styles.voteCount}>{comment.downvotes || 0}</span>
+          </button>
+        </div>
         <button
           onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
           className={styles.replyButton}
@@ -185,7 +225,7 @@ export default function CommentSection({ caseId }) {
         {commentTree.length > 0 ? (
           commentTree.map(comment => renderComment(comment))
         ) : (
-          <p className={styles.noComments}>No comments yet. Be the first to comment!</p>
+          <p className={styles.noComments}>No comments yet. Be the first to comment!</p> 
         )}
       </div>
     </section>
