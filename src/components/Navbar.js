@@ -1,4 +1,3 @@
-
 // components/Navbar.jsx
 import { useState } from 'react';
 import Link from 'next/link';
@@ -10,7 +9,7 @@ import Image from 'next/image';
 import styles from '../styles/navbar.module.css';
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -47,6 +46,7 @@ export default function Navbar() {
             onClick={toggleSidebar}
             className={styles.userButton}
             aria-label="User menu"
+            disabled={loading}
           >
             <Image
               src={user?.photoURL || '/images/doctor-avatar.jpeg'}
