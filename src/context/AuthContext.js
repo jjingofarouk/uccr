@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
           uid: currentUser.uid,
           displayName: currentUser.displayName || 'User',
           email: currentUser.email || '',
-          photoURL: currentUser.photoURL || profile?.photoURL || '/images/doctor-avatar.jpeg',
+          photoURL: profile?.photoURL || currentUser.photoURL || '/images/doctor-avatar.jpeg',
           ...profile,
         });
       } else {
