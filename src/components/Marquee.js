@@ -1,40 +1,42 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './Marquee.module.css';
-import { researchFindings } from './ResearchFindings';
+import { researchHeadlines } from '@/lib/researchHeadlines'; // Replace with your data
 
 export default function Marquee() {
   const marqueeRef = useRef(null);
+  const [show, setShow] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setShow(currentScrollY < lastScrollY || currentScrollY < 100); // Show on scroll up or near top
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   useEffect(() => {
     const marquee = marqueeRef.current;
     if (!marquee) return;
 
-    const shuffledFindings = [...researchFindings].sort(() => Math.random() - 0.5);
-
-    marquee.innerHTML = [...shuffledFindings, ...shuffledFindings]
-      .map(finding => `<span>${finding}</span>`)
+    const shuffled = [...researchHeadlines].sort(() => Math.random() - 0.5);
+    marquee.innerHTML = [...shuffled, ...shuffled]
+      .map((msg) => `<span>${msg}</span>`)
       .join(' • ');
 
-    const totalWidth = shuffledFindings.length * 300;
+    const totalWidth = shuffled.length * 300;
     marquee.style.setProperty('--marquee-width', `${totalWidth}px`);
     marquee.style.setProperty('--marquee-duration', `${totalWidth / 50}s`);
-
-    const handleMouseEnter = () => marquee.style.animationPlayState = 'paused';
-    const handleMouseLeave = () => marquee.style.animationPlayState = 'running';
-
-    marquee.addEventListener('mouseenter', handleMouseEnter);
-    marquee.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      marquee.innerHTML = '';
-      marquee.removeEventListener('mouseenter', handleMouseEnter);
-      marquee.removeEventListener('mouseleave', handleMouseLeave);
-    };
   }, []);
 
   return (
-    <div className={styles.marqueeContainer}>
+    <div
+      className={`${styles.marqueeContainer} ${show ? styles.visible : styles.hidden}`}
+    >
       <div className={styles.marquee} ref={marqueeRef}></div>
     </div>
   );
