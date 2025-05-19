@@ -1,8 +1,8 @@
-// components/Case/CommentSection.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { addComment, getComments, addReaction } from '../../firebase/firestore';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import styles from './commentSection.module.css';
 
@@ -56,6 +56,7 @@ export default function CommentSection({ caseId }) {
       );
     } catch (err) {
       setError('Failed to post comment. Please try again.');
+      console.error('Comment submit error:', err);
     }
   };
 
@@ -75,6 +76,7 @@ export default function CommentSection({ caseId }) {
       );
     } catch (err) {
       setError('Failed to record vote. Please try again.');
+      console.error('Vote error:', err);
     }
   };
 
@@ -105,16 +107,21 @@ export default function CommentSection({ caseId }) {
 
   const renderComment = (comment, depth = 0) => (
     <div key={comment.id} className={`${styles.comment} ${depth > 0 ? styles.reply : ''}`}>
-      <Image
-        src={comment.userPhoto || '/images/doctor-avatar.jpeg'}
-        alt={`${comment.userName} avatar`}
-        width={32}
-        height={32}
-        className={styles.commentAvatar}
-      />
+      <Link href={`/profile/view/${comment.userId}`}>
+        <Image
+          src={comment.userPhoto || '/images/doctor-avatar.jpeg'}
+          alt={`${comment.userName} avatar`}
+          width={32}
+          height={32}
+          className={styles.commentAvatar}
+          onError={(e) => console.error('Comment image error:', comment.userPhoto)}
+        />
+      </Link>
       <div className={styles.commentContent}>
         <p className={styles.commentHeader}>
-          <strong>{comment.userName}</strong>
+          <Link href={`/profile/view/${comment.userId}`}>
+            <strong className={styles.commentAuthor}>{comment.userName}</strong>
+          </Link>
           <span className={styles.commentDate}>
             {new Date(comment.createdAt).toLocaleString('en-US', {
               year: 'numeric',
