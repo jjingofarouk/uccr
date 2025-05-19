@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
 import { Award } from 'lucide-react';
 import CommentSection from './CommentSection';
-import styles from '../../caseDetail.module.css';
+import styles from '../../styles/caseDetail.module.css';
 
 export default function CaseDetail({ caseData }) {
   const { user } = useAuth();
@@ -26,27 +26,27 @@ export default function CaseDetail({ caseData }) {
   };
 
   return (
-    <div className={styles.caseDetail}>
+    <article className={styles.caseDetail}>
       <header className={styles.header}>
-        <h1 className={styles.title}>{caseData.title}</h1>
+        <h1 className={styles.title}>{caseData.title || 'Untitled Case'}</h1>
         <div className={styles.meta}>
           <div className={styles.author}>
             <Image
               src={caseData.userPhoto || '/images/doctor-avatar.jpeg'}
-              alt={caseData.userName}
-              width={32}
-              height={32}
+              alt={caseData.userName || 'Contributor'}
+              width={40}
+              height={40}
               className={styles.avatar}
             />
-            <span>{caseData.userName || 'Anonymous'}</span>
+            <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
           </div>
-          <span className={styles.date}>
+          <time className={styles.date}>
             {new Date(caseData.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
             })}
-          </span>
+          </time>
         </div>
       </header>
 
@@ -55,6 +55,7 @@ export default function CaseDetail({ caseData }) {
           onClick={() => handleVote('award')}
           className={styles.voteButton}
           disabled={!user}
+          aria-label="Award case"
         >
           <Award size={20} />
           <span className={styles.voteCount}>{caseData.awards || 0}</span>
@@ -63,32 +64,42 @@ export default function CaseDetail({ caseData }) {
       </div>
 
       <section className={styles.content}>
-        <h2>Chief Concern</h2>
-        <p>{caseData.presentingComplaint || 'Not specified'}</p>
-
-        <h2>Specialty</h2>
-        <p>{caseData.specialty || 'Not specified'}</p>
-
-        <h2>History</h2>
-        <p>{caseData.history || 'Not provided'}</p>
-
-        <h2>Investigations</h2>
-        <p>{caseData.investigations || 'Not provided'}</p>
-
-        <h2>Management</h2>
-        <p>{caseData.management || 'Not provided'}</p>
-
-        <h2>Provisional Diagnosis</h2>
-        <p>{caseData.provisionalDiagnosis || 'Not specified'}</p>
-
-        <h2>Hospital</h2>
-        <p>{caseData.hospital || 'Not specified'}</p>
-
-        <h2>Referral Center</h2>
-        <p>{caseData.referralCenter || 'Not specified'}</p>
-
-        <h2>Discussion</h2>
-        <p>{caseData.discussion || 'Not provided'}</p>
+        <div className={styles.section}>
+          <h2>Chief Concern</h2>
+          <p>{caseData.presentingComplaint || 'Not specified'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>Specialty</h2>
+          <p>{caseData.specialty || 'Not specified'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>History</h2>
+          <p>{caseData.history || 'Not provided'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>Investigations</h2>
+          <p>{caseData.investigations || 'Not provided'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>Management</h2>
+          <p>{caseData.management || 'Not provided'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>Provisional Diagnosis</h2>
+          <p>{caseData.provisionalDiagnosis || 'Not specified'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>Hospital</h2>
+          <p>{caseData.hospital || 'Not specified'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>Referral Center</h2>
+          <p>{caseData.referralCenter || 'Not specified'}</p>
+        </div>
+        <div className={styles.section}>
+          <h2>Discussion</h2>
+          <p>{caseData.discussion || 'Not provided'}</p>
+        </div>
       </section>
 
       {caseData.mediaUrls?.length > 0 && (
@@ -100,9 +111,10 @@ export default function CaseDetail({ caseData }) {
                 key={index}
                 src={url}
                 alt={`Case media ${index + 1}`}
-                width={300}
-                height={200}
+                width={600}
+                height={400}
                 className={styles.mediaImage}
+                objectFit="contain"
               />
             ))}
           </div>
@@ -110,6 +122,6 @@ export default function CaseDetail({ caseData }) {
       )}
 
       <CommentSection caseId={caseData.id} />
-    </div>
+    </article>
   );
 }
