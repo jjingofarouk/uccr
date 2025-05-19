@@ -82,8 +82,11 @@ export default function CaseForm() {
         specialty: specialty || 'Not specified',
         discussion: discussion || 'Not provided',
         mediaUrls,
+        userId: user.uid,
+        userName: user.displayName || 'Anonymous',
+        userPhoto: user.photoURL || '/images/doctor-avatar.jpeg',
       };
-      await addCase(caseData, user.uid, user.displayName || 'Anonymous', user.photoURL);
+      await addCase(caseData);
       router.push('/cases');
     } catch (err) {
       setError(err.message || 'Failed to submit case.');
