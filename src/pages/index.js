@@ -1,29 +1,37 @@
-// pages/index.jsx
+import { useState, useEffect, useMemo } from 'react';
+import { useCases } from '../hooks/useCases';
 import Navbar from '../components/Navbar';
 import Marquee from '../components/Marquee';
 import CaseCard from '../components/Case/CaseCard';
-import { useCases } from '../hooks/useCases';
+import ProtectedRoute from '../components/Auth/ProtectedRoute';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import styles from './Home.module.css';
 
 export default function Home() {
-  const { cases } = useCases();
+  const { cases, loading, error } = useCases(); // Assume useCases provides loading and error states
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
 
+  // Select Case of the Day with stable daily selection
   useEffect(() => {
     if (cases.length > 0) {
-      const randomIndex = Math.floor(Math.random() * cases.length);
+      // Use a deterministic seed based on the current date for daily consistency
+      const today = new Date().toISOString().split('T')[0];
+      const seed = today.split('-').reduce((acc, val) => acc + parseInt(val), 0);
+      const randomIndex = seed % cases.length;
       setCaseOfTheDay(cases[randomIndex]);
     }
   }, [cases]);
 
-  const recentCases = cases
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
+  // Memoize recent cases to prevent unnecessary re-sorting
+  const recentCases = useMemo(() => {
+    return cases
+      .slice() // Create a shallow copy to avoid mutating original array
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+  }, [cases]);
 
   return (
-    <>
+    <ProtectedRoute>
       <Navbar />
       <Marquee />
       <main className={styles.container}>
@@ -42,16 +50,37 @@ export default function Home() {
           </div>
         </section>
 
-        {caseOfTheDay && (
+        {loading && (
+          <section className={styles.loadingSection}>
+            <p className={styles.loadingText}>Loading cases...</p>
+          </section>
+        )}
+
+        {error && (
+          <section className={styles.errorSection}>
+            <p className={styles.errorText}>Error: {error}</p>
+          </section>
+        )}
+
+        {!loading && !error && cases.length === 0 && (
+          <section className={styles.emptySection}>
+            <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
+            <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+              Share a Case
+            </Link>
+          </section>
+        )}
+
+        {!loading && !error && caseOfTheDay && (
           <section className={styles.featuredSection}>
             <h2 className={styles.sectionTitle}>Case of the Day</h2>
             <div className={styles.featuredCard}>
-              <CaseCard caseData={caseOfTheDay} />
+              <CaseCard key={caseOfTheDay.id} caseData={caseOfTheDay} />
             </div>
           </section>
         )}
 
-        {recentCases.length > 0 && (
+        {!loading && !error && recentCases.length > 0 && (
           <section className={styles.recentSection}>
             <h2 className={styles.sectionTitle}>Recently Published Cases</h2>
             <div className={styles.caseList}>
@@ -62,6 +91,6 @@ export default function Home() {
           </section>
         )}
       </main>
-    </>
+    </ProtectedRoute>
   );
 }
