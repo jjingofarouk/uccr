@@ -1,4 +1,3 @@
-// firebase/firestore.js
 import { db } from './config';
 import { 
   collection, 
@@ -14,6 +13,20 @@ import {
   updateDoc,
   increment
 } from 'firebase/firestore';
+
+// Helper function to fetch photoURL for a user
+const fetchUserPhotoURL = async (userId) => {
+  try {
+    const profileRef = doc(db, 'profiles', userId);
+    const profileSnap = await getDoc(profileRef);
+    const photoURL = profileSnap.exists() ? profileSnap.data().photoURL : null;
+    console.log('Fetched photoURL for user:', userId, 'photoURL:', photoURL); // Debug
+    return photoURL || '/images/doctor-avatar.jpeg';
+  } catch (error) {
+    console.error('Fetch user photoURL error:', error);
+    return '/images/doctor-avatar.jpeg';
+  }
+};
 
 export const addCase = async (caseData) => {
   try {
@@ -37,18 +50,21 @@ export const addCase = async (caseData) => {
 export const getCases = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'cases'));
-    const cases = querySnapshot.docs.map(doc => {
+    const casesPromises = querySnapshot.docs.map(async (doc) => {
       const data = doc.data();
       const mediaUrls = Array.isArray(data.mediaUrls) ? data.mediaUrls : [];
-      console.log('Case ID:', doc.id, 'mediaUrls:', mediaUrls); // Debug
+      const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/doctor-avatar.jpeg';
       return {
         id: doc.id,
         ...data,
         mediaUrls,
+        photoURL, // Add photoURL to case data
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(),
       };
     });
+    const cases = await Promise.all(casesPromises);
+    console.log('Fetched cases:', cases); // Debug
     return cases;
   } catch (error) {
     console.error('Get cases error:', error);
@@ -66,14 +82,17 @@ export const getCaseById = async (id) => {
     }
     const data = docSnap.data();
     const mediaUrls = Array.isArray(data.mediaUrls) ? data.mediaUrls : [];
-    console.log('Case ID:', docSnap.id, 'mediaUrls:', mediaUrls); // Debug
-    return {
+    const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/doctor-avatar.jpeg';
+    const caseData = {
       id: docSnap.id,
       ...data,
       mediaUrls,
+      photoURL, // Add photoURL to case data
       createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
       updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(),
     };
+    console.log('Fetched case:', caseData); // Debug
+    return caseData;
   } catch (error) {
     console.error('Get case by ID error:', error);
     return null;
