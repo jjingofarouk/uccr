@@ -1,21 +1,128 @@
 .container {
-  margin-top: 120px; /* 60px navbar + ~60px marquee height */
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
+  max-width: 1280px;
+  margin: 120px auto 40px;
+  padding: 0 24px;
 }
 
-.title {
-  font-size: 28px;
-  font-weight: bold;
+.hero {
+  text-align: center;
+  padding: 48px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
+  margin-bottom: 48px;
+}
+
+.dark-mode .hero {
+  background: linear-gradient(135deg, #2a2e35 0%, #1f232a 100%);
+}
+
+.heroTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.dark-mode .heroTitle {
+  color: #e2e8f0;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  color: #4a5568;
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dark-mode .heroSubtitle {
+  color: #a0aec0;
+}
+
+.heroButtons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.ctaButtonPrimary,
+.ctaButtonSecondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.ctaButtonPrimary {
+  background: #007bff;
+  color: #ffffff;
+}
+
+.ctaButtonPrimary:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.dark-mode .ctaButtonPrimary {
+  background: #4299e1;
+}
+
+.dark-mode .ctaButtonPrimary:hover {
+  background: #2b6cb0;
+}
+
+.ctaButtonSecondary {
+  background: transparent;
   color: #007bff;
-  margin-bottom: 20px;
+  border: 2px solid #007bff;
+}
+
+.ctaButtonSecondary:hover {
+  background: #007bff;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.dark-mode .ctaButtonSecondary {
+  color: #4299e1;
+  border-color: #4299e1;
+}
+
+.dark-mode .ctaButtonSecondary:hover {
+  background: #4299e1;
+  color: #1a202c;
+}
+
+.featuredSection,
+.recentSection {
+  margin-bottom: 48px;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 24px;
+}
+
+.dark-mode .sectionTitle {
+  color: #e2e8f0;
+}
+
+.featuredCard {
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .caseList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  padding-bottom: 24px;
 }
