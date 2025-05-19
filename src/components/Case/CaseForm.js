@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { addCase } from '../../firebase/firestore';
 import { useAuth } from '../../hooks/useAuth';
+import { addCase } from '../../firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import styles from '../../styles/caseForm.module.css';
 
