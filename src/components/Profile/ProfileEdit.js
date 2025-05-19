@@ -1,3 +1,4 @@
+// components/ProfileEdit.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -8,7 +9,7 @@ import Image from 'next/image';
 import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
-  const { user, loading } = useAuth(); // Removed refreshProfile if not defined
+  const { user, loading } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     photoUrl: '',
@@ -38,7 +39,7 @@ export default function ProfileEdit() {
             specialty: data.specialty || '',
             bio: data.bio || '',
           });
-          console.log('Fetched profile photoURL:', data.photoURL); // Debug
+          console.log('Fetched profile photoURL:', data.photoURL);
         } catch (err) {
           setError('Failed to load profile.');
           console.error('Profile fetch error:', err);
@@ -72,7 +73,7 @@ export default function ProfileEdit() {
               if (!error && result && result.event === 'success') {
                 const newUrl = result.info.secure_url;
                 setFormData(prev => ({ ...prev, photoUrl: newUrl }));
-                console.log('Cloudinary uploaded URL:', newUrl); // Debug
+                console.log('Cloudinary uploaded URL:', newUrl);
               } else if (error) {
                 setError('Image upload failed.');
                 console.error('Cloudinary error:', error);
@@ -121,7 +122,7 @@ export default function ProfileEdit() {
         updatedAt: new Date(),
       };
       await setDoc(doc(db, 'profiles', user.uid), profileData, { merge: true });
-      console.log('Profile saved with photoURL:', formData.photoUrl); // Debug
+      console.log('Profile saved with photoURL:', formData.photoUrl);
       router.push('/profile');
     } catch (err) {
       setError('Failed to update profile: ' + err.message);
@@ -205,7 +206,7 @@ export default function ProfileEdit() {
           >
             Upload Profile Photo
           </button>
-          {formData.photoUrl && (
+          {formData.photoUrl ? (
             <div>
               <p>
                 Photo uploaded:{' '}
@@ -219,9 +220,12 @@ export default function ProfileEdit() {
                 width={100}
                 height={100}
                 className={styles.previewImage}
-                onError={(e) => console.error('Preview image error:', formData.photoUrl)} // Debug
+                onError={(e) => console.error('Preview image error:', formData.photoUrl)}
+                unoptimized // Bypass Next.js optimization for testing
               />
             </div>
+          ) : (
+            <p>No photo uploaded.</p>
           )}
         </div>
         <div className={styles.section}>
