@@ -1,113 +1,184 @@
 .card {
   background-color: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 6px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 8px 8px rgba(0, 0, 0, 0.05);
 }
 
 .card h2 {
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #2c3e50;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+  font-weight: 700;
+  line-height: 1.2;
+  border-bottom: 2px solid #f0f4f8;
+  padding-bottom: 0.8rem;
 }
 
 .card p {
   font-size: 1rem;
-  margin-bottom: 0.5rem;
-  color: #34495e;
+  margin-bottom: 0.75rem;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.card p strong {
+  font-weight: 600;
+  color: #2c5282;
 }
 
 .media {
-  margin-top: 1rem;
-  display: flex;
-  flex-wrap: wrap;
+  margin: 1.5rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
+  align-items: center;
 }
 
 .image {
-  max-width: 100%;
-  max-height: 200px;
+  width: 100%;
+  aspect-ratio: 4/3;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.image:hover {
+  transform: scale(1.03);
 }
 
 .link {
   display: inline-block;
-  margin-top: 1rem;
-  color: #3498db;
+  margin-top: 1.25rem;
+  background-color: #4299e1;
+  color: white;
   text-decoration: none;
-  font-weight: bold;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.2);
 }
 
 .link:hover {
-  background-color: #eaf4ff;
-  color: #2980b9;
+  background-color: #3182ce;
+  box-shadow: 0 6px 8px rgba(49, 130, 206, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Specialty Tag */
+.card p:nth-of-type(1) strong {
+  background-color: #ebf4ff;
+  color: #2b6cb0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-right: 0.25rem;
+}
+
+/* User Attribution */
+.card p:nth-last-of-type(1) {
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+  color: #718096;
+  font-style: italic;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .card {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .card h2 {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
+    padding-bottom: 0.6rem;
   }
 
-  .card p {
-    font-size: 0.95rem;
-  }
-
-  .image {
-    max-height: 150px;
+  .media {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
 
 @media (max-width: 480px) {
   .card {
-    padding: 0.75rem;
+    padding: 1rem;
+    border-radius: 10px;
   }
 
   .card h2 {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
   }
 
   .card p {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    margin-bottom: 0.6rem;
   }
 
-  .image {
-    max-height: 120px;
+  .media {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .link {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    width: 100%;
   }
 }
 
 /* Dark Mode Overrides */
 :global(body.dark-mode) .card {
-  background-color: #2c2c2c;
-  color: #ffffff;
+  background-color: #1a202c;
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 :global(body.dark-mode) .card h2 {
-  color: #ecf0f1;
+  color: #f7fafc;
+  border-bottom-color: #2d3748;
 }
 
 :global(body.dark-mode) .card p {
-  color: #bdc3c7;
+  color: #e2e8f0;
+}
+
+:global(body.dark-mode) .card p strong {
+  color: #90cdf4;
 }
 
 :global(body.dark-mode) .link {
-  color: #66b3ff;
+  background-color: #4299e1;
+  color: #fff;
 }
 
 :global(body.dark-mode) .link:hover {
-  background-color: #34495e;
-  color: #4d94ff;
+  background-color: #3182ce;
+}
+
+:global(body.dark-mode) .card p:nth-of-type(1) strong {
+  background-color: rgba(66, 153, 225, 0.2);
+  color: #90cdf4;
+}
+
+:global(body.dark-mode) .card p:nth-last-of-type(1) {
+  color: #a0aec0;
+}
+
+:global(body.dark-mode) .image {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
