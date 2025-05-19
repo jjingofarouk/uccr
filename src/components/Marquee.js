@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import styles from './Marquee.module.css';
-import { researchHeadlines } from '@/lib/researchHeadlines'; // Replace with your data
+import { researchFindings } from './ResearchFindings'; // Replace with your data
 
 export default function Marquee() {
   const marqueeRef = useRef(null);
@@ -23,7 +23,7 @@ export default function Marquee() {
     const marquee = marqueeRef.current;
     if (!marquee) return;
 
-    const shuffled = [...researchHeadlines].sort(() => Math.random() - 0.5);
+    const shuffled = [...researchFindings].sort(() => Math.random() - 0.5);
     marquee.innerHTML = [...shuffled, ...shuffled]
       .map((msg) => `<span>${msg}</span>`)
       .join(' • ');
