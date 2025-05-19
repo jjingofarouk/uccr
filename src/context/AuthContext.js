@@ -1,6 +1,8 @@
+// context/AuthContext.jsx
 import { createContext, useState, useEffect } from 'react';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
+import { getProfile } from '../firebase/firestore';
 
 export const AuthContext = createContext();
 
@@ -10,22 +12,25 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('AuthProvider: Setting up onAuthStateChanged');
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log('AuthProvider: onAuthStateChanged fired', {
-        currentUser: currentUser ? { uid: currentUser.uid, displayName: currentUser.displayName } : null,
-      });
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const profile = await getProfile(currentUser.uid);
+        setUser({
+          uid: currentUser.uid,
+          displayName: currentUser.displayName || 'User',
+          email: currentUser.email || '',
+          photoURL: currentUser.photoURL || profile?.photoURL || '/images/doctor-avatar.jpeg',
+          ...profile,
+        });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     }, (err) => {
-      console.error('AuthProvider: onAuthStateChanged error', err);
       setError(err.message);
       setLoading(false);
     });
-    return () => {
-      console.log('AuthProvider: Cleaning up onAuthStateChanged');
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   return (
