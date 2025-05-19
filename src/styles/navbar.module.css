@@ -6,7 +6,7 @@
   border-bottom: 1px solid #d1d5db;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 1000; /* Increased to ensure navbar is above all content */
 }
 
 .dark-mode .header {
@@ -85,7 +85,7 @@
   height: 100%;
   background-color: #ffffff;
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  z-index: 2000; /* Higher than header and marquee */
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
