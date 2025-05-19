@@ -1,8 +1,9 @@
-// components/Case/CaseDetail.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 import { Award } from 'lucide-react';
 import CommentSection from './CommentSection';
 import styles from '../../styles/caseDetail.module.css';
@@ -10,8 +11,34 @@ import styles from '../../styles/caseDetail.module.css';
 export default function CaseDetail({ caseData }) {
   const { user } = useAuth();
   const [error, setError] = useState('');
+  const [userPhoto, setUserPhoto] = useState(null);
 
-  console.log('CaseDetail mediaUrls:', caseData.mediaUrls); // Debug
+  useEffect(() => {
+    const fetchUserPhoto = async () => {
+      if (caseData.userId) {
+        try {
+          const profileDoc = await getDoc(doc(db, 'profiles', caseData.userId));
+          if (profileDoc.exists()) {
+            const data = profileDoc.data();
+            setUserPhoto(data.photoURL || '/images/doctor-avatar.jpeg');
+            console.log('CaseDetail fetched photoURL:', data.photoURL); // Debug
+          } else {
+            setUserPhoto('/images/doctor-avatar.jpeg');
+            console.log('CaseDetail: No profile found for userId:', caseData.userId);
+          }
+        } catch (error) {
+          console.error('CaseDetail fetch error:', error);
+          setUserPhoto('/images/doctor-avatar.jpeg');
+        }
+      } else {
+        setUserPhoto('/images/doctor-avatar.jpeg');
+        console.log('CaseDetail: No userId in caseData');
+      }
+    };
+    fetchUserPhoto();
+  }, [caseData.userId]);
+
+  console.log('CaseDetail caseData:', caseData);
 
   const handleVote = async (type) => {
     if (!user) {
@@ -33,20 +60,23 @@ export default function CaseDetail({ caseData }) {
         <div className={styles.meta}>
           <div className={styles.author}>
             <Image
-              src={caseData.userPhoto || '/images/doctor-avatar.jpeg'}
+              src={userPhoto}
               alt={caseData.userName || 'Contributor'}
               width={40}
               height={40}
               className={styles.avatar}
+              onError={(e) => console.error('Author image error:', userPhoto)}
             />
             <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
           </div>
           <time className={styles.date}>
-            {new Date(caseData.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+            {caseData.createdAt
+              ? new Date(caseData.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : 'Unknown date'}
           </time>
         </div>
       </header>
@@ -103,23 +133,40 @@ export default function CaseDetail({ caseData }) {
         </div>
       </section>
 
-      {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 && (
+      {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? (
         <section className={styles.media}>
           <h2>Media</h2>
           <div className={styles.mediaGrid}>
             {caseData.mediaUrls.map((url, index) => (
-              <Image
-                key={index}
-                src={url}
-                alt={`Case media ${index + 1}`}
-                width={600}
-                height={400}
-                className={styles.mediaImage}
-                objectFit="contain"
-                onError={(e) => console.error('Image load error:', url)} // Debug
-              />
+              url ? (
+                <Image
+                  key={index}
+                  src={url}
+                  alt={`Case media ${index + 1}`}
+                  width={600}
+                  height={400}
+                  className={styles.mediaImage}
+                  objectFit="contain"
+                  onError={(e) => console.error('Media image error:', url)}
+                />
+              ) : (
+                <div key={index} className={styles.mediaImage}>
+                  <Image
+                    src="/images/placeholder-case.jpg"
+                    alt="No media available"
+                    width={600}
+                    height={400}
+                    objectFit="contain"
+                  />
+                </div>
+              )
             ))}
           </div>
+        </section>
+      ) : (
+        <section className={styles.media}>
+          <h2>Media</h2>
+          <p>No media available.</p>
         </section>
       )}
 
