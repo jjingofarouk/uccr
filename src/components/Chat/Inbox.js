@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { getMessages, getUsers, sendMessage, getThreadMessages } from '../../firebase/firestore';
+import { getMessages, getUsers, sendMessage, getThreadMessages, getProfile } from '../../firebase/firestore';
 import Navbar from '../../components/Navbar';
 import { Search, Send, AlertCircle } from 'lucide-react';
-import styles from './inbox.module.css';
+import styles from './styles/inbox.module.css';
 
 export default function Inbox() {
   const { user } = useAuth();
+  const router = useRouter();
+  const { recipient: recipientId } = router.query;
   const [threads, setThreads] = useState([]);
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -19,6 +22,7 @@ export default function Inbox() {
 
   useEffect(() => {
     if (!user) return;
+
     const fetchThreads = async () => {
       const fetchedThreads = await getMessages(user.uid);
       setThreads(fetchedThreads);
@@ -28,6 +32,7 @@ export default function Inbox() {
 
   useEffect(() => {
     if (!user) return;
+
     const fetchUsers = async () => {
       const allUsers = await getUsers();
       const filtered = allUsers.filter(u => u.uid !== user.uid);
@@ -64,6 +69,34 @@ export default function Inbox() {
     fetchMessages();
   }, [selectedThread]);
 
+  useEffect(() => {
+    if (!user || !recipientId || !users.length) return;
+
+    const selectRecipient = async () => {
+      const recipient = users.find(u => u.uid === recipientId);
+      if (!recipient) {
+        // Fetch recipient profile if not in users collection
+        const profile = await getProfile(recipientId);
+        if (profile.displayName) {
+          const recipientData = {
+            uid: recipientId,
+            displayName: profile.displayName,
+            email: '',
+            photoURL: profile.photoURL,
+          };
+          setUsers(prev => [...prev, recipientData]);
+          setFilteredUsers(prev => [...prev, recipientData]);
+          handleSelectUser(recipientData);
+        } else {
+          setError('User not found.');
+        }
+        return;
+      }
+      handleSelectUser(recipient);
+    };
+    selectRecipient();
+  }, [recipientId, user, users]);
+
   const handleSelectUser = async (recipient) => {
     const threadId = [user.uid, recipient.uid].sort().join('_');
     const existingThread = threads.find(t => t.id === threadId);
@@ -80,6 +113,8 @@ export default function Inbox() {
     setSearchQuery('');
     setError('');
     setSuccess('');
+    // Clear query param to avoid re-triggering
+    router.replace('/inbox', undefined, { shallow: true });
   };
 
   const handleSendMessage = async (e) => {
