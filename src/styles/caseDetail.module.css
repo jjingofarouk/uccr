@@ -1,27 +1,34 @@
 .caseDetail {
-  max-width: 800px;
-  margin: 40px auto;
+  max-width: 1200px;
+  margin: 24px auto;
   padding: 24px;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
 }
 
 .dark-mode .caseDetail {
-  background: #2d3748;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: #1f2937;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .header {
   margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 16px;
+}
+
+.dark-mode .header {
+  border-bottom-color: #374151;
 }
 
 .title {
-  font-family: 'Inter', sans-serif;
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #1a202c;
-  margin: 0 0 16px;
+  margin: 0 0 12px;
+  line-height: 1.3;
 }
 
 .dark-mode .title {
@@ -30,14 +37,16 @@
 
 .meta {
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.95rem;
-  color: #718096;
+  font-size: 0.9rem;
+  color: #6b7280;
 }
 
 .dark-mode .meta {
-  color: #a0aec0;
+  color: #9ca3af;
 }
 
 .author {
@@ -46,103 +55,117 @@
   gap: 8px;
 }
 
+.authorName {
+  font-weight: 500;
+  color: #374151;
+}
+
+.dark-mode .authorName {
+  color: #d1d5db;
+}
+
 .avatar {
   border-radius: 50%;
   object-fit: cover;
 }
 
 .date {
-  font-family: 'Inter', sans-serif;
+  font-weight: 400;
 }
 
 .voteSection {
-  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
 }
 
 .voteButton {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: none;
+  gap: 6px;
+  background: #f3f4f6;
   border: none;
-  color: #718096;
-  cursor: pointer;
-  padding: 8px 12px;
   border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.voteButton:hover:not(:disabled) {
-  background: #edf2f7;
-  color: #2d3748;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #4a5568;
+  font-size: 0.9rem;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .dark-mode .voteButton {
-  color: #a0aec0;
+  background: #374151;
+  color: #d1d5db;
+}
+
+.voteButton:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #1a202c;
 }
 
 .dark-mode .voteButton:hover:not(:disabled) {
-  background: #4a5568;
-  color: #e2e8f0;
+  background: #4b5563;
+  color: #f3f4f6;
 }
 
 .voteButton:disabled {
-  cursor: not-allowed;
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .voteCount {
-  font-size: 0.95rem;
-  font-family: 'Inter', sans-serif;
+  font-weight: 500;
 }
 
 .error {
-  color: #e53e3e;
-  font-size: 0.9rem;
-  margin-top: 8px;
+  color: #dc2626;
+  font-size: 0.85rem;
 }
 
 .dark-mode .error {
-  color: #f687b3;
+  color: #f87171;
 }
 
 .content {
-  margin-bottom: 40px;
+  margin: 24px 0;
 }
 
-.content h2 {
-  font-family: 'Inter', sans-serif;
+.section {
+  margin-bottom: 24px;
+}
+
+.section h2 {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1a202c;
-  margin: 24px 0 12px;
+  margin: 0 0 8px;
 }
 
-.dark-mode .content h2 {
+.dark-mode .section h2 {
   color: #e2e8f0;
 }
 
-.content p {
-  font-family: 'Inter', sans-serif;
+.section p {
   font-size: 0.95rem;
-  color: #2d3748;
+  color: #4a5568;
   line-height: 1.6;
+  margin: 0;
 }
 
-.dark-mode .content p {
-  color: #e2e8f0;
+.dark-mode .section p {
+  color: #d1d5db;
 }
 
 .media {
-  margin-bottom: 40px;
+  margin: 24px 0;
 }
 
 .media h2 {
-  font-family: 'Inter', sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: #1a202c;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
 }
 
 .dark-mode .media h2 {
@@ -151,13 +174,63 @@
 
 .mediaGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
 }
 
 .mediaImage {
-  border-radius: 8px;
-  object-fit: cover;
   width: 100%;
   height: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .caseDetail {
+    margin: 16px;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .author {
+    font-size: 0.85rem;
+  }
+
+  .date {
+    font-size: 0.85rem;
+  }
+
+  .voteButton {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+
+  .section h2 {
+    font-size: 1.1rem;
+  }
+
+  .section p {
+    font-size: 0.9rem;
+  }
+
+  .media h2 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .mediaGrid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
 }
