@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
 import { Award } from 'lucide-react';
 import CommentSection from './CommentSection';
 import styles from '../../styles/caseDetail.module.css';
@@ -11,34 +9,8 @@ import styles from '../../styles/caseDetail.module.css';
 export default function CaseDetail({ caseData }) {
   const { user } = useAuth();
   const [error, setError] = useState('');
-  const [userPhoto, setUserPhoto] = useState(null);
 
-  useEffect(() => {
-    const fetchUserPhoto = async () => {
-      if (caseData.userId) {
-        try {
-          const profileDoc = await getDoc(doc(db, 'profiles', caseData.userId));
-          if (profileDoc.exists()) {
-            const data = profileDoc.data();
-            setUserPhoto(data.photoURL || '/images/doctor-avatar.jpeg');
-            console.log('CaseDetail fetched photoURL:', data.photoURL); // Debug
-          } else {
-            setUserPhoto('/images/doctor-avatar.jpeg');
-            console.log('CaseDetail: No profile found for userId:', caseData.userId);
-          }
-        } catch (error) {
-          console.error('CaseDetail fetch error:', error);
-          setUserPhoto('/images/doctor-avatar.jpeg');
-        }
-      } else {
-        setUserPhoto('/images/doctor-avatar.jpeg');
-        console.log('CaseDetail: No userId in caseData');
-      }
-    };
-    fetchUserPhoto();
-  }, [caseData.userId]);
-
-  console.log('CaseDetail caseData:', caseData);
+  console.log('CaseDetail caseData:', caseData); // Debug
 
   const handleVote = async (type) => {
     if (!user) {
@@ -60,12 +32,12 @@ export default function CaseDetail({ caseData }) {
         <div className={styles.meta}>
           <div className={styles.author}>
             <Image
-              src={userPhoto}
+              src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
               alt={caseData.userName || 'Contributor'}
               width={40}
               height={40}
               className={styles.avatar}
-              onError={(e) => console.error('Author image error:', userPhoto)}
+              onError={(e) => console.error('Author image error:', caseData.photoURL)}
             />
             <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
           </div>
@@ -117,7 +89,7 @@ export default function CaseDetail({ caseData }) {
         </div>
         <div className={styles.section}>
           <h2>Provisional Diagnosis</h2>
-          <p>{caseData.provisionalDiagnosis || 'Not specified'}</p>
+          <p>{caseData.presentingComplaint || 'Not specified'}</p>
         </div>
         <div className={styles.section}>
           <h2>Hospital</h2>
