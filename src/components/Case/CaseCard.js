@@ -4,9 +4,11 @@ import Image from 'next/image';
 import styles from '../../styles/caseCard.module.css';
 
 export default function CaseCard({ caseData }) {
+  console.log('CaseCard mediaUrls:', caseData.mediaUrls); // Debug
+
   return (
     <Link href={`/cases/${caseData.id}`} className={styles.card}>
-      {caseData.mediaUrls?.length > 0 && (
+      {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 && (
         <div className={styles.imageContainer}>
           <Image
             src={caseData.mediaUrls[0]}
@@ -15,6 +17,7 @@ export default function CaseCard({ caseData }) {
             height={180}
             className={styles.image}
             objectFit="cover"
+            onError={(e) => console.error('Image load error:', caseData.mediaUrls[0])} // Debug
           />
         </div>
       )}
