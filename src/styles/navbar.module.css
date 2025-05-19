@@ -58,7 +58,7 @@
   transform: translateY(-2px);
 }
 
-.dark-mode .themeToggle,
+.dark-mode .theme apertures,
 .dark-mode .userButton {
   color: #f3f4f6;
 }
@@ -87,7 +87,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 320px;
+  width: 280px;
   height: 100%;
   background: #ffffff;
   box-shadow: -8px 0 24px rgba(0, 0, 0, 0.1);
@@ -217,7 +217,7 @@
   }
 
   .sidebar {
-    width: 280px;
+    width: 260px;
     padding: 1.5rem;
   }
 
@@ -252,7 +252,7 @@
   }
 
   .sidebar {
-    width: 260px;
+    width: 240px;
   }
 
   .sidebarAvatar {
