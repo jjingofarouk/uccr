@@ -1,16 +1,18 @@
+
+// components/Navbar.jsx
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
 import { Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import styles from '../styles/navbar.module.css';
 
 export default function Navbar() {
   const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [error, setError] = useState('');
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleDarkMode = () => {
@@ -22,26 +24,37 @@ export default function Navbar() {
     try {
       await logout();
       toggleSidebar();
-      setError('');
     } catch (err) {
       console.error('Logout error:', err);
-      setError('Failed to log out. Please try again.');
     }
   };
-
-  const userInitials = user ? 
-    (user.displayName ? user.displayName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U') : 'G';
 
   return (
     <header className={styles.header}>
       <div className={styles.headerContent}>
-        <Link href="/" className={styles.logo}>UCCR</Link>
+        <Link href="/" className={styles.logo}>
+          UCCR
+        </Link>
         <div className={styles.headerControls}>
-          <button onClick={toggleDarkMode} className={styles.themeToggle} aria-label="Toggle theme">
-            {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
+          <button
+            onClick={toggleDarkMode}
+            className={styles.themeToggle}
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
-          <button onClick={toggleSidebar} className={styles.userButton} aria-label="User menu">
-            {userInitials}
+          <button
+            onClick={toggleSidebar}
+            className={styles.userButton}
+            aria-label="User menu"
+          >
+            <Image
+              src={user?.photoURL || '/images/doctor-avatar.jpeg'}
+              alt="User profile"
+              width={36}
+              height={36}
+              className={styles.userAvatar}
+            />
           </button>
         </div>
       </div>
@@ -55,24 +68,56 @@ export default function Navbar() {
             transition={{ type: 'tween', duration: 0.3 }}
           >
             <div className={styles.sidebarHeader}>
-              {user && <span className={styles.userName}>{user.displayName || 'User'}</span>}
+              {user && (
+                <div className={styles.userInfo}>
+                  <Image
+                    src={user.photoURL || '/images/doctor-avatar.jpeg'}
+                    alt="User profile"
+                    width={48}
+                    height={48}
+                    className={styles.sidebarAvatar}
+                  />
+                  <span className={styles.userName}>{user.displayName || 'User'}</span>
+                </div>
+              )}
             </div>
             <nav className={styles.sidebarNav}>
-              <Link href="/" onClick={toggleSidebar} className={styles.navLink}>Home</Link>
-              <Link href="/cases" onClick={toggleSidebar} className={styles.navLink}>Cases</Link>
-              {user && <Link href="/cases/new" onClick={toggleSidebar} className={styles.navLink}>Add Case</Link>}
-              {user && <Link href="/profile" onClick={toggleSidebar} className={styles.navLink}>Profile</Link>}
-              {user && <Link href="/inbox" onClick={toggleSidebar} className={styles.navLink}>Inbox</Link>}
+              <Link href="/" onClick={toggleSidebar} className={styles.navLink}>
+                Home
+              </Link>
+              <Link href="/cases" onClick={toggleSidebar} className={styles.navLink}>
+                Cases
+              </Link>
+              {user && (
+                <Link href="/cases/new" onClick={toggleSidebar} className={styles.navLink}>
+                  Add Case
+                </Link>
+              )}
+              {user && (
+                <Link href="/profile" onClick={toggleSidebar} className={styles.navLink}>
+                  Profile
+                </Link>
+              )}
+              {user && (
+                <Link href="/inbox" onClick={toggleSidebar} className={styles.navLink}>
+                  Inbox
+                </Link>
+              )}
               {user ? (
-                <button onClick={handleLogout} className={styles.sidebarButton}>Logout</button>
+                <button onClick={handleLogout} className={styles.sidebarButton}>
+                  Logout
+                </button>
               ) : (
                 <>
-                  <Link href="/login" onClick={toggleSidebar} className={styles.navLink}>Login</Link>
-                  <Link href="/signup" onClick={toggleSidebar} className={styles.navLink}>Sign Up</Link>
+                  <Link href="/login" onClick={toggleSidebar} className={styles.navLink}>
+                    Login
+                  </Link>
+                  <Link href="/signup" onClick={toggleSidebar} className={styles.navLink}>
+                    Sign Up
+                  </Link>
                 </>
               )}
             </nav>
-            {error && <p className={styles.error}>{error}</p>}
           </motion.aside>
         )}
       </AnimatePresence>
