@@ -1,3 +1,4 @@
+// firebase/firestore.js
 import { db } from './config';
 import { 
   collection, 
@@ -12,11 +13,15 @@ import {
   orderBy 
 } from 'firebase/firestore';
 
-export const addCase = async (caseData) => {
+export const addCase = async (caseData, userId, userName, userPhoto) => {
   try {
     const docRef = await addDoc(collection(db, 'cases'), {
       ...caseData,
+      userId,
+      userName,
+      userPhoto: userPhoto || '/images/doctor-avatar.jpeg',
       createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
     return docRef.id;
   } catch (error) {
@@ -27,7 +32,12 @@ export const addCase = async (caseData) => {
 export const getCases = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'cases'));
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : new Date(),
+      updatedAt: doc.data().updatedAt?.toDate ? doc.data().updatedAt.toDate() : new Date(),
+    }));
   } catch (error) {
     return [];
   }
@@ -37,7 +47,14 @@ export const getCaseById = async (id) => {
   try {
     const docRef = doc(db, 'cases', id);
     const docSnap = await getDoc(docRef);
-    return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+    if (!docSnap.exists()) return null;
+    const data = docSnap.data();
+    return {
+      id: docSnap.id,
+      ...data,
+      createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(),
+    };
   } catch (error) {
     return null;
   }
@@ -63,7 +80,11 @@ export const getComments = async (caseId) => {
       orderBy('createdAt', 'asc')
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : new Date(),
+    }));
   } catch (error) {
     return [];
   }
@@ -71,7 +92,10 @@ export const getComments = async (caseId) => {
 
 export const addReaction = async (caseId, userId, type) => {
   try {
-    await setDoc(doc(db, `cases/${caseId}/reactions`, userId), { type, timestamp: serverTimestamp() });
+    await setDoc(doc(db, `cases/${caseId}/reactions`, userId), { 
+      type, 
+      timestamp: serverTimestamp() 
+    });
   } catch (error) {
     throw error;
   }
@@ -84,6 +108,7 @@ export const getUsers = async () => {
       uid: doc.id,
       displayName: doc.data().displayName || 'User',
       email: doc.data().email || '',
+      photoURL: doc.data().photoURL || '/images/doctor-avatar.jpeg',
     }));
   } catch (error) {
     return [];
@@ -141,7 +166,7 @@ export const getMessages = async (userId) => {
         id: doc.id,
         otherUserName: data.userNames[otherUserId] || 'User',
         lastMessage: data.lastMessage || '',
-        timestamp: data.timestamp,
+        timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : new Date(),
       });
     });
     return threads;
@@ -160,6 +185,7 @@ export const getThreadMessages = async (threadId) => {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate ? doc.data().timestamp.toDate() : new Date(),
     }));
   } catch (error) {
     return [];
@@ -170,7 +196,10 @@ export const getProfile = async (userId) => {
   try {
     const profileRef = doc(db, 'profiles', userId);
     const profileSnap = await getDoc(profileRef);
-    return profileSnap.exists() ? profileSnap.data() : null;
+    return profileSnap.exists() ? {
+      ...profileSnap.data(),
+      photoURL: profileSnap.data().photoURL || '/images/doctor-avatar.jpeg',
+    } : null;
   } catch (error) {
     return null;
   }
