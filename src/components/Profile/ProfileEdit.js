@@ -1,7 +1,7 @@
+// components/ProfileEdit.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { updateProfile } from '../../firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,9 +35,11 @@ export default function ProfileEdit() {
             setInstitution(data.institution || '');
             setSpecialty(data.specialty || '');
             setBio(data.bio || '');
+            setPhotoUrl(data.photoURL || user.photoURL || '');
           }
         } catch (err) {
           setError('Failed to load profile.');
+          console.error('Profile fetch error:', err);
         }
       };
       fetchProfile();
@@ -66,8 +68,10 @@ export default function ProfileEdit() {
           (error, result) => {
             if (!error && result && result.event === 'success') {
               setPhotoUrl(result.info.secure_url);
+              console.log('Cloudinary URL:', result.info.secure_url); // Debug
             } else if (error) {
               setError('Image upload failed.');
+              console.error('Cloudinary error:', error); // Debug
             }
           }
         );
@@ -86,10 +90,11 @@ export default function ProfileEdit() {
       return;
     }
     try {
-      await updateProfile(user, name, photoUrl);
       await setDoc(
         doc(db, 'profiles', user.uid),
         {
+          displayName: name || user.displayName || 'User',
+          photoURL: photoUrl || user.photoURL || '/images/doctor-avatar.jpeg',
           title,
           education,
           institution,
@@ -99,9 +104,11 @@ export default function ProfileEdit() {
         },
         { merge: true }
       );
+      console.log('Profile updated with photoURL:', photoUrl); // Debug
       router.push('/profile');
     } catch (err) {
-      setError(err.message || 'Failed to update profile.');
+      setError('Failed to update profile: ' + err.message);
+      console.error('Firestore error:', err);
     }
   };
 
@@ -172,12 +179,21 @@ export default function ProfileEdit() {
             Upload Profile Photo
           </button>
           {photoUrl && (
-            <p>
-              Photo uploaded:{' '}
-              <a href={photoUrl} target="_blank" rel="noopener noreferrer">
-                View
-              </a>
-            </p>
+            <div>
+              <p>
+                Photo uploaded:{' '}
+                <a href={photoUrl} target="_blank" rel="noopener noreferrer">
+                  View
+                </a>
+              </p>
+              <Image
+                src={photoUrl}
+                alt="Profile preview"
+                width={100}
+                height={100}
+                className={styles.previewImage}
+              />
+            </div>
           )}
         </div>
         <div className={styles.section}>
