@@ -1,6 +1,6 @@
-
 // pages/cases/[id].jsx
 import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react'; // Added useState and useEffect imports
 import { useCases } from '../../hooks/useCases';
 import CaseDetail from '../../components/Case/CaseDetail';
 import Navbar from '../../components/Navbar';
@@ -11,7 +11,6 @@ export default function CasePage() {
   const router = useRouter();
   const { id } = router.query;
   const { getCaseById } = useCases();
-
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
 
