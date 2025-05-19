@@ -19,7 +19,6 @@ export default function CasePage() {
       <div className="container">
         <Navbar />
         <CaseDetail caseData={caseData} />
-        <Footer />
       </div>
     </ProtectedRoute>
   );
