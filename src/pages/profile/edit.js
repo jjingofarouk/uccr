@@ -9,7 +9,6 @@ export default function ProfileEditPage() {
       <div className="container">
         <Navbar />
         <ProfileEdit />
-        <Footer />
       </div>
     </ProtectedRoute>
   );
