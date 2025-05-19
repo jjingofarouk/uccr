@@ -1,3 +1,4 @@
+// components/Case/CaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -6,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import styles from '../../styles/caseForm.module.css';
 
 export default function CaseForm() {
-  const { user, loading, error: authError } = useAuth();
+  const { user, loading } = useAuth();
   const [title, setTitle] = useState('');
   const [presentingComplaint, setPresentingComplaint] = useState('');
   const [history, setHistory] = useState('');
@@ -70,36 +71,29 @@ export default function CaseForm() {
     }
     try {
       const caseData = {
-        title,
-        presentingComplaint,
-        history,
-        investigations,
-        management,
-        provisionalDiagnosis,
-        hospital,
-        referralCenter,
-        specialty,
-        discussion,
+        title: title || 'Untitled Case',
+        presentingComplaint: presentingComplaint || 'Not specified',
+        history: history || 'Not provided',
+        investigations: investigations || 'Not provided',
+        management: management || 'Not provided',
+        provisionalDiagnosis: provisionalDiagnosis || 'Not specified',
+        hospital: hospital || 'Not specified',
+        referralCenter: referralCenter || 'Not specified',
+        specialty: specialty || 'Not specified',
+        discussion: discussion || 'Not provided',
         mediaUrls,
-        createdAt: new Date(),
-        userId: user.uid,
-        userName: user.displayName || 'Anonymous',
       };
-      await addCase(caseData);
+      await addCase(caseData, user.uid, user.displayName || 'Anonymous', user.photoURL);
       router.push('/cases');
     } catch (err) {
       setError(err.message || 'Failed to submit case.');
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <div className={styles.caseForm}>
       <h2>Submit Case Report</h2>
-      {authError && <p className={styles.error}>Auth Error: {authError}</p>}
+      {error && <p className={styles.error}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className={styles.section}>
           <h3>Case Overview</h3>
@@ -113,13 +107,13 @@ export default function CaseForm() {
           />
           <textarea
             className={styles.textareaField}
-            placeholder="Presenting Complaint *"
+            placeholder="Chief Concern *"
             value={presentingComplaint}
             onChange={(e) => setPresentingComplaint(e.target.value)}
             required
           />
           <select
-            className={styles.selectField}
+            className={styles.inputField}
             value={specialty}
             onChange={(e) => setSpecialty(e.target.value)}
             required
@@ -199,24 +193,21 @@ export default function CaseForm() {
             Upload Images
           </button>
           {mediaUrls.length > 0 && (
-            <div>
-              <p>Uploaded images:</p>
-              <ul>
-                {mediaUrls.map((url, index) => (
-                  <li key={index}>
-                    <a href={url} target="_blank" rel="noopener noreferrer">
-                      View Image {index + 1}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+            <div className={styles.mediaPreview}>
+              {mediaUrls.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`Uploaded image ${index + 1}`}
+                  className={styles.previewImage}
+                />
+              ))}
             </div>
           )}
         </div>
-        <button type="submit" className={styles.submitButton} disabled={!user}>
+        <button type="submit" className={styles.submitButton} disabled={loading || !user}>
           Submit Case Report
         </button>
-        {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>
   );
