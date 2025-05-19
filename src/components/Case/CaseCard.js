@@ -1,39 +1,9 @@
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
 import styles from '../../styles/caseCard.module.css';
 
 export default function CaseCard({ caseData }) {
-  const [userPhoto, setUserPhoto] = useState(null);
-
-  useEffect(() => {
-    const fetchUserPhoto = async () => {
-      if (caseData.userId) {
-        try {
-          const profileDoc = await getDoc(doc(db, 'profiles', caseData.userId));
-          if (profileDoc.exists()) {
-            const data = profileDoc.data();
-            setUserPhoto(data.photoURL || '/images/doctor-avatar.jpeg');
-            console.log('CaseCard fetched photoURL:', data.photoURL); // Debug
-          } else {
-            setUserPhoto('/images/doctor-avatar.jpeg');
-            console.log('CaseCard: No profile found for userId:', caseData.userId);
-          }
-        } catch (error) {
-          console.error('CaseCard fetch error:', error);
-          setUserPhoto('/images/doctor-avatar.jpeg');
-        }
-      } else {
-        setUserPhoto('/images/doctor-avatar.jpeg');
-        console.log('CaseCard: No userId in caseData');
-      }
-    };
-    fetchUserPhoto();
-  }, [caseData.userId]);
-
-  console.log('CaseCard caseData:', caseData);
+  console.log('CaseCard caseData:', caseData); // Debug
 
   return (
     <Link href={`/cases/${caseData.id}`} className={styles.card}>
@@ -68,12 +38,12 @@ export default function CaseCard({ caseData }) {
         </p>
         <div className={styles.contributor}>
           <Image
-            src={userPhoto}
+            src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
             alt={caseData.userName || 'Contributor'}
             width={24}
             height={24}
             className={styles.contributorAvatar}
-            onError={(e) => console.error('Contributor image error:', userPhoto)}
+            onError={(e) => console.error('Contributor image error:', caseData.photoURL)}
           />
           <span>{caseData.userName || 'Anonymous'}</span>
         </div>
