@@ -15,7 +15,7 @@ export default function MessageThreadPage() {
       <div className="container">
         <Navbar />
         <MessageThread threadId={chatId} otherUserName="User" />
-        <Footer />
+
       </div>
     </ProtectedRoute>
   );
