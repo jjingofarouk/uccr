@@ -5,7 +5,7 @@ export default function ProfileCard({ userData }) {
   return (
     <div className="profile-card">
       <img
-        src={userData.photoURL || '/images/placeholder.png'}
+        src={userData.photoURL || '/images/doctor-avatar.jpeg'}
         alt="Profile"
         className="profile-image"
       />
