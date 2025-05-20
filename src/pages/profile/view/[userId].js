@@ -5,7 +5,7 @@ import { getProfile } from '../../../firebase/firestore';
 import ProfileCard from '../../../components/Profile/ProfileCard';
 import Navbar from '../../../components/Navbar';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
-import ProfileSkeleton from '../../../components/Profile/ProfileSkeleton'; // import skeleton loader
+import ProfileSkeleton from '../../../components/ProfileSkeleton'; // import skeleton loader
 import Link from 'next/link';
 import styles from '../../../styles/profile.module.css';
 
