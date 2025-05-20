@@ -1,4 +1,3 @@
-// components/ProfileEdit.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -6,6 +5,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
+import Loading from '../../components/Loading';
 import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
@@ -39,7 +39,6 @@ export default function ProfileEdit() {
             specialty: data.specialty || '',
             bio: data.bio || '',
           });
-          console.log('Fetched profile photoURL:', data.photoURL);
         } catch (err) {
           setError('Failed to load profile.');
           console.error('Profile fetch error:', err);
@@ -71,9 +70,7 @@ export default function ProfileEdit() {
             },
             (error, result) => {
               if (!error && result && result.event === 'success') {
-                const newUrl = result.info.secure_url;
-                setFormData(prev => ({ ...prev, photoUrl: newUrl }));
-                console.log('Cloudinary uploaded URL:', newUrl);
+                setFormData((prev) => ({ ...prev, photoUrl: result.info.secure_url }));
               } else if (error) {
                 setError('Image upload failed.');
                 console.error('Cloudinary error:', error);
@@ -81,27 +78,23 @@ export default function ProfileEdit() {
             }
           );
         } else {
-          console.error('Cloudinary not initialized');
           setError('Failed to initialize image uploader.');
         }
       };
 
       script.onerror = () => {
-        console.error('Failed to load Cloudinary script');
         setError('Failed to load image uploader.');
       };
 
       return () => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
+        if (script.parentNode) script.parentNode.removeChild(script);
       };
     }
   }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -122,7 +115,6 @@ export default function ProfileEdit() {
         updatedAt: new Date(),
       };
       await setDoc(doc(db, 'profiles', user.uid), profileData, { merge: true });
-      console.log('Profile saved with photoURL:', formData.photoUrl);
       router.push('/profile');
     } catch (err) {
       setError('Failed to update profile: ' + err.message);
@@ -130,13 +122,8 @@ export default function ProfileEdit() {
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!user) {
-    return <p>Please log in to edit your profile.</p>;
-  }
+  if (loading) return <Loading />;
+  if (!user) return <p>Please log in to edit your profile.</p>;
 
   return (
     <div className={styles.profileEdit}>
@@ -144,48 +131,49 @@ export default function ProfileEdit() {
       <form onSubmit={handleSubmit}>
         <div className={styles.section}>
           <h3>Personal Information</h3>
+          <label className={styles.label}>Full Name *</label>
           <input
             className={styles.inputField}
             type="text"
             name="name"
-            placeholder="Full Name *"
             value={formData.name}
             onChange={handleChange}
             required
           />
+          <label className={styles.label}>Professional Title</label>
           <input
             className={styles.inputField}
             type="text"
             name="title"
-            placeholder="Professional Title (e.g., Dr., Prof.)"
             value={formData.title}
             onChange={handleChange}
           />
         </div>
         <div className={styles.section}>
           <h3>Education & Affiliation</h3>
+          <label className={styles.label}>Education</label>
           <textarea
             className={styles.textareaField}
             name="education"
-            placeholder="Education (e.g., MBChB, MSc)"
             value={formData.education}
             onChange={handleChange}
           />
+          <label className={styles.label}>Institution</label>
           <input
             className={styles.inputField}
             type="text"
             name="institution"
-            placeholder="Institution (e.g., Makerere University)"
             value={formData.institution}
             onChange={handleChange}
           />
+          <label className={styles.label}>Specialty</label>
           <select
             className={styles.selectField}
             name="specialty"
             value={formData.specialty}
             onChange={handleChange}
           >
-            <option value="">Select Specialty (Optional)</option>
+            <option value="">Select Specialty</option>
             <option value="Internal Medicine">Internal Medicine</option>
             <option value="Surgery">Surgery</option>
             <option value="Pediatrics">Pediatrics</option>
@@ -204,42 +192,33 @@ export default function ProfileEdit() {
             className={styles.uploadButton}
             disabled={!widgetRef.current}
           >
-            Upload Profile Photo
+            Upload Photo
           </button>
-          {formData.photoUrl ? (
-            <div>
-              <p>
-                Photo uploaded:{' '}
-                <a href={formData.photoUrl} target="_blank" rel="noopener noreferrer">
-                  View
-                </a>
-              </p>
+          {formData.photoUrl && (
+            <div className={styles.previewContainer}>
               <Image
                 src={formData.photoUrl}
                 alt="Profile preview"
-                width={100}
-                height={100}
+                width={80}
+                height={80}
                 className={styles.previewImage}
                 onError={(e) => console.error('Preview image error:', formData.photoUrl)}
-                unoptimized // Bypass Next.js optimization for testing
               />
             </div>
-          ) : (
-            <p>No photo uploaded.</p>
           )}
         </div>
         <div className={styles.section}>
           <h3>Bio</h3>
           <textarea
-            className={`${styles.textareaField} ${styles.bio}`}
+            className={styles.textareaField}
             name="bio"
-            placeholder="Brief bio (e.g., research interests)"
             value={formData.bio}
             onChange={handleChange}
+            placeholder="Brief bio (e.g., research interests)"
           />
         </div>
         <button type="submit" className={styles.submitButton}>
-          Save Changes
+          Save Profile
         </button>
         {error && <p className={styles.error}>{error}</p>}
       </form>
