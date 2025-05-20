@@ -33,7 +33,7 @@ function CasePageContent() {
   if (loading) {
     return (
       <section className={styles.loadingSection}>
-        <CaseSkeleton />
+        <Loading />
       </section>
     );
   }
