@@ -56,6 +56,7 @@
   font-weight: 600;
   color: #4a5568;
   text-align: center;
+  white-space: nowrap;
 }
 
 .dark-mode .loaderText {
@@ -88,5 +89,6 @@
 
   .loaderText {
     font-size: 1.25rem;
+    white-space: nowrap;
   }
 }
