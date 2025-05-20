@@ -1,4 +1,3 @@
-// src/firebase/firestore.js
 import { db, auth } from './config';
 import {
   collection,
@@ -16,13 +15,12 @@ import {
   collectionGroup,
 } from 'firebase/firestore';
 
-// Helper function to fetch photoURL for a user
 const fetchUserPhotoURL = async (uid) => {
   try {
     const profileRef = doc(db, 'profiles', uid);
     const profileSnap = await getDoc(profileRef);
     const photoURL = profileSnap.exists() ? profileSnap.data().photoURL : null;
-    console.log('Fetched photoURL for uid:', uid, 'photoURL:', photoURL); // Debug
+    console.log('Fetched photoURL for uid:', uid, 'photoURL:', photoURL);
     return photoURL || '/images/doctor-avatar.jpeg';
   } catch (error) {
     console.error('Fetch user photoURL error:', error.message);
@@ -36,7 +34,7 @@ export const addCase = async (caseData) => {
       throw new Error('Missing uid in caseData');
     }
     const validatedCaseData = {
-      userId: caseData.uid, // Ensure userId is uid
+      userId: caseData.uid,
       userName: caseData.userName || 'User',
       title: caseData.title || '',
       specialty: caseData.specialty || '',
@@ -54,7 +52,7 @@ export const addCase = async (caseData) => {
       updatedAt: serverTimestamp(),
     };
     const docRef = await addDoc(collection(db, 'cases'), validatedCaseData);
-    console.log('Case added with ID:', docRef.id, 'uid:', caseData.uid); // Debug
+    console.log('Case added with ID:', docRef.id, 'uid:', caseData.uid);
     return docRef.id;
   } catch (error) {
     console.error('Add case error:', error.code, error.message);
@@ -94,7 +92,7 @@ export const getCases = async (uid = null) => {
       };
     });
     const cases = await Promise.all(casesPromises);
-    console.log('Fetched cases:', cases.length, 'for uid:', uid || 'all'); // Debug
+    console.log('Fetched cases:', cases.length, 'for uid:', uid || 'all');
     return cases;
   } catch (error) {
     console.error('Get cases error:', error.code, error.message);
@@ -107,7 +105,7 @@ export const getCaseById = async (id) => {
     const docRef = doc(db, 'cases', id);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
-      console.warn('Case not found:', id); // Debug
+      console.warn('Case not found:', id);
       return null;
     }
     const data = docSnap.data();
@@ -132,7 +130,7 @@ export const getCaseById = async (id) => {
       updatedAt: data.updatedAt?.toDate?.() || new Date(),
       photoURL,
     };
-    console.log('Fetched case:', caseData.id, 'uid:', caseData.userId); // Debug
+    console.log('Fetched case:', caseData.id, 'uid:', caseData.userId);
     return caseData;
   } catch (error) {
     console.error('Get case by ID error:', error.code, error.message);
@@ -146,7 +144,7 @@ export const addComment = async (caseId, commentData, parentCommentId = null) =>
       throw new Error('Missing uid in commentData');
     }
     const comment = {
-      userId: commentData.uid, // Ensure userId is uid
+      userId: commentData.uid,
       text: commentData.text || '',
       createdAt: serverTimestamp(),
       parentCommentId,
@@ -154,7 +152,7 @@ export const addComment = async (caseId, commentData, parentCommentId = null) =>
       downvotes: 0,
     };
     const docRef = await addDoc(collection(db, `cases/${caseId}/comments`), comment);
-    console.log('Comment added for case:', caseId, 'ID:', docRef.id, 'uid:', comment.userId); // Debug
+    console.log('Comment added for case:', caseId, 'ID:', docRef.id, 'uid:', comment.userId);
     return docRef.id;
   } catch (error) {
     console.error('Add comment error:', error.code, error.message);
@@ -178,7 +176,7 @@ export const getComments = async (caseId, uid = null) => {
       downvotes: Number(doc.data().downvotes) || 0,
       createdAt: doc.data().createdAt?.toDate?.() || new Date(),
     }));
-    console.log('Fetched comments for case:', caseId, 'Count:', comments.length, 'uid:', uid || 'all'); // Debug
+    console.log('Fetched comments for case:', caseId, 'Count:', comments.length, 'uid:', uid || 'all');
     return comments;
   } catch (error) {
     console.error('Get comments error:', error.code, error.message);
@@ -210,7 +208,7 @@ export const addReaction = async (caseId, uid, type, commentId = null) => {
         downvotes: increment(type === 'downvote' ? 1 : 0),
       });
     }
-    console.log('Reaction added:', { caseId, uid, type, commentId }); // Debug
+    console.log('Reaction added:', { caseId, uid, type, commentId });
   } catch (error) {
     console.error('Add reaction error:', error.code, error.message);
     throw new Error(error.code === 'permission-denied' ? 'Missing permissions to add reaction' : 'Failed to add reaction');
@@ -226,7 +224,7 @@ export const getUsers = async () => {
       email: doc.data().email || '',
       photoURL: doc.data().photoURL || '/images/doctor-avatar.jpeg',
     }));
-    console.log('Fetched users:', users.length); // Debug
+    console.log('Fetched users:', users.length);
     return users;
   } catch (error) {
     console.error('Get users error:', error.code, error.message);
@@ -236,7 +234,6 @@ export const getUsers = async () => {
 
 export const sendMessage = async ({ senderId, recipientId, senderName, recipientName, text }) => {
   try {
-    // Validate inputs
     if (!senderId || !recipientId || !text?.trim()) {
       throw new Error('Missing required fields: senderId, recipientId, and text are required');
     }
@@ -250,9 +247,8 @@ export const sendMessage = async ({ senderId, recipientId, senderName, recipient
       throw new Error('senderId does not match authenticated user');
     }
 
-    console.log('sendMessage inputs:', { senderId, recipientId, senderName, recipientName, text }); // Debug
+    console.log('sendMessage inputs:', { senderId, recipientId, senderName, recipientName, text });
 
-    // Validate recipient exists
     const recipientDoc = await getDoc(doc(db, 'users', recipientId));
     if (!recipientDoc.exists()) {
       throw new Error(`Recipient user ${recipientId} does not exist in users collection`);
@@ -261,7 +257,6 @@ export const sendMessage = async ({ senderId, recipientId, senderName, recipient
     const threadId = [senderId, recipientId].sort().join('_');
     const threadRef = doc(db, 'messages', threadId);
 
-    // Create or update thread document
     const threadData = {
       participants: [senderId, recipientId],
       userNames: {
@@ -271,22 +266,21 @@ export const sendMessage = async ({ senderId, recipientId, senderName, recipient
       lastMessage: text.trim(),
       timestamp: serverTimestamp(),
     };
-    console.log('Creating/updating thread:', threadData); // Debug
+    console.log('Creating/updating thread:', threadData);
     await setDoc(threadRef, threadData, { merge: true });
 
-    // Add message to subcollection
     const messageData = {
       senderId,
       text: text.trim(),
       timestamp: serverTimestamp(),
     };
-    console.log('Adding message:', messageData); // Debug
+    console.log('Adding message:', messageData);
     const messageRef = await addDoc(collection(threadRef, 'messages'), messageData);
 
     console.log('Message sent, thread:', threadId, 'message ID:', messageRef.id);
     return messageRef.id;
   } catch (error) {
-    console.error('Send message error:', error.code, error.message, error.stack); // Debug
+    console.error('Send message error:', error.code, error.message, error.stack);
     throw new Error(
       error.code === 'permission-denied'
         ? 'Permission denied: Check authentication and user IDs'
@@ -314,7 +308,7 @@ export const getMessages = async (uid) => {
         timestamp: data.timestamp?.toDate?.() || new Date(),
       });
     });
-    console.log('Fetched threads for uid:', uid, 'Count:', threads.length); // Debug
+    console.log('Fetched threads for uid:', uid, 'Count:', threads.length);
     return threads;
   } catch (error) {
     console.error('Get messages error:', error.code, error.message);
@@ -335,7 +329,7 @@ export const getThreadMessages = async (threadId) => {
       text: doc.data().text || '',
       timestamp: doc.data().timestamp?.toDate?.() || new Date(),
     }));
-    console.log('Fetched messages for thread:', threadId, 'Count:', messages.length); // Debug
+    console.log('Fetched messages for thread:', threadId, 'Count:', messages.length);
     return messages;
   } catch (error) {
     console.error('Get thread messages error:', error.code, error.message);
@@ -360,7 +354,7 @@ export const getProfile = async (uid) => {
       bio: profileData.bio || '',
       updatedAt: profileData.updatedAt?.toDate?.() || new Date(),
     };
-    console.log('Profile fetched for uid:', uid, 'photoURL:', validatedProfile.photoURL); // Debug
+    console.log('Profile fetched for uid:', uid, 'photoURL:', validatedProfile.photoURL);
     return validatedProfile;
   } catch (error) {
     console.error('Get profile error:', error.code, error.message);
@@ -394,20 +388,28 @@ export const updateProfile = async (uid, profileData) => {
       updatedAt: serverTimestamp(),
     };
     await setDoc(profileRef, validatedProfileData, { merge: true });
-    console.log('Profile updated for uid:', uid, 'photoURL:', validatedProfileData.photoURL); // Debug
+    console.log('Profile updated for uid:', uid, 'photoURL:', validatedProfileData.photoURL);
   } catch (error) {
     console.error('Update profile error:', error.code, error.message);
     throw new Error(error.code === 'permission-denied' ? 'Missing permissions to update profile' : 'Failed to update profile');
   }
 };
 
+export const updateUserProfile = async (userId, profileData) => {
+  try {
+    await setDoc(doc(db, 'profiles', userId), profileData, { merge: true });
+    console.log('User profile updated for:', userId);
+  } catch (error) {
+    console.error('Update user profile error:', error);
+    throw error;
+  }
+};
+
 export const getUserStats = async (uid) => {
   try {
-    // Fetch cases
     const cases = await getCases(uid);
     const caseCount = cases.length;
 
-    // Fetch comments using collection group query
     const commentsQuery = query(
       collectionGroup(db, 'comments'),
       where('userId', '==', uid)
@@ -420,7 +422,7 @@ export const getUserStats = async (uid) => {
       reactionCount += (Number(comment.upvotes) || 0) + (Number(comment.downvotes) || 0);
     });
 
-    console.log('Fetched user stats for uid:', uid, { cases: caseCount, comments: commentCount, reactions: reactionCount }); // Debug
+    console.log('Fetched user stats for uid:', uid, { cases: caseCount, comments: commentCount, reactions: reactionCount });
     return {
       cases: caseCount,
       comments: commentCount,
