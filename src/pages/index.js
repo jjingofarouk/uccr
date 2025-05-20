@@ -5,6 +5,7 @@ import CaseCard from '../components/Case/CaseCard';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import Marquee from '../components/Marquee';
 import styles from './Home.module.css';
 
 // Dynamically import Loading component with SSR disabled
@@ -32,6 +33,7 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
+      <Marquee />
       <main className={styles.container}>
         <section className={styles.hero} aria-labelledby="hero-title">
           <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
