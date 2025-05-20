@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile } from '../../firebase/firestore';
 import ProfileCard from '../../components/Profile/ProfileCard';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 import ProfileSkeleton from '../../components/ProfileSkeleton';
 import styles from '../../styles/profile.module.css';
@@ -87,9 +85,8 @@ export default function Profile() {
   return (
     <ProtectedRoute>
       <div className={styles.container}>
-        <Navbar />
         <ProfileCard userData={userData} />
-        <Footer />
+
       </div>
     </ProtectedRoute>
   );
