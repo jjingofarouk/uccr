@@ -1,3 +1,4 @@
+// src/firebase/firestore.js
 import { db, auth } from './config';
 import {
   collection,
@@ -30,11 +31,11 @@ const fetchUserPhotoURL = async (uid) => {
 
 export const addCase = async (caseData) => {
   try {
-    if (!caseData.uid) {
-      throw new Error('Missing uid in caseData');
+    if (!caseData.userId) {
+      throw new Error('Missing userId in caseData');
     }
     const validatedCaseData = {
-      userId: caseData.uid,
+      userId: caseData.userId,
       userName: caseData.userName || 'User',
       title: caseData.title || '',
       specialty: caseData.specialty || '',
@@ -52,11 +53,11 @@ export const addCase = async (caseData) => {
       updatedAt: serverTimestamp(),
     };
     const docRef = await addDoc(collection(db, 'cases'), validatedCaseData);
-    console.log('Case added with ID:', docRef.id, 'uid:', caseData.uid);
+    console.log('Case added with ID:', docRef.id, 'userId:', caseData.userId);
     return docRef.id;
   } catch (error) {
     console.error('Add case error:', error.code, error.message);
-    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to create case' : 'Failed to create case');
+    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to create case' : `Failed to create case: ${error.message}`);
   }
 };
 
