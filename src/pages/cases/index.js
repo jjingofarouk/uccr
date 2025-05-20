@@ -11,7 +11,6 @@ export default function Cases() {
   return (
     <ProtectedRoute>
       <div className={styles.container}>
-        <Navbar />
         <h1 className={styles.title}>All Cases</h1>
         <div className={styles['case-list']}>
           {cases.map((caseData) => (
