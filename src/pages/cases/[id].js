@@ -7,7 +7,7 @@ import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 import Loading from '../../components/Loading';
 import styles from '../../styles/casePage.module.css';
 
-export default function CasePage() {
+function CasePageContent() {
   const router = useRouter();
   const { id } = router.query;
   const { getCaseById } = useCases();
@@ -47,10 +47,16 @@ export default function CasePage() {
   }
 
   return (
+    <div className={styles.container}>
+      <CaseDetail caseData={caseData} />
+    </div>
+  );
+}
+
+export default function CasePage() {
+  return (
     <ProtectedRoute>
-      <div className={styles.container}>
-        <CaseDetail caseData={caseData} />
-      </div>
+      <CasePageContent />
     </ProtectedRoute>
   );
 }
