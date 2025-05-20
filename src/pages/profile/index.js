@@ -6,7 +6,7 @@ import ProfileCard from '../../components/Profile/ProfileCard';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import styles from '../../styles/profile.module.css'; // Assuming global container styles
+import styles from '../../styles/global.module.css';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -23,21 +23,25 @@ export default function Profile() {
       }
 
       try {
-        console.log('Fetching profile for user:', user.uid); // Debug
+        console.log('Fetching profile for uid:', user.uid); // Debug
         const profile = await getProfile(user.uid);
         setUserData({
-          userId: user.uid, // Map uid to userId
+          uid: user.uid, // Use uid instead of userId
           displayName: profile.displayName || user.displayName || 'User',
           email: profile.email || user.email || 'No email',
           photoURL: profile.photoURL || user.photoURL || '/images/doctor-avatar.jpeg',
           title: profile.title || 'No title',
           specialty: profile.specialty || 'No specialty',
+          bio: profile.bio || '',
+          education: profile.education || '',
+          institution: profile.institution || ''
         });
+        console.log('userData set:', { uid: user.uid, ...userData }); // Debug
         setLoading(false);
       } catch (err) {
         setError('Failed to load profile.');
         setLoading(false);
-        console.error('Fetch profile error:', err);
+        console.error('Fetch profile error:', err.message);
       }
     };
 
