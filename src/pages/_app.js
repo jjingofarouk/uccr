@@ -11,9 +11,10 @@ function MyApp({ Component, pageProps }) {
     <AuthProvider>
       <ThemeProvider>
         <Navbar />
-        <Marquee />
-        <Component {...pageProps} />
-
+        <main style={{ marginTop: '60px' }}>
+          <Component {...pageProps} />
+        </main>
+        <Footer />
       </ThemeProvider>
     </AuthProvider>
   );
