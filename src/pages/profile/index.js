@@ -26,7 +26,7 @@ export default function Profile() {
         console.log('Fetching profile for uid:', user.uid); // Debug
         const profile = await getProfile(user.uid);
         setUserData({
-          uid: user.uid, // Use uid instead of userId
+          uid: user.uid,
           displayName: profile.displayName || user.displayName || 'User',
           email: profile.email || user.email || 'No email',
           photoURL: profile.photoURL || user.photoURL || '/images/doctor-avatar.jpeg',
@@ -34,7 +34,7 @@ export default function Profile() {
           specialty: profile.specialty || 'No specialty',
           bio: profile.bio || '',
           education: profile.education || '',
-          institution: profile.institution || ''
+          institution: profile.institution || '',
         });
         console.log('userData set:', { uid: user.uid, ...userData }); // Debug
         setLoading(false);
