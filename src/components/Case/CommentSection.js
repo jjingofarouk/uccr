@@ -1,3 +1,4 @@
+// src/components/Case/CommentSection.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { addComment, getComments, addReaction } from '../../firebase/firestore';
@@ -5,6 +6,26 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import styles from './commentSection.module.css';
+
+// Utility function to process comment text with line breaks and paragraphs
+const formatCommentText = (text) => {
+  if (!text || typeof text !== 'string') return <p>Not specified</p>;
+  const paragraphs = text.split('\n\n').filter(p => p.trim());
+  return paragraphs.map((paragraph, index) => (
+    <p key={index} className={styles.commentParagraph}>
+      {paragraph.split('\n').map((line, i, arr) =>
+        i < arr.length - 1 ? (
+          <span key={i}>
+            {line}
+            <br />
+          </span>
+        ) : (
+          line
+        )
+      )}
+    </p>
+  ));
+};
 
 export default function CommentSection({ caseId }) {
   const { user } = useAuth();
@@ -33,7 +54,7 @@ export default function CommentSection({ caseId }) {
     if (!user || !text.trim()) return;
     try {
       await addComment(caseId, {
-        text,
+        text: text.replace(/\n{3,}/g, '\n\n').trimEnd(),
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
         userPhoto: user.photoURL || '/images/doctor-avatar.jpeg',
@@ -132,7 +153,7 @@ export default function CommentSection({ caseId }) {
             })}
           </span>
         </p>
-        <p className={styles.commentText}>{comment.text}</p>
+        <div className={styles.commentText}>{formatCommentText(comment.text)}</div>
         <div className={styles.voteButtons}>
           <button
             onClick={() => handleVote(comment.id, 'upvote')}
@@ -232,7 +253,7 @@ export default function CommentSection({ caseId }) {
         {commentTree.length > 0 ? (
           commentTree.map(comment => renderComment(comment))
         ) : (
-          <p className={styles.noComments}>No comments yet. Be the first to comment!</p> 
+          <p className={styles.noComments}>No comments yet. Be the first to comment!</p>
         )}
       </div>
     </section>
