@@ -1,8 +1,9 @@
+// src/firebase/auth.js
 import { auth } from './config';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  updateProfile as updateAuthProfile, 
+  updateProfile, 
   signOut 
 } from 'firebase/auth';
 
@@ -32,11 +33,8 @@ export const signup = async (email, password, name) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
     const user = userCredential.user;
     console.log('User created:', user.uid, email);
-
-    // Update Firebase Auth profile
-    await updateAuthProfile(user, { displayName: name.trim() });
+    await updateProfile(user, { displayName: name.trim() });
     console.log('Auth profile updated with displayName:', name);
-
     return { success: true, user };
   } catch (error) {
     console.error('Signup error:', {
@@ -56,7 +54,7 @@ export const updateAuthProfile = async (user, { displayName, photoURL }) => {
     const updateData = {};
     if (displayName) updateData.displayName = displayName.trim();
     if (photoURL) updateData.photoURL = photoURL;
-    await updateAuthProfile(user, updateData);
+    await updateProfile(user, updateData);
     console.log('Auth profile updated for:', user.uid, updateData);
     return { success: true };
   } catch (error) {
@@ -86,7 +84,7 @@ export const logout = async (retryCount = 2) => {
     });
     if (retryCount > 0 && error.code === 'network-request-failed') {
       console.log(`Retrying logout, attempts remaining: ${retryCount}`);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s
+      await new Promise(resolve => setTimeout(resolve, 1000));
       return logout(retryCount - 1);
     }
     return { success: false, error: error.message || 'Unable to sign out' };
