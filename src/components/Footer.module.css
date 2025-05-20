@@ -1,9 +1,11 @@
-/* src/components/Footer.module.css */
 .footer {
   background: #f8fafc;
   border-top: 1px solid #e2e8f0;
-  padding: 2rem 1rem;
+  padding: 2rem 0;
+  position: sticky;
+  bottom: 0;
   width: 100%;
+  z-index: 100;
 }
 
 .dark-mode .footer {
@@ -14,25 +16,24 @@
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  display: flex;
-  justify-content: center;
+  padding: 0 1rem;
 }
 
 .content {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
-  width: 100%;
 }
 
 .brand {
-  text-align: center;
+  flex: 1 1 200px;
 }
 
 .copyright {
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: #4a5568;
   margin: 0;
 }
@@ -45,33 +46,35 @@
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
+  flex: 1 1 200px;
   justify-content: center;
 }
 
 .navLink {
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  color: #3b82f6;
+  font-size: 0.875rem;
+  color: #4a5568;
   text-decoration: none;
-  transition: color 0.3s ease, transform 0.2s ease;
+  transition: color 0.3s ease;
 }
 
 .navLink:hover {
-  color: #2563eb;
-  transform: translateY(-2px);
+  color: #3b82f6;
 }
 
 .dark-mode .navLink {
-  color: #60a5fa;
+  color: #cbd5e1;
 }
 
 .dark-mode .navLink:hover {
-  color: #93c5fd;
+  color: #60a5fa;
 }
 
 .social {
   display: flex;
   gap: 1rem;
+  flex: 1 1 200px;
+  justify-content: flex-end;
 }
 
 .socialLink {
@@ -95,31 +98,27 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .content {
-    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .social {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 1.5rem 0;
   }
 
   .nav {
     gap: 1rem;
   }
 
-  .copyright,
-  .navLink {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer {
-    padding: 1.5rem 0.5rem;
-  }
-
-  .copyright,
-  .navLink {
-    font-size: 0.8rem;
-  }
-
-  .socialLink svg {
-    width: 18px;
-    height: 18px;
+  .navLink,
+  .copyright {
+    font-size: 0.75rem;
   }
 }
