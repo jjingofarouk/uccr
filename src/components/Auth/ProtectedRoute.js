@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }) {
   const [loadStart, setLoadStart] = useState(null);
   const [loadTime, setLoadTime] = useState(null);
   const [forceLoading, setForceLoading] = useState(true);
-  const MINIMUM_LOADING_DURATION = 5000; // 5 seconds in milliseconds
+  const MINIMUM_LOADING_DURATION = 1000; // 5 seconds in milliseconds
 
   useEffect(() => {
     if (loading || (forceLoading && user)) {
