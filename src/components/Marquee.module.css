@@ -1,9 +1,9 @@
 .marqueeContainer {
   overflow: hidden;
   width: 100%;
-  background: var(--marquee-bg, #f97316); /* Vibrant orange for light mode */
-  padding: 1rem 0;
-  box-shadow: 0 4px 12px var(--shadow);
+  background: var(--marquee-bg, #f97316);
+  padding: 0.25rem 0;
+  box-shadow: 0 2px 6px var(--shadow);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -13,10 +13,10 @@
   animation: marquee var(--marquee-duration, 20s) linear infinite;
   color: var(--marquee-text, #ffffff);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.35;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -24,7 +24,7 @@
 
 .marquee span {
   display: inline-block;
-  margin: 0 3rem;
+  margin: 0 2rem;
 }
 
 .visible {
@@ -47,6 +47,6 @@
 }
 
 .dark-mode .marqueeContainer {
-  --marquee-bg: #c2410c; /* Deeper orange for dark mode */
-  --marquee-text: #fef3c7; /* Warm off-white for dark mode contrast */
+  --marquee-bg: #c2410c;
+  --marquee-text: #fef3c7;
 }
