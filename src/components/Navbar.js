@@ -35,7 +35,6 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    console.log('handleLogout triggered');
     try {
       const result = await logout();
       if (result.success) {
@@ -43,11 +42,9 @@ export default function Navbar() {
         router.push('/auth');
       } else {
         setLogoutError(result.error);
-        console.error('Logout failed:', result.error);
       }
     } catch (error) {
-      setLogoutError(error.message || 'Failed to log out. Please try again.');
-      console.error('Unexpected logout error:', error);
+      setLogoutError('Failed to log out. Please try again.');
     }
   };
 
