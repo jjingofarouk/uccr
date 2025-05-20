@@ -37,57 +37,102 @@ export default function ProfileCard({ userData }) {
 
   return (
     <div className={styles.card}>
-      <div className={styles.cardHeader}>
-        <div className={styles.imageContainer}>
-          <Image
-            src={userData.photoURL || '/images/doctor-avatar.jpeg'}
-            alt="Profile"
-            width={120}
-            height={120}
-            className={styles.profileImage}
-            onError={(e) => {
-              e.target.src = '/images/doctor-avatar.jpeg';
-            }}
-          />
-        </div>
-      </div>
-      <div className={styles.cardContent}>
-        <h3 className={styles.name}>{userData.displayName || 'User'}</h3>
-        <p className={styles.email}>{userData.email || 'No email'}</p>
-        {userData.title && <p className={styles.title}>{userData.title}</p>}
-        {userData.specialty && <p className={styles.specialty}>{userData.specialty}</p>}
-        {userData.institution && <p className={styles.institution}>{userData.institution}</p>}
-        {userData.education && <p className={styles.education}>{userData.education}</p>}
-        {userData.bio && <p className={styles.bio}>{userData.bio}</p>}
-        {userData.updatedAt && (
-          <p className={styles.updatedAt}>
-            Last Updated: {new Date(userData.updatedAt).toLocaleDateString()}
-          </p>
-        )}
-        <div className={styles.stats}>
-          <div className={styles.stat}>
-            <span className={styles.statNumber}>{stats.cases}</span>
-            <span className={styles.statLabel}>Cases</span>
+      <div className={styles.cardInner}>
+        {/* Left Column - Avatar and Basic Info */}
+        <div className={styles.cardSidebar}>
+          <div className={styles.imageWrapper}>
+            <Image
+              src={userData.photoURL || '/images/doctor-avatar.jpeg'}
+              alt="Profile"
+              width={120}
+              height={120}
+              className={styles.profileImage}
+              onError={(e) => {
+                e.target.src = '/images/doctor-avatar.jpeg';
+              }}
+            />
           </div>
-          <div className={styles.stat}>
-            <span className={styles.statNumber}>{stats.comments}</span>
-            <span className={styles.statLabel}>Comments</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNumber}>{stats.reactions}</span>
-            <span className={styles.statLabel}>Reactions</span>
+          <h3 className={styles.name}>{userData.displayName || 'User'}</h3>
+          <p className={styles.email}>{userData.email || 'No email'}</p>
+          
+          <div className={styles.actions}>
+            <Link href={`/profile/view/${userData.uid}`} className={styles.viewButton}>
+              View Profile
+            </Link>
+            {user && user.uid === userData.uid && (
+              <Link href="/profile/edit" className={styles.editButton}>
+                Edit Profile
+              </Link>
+            )}
           </div>
         </div>
-      </div>
-      <div className={styles.actions}>
-        <Link href={`/profile/view/${userData.uid}`} className={styles.viewButton}>
-          View Profile
-        </Link>
-        {user && user.uid === userData.uid && (
-          <Link href="/profile/edit" className={styles.editButton}>
-            Edit Profile
-          </Link>
-        )}
+        
+        {/* Right Column - Details & Stats */}
+        <div className={styles.cardContent}>
+          <div className={styles.infoSection}>
+            <h4 className={styles.sectionTitle}>Professional Information</h4>
+            <div className={styles.infoGrid}>
+              {userData.title && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Title:</span>
+                  <span className={styles.infoValue}>{userData.title}</span>
+                </div>
+              )}
+              
+              {userData.specialty && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Specialty:</span>
+                  <span className={styles.infoValue}>{userData.specialty}</span>
+                </div>
+              )}
+              
+              {userData.institution && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Institution:</span>
+                  <span className={styles.infoValue}>{userData.institution}</span>
+                </div>
+              )}
+              
+              {userData.education && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Education:</span>
+                  <span className={styles.infoValue}>{userData.education}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {userData.bio && (
+            <div className={styles.bioSection}>
+              <h4 className={styles.sectionTitle}>Bio</h4>
+              <p className={styles.bio}>{userData.bio}</p>
+            </div>
+          )}
+
+          <div className={styles.statsSection}>
+            <h4 className={styles.sectionTitle}>Activity</h4>
+            <div className={styles.stats}>
+              <div className={styles.stat}>
+                <span className={styles.statNumber}>{stats.cases}</span>
+                <span className={styles.statLabel}>Cases</span>
+              </div>
+              <div className={styles.stat}>
+                <span className={styles.statNumber}>{stats.comments}</span>
+                <span className={styles.statLabel}>Comments</span>
+              </div>
+              <div className={styles.stat}>
+                <span className={styles.statNumber}>{stats.reactions}</span>
+                <span className={styles.statLabel}>Reactions</span>
+              </div>
+            </div>
+          </div>
+          
+          {userData.updatedAt && (
+            <p className={styles.updatedAt}>
+              Last Updated: {new Date(userData.updatedAt).toLocaleDateString()}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
