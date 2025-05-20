@@ -1,3 +1,4 @@
+// src/pages/profile/index.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile } from '../../firebase/firestore';
@@ -5,8 +6,7 @@ import ProfileCard from '../../components/Profile/ProfileCard';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-// Import the shared ProfileSkeleton component (adjust the path as needed)
-import ProfileSkeleton from '../../components/ProfileSkeleton'; 
+import ProfileSkeleton from '../../components/ProfileSkeleton';
 import styles from '../../styles/profile.module.css';
 
 export default function Profile() {
@@ -28,14 +28,25 @@ export default function Profile() {
         const profile = await getProfile(user.uid);
         setUserData({
           uid: user.uid,
+          role: profile.role || '',
           displayName: profile.displayName || user.displayName || 'User',
-          email: profile.email || user.email || 'No email',
+          email: profile.email || user.email || '',
           photoURL: profile.photoURL || user.photoURL || '/images/doctor-avatar.jpeg',
-          title: profile.title || 'No title',
-          specialty: profile.specialty || 'No specialty',
-          bio: profile.bio || '',
+          title: profile.title || '',
           education: profile.education || '',
           institution: profile.institution || '',
+          specialty: profile.specialty || '',
+          bio: profile.bio || '',
+          linkedIn: profile.linkedIn || '',
+          xProfile: profile.xProfile || '',
+          researchInterests: Array.isArray(profile.researchInterests) ? profile.researchInterests : [],
+          certifications: Array.isArray(profile.certifications) ? profile.certifications : [],
+          yearsOfExperience: profile.yearsOfExperience || '',
+          professionalAffiliations: Array.isArray(profile.professionalAffiliations)
+            ? profile.professionalAffiliations
+            : [],
+          levelOfStudy: profile.levelOfStudy || '',
+          courseOfStudy: profile.courseOfStudy || '',
           updatedAt: profile.updatedAt || new Date(),
         });
         setLoading(false);
@@ -54,8 +65,8 @@ export default function Profile() {
       <ProtectedRoute>
         <div className={styles.container}>
           <Navbar />
-          <ProfileSkeleton />  {/* Use skeleton loader here */}
-   
+          <ProfileSkeleton />
+          <Footer />
         </div>
       </ProtectedRoute>
     );
@@ -67,7 +78,7 @@ export default function Profile() {
         <div className={styles.container}>
           <Navbar />
           <div className={styles.error}>{error || 'Invalid user data.'}</div>
-
+          <Footer />
         </div>
       </ProtectedRoute>
     );
@@ -78,6 +89,7 @@ export default function Profile() {
       <div className={styles.container}>
         <Navbar />
         <ProfileCard userData={userData} />
+        <Footer />
       </div>
     </ProtectedRoute>
   );
