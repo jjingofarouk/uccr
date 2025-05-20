@@ -55,7 +55,7 @@ export default function Profile() {
         <div className={styles.container}>
           <Navbar />
           <ProfileSkeleton />  {/* Use skeleton loader here */}
-          <Footer />
+   
         </div>
       </ProtectedRoute>
     );
@@ -67,7 +67,7 @@ export default function Profile() {
         <div className={styles.container}>
           <Navbar />
           <div className={styles.error}>{error || 'Invalid user data.'}</div>
-          <Footer />
+
         </div>
       </ProtectedRoute>
     );
@@ -78,7 +78,6 @@ export default function Profile() {
       <div className={styles.container}>
         <Navbar />
         <ProfileCard userData={userData} />
-        <Footer />
       </div>
     </ProtectedRoute>
   );
