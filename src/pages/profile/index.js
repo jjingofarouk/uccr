@@ -62,9 +62,8 @@ export default function Profile() {
     return (
       <ProtectedRoute>
         <div className={styles.container}>
-          <Navbar />
           <ProfileSkeleton />
-          <Footer />
+
         </div>
       </ProtectedRoute>
     );
