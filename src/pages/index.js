@@ -12,38 +12,6 @@ export default function Home() {
   const { user } = useAuth();
   const { cases, loading, error } = useCases();
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
-  const [loadStart, setLoadStart] = useState(null);
-  const [loadTime, setLoadTime] = useState(null);
-  const [forceLoading, setForceLoading] = useState(true);
-  const MINIMUM_LOADING_DURATION = 5000; // 5 seconds in milliseconds
-
-  useEffect(() => {
-    if ((loading || forceLoading) && user) {
-      if (!loadStart) {
-        setLoadStart(Date.now());
-        setLoadTime(null);
-      }
-    } else if (loadStart) {
-      const duration = Date.now() - loadStart;
-      setLoadTime(duration);
-      console.log(`Loading component displayed for ${duration}ms`);
-    }
-  }, [loading, forceLoading, user, loadStart]);
-
-  useEffect(() => {
-    if (!loading && cases && loadStart && user) {
-      const elapsed = Date.now() - loadStart;
-      const remaining = MINIMUM_LOADING_DURATION - elapsed;
-      if (remaining > 0) {
-        const timer = setTimeout(() => {
-          setForceLoading(false);
-        }, remaining);
-        return () => clearTimeout(timer);
-      } else {
-        setForceLoading(false);
-      }
-    }
-  }, [loading, cases, loadStart, user]);
 
   useEffect(() => {
     if (cases.length > 0) {
@@ -79,19 +47,19 @@ export default function Home() {
         </div>
       </section>
 
-      {(loading || forceLoading) && (
+      {loading && (
         <section className={styles.loadingSection}>
           <Loading />
         </section>
       )}
 
-      {!(loading || forceLoading) && error && (
+      {!loading && error && (
         <section className={styles.errorSection} role="alert">
           <p className={styles.errorText}>Error: {error}</p>
         </section>
       )}
 
-      {!(loading || forceLoading) && !error && cases.length === 0 && (
+      {!loading && !error && cases.length === 0 && (
         <section className={styles.emptySection} aria-live="polite">
           <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
           <Link href="/cases/new" className={styles.ctaButtonSecondary}>
@@ -100,7 +68,7 @@ export default function Home() {
         </section>
       )}
 
-      {!(loading || forceLoading) && !error && caseOfTheDay && (
+      {!loading && !error && caseOfTheDay && (
         <section className={styles.featuredSection} aria-labelledby="featured-title">
           <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
           <div className={styles.featuredCard}>
@@ -109,7 +77,7 @@ export default function Home() {
         </section>
       )}
 
-      {!(loading || forceLoading) && !error && recentCases.length > 0 && (
+      {!loading && !error && recentCases.length > 0 && (
         <section className={styles.recentSection} aria-labelledby="recent-title">
           <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
           <div className={styles.caseList}>
