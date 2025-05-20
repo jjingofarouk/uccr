@@ -77,12 +77,17 @@
   color: #ffffff;
 }
 
+.menuButtonWrapper {
+  display: flex;
+  align-items: center;
+}
+
 .menuButton {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
-  border-radius: 50%;
+  padding: 0.5rem;
+  border-radius: 8px;
   transition: background 0.3s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
@@ -101,6 +106,12 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.userAvatar:hover {
+  transform: scale(1.05);
 }
 
 .dark-mode .userAvatar {
@@ -117,7 +128,7 @@
   box-shadow: -4px 0 12px var(--shadow);
   padding: 1.5rem;
   overflow-y: auto;
-  z-index: 2000; /* Increased to ensure visibility */
+  z-index: 2000;
 }
 
 .dark-mode .sidebar {
