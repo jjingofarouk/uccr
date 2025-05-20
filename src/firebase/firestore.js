@@ -465,14 +465,15 @@ export const updateUserProfile = async (userId, profileData) => {
 
 export const getUserStats = async (uid) => {
   try {
-    const cases = await getCases(uid);
-    const caseCount = cases.length;
+    const casesQuery = query(collection(db, 'cases'), where('userId', '==', uid));
+    const casesSnapshot = await getDocs(casesQuery, { source: 'server' });
+    const caseCount = casesSnapshot.size;
 
     const commentsQuery = query(
       collectionGroup(db, 'comments'),
       where('userId', '==', uid)
     );
-    const commentsSnapshot = await getDocs(commentsQuery);
+    const commentsSnapshot = await getDocs(commentsQuery, { source: 'server' });
     const commentCount = commentsSnapshot.size;
     let reactionCount = 0;
     commentsSnapshot.forEach(doc => {
