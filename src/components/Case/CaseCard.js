@@ -3,6 +3,26 @@ import Link from 'next/link';
 import Image from 'next/image';
 import styles from '../../styles/caseCard.module.css';
 
+// Utility function to process text with line breaks
+const formatText = (text) => {
+  if (!text || typeof text !== 'string') return 'Not specified';
+  // For CaseCard, limit to first paragraph and add ellipsis if more exists
+  const paragraphs = text.split('\n\n').filter(p => p.trim());
+  const firstParagraph = paragraphs[0] || '';
+  return firstParagraph.length > 100
+    ? firstParagraph.slice(0, 100) + '...' // Truncate for brevity
+    : firstParagraph.split('\n').map((line, i, arr) =>
+        i < arr.length - 1 ? (
+          <span key={i}>
+            {line}
+            <br />
+          </span>
+        ) : (
+          line
+        )
+      );
+};
+
 export default function CaseCard({ caseData }) {
   console.log(`CaseCard caseData (ID: ${caseData?.id || 'unknown'}):`, caseData);
 
@@ -36,7 +56,7 @@ export default function CaseCard({ caseData }) {
       <div className={styles.content}>
         <h3 className={styles.title}>{caseData.title || 'Untitled Case'}</h3>
         <p className={styles.concern}>
-          <strong>Chief Concern:</strong> {caseData.presentingComplaint || 'Not specified'}
+          <strong>Chief Concern:</strong> {formatText(caseData.presentingComplaint)}
         </p>
         <div className={styles.contributor}>
           <Image
