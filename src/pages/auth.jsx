@@ -1,8 +1,9 @@
-// pages/auth.jsx
-import { useState } from 'react';
+// src/pages/auth.jsx
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { login, signup } from '../firebase/auth';
 import { Stethoscope, Mail, Lock, User, AlertCircle, LogIn } from 'lucide-react';
+import Loading from '../components/Loading';
 import styles from './AuthPage.module.css';
 import Link from 'next/link';
 
@@ -12,15 +13,21 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadStart, setLoadStart] = useState(null);
+  const [forceLoading, setForceLoading] = useState(false);
   const router = useRouter();
+  const LOGIN_LOADING_DURATION = 3000; // 3 seconds for post-login loading
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     try {
       if (isLogin) {
         await login(email, password);
-        router.push('/');
+        setLoadStart(Date.now());
+        setForceLoading(true);
       } else {
         await signup(email, password, name);
         router.push('/profile/edit');
@@ -28,8 +35,28 @@ export default function AuthPage() {
     } catch (err) {
       console.error(`${isLogin ? 'Login' : 'Signup'} error:`, err);
       setError(err.message || `Failed to ${isLogin ? 'log in' : 'sign up'}. Please try again.`);
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (forceLoading && loadStart) {
+      const elapsed = Date.now() - loadStart;
+      const remaining = LOGIN_LOADING_DURATION - elapsed;
+      if (remaining <= 0) {
+        setForceLoading(false);
+        setIsLoading(false);
+        router.push('/');
+      } else {
+        const timer = setTimeout(() => {
+          setForceLoading(false);
+          setIsLoading(false);
+          router.push('/');
+        }, remaining);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [forceLoading, loadStart, router]);
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
@@ -38,6 +65,10 @@ export default function AuthPage() {
     setPassword('');
     setName('');
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className={styles.container}>
