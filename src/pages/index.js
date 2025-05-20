@@ -39,7 +39,6 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <Marquee />
       <main className={styles.container}>
         <section className={styles.hero} aria-labelledby="hero-title">
           <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
