@@ -1,113 +1,176 @@
+/* src/styles/caseCard.module.css */
 .card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px var(--shadow);
+  max-width: 100%;
+  margin: 0;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px var(--shadow);
 }
 
-.card h2 {
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #2c3e50;
+.dark-mode .card {
+  background: #1f2937;
+  border-color: var(--border);
 }
 
-.card p {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  color: #34495e;
+.noImageCard {
+  padding: 1.5rem;
 }
 
-.media {
-  margin-top: 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 }
 
 .image {
-  max-width: 100%;
-  max-height: 200px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 4px;
+  border-bottom: 1px solid var(--border);
+  transition: transform 0.3s ease;
 }
 
-.link {
-  display: inline-block;
-  margin-top: 1rem;
-  color: #3498db;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+.card:hover .image {
+  transform: scale(1.05);
 }
 
-.link:hover {
-  background-color: #eaf4ff;
-  color: #2980b9;
+.dark-mode .image {
+  border-bottom-color: var(--border);
 }
 
-/* Responsive Design */
+.content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.title:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.concern {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.concern strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.contributor {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.dark-mode .contributor {
+  color: #9ca3af;
+}
+
+.contributorAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.dark-mode .contributorAvatar {
+  border-color: var(--border);
+}
+
+.error {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #ef4444;
+  text-align: center;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.dark-mode .error {
+  background: #1f2937;
+  border-color: var(--border);
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .card {
+    border-radius: 12px;
+  }
+
+  .content {
     padding: 1rem;
   }
 
-  .card h2 {
-    font-size: 1.25rem;
+  .title {
+    font-size: 1.1rem;
   }
 
-  .card p {
-    font-size: 0.95rem;
+  .concern {
+    font-size: 0.9rem;
   }
 
-  .image {
-    max-height: 150px;
+  .contributor {
+    font-size: 0.85rem;
+  }
+
+  .contributorAvatar {
+    width: 20px;
+    height: 20px;
   }
 }
 
 @media (max-width: 480px) {
   .card {
+    border-radius: 10px;
+  }
+
+  .content {
     padding: 0.75rem;
   }
 
-  .card h2 {
-    font-size: 1.1rem;
+  .title {
+    font-size: 1rem;
   }
 
-  .card p {
+  .concern {
+    font-size: 0.85rem;
+  }
+
+  .error {
     font-size: 0.9rem;
+    padding: 0.75rem;
   }
-
-  .image {
-    max-height: 120px;
-  }
-}
-
-/* Dark Mode Overrides */
-:global(body.dark-mode) .card {
-  background-color: #2c2c2c;
-  color: #ffffff;
-}
-
-:global(body.dark-mode) .card h2 {
-  color: #ecf0f1;
-}
-
-:global(body.dark-mode) .card p {
-  color: #bdc3c7;
-}
-
-:global(body.dark-mode) .link {
-  color: #66b3ff;
-}
-
-:global(body.dark-mode) .link:hover {
-  background-color: #34495e;
-  color: #4d94ff;
 }

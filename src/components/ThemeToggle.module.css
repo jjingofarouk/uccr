@@ -1,0 +1,28 @@
+/* src/components/ThemeToggle.module.css */
+.toggleButton {
+  background: none;
+  border: none;
+  color: #4a5568;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleButton:hover {
+  background: #e2e8f0;
+  color: #3b82f6;
+  transform: scale(1.1);
+}
+
+.dark-mode .toggleButton {
+  color: #cbd5e1;
+}
+
+.dark-mode .toggleButton:hover {
+  background: #374151;
+  color: #60a5fa;
+}

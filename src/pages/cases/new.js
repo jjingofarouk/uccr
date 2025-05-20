@@ -7,9 +7,7 @@ export default function NewCase() {
   return (
     <ProtectedRoute>
       <div className="container">
-        <Navbar />
         <CaseForm />
-        <Footer />
       </div>
     </ProtectedRoute>
   );

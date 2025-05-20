@@ -1,21 +1,92 @@
+// src/firebase/auth.js
 import { auth } from './config';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile as updateAuthProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from './config';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  updateProfile, 
+  signOut 
+} from 'firebase/auth';
 
 export const login = async (email, password) => {
-  await signInWithEmailAndPassword(auth, email, password);
+  try {
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+    const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+    console.log('User logged in:', userCredential.user.uid, email);
+    return { success: true, user: userCredential.user };
+  } catch (error) {
+    console.error('Login error:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+    });
+    return { success: false, error: error.message || 'Failed to log in' };
+  }
 };
 
 export const signup = async (email, password, name) => {
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  await updateAuthProfile(userCredential.user, { displayName: name });
+  try {
+    if (!email || !password || !name) {
+      throw new Error('Email, password, and name are required');
+    }
+    const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+    const user = userCredential.user;
+    console.log('User created:', user.uid, email);
+    await updateProfile(user, { displayName: name.trim() });
+    console.log('Auth profile updated with displayName:', name);
+    return { success: true, user };
+  } catch (error) {
+    console.error('Signup error:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+    });
+    return { success: false, error: error.message || 'Failed to sign up' };
+  }
 };
 
-export const updateProfile = async (user, name, photoUrl) => {
-  await updateAuthProfile(user, { displayName: name, photoURL: photoUrl });
+export const updateAuthProfile = async (user, { displayName, photoURL }) => {
+  try {
+    if (!user) {
+      throw new Error('No authenticated user provided');
+    }
+    const updateData = {};
+    if (displayName) updateData.displayName = displayName.trim();
+    if (photoURL) updateData.photoURL = photoURL;
+    await updateProfile(user, updateData);
+    console.log('Auth profile updated for:', user.uid, updateData);
+    return { success: true };
+  } catch (error) {
+    console.error('Update auth profile error:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+    });
+    return { success: false, error: error.message || 'Failed to update profile' };
+  }
 };
 
-export const updateUserProfile = async (userId, profileData) => {
-  await setDoc(doc(db, 'profiles', userId), profileData, { merge: true });
+export const logout = async (retryCount = 2) => {
+  try {
+    if (!auth) {
+      console.error('Firebase auth not initialized');
+      return { success: false, error: 'Authentication service unavailable' };
+    }
+    await signOut(auth);
+    console.log('User signed out successfully');
+    return { success: true };
+  } catch (error) {
+    console.error('Firebase signOut error:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+    });
+    if (retryCount > 0 && error.code === 'network-request-failed') {
+      console.log(`Retrying logout, attempts remaining: ${retryCount}`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return logout(retryCount - 1);
+    }
+    return { success: false, error: error.message || 'Unable to sign out' };
+  }
 };
