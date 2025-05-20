@@ -121,7 +121,7 @@
 }
 
 .dark-mode .sidebar {
-  background: #  #1f2937;
+  background: #1f2937;
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -188,6 +188,10 @@
 .dark-mode .navLink:hover {
   background: #374151;
   color: #60a5fa;
+}
+
+.navIcon {
+  flex-shrink: 0;
 }
 
 .sidebarButton {
