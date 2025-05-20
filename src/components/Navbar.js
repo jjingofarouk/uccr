@@ -1,5 +1,7 @@
+// src/components/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout, getMessages } from '../firebase/firestore';
 import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell } from 'lucide-react';
@@ -11,9 +13,11 @@ import styles from '../styles/navbar.module.css';
 export default function Navbar() {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadThreads, setUnreadThreads] = useState([]);
+  const [logoutError, setLogoutError] = useState('');
   const sidebarRef = useRef(null);
   const userAvatarRef = useRef(null);
   const notificationsRef = useRef(null);
@@ -21,21 +25,37 @@ export default function Navbar() {
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
     setIsNotificationsOpen(false);
+    setLogoutError('');
   };
 
   const toggleNotifications = () => {
     setIsNotificationsOpen((prev) => !prev);
     setIsSidebarOpen(false);
+    setLogoutError('');
   };
 
   const handleLogout = async () => {
-    await logout();
-    setIsSidebarOpen(false);
+    try {
+      const result = await logout();
+      if (result.success) {
+        setIsSidebarOpen(false);
+        router.push('/auth');
+      } else {
+        setLogoutError(result.error);
+        console.error('Logout failed:', result.error);
+      }
+    } catch (error) {
+      setLogoutError('Failed to log out. Please try again.');
+      console.error('Unexpected logout error:', error);
+    }
   };
 
   useEffect(() => {
     const fetchUnreadMessages = async () => {
-      if (!user) return;
+      if (!user) {
+        setUnreadThreads([]);
+        return;
+      }
       try {
         const threads = await getMessages(user.uid);
         const unread = threads.filter(thread => thread.lastMessage && !thread.read);
@@ -59,6 +79,7 @@ export default function Navbar() {
       ) {
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
+        setLogoutError('');
       }
     };
 
@@ -217,7 +238,11 @@ export default function Navbar() {
                 </Link>
               )}
               {user ? (
-                <button onClick={handleLogout} className={styles.navLink}>
+                <button
+                  onClick={handleLogout}
+                  className={`${styles.navLink} ${styles.logoutButton}`}
+                  disabled={loading}
+                >
                   <LogOut size={20} className={styles.navIcon} />
                   Logout
                 </button>
@@ -228,6 +253,11 @@ export default function Navbar() {
                 </Link>
               )}
             </nav>
+            {logoutError && (
+              <div className={styles.error}>
+                <span>{logoutError}</span>
+              </div>
+            )}
           </motion.aside>
         )}
       </AnimatePresence>
