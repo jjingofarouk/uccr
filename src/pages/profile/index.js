@@ -75,7 +75,6 @@ export default function Profile() {
       <div className={styles.container}>
         <Navbar />
         <ProfileCard userData={userData} />
-        <Footer />
       </div>
     </ProtectedRoute>
   );
