@@ -6,7 +6,7 @@ import ProfileCard from '../../components/Profile/ProfileCard';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import styles from '../../styles/global.module.css';
+import styles from '../../styles/profile.module.css';
 
 export default function Profile() {
   const { user } = useAuth();
