@@ -14,7 +14,6 @@ function MyApp({ Component, pageProps }) {
         <main style={{ marginTop: '60px' }}>
           <Component {...pageProps} />
         </main>
-        <Footer />
       </ThemeProvider>
     </AuthProvider>
   );
