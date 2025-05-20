@@ -31,7 +31,15 @@
   font-weight: 800;
   color: var(--primary);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   transition: color 0.3s ease;
+}
+
+.logo img {
+  width: 40px;
+  height: 40px;
 }
 
 .logo:hover {
@@ -342,6 +350,11 @@
 
   .logo {
     font-size: 1.3rem;
+  }
+
+  .logo img {
+    width: 32px;
+    height: 32px;
   }
 
   .userAvatar,
