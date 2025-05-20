@@ -1,10 +1,10 @@
-// pages/cases/[id].jsx
+// src/pages/cases/[id].jsx
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react'; // Added useState and useEffect imports
+import { useState, useEffect } from 'react';
 import { useCases } from '../../hooks/useCases';
 import CaseDetail from '../../components/Case/CaseDetail';
-import Navbar from '../../components/Navbar';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
+import Loading from '../../components/Loading';
 import styles from '../../styles/casePage.module.css';
 
 export default function CasePage() {
@@ -17,21 +17,38 @@ export default function CasePage() {
   useEffect(() => {
     if (id) {
       const fetchCase = async () => {
-        const data = await getCaseById(id);
-        setCaseData(data);
-        setLoading(false);
+        try {
+          const data = await getCaseById(id);
+          setCaseData(data);
+        } catch (error) {
+          console.error('Error fetching case:', error);
+        } finally {
+          setLoading(false);
+        }
       };
       fetchCase();
     }
   }, [id, getCaseById]);
 
-  if (loading) return <div>Loading...</div>;
-  if (!caseData) return <div>Case not found</div>;
+  if (loading) {
+    return (
+      <section className={styles.loadingSection}>
+        <Loading />
+      </section>
+    );
+  }
+
+  if (!caseData) {
+    return (
+      <div className={styles.errorSection} role="alert">
+        <p className={styles.errorText}>Case not found</p>
+      </div>
+    );
+  }
 
   return (
     <ProtectedRoute>
       <div className={styles.container}>
-
         <CaseDetail caseData={caseData} />
       </div>
     </ProtectedRoute>
