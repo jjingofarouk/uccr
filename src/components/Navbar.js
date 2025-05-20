@@ -7,7 +7,7 @@ import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu } from 'l
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
-import styles from '../navbar.module.css';
+import styles from '../styles/navbar.module.css';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
