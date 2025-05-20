@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getCases, getComments } from '../../firebase/firestore';
+import { getUserStats } from '../../firebase/firestore';
 import { useAuth } from '../../hooks/useAuth';
 import styles from './profileCard.module.css';
 
@@ -24,53 +24,8 @@ export default function ProfileCard({ userData }) {
         }
 
         console.log('Fetching stats for uid:', userData.uid); // Debug
-
-        // Fetch cases
-        const allCases = await getCases();
-        console.log('Fetched cases:', allCases.length, 'for uid:', userData.uid); // Debug
-        const userCases = allCases.filter(caseData => {
-          const isMatch = caseData.userId === userData.uid;
-          if (!isMatch) {
-            console.log('Case not matched:', { caseId: caseData.id, caseUserId: caseData.userId, profileUid: userData.uid }); // Debug
-          }
-          return isMatch;
-        });
-        const caseCount = userCases.length;
-
-        // Fetch comments and reactions
-        let commentCount = 0;
-        let reactionCount = 0;
-        const caseIds = allCases.map(caseData => caseData.id);
-        console.log('Processing comments for cases:', caseIds); // Debug
-        for (const caseId of caseIds) {
-          try {
-            const comments = await getComments(caseId);
-            console.log(`Comments for case ${caseId}:`, comments.length); // Debug
-            const userComments = comments.filter(comment => {
-              const isMatch = comment.userId === userData.uid;
-              if (!isMatch) {
-                console.log('Comment not matched:', { commentId: comment.id, commentUserId: comment.userId, profileUid: userData.uid }); // Debug
-              }
-              return isMatch;
-            });
-            commentCount += userComments.length;
-            userComments.forEach(comment => {
-              const upvotes = Number(comment.upvotes) || 0;
-              const downvotes = Number(comment.downvotes) || 0;
-              reactionCount += upvotes + downvotes;
-              console.log(`Comment ${comment.id} reactions:`, { upvotes, downvotes }); // Debug
-            });
-          } catch (err) {
-            console.warn(`Failed to fetch comments for case ${caseId}:`, err.message); // Debug
-            continue; // Skip to next case
-          }
-        }
-
-        setStats({
-          collections: caseCount,
-          comments: commentCount,
-          reactions: reactionCount,
-        });
+        const userStats = await getUserStats(userData.uid);
+        setStats(userStats);
         setLoading(false);
       } catch (err) {
         setError('Failed to load user stats. Please try again.');
