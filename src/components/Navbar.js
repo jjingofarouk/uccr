@@ -1,3 +1,4 @@
+// src/components/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -98,6 +99,7 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={styles.headerContent}>
         <Link href="/" className={styles.logo}>
+          <Image src="/logo.png" alt="UCCR Logo" width={40} height={40} />
           <span>UCCR</span>
         </Link>
         <div className={styles.headerControls}>
