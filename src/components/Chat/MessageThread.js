@@ -1,3 +1,4 @@
+// src/components/Chat/MessageThread.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { sendMessage, getThreadMessages } from '../../firebase/firestore';
@@ -11,25 +12,30 @@ export default function MessageThread({ threadId, otherUserName }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!threadId) return;
+    if (!threadId || !user) return;
+    console.log('Fetching messages for thread:', threadId, 'User:', user.uid);
     const fetchMessages = async () => {
       try {
         const threadMessages = await getThreadMessages(threadId);
         setMessages(threadMessages);
       } catch (err) {
         setError('Failed to load messages');
+        console.error('Fetch messages error:', err);
       }
     };
     fetchMessages();
-  }, [threadId]);
+  }, [threadId, user]);
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!user || !newMessage.trim()) return;
+    if (!user || !newMessage.trim()) {
+      setError('Please log in and enter a message.');
+      return;
+    }
     try {
-      // Find recipient ID from threadId (e.g., "uid1_uid2")
       const [user1, user2] = threadId.split('_');
       const recipientId = user1 === user.uid ? user2 : user1;
+      console.log('Sending message:', { senderId: user.uid, recipientId, text: newMessage });
       await sendMessage({
         senderId: user.uid,
         recipientId,
@@ -40,8 +46,10 @@ export default function MessageThread({ threadId, otherUserName }) {
       setNewMessage('');
       const updatedMessages = await getThreadMessages(threadId);
       setMessages(updatedMessages);
+      setError('');
     } catch (err) {
-      setError('Failed to send message');
+      setError(err.message || 'Failed to send message');
+      console.error('Send message error:', err);
     }
   };
 
@@ -49,15 +57,15 @@ export default function MessageThread({ threadId, otherUserName }) {
     <>
       <Navbar />
       <div className={styles.container}>
-        <h3>Chat with {otherUserName}</h3>
+        <h3 className={styles.chatTitle}>Chat with {otherUserName}</h3>
         <div className={styles.messages}>
           {messages.length === 0 ? (
-            <p>No messages in this thread</p>
+            <p className={styles.noChat}>No messages in this thread</p>
           ) : (
             messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`${styles.message} ${msg.senderId === user.uid ? styles.sent : styles.received}`}
+                className={`${styles.message} ${msg.senderId === user?.uid ? styles.sent : styles.received}`}
               >
                 <p>{msg.text}</p>
                 <small>
@@ -80,7 +88,12 @@ export default function MessageThread({ threadId, otherUserName }) {
             Send
           </button>
         </form>
-        {error && <p className={styles.error}>{error}</p>}
+        {error && (
+          <div className={styles.error}>
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
       </div>
     </>
   );
