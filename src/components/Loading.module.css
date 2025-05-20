@@ -1,14 +1,20 @@
 /* src/components/Loading.module.css */
 .loaderContainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  padding: 2rem;
+  justify-content: center;
+  gap: 2rem;
+  padding: 3rem;
+  z-index: 1000;
 }
 
 .loader {
-  width: 30px;
+  width: 60px;
   aspect-ratio: 1;
   background: #3b82f6; /* Primary color for light mode */
   display: grid;
@@ -46,8 +52,8 @@
 
 .loaderText {
   font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #4a5568;
   text-align: center;
 }
@@ -71,12 +77,16 @@
 
 /* Responsive adjustments */
 @media (max-width: 480px) {
+  .loaderContainer {
+    padding: 2rem;
+    gap: 1.5rem;
+  }
+
   .loader {
-    width: 24px;
-    height: 24px;
+    width: 48px;
   }
 
   .loaderText {
-    font-size: 0.9rem;
+    font-size: 1.25rem;
   }
 }
