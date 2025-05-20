@@ -21,14 +21,12 @@ const fetchUserPhotoURL = async (uid) => {
     const profileRef = doc(db, 'profiles', uid);
     const profileSnap = await getDoc(profileRef);
     const photoURL = profileSnap.exists() ? profileSnap.data().photoURL : null;
-    console.log('Fetched photoURL for uid:', uid, 'photoURL:', photoURL);
     return photoURL || '/images/doctor-avatar.jpeg';
   } catch (error) {
     console.error('Fetch user photoURL error:', error.message);
     return '/images/doctor-avatar.jpeg';
   }
 };
-
 
 export const addCase = async (caseData) => {
   try {
@@ -41,15 +39,18 @@ export const addCase = async (caseData) => {
     }
     const validatedCaseData = {
       userId: caseData.userId,
-      userName: caseData.userName || 'User',
+      userName: caseData.userName || 'Anonymous',
       title: String(caseData.title || ''),
       specialty: String(caseData.specialty || ''),
       presentingComplaint: String(caseData.presentingComplaint || ''),
       history: String(caseData.history || ''),
+      physicalExam: String(caseData.physicalExam || ''),
       investigations: String(caseData.investigations || ''),
       provisionalDiagnosis: String(caseData.provisionalDiagnosis || ''),
       management: String(caseData.management || ''),
       discussion: String(caseData.discussion || ''),
+      highLevelSummary: String(caseData.highLevelSummary || ''),
+      references: String(caseData.references || ''),
       hospital: String(caseData.hospital || ''),
       referralCenter: String(caseData.referralCenter || ''),
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
@@ -80,15 +81,18 @@ export const getCases = async (uid = null) => {
       return {
         id: doc.id,
         userId: data.userId,
-        userName: data.userName || 'User',
+        userName: data.userName || 'Anonymous',
         title: data.title || '',
         specialty: data.specialty || '',
         presentingComplaint: data.presentingComplaint || '',
         history: data.history || '',
+        physicalExam: data.physicalExam || '',
         investigations: data.investigations || '',
         provisionalDiagnosis: data.provisionalDiagnosis || '',
         management: data.management || '',
         discussion: data.discussion || '',
+        highLevelSummary: data.highLevelSummary || '',
+        references: data.references || '',
         hospital: data.hospital || '',
         referralCenter: data.referralCenter || '',
         mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
@@ -120,15 +124,18 @@ export const getCaseById = async (id) => {
     const caseData = {
       id: docSnap.id,
       userId: data.userId,
-      userName: data.userName || 'User',
+      userName: data.userName || 'Anonymous',
       title: data.title || '',
       specialty: data.specialty || '',
       presentingComplaint: data.presentingComplaint || '',
       history: data.history || '',
+      physicalExam: data.physicalExam || '',
       investigations: data.investigations || '',
       provisionalDiagnosis: data.provisionalDiagnosis || '',
       management: data.management || '',
       discussion: data.discussion || '',
+      highLevelSummary: data.highLevelSummary || '',
+      references: data.references || '',
       hospital: data.hospital || '',
       referralCenter: data.referralCenter || '',
       mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
@@ -145,7 +152,6 @@ export const getCaseById = async (id) => {
   }
 };
 
-// src/firebase/firestore.js
 export const addComment = async (caseId, commentData, parentCommentId = null) => {
   try {
     if (!commentData.userId) {
