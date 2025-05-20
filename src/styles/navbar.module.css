@@ -1,8 +1,7 @@
-/* src/styles/navbar.module.css */
 .header {
   background: var(--background);
   border-bottom: 1px solid var(--border);
-  padding: 1rem 0;
+  padding: 1rem;
   position: fixed;
   top: 0;
   left: 0;
@@ -11,18 +10,13 @@
   box-shadow: 0 2px 4px var(--shadow);
 }
 
-.dark-mode .header {
-  background: #1f2937;
-  border-bottom-color: var(--border);
-}
-
 .headerContent {
-  max-width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 1rem;
 }
 
 .logo {
@@ -40,24 +34,20 @@
 .logo img {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  clip-path: circle(50% at 50% 50%);
+  border: none;
 }
 
 .logo:hover {
   color: var(--primary-hover);
 }
 
-.dark-mode .logo {
-  color: var(--primary);
-}
-
-.dark-mode .logo:hover {
-  color: var(--primary-hover);
-}
-
 .headerControls {
   display: flex;
-  gap: 0.75rem;
   align-items: center;
+  gap: 0.75rem;
 }
 
 .themeToggle {
@@ -76,15 +66,6 @@
   transform: scale(1.05);
 }
 
-.dark-mode .themeToggle {
-  color: var(--text);
-}
-
-.dark-mode .themeToggle:hover {
-  background: var(--primary);
-  color: #ffffff;
-}
-
 .notificationWrapper {
   position: relative;
 }
@@ -92,12 +73,11 @@
 .notificationButton {
   background: none;
   border: none;
-  cursor: pointer;
   color: var(--text);
+  cursor: pointer;
   padding: 0.5rem;
   border-radius: 8px;
   transition: background 0.3s ease, transform 0.2s ease;
-  position: relative;
 }
 
 .notificationButton:hover {
@@ -105,20 +85,12 @@
   transform: scale(1.05);
 }
 
-.dark-mode .notificationButton {
-  color: var(--text);
-}
-
-.dark-mode .notificationButton:hover {
-  background: var(--primary);
-}
-
 .notificationBadge {
   position: absolute;
   top: 0;
   right: 0;
-  background-color: var(--accent);
-  color: white;
+  background: var(--accent);
+  color: #ffffff;
   border-radius: 50%;
   width: 18px;
   height: 18px;
@@ -144,30 +116,16 @@
   padding: 0.5rem;
 }
 
-.dark-mode .notificationDropdown {
-  background: #1f2937;
-  border-color: var(--border);
-}
-
 .notificationItem {
   display: block;
   padding: 0.75rem;
   color: var(--text);
   text-decoration: none;
   border-radius: 6px;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .notificationItem:hover {
-  background: var(--primary);
-  color: #ffffff;
-}
-
-.dark-mode .notificationItem {
-  color: var(--text);
-}
-
-.dark-mode .notificationItem:hover {
   background: var(--primary);
   color: #ffffff;
 }
@@ -186,10 +144,6 @@
   text-align: center;
 }
 
-.dark-mode .noNotifications {
-  color: var(--text-secondary);
-}
-
 .menuButtonWrapper {
   display: flex;
   align-items: center;
@@ -202,8 +156,6 @@
   padding: 0.5rem;
   border-radius: 8px;
   transition: background 0.3s ease, transform 0.2s ease;
-  display: flex;
-  align-items: center;
 }
 
 .menuButton:hover {
@@ -211,24 +163,18 @@
   transform: scale(1.05);
 }
 
-.dark-mode .menuButton:hover {
-  background: var(--primary);
-}
-
 .userAvatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border);
+  border: none;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
 .userAvatar:hover {
   transform: scale(1.05);
-}
-
-.dark-mode .userAvatar {
-  border-color: var(--border);
 }
 
 .sidebar {
@@ -244,19 +190,10 @@
   z-index: 2000;
 }
 
-.dark-mode .sidebar {
-  background: #1f2937;
-  box-shadow: -4px 0 12px var(--shadow);
-}
-
 .sidebarHeader {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
-}
-
-.dark-mode .sidebarHeader {
-  border-bottom-color: var(--border);
 }
 
 .userInfo {
@@ -266,23 +203,17 @@
 }
 
 .sidebarAvatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border);
-}
-
-.dark-mode .sidebarAvatar {
-  border-color: var(--border);
+  border: none;
 }
 
 .userName {
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text);
-}
-
-.dark-mode .userName {
   color: var(--text);
 }
 
@@ -311,23 +242,34 @@
   transform: translateX(4px);
 }
 
-.dark-mode .navLink {
-  color: var(--text);
-}
-
-.dark-mode .navLink:hover {
-  background: var(--primary);
-  color: #ffffff;
-}
-
 .navIcon {
   flex-shrink: 0;
+}
+
+.dark-mode {
+  --background: #1f2937;
+  --border: #4b5563;
+  --text: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --accent: #ef4444;
+  --shadow: rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .logo {
     font-size: 1.5rem;
+  }
+
+  .logo img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    clip-path: circle(50% at 50% 50%);
+    border: none;
   }
 
   .sidebar {
@@ -341,6 +283,12 @@
   .navLink {
     font-size: 0.9rem;
   }
+
+  .userAvatar,
+  .sidebarAvatar {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -353,14 +301,18 @@
   }
 
   .logo img {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    clip-path: circle(50% at 50% 50%);
+    border: none;
   }
 
   .userAvatar,
   .sidebarAvatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .navLink {
