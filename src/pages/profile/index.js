@@ -35,6 +35,7 @@ export default function Profile() {
           bio: profile.bio || '',
           education: profile.education || '',
           institution: profile.institution || '',
+          updatedAt: profile.updatedAt || new Date(),
         });
         console.log('userData set:', { uid: user.uid, ...userData }); // Debug
         setLoading(false);
@@ -54,6 +55,7 @@ export default function Profile() {
         <div className={styles.container}>
           <Navbar />
           <Loading />
+          <Footer />
         </div>
       </ProtectedRoute>
     );
@@ -65,6 +67,7 @@ export default function Profile() {
         <div className={styles.container}>
           <Navbar />
           <div className={styles.error}>{error || 'Invalid user data.'}</div>
+          <Footer />
         </div>
       </ProtectedRoute>
     );
