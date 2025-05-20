@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
-import Loading from '../Loading';
+import Loading from '../components/Loading';
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -10,10 +10,10 @@ export default function ProtectedRoute({ children }) {
   const [loadStart, setLoadStart] = useState(null);
   const [loadTime, setLoadTime] = useState(null);
   const [forceLoading, setForceLoading] = useState(true);
-  const MINIMUM_LOADING_DURATION = 5000; // 2 seconds in milliseconds
+  const MINIMUM_LOADING_DURATION = 5000; // 5 seconds in milliseconds
 
   useEffect(() => {
-    if (loading || forceLoading) {
+    if (loading || (forceLoading && user)) {
       if (!loadStart) {
         setLoadStart(Date.now());
         setLoadTime(null);
@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children }) {
       setLoadTime(duration);
       console.log(`Loading component displayed for ${duration}ms`);
     }
-  }, [loading, forceLoading, loadStart]);
+  }, [loading, forceLoading, user, loadStart]);
 
   useEffect(() => {
     if (!loading && user && loadStart) {
@@ -41,11 +41,11 @@ export default function ProtectedRoute({ children }) {
   }, [loading, user, loadStart]);
 
   useEffect(() => {
-    if (!loading && !forceLoading && !user) {
+    if (!loading && !user) {
       router.push('/auth');
     }
-  }, [user, loading, forceLoading, router]);
+  }, [user, loading, router]);
 
-  if (loading || forceLoading) return <Loading />;
+  if (loading || (forceLoading && user)) return <Loading />;
   return user ? children : null;
 }
