@@ -77,6 +77,111 @@
   color: #ffffff;
 }
 
+.notificationWrapper {
+  position: relative;
+}
+
+.notificationButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  position: relative;
+}
+
+.notificationButton:hover {
+  background: var(--primary);
+  transform: scale(1.05);
+}
+
+.dark-mode .notificationButton {
+  color: var(--text);
+}
+
+.dark-mode .notificationButton:hover {
+  background: var(--primary);
+}
+
+.notificationBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--accent);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.notificationDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px var(--shadow);
+  z-index: 1002;
+  padding: 0.5rem;
+}
+
+.dark-mode .notificationDropdown {
+  background: #1f2937;
+  border-color: var(--border);
+}
+
+.notificationItem {
+  display: block;
+  padding: 0.75rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.notificationItem:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.dark-mode .notificationItem {
+  color: var(--text);
+}
+
+.dark-mode .notificationItem:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.notificationItem small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.noNotifications {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.dark-mode .noNotifications {
+  color: var(--text-secondary);
+}
+
 .menuButtonWrapper {
   display: flex;
   align-items: center;
@@ -221,6 +326,10 @@
     width: 240px;
   }
 
+  .notificationDropdown {
+    width: 240px;
+  }
+
   .navLink {
     font-size: 0.9rem;
   }
@@ -247,7 +356,12 @@
   }
 
   .themeToggle,
-  .menuButton {
+  .menuButton,
+  .notificationButton {
     padding: 0.4rem;
+  }
+
+  .notificationDropdown {
+    width: 200px;
   }
 }
