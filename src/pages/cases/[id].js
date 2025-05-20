@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useCases } from '../../hooks/useCases';
 import CaseDetail from '../../components/Case/CaseDetail';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import Loading from '../../components/Loading';
+import CaseSkeleton from '../../components/Case/CaseSkeleton';
 import styles from '../../styles/casePage.module.css';
 
 function CasePageContent() {
@@ -33,7 +33,7 @@ function CasePageContent() {
   if (loading) {
     return (
       <section className={styles.loadingSection}>
-        <Loading />
+        <CaseSkeleton />
       </section>
     );
   }
