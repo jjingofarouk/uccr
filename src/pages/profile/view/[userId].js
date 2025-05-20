@@ -5,6 +5,7 @@ import { getProfile } from '../../../firebase/firestore';
 import ProfileCard from '../../../components/Profile/ProfileCard';
 import Navbar from '../../../components/Navbar';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
+import Loading from '../../../components/Loading';
 import Link from 'next/link';
 import styles from '../../../styles/profile.module.css';
 
@@ -35,7 +36,17 @@ export default function ProfileView() {
     fetchProfile();
   }, [userId]);
 
-  if (authLoading || loading) return <div>Loading...</div>;
+  if (authLoading || loading) {
+    return (
+      <ProtectedRoute>
+        <div className={styles.container}>
+          <Navbar />
+          <Loading />
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
