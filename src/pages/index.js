@@ -8,8 +8,14 @@ import Link from 'next/link';
 import Marquee from '../components/Marquee';
 import styles from './Home.module.css';
 
-// Dynamically import Loading component with SSR disabled
-const Loading = dynamic(() => import('../components/Loading'), { ssr: false });
+// Dynamically import Loading component with SSR disabled and a fallback
+const Loading = dynamic(() => import('../components/Loading').catch((err) => {
+  console.error('Failed to load Loading component:', err);
+  return () => <div>Loading failed...</div>;
+}), {
+  ssr: false,
+  loading: () => <div aria-live="polite">Loading...</div>, // Fallback UI while Loading component is being fetched
+});
 
 export default function Home() {
   const { cases, loading, error } = useCases();
