@@ -31,7 +31,7 @@ export default function CasePage() {
   return (
     <ProtectedRoute>
       <div className={styles.container}>
-        <Navbar />
+
         <CaseDetail caseData={caseData} />
       </div>
     </ProtectedRoute>
