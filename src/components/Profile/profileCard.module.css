@@ -1,39 +1,41 @@
 /* src/styles/profileCard.module.css */
 .card {
-  display: flex;
-  flex-direction: column;
   background: var(--background);
   border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 8px var(--shadow);
-  max-width: 100%;
+  box-shadow: 0 4px 12px var(--shadow);
+  max-width: 800px;
   margin: 0 auto;
-  padding: 1.5rem;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px var(--shadow);
+  box-shadow: 0 8px 20px var(--shadow);
 }
 
-.dark-mode .card {
-  background: #1f2937;
-  border-color: var(--border);
-}
-
-.cardHeader {
-  position: relative;
+.cardInner {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
+  flex-direction: row;
 }
 
-.imageContainer {
-  position: relative;
+/* Sidebar - Avatar & Actions section */
+.cardSidebar {
+  flex: 0 0 250px;
+  padding: 2rem 1.5rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.imageWrapper {
+  margin-bottom: 1.5rem;
+  position: relative; 
 }
 
 .profileImage {
@@ -41,38 +43,12 @@
   object-fit: cover;
   border: 3px solid var(--border);
   transition: transform 0.3s ease;
+  width: 120px;
+  height: 120px;
 }
 
 .card:hover .profileImage {
   transform: scale(1.05);
-}
-
-.dark-mode .profileImage {
-  border-color: var(--border);
-}
-
-.onlineIndicator {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: 12px;
-  height: 12px;
-  background: #22c55e;
-  border-radius: 50%;
-  border: 2px solid var(--background);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-}
-
-.dark-mode .onlineIndicator {
-  border-color: #1f2937;
-}
-
-.cardContent {
-  text-align: center;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
 }
 
 .name {
@@ -82,6 +58,7 @@
   margin: 0;
   line-height: 1.3;
   letter-spacing: -0.015em;
+  margin-bottom: 0.5rem;
 }
 
 .email {
@@ -89,78 +66,26 @@
   color: #6b7280;
   margin: 0;
   line-height: 1.5;
-}
-
-.dark-mode .email {
-  color: #9ca3af;
-}
-
-.title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--primary);
-  margin: 0;
-}
-
-.dark-mode .title {
-  color: var(--primary);
-}
-
-.specialty {
-  font-size: 0.95rem;
-  color: var(--text);
-  margin: 0;
-  line-height: 1.5;
-}
-
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 1rem;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.statNumber {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.statLabel {
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.dark-mode .statLabel {
-  color: #9ca3af;
+  margin-bottom: 1.5rem;
 }
 
 .actions {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.dark-mode .actions {
-  border-top-color: var(--border);
+  flex-direction: column;
+  width: 100%;
+  gap: 0.75rem;
+  margin-top: auto;
 }
 
 .viewButton,
 .editButton {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 500;
   text-decoration: none;
   transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  text-align: center;
 }
 
 .viewButton {
@@ -185,83 +110,176 @@
   transform: translateY(-2px);
 }
 
-.dark-mode .editButton {
-  border-color: var(--primary);
+/* Main Content area */
+.cardContent {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.dark-mode .editButton:hover {
-  background: var(--primary);
-  color: #ffffff;
+.sectionTitle {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin: 0 0 1rem 0;
+  font-weight: 600;
 }
 
-/* Responsive adjustments */
+.infoSection, .bioSection, .statsSection {
+  margin-bottom: 1.5rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.infoLabel {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.infoValue {
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.bio {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  min-width: 80px;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.updatedAt {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: auto;
+  font-style: italic;
+}
+
+.error {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Dark mode styles */
+.dark-mode .card {
+  background: #1f2937;
+}
+
+.dark-mode .cardSidebar {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.dark-mode .email,
+.dark-mode .sectionTitle,
+.dark-mode .infoLabel,
+.dark-mode .statLabel,
+.dark-mode .updatedAt {
+  color: #9ca3af;
+}
+
+.dark-mode .stat {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
-  .card {
-    padding: 1rem;
-    border-radius: 12px;
+  .cardInner {
+    flex-direction: column;
   }
-
-  .name {
-    font-size: 1.25rem;
+  
+  .cardSidebar {
+    flex: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem;
   }
-
-  .email,
-  .specialty {
-    font-size: 0.9rem;
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
   }
-
-  .title {
-    font-size: 0.95rem;
-  }
-
+  
   .stats {
-    gap: 1rem;
-  }
-
-  .statNumber {
-    font-size: 1.1rem;
-  }
-
-  .statLabel {
-    font-size: 0.8rem;
+    justify-content: space-around;
   }
 }
 
 @media (max-width: 480px) {
   .card {
-    padding: 0.75rem;
-    border-radius: 10px;
+    border-radius: 12px;
   }
-
+  
   .profileImage {
-    width: 64px;
-    height: 64px;
+    width: 96px;
+    height: 96px;
   }
-
+  
+  .cardContent {
+    padding: 1.25rem;
+  }
+  
   .name {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
   }
-
-  .email,
-  .specialty {
-    font-size: 0.85rem;
-  }
-
-  .title {
-    font-size: 0.9rem;
-  }
-
-  .viewButton,
-  .editButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
+  
   .stats {
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
-
+  
+  .stat {
+    padding: 0.75rem;
+    min-width: 70px;
+  }
+  
   .statNumber {
-    font-size: 1rem;
+    font-size: 1.25rem;
+  }
+  
+  .viewButton, 
+  .editButton {
+    padding: 0.6rem 1rem;
   }
 }
