@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -62,7 +62,7 @@ export default function Navbar() {
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
               >
-                <lucide-react.Moon size={20} />
+                <Moon size={20} />
               </motion.div>
             ) : (
               <motion.div
@@ -70,7 +70,7 @@ export default function Navbar() {
                 animate={{ rotate: -360 }}
                 transition={{ duration: 0.5 }}
               >
-                <lucide-react.Sun size={20} />
+                <Sun size={20} />
               </motion.div>
             )}
           </button>
