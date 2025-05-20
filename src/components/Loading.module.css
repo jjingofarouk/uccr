@@ -8,9 +8,40 @@
 }
 
 .loader {
-  width: 80px;
-  height: 80px;
-  max-width: 100%;
+  width: 30px;
+  aspect-ratio: 1;
+  background: #3b82f6; /* Primary color for light mode */
+  display: grid;
+  transform-origin: top right;
+  animation: spinMain 4s infinite linear;
+}
+
+.dark-mode .loader {
+  background: #60a5fa; /* Primary color for dark mode */
+}
+
+.loader::before,
+.loader::after {
+  content: "";
+  grid-area: 1/1;
+  background: #2563eb; /* Secondary color for light mode */
+  transform-origin: inherit;
+  animation: inherit;
+  animation-name: spinSecondary;
+  animation-duration: 1s;
+}
+
+.dark-mode .loader::before {
+  background: #3b82f6; /* Adjusted for dark mode */
+}
+
+.loader::after {
+  background: #93c5fd; /* Tertiary color for contrast */
+  --s: 60deg;
+}
+
+.dark-mode .loader::after {
+  background: #93c5fd; /* Consistent in dark mode for contrast */
 }
 
 .loaderText {
@@ -25,11 +56,24 @@
   color: #cbd5e1;
 }
 
+@keyframes spinMain {
+  0%, 5%   { transform: rotate(0); }
+  25%, 30% { transform: rotate(90deg); }
+  50%, 55% { transform: rotate(180deg); }
+  75%, 80% { transform: rotate(270deg); }
+  100%     { transform: rotate(360deg); }
+}
+
+@keyframes spinSecondary {
+  50%  { transform: rotate(var(--s, 30deg)); }
+  100% { transform: rotate(0); }
+}
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .loader {
-    width: 60px;
-    height: 60px;
+    width: 24px;
+    height: 24px;
   }
 
   .loaderText {
