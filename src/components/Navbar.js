@@ -14,6 +14,7 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef(null);
+  const userAvatarRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -30,7 +31,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        userAvatarRef.current &&
+        !userAvatarRef.current.contains(event.target)
+      ) {
         setIsSidebarOpen(false);
       }
     };
@@ -75,6 +81,7 @@ export default function Navbar() {
             )}
           </button>
           <button
+            ref={userAvatarRef}
             onClick={toggleSidebar}
             className={styles.menuButton}
             aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
