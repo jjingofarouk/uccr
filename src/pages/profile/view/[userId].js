@@ -5,7 +5,7 @@ import { getProfile } from '../../../firebase/firestore';
 import ProfileCard from '../../../components/Profile/ProfileCard';
 import Navbar from '../../../components/Navbar';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
-import Loading from '../../../components/Loading';
+import ProfileSkeleton from '../../../components/Profile/ProfileSkeleton'; // import skeleton loader
 import Link from 'next/link';
 import styles from '../../../styles/profile.module.css';
 
@@ -13,6 +13,7 @@ export default function ProfileView() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { userId } = router.query;
+
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,10 +23,10 @@ export default function ProfileView() {
 
     const fetchProfile = async () => {
       try {
+        setLoading(true); // ensure loading state true before fetching
         const profile = await getProfile(userId);
         setProfileData(profile);
         setLoading(false);
-        console.log('ProfileView fetched profile:', profile); // Debug
       } catch (err) {
         setError('Failed to load profile.');
         setLoading(false);
@@ -36,18 +37,28 @@ export default function ProfileView() {
     fetchProfile();
   }, [userId]);
 
+  // Show loading skeleton while either auth or data loading
   if (authLoading || loading) {
     return (
       <ProtectedRoute>
         <div className={styles.container}>
           <Navbar />
-          <Loading />
+          <ProfileSkeleton />
         </div>
       </ProtectedRoute>
     );
   }
 
-  if (error) return <div className={styles.error}>{error}</div>;
+  if (error) {
+    return (
+      <ProtectedRoute>
+        <div className={styles.container}>
+          <Navbar />
+          <div className={styles.error}>{error}</div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute>
