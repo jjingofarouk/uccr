@@ -184,15 +184,23 @@ export const getComments = async (caseId, uid = null) => {
       q = query(collection(db, `cases/${caseId}/comments`), where('userId', '==', uid), orderBy('createdAt', 'asc'));
     }
     const querySnapshot = await getDocs(q);
-    const comments = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      userId: doc.data().userId,
-      text: doc.data().text || '',
-      parentCommentId: doc.data().parentCommentId || null,
-      upvotes: Number(doc.data().upvotes) || 0,
-      downvotes: Number(doc.data().downvotes) || 0,
-      createdAt: doc.data().createdAt?.toDate?.() || new Date(),
-    }));
+    const commentsPromises = querySnapshot.docs.map(async (doc) => {
+      const data = doc.data();
+      const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/doctor-avatar.jpeg';
+      const profile = data.userId ? await getProfile(data.userId) : { displayName: 'Anonymous' };
+      return {
+        id: doc.id,
+        userId: data.userId,
+        userName: profile.displayName || 'Anonymous',
+        userPhoto: photoURL,
+        text: data.text || '',
+        parentCommentId: data.parentCommentId || null,
+        upvotes: Number(data.upvotes) || 0,
+        downvotes: Number(data.downvotes) || 0,
+        createdAt: data.createdAt?.toDate?.() || new Date(),
+      };
+    });
+    const comments = await Promise.all(commentsPromises);
     console.log('Fetched comments for case:', caseId, 'Count:', comments.length, 'uid:', uid || 'all');
     return comments;
   } catch (error) {
