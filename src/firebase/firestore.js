@@ -14,6 +14,7 @@ import {
   increment,
   collectionGroup,
 } from 'firebase/firestore';
+import { onSnapshot } from 'firebase/firestore';
 
 // Utility function to fetch user photo URL
 const fetchUserPhotoURL = async (uid) => {
@@ -490,5 +491,48 @@ export const getUserStats = async (uid) => {
   } catch (error) {
     console.error('Get user stats error:', error.code, error.message);
     return { cases: 0, comments: 0, reactions: 0 };
+  }
+};
+
+
+export const subscribeUserStats = (uid, callback) => {
+  try {
+    const casesQuery = query(collection(db, 'cases'), where('userId', '==', uid));
+    const commentsQuery = query(collectionGroup(db, 'comments'), where('userId', '==', uid));
+
+    const unsubscribeCases = onSnapshot(casesQuery, (casesSnapshot) => {
+      const caseCount = casesSnapshot.size;
+      let reactionCount = 0;
+
+      const unsubscribeComments = onSnapshot(commentsQuery, (commentsSnapshot) => {
+        const commentCount = commentsSnapshot.size;
+        commentsSnapshot.forEach(doc => {
+          const comment = doc.data();
+          reactionCount += (Number(comment.upvotes) || 0) + (Number(comment.downvotes) || 0);
+        });
+
+        const stats = {
+          cases: caseCount,
+          comments: commentCount,
+          reactions: reactionCount,
+        };
+        console.log('Real-time stats for uid:', uid, stats);
+        callback(stats);
+      }, (error) => {
+        console.error('Comments subscription error:', error.code, error.message);
+        callback({ cases: caseCount, comments: 0, reactions: 0 });
+      });
+
+      return () => unsubscribeComments();
+    }, (error) => {
+      console.error('Cases subscription error:', error.code, error.message);
+      callback({ cases: 0, comments: 0, reactions: 0 });
+    });
+
+    return () => unsubscribeCases();
+  } catch (error) {
+    console.error('Subscribe user stats error:', error.code, error.message);
+    callback({ cases: 0, comments: 0, reactions: 0 });
+    return () => {};
   }
 };
