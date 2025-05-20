@@ -6,7 +6,7 @@ import ProfileCard from '../../components/Profile/ProfileCard';
 import Navbar from '../../components/Navbar';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 import Link from 'next/link';
-import styles from '../../styles/profile.module.css';
+import styles from '../../../styles/profile.module.css';
 
 export default function ProfileView() {
   const { user, loading: authLoading } = useAuth();
