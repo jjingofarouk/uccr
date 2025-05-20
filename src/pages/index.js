@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCases } from '../hooks/useCases';
 import { useAuth } from '../hooks/useAuth';
 import CaseCard from '../components/Case/CaseCard';
-import ProtectedRoute from '../components/Auth/ProtectedRoute';
 import Loading from '../components/Loading';
 import Link from 'next/link';
 import Marquee from '../components/Marquee';
@@ -63,65 +62,63 @@ export default function Home() {
   }, [cases]);
 
   return (
-    <ProtectedRoute>
+    <main className={styles.container}>
       <Marquee />
-      <main className={styles.container}>
-        <section className={styles.hero} aria-labelledby="hero-title">
-          <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
-          <p className={styles.heroSubtitle}>
-            Explore and contribute to a growing database of medical case studies from Uganda.
-          </p>
-          <div className={styles.heroButtons}>
-            <Link href="/cases" className={styles.ctaButtonPrimary}>
-              Browse Cases
-            </Link>
-            <Link href="/cases/new" className={styles.ctaButtonSecondary}>
-              Share a Case
-            </Link>
+      <section className={styles.hero} aria-labelledby="hero-title">
+        <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
+        <p className={styles.heroSubtitle}>
+          Explore and contribute to a growing database of medical case studies from Uganda.
+        </p>
+        <div className={styles.heroButtons}>
+          <Link href="/cases" className={styles.ctaButtonPrimary}>
+            Browse Cases
+          </Link>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Share a Case
+          </Link>
+        </div>
+      </section>
+
+      {(loading || forceLoading) && (
+        <section className={styles.loadingSection}>
+          <Loading />
+        </section>
+      )}
+
+      {!(loading || forceLoading) && error && (
+        <section className={styles.errorSection} role="alert">
+          <p className={styles.errorText}>Error: {error}</p>
+        </section>
+      )}
+
+      {!(loading || forceLoading) && !error && cases.length === 0 && (
+        <section className={styles.emptySection} aria-live="polite">
+          <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Share a Case
+          </Link>
+        </section>
+      )}
+
+      {!(loading || forceLoading) && !error && caseOfTheDay && (
+        <section className={styles.featuredSection} aria-labelledby="featured-title">
+          <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
+          <div className={styles.featuredCard}>
+            <CaseCard key={caseOfTheDay.id} caseData={caseOfTheDay} />
           </div>
         </section>
+      )}
 
-        {(loading || forceLoading) && user && (
-          <section className={styles.loadingSection}>
-            <Loading />
-          </section>
-        )}
-
-        {!(loading || forceLoading) && user && error && (
-          <section className={styles.errorSection} role="alert">
-            <p className={styles.errorText}>Error: {error}</p>
-          </section>
-        )}
-
-        {!(loading || forceLoading) && user && !error && cases.length === 0 && (
-          <section className={styles.emptySection} aria-live="polite">
-            <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
-            <Link href="/cases/new" className={styles.ctaButtonSecondary}>
-              Share a Case
-            </Link>
-          </section>
-        )}
-
-        {!(loading || forceLoading) && user && !error && caseOfTheDay && (
-          <section className={styles.featuredSection} aria-labelledby="featured-title">
-            <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
-            <div className={styles.featuredCard}>
-              <CaseCard key={caseOfTheDay.id} caseData={caseOfTheDay} />
-            </div>
-          </section>
-        )}
-
-        {!(loading || forceLoading) && user && !error && recentCases.length > 0 && (
-          <section className={styles.recentSection} aria-labelledby="recent-title">
-            <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
-            <div className={styles.caseList}>
-              {recentCases.map((caseData) => (
-                <CaseCard key={caseData.id} caseData={caseData} />
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-    </ProtectedRoute>
+      {!(loading || forceLoading) && !error && recentCases.length > 0 && (
+        <section className={styles.recentSection} aria-labelledby="recent-title">
+          <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
+          <div className={styles.caseList}>
+            {recentCases.map((caseData) => (
+              <CaseCard key={caseData.id} caseData={caseData} />
+            ))}
+          </div>
+        </section>
+      )}
+    </main>
   );
 }
