@@ -1,3 +1,4 @@
+// src/components/ProfileCard.jsx
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -26,7 +27,6 @@ export default function ProfileCard({ userData }) {
       } catch (err) {
         setError('Failed to load user stats.');
         setLoading(false);
-        console.error('Fetch user stats error:', err.message);
       }
     };
     fetchUserStats();
@@ -47,14 +47,13 @@ export default function ProfileCard({ userData }) {
               width={120}
               height={120}
               className={styles.profileImage}
-              onError={(e) => {
-                e.target.src = '/images/doctor-avatar.jpeg';
-              }}
+              onError={(e) => { e.target.src = '/images/doctor-avatar.jpeg'; }}
             />
           </div>
           <h3 className={styles.name}>{userData.displayName || 'User'}</h3>
-          <p className={styles.email}>{userData.email || 'No email'}</p>
-          
+          {userData.role && (
+            <p className={styles.role}>{userData.role}</p>
+          )}
           <div className={styles.actions}>
             <Link href={`/profile/view/${userData.uid}`} className={styles.viewButton}>
               View Profile
@@ -66,9 +65,39 @@ export default function ProfileCard({ userData }) {
             )}
           </div>
         </div>
-        
+
         {/* Right Column - Details & Stats */}
         <div className={styles.cardContent}>
+          <div className={styles.infoSection}>
+            <h4 className={styles.sectionTitle}>Personal Information</h4>
+            <div className={styles.infoGrid}>
+              {userData.displayName && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Name:</span>
+                  <span className={styles.infoValue}>{userData.displayName}</span>
+                </div>
+              )}
+              {userData.email && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Email:</span>
+                  <span className={styles.infoValue}>{userData.email}</span>
+                </div>
+              )}
+              {userData.uid && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>User ID:</span>
+                  <span className={styles.infoValue}>{userData.uid}</span>
+                </div>
+              )}
+              {userData.photoURL && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Photo URL:</span>
+                  <span className={styles.infoValue}>{userData.photoURL}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className={styles.infoSection}>
             <h4 className={styles.sectionTitle}>Professional Information</h4>
             <div className={styles.infoGrid}>
@@ -78,29 +107,129 @@ export default function ProfileCard({ userData }) {
                   <span className={styles.infoValue}>{userData.title}</span>
                 </div>
               )}
-              
               {userData.specialty && (
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Specialty:</span>
                   <span className={styles.infoValue}>{userData.specialty}</span>
                 </div>
               )}
-              
               {userData.institution && (
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Institution:</span>
                   <span className={styles.infoValue}>{userData.institution}</span>
                 </div>
               )}
-              
               {userData.education && (
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Education:</span>
                   <span className={styles.infoValue}>{userData.education}</span>
                 </div>
               )}
+              {userData.levelOfStudy && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Level of Study:</span>
+                  <span className={styles.infoValue}>{userData.levelOfStudy}</span>
+                </div>
+              )}
+              {userData.courseOfStudy && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Course of Study:</span>
+                  <span className={styles.infoValue}>{userData.courseOfStudy}</span>
+                </div>
+              )}
+              {userData.yearsOfExperience && (
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Years of Experience:</span>
+                  <span className={styles.infoValue}>{userData.yearsOfExperience}</span>
+                </div>
+              )}
             </div>
           </div>
+
+          {userData.researchInterests?.length > 0 && (
+            <div className={styles.infoSection}>
+              <h4 className={styles.sectionTitle}>Research Interests</h4>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Interests:</span>
+                  <span className={styles.infoValue}>
+                    {userData.researchInterests.map((interest, index) => (
+                      <span key={index}>
+                        {interest.replace(/^Other:/, '')}
+                        {index < userData.researchInterests.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {userData.certifications?.length > 0 && (
+            <div className={styles.infoSection}>
+              <h4 className={styles.sectionTitle}>Certifications</h4>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Certifications:</span>
+                  <span className={styles.infoValue}>
+                    {userData.certifications.map((cert, index) => (
+                      <span key={index}>
+                        {cert.replace(/^Other:/, '')}
+                        {index < userData.certifications.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {userData.professionalAffiliations?.length > 0 && (
+            <div className={styles.infoSection}>
+              <h4 className={styles.sectionTitle}>Professional Affiliations</h4>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Affiliations:</span>
+                  <span className={styles.infoValue}>
+                    {userData.professionalAffiliations.map((aff, index) => (
+                      <span key={index}>
+                        {aff.replace(/^Other:/, '')}
+                        {index < userData.professionalAffiliations.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(userData.linkedIn || userData.xProfile) && (
+            <div className={styles.infoSection}>
+              <h4 className={styles.sectionTitle}>Professional Links</h4>
+              <div className={styles.infoGrid}>
+                {userData.linkedIn && (
+                  <div className={styles.infoItem}>
+                    <span className={styles.infoLabel}>LinkedIn:</span>
+                    <span className={styles.infoValue}>
+                      <a href={userData.linkedIn} target="_blank" rel="noopener noreferrer">
+                        {userData.linkedIn}
+                      </a>
+                    </span>
+                  </div>
+                )}
+                {userData.xProfile && (
+                  <div className={styles.infoItem}>
+                    <span className={styles.infoLabel}>X Profile:</span>
+                    <span className={styles.infoValue}>
+                      <a href={userData.xProfile} target="_blank" rel="noopener noreferrer">
+                        {userData.xProfile}
+                      </a>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {userData.bio && (
             <div className={styles.bioSection}>
@@ -126,7 +255,7 @@ export default function ProfileCard({ userData }) {
               </div>
             </div>
           </div>
-          
+
           {userData.updatedAt && (
             <p className={styles.updatedAt}>
               Last Updated: {new Date(userData.updatedAt).toLocaleDateString()}
