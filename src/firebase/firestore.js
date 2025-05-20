@@ -29,34 +29,40 @@ const fetchUserPhotoURL = async (uid) => {
   }
 };
 
+
 export const addCase = async (caseData) => {
   try {
+    console.log('addCase called with caseData:', caseData);
     if (!caseData.userId) {
       throw new Error('Missing userId in caseData');
+    }
+    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
+      throw new Error('Authenticated user does not match caseData.userId');
     }
     const validatedCaseData = {
       userId: caseData.userId,
       userName: caseData.userName || 'User',
-      title: caseData.title || '',
-      specialty: caseData.specialty || '',
-      presentingComplaint: caseData.presentingComplaint || '',
-      history: caseData.history || '',
-      investigations: caseData.investigations || '',
-      provisionalDiagnosis: caseData.provisionalDiagnosis || '',
-      management: caseData.management || '',
-      discussion: caseData.discussion || '',
-      hospital: caseData.hospital || '',
-      referralCenter: caseData.referralCenter || '',
+      title: String(caseData.title || ''),
+      specialty: String(caseData.specialty || ''),
+      presentingComplaint: String(caseData.presentingComplaint || ''),
+      history: String(caseData.history || ''),
+      investigations: String(caseData.investigations || ''),
+      provisionalDiagnosis: String(caseData.provisionalDiagnosis || ''),
+      management: String(caseData.management || ''),
+      discussion: String(caseData.discussion || ''),
+      hospital: String(caseData.hospital || ''),
+      referralCenter: String(caseData.referralCenter || ''),
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
       awards: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
+    console.log('Validated case data:', validatedCaseData);
     const docRef = await addDoc(collection(db, 'cases'), validatedCaseData);
     console.log('Case added with ID:', docRef.id, 'userId:', caseData.userId);
     return docRef.id;
   } catch (error) {
-    console.error('Add case error:', error.code, error.message);
+    console.error('Add case error:', { code: error.code, message: error.message, stack: error.stack });
     throw new Error(error.code === 'permission-denied' ? 'Missing permissions to create case' : `Failed to create case: ${error.message}`);
   }
 };
