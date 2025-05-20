@@ -1,4 +1,3 @@
-// src/components/Footer.js
 import Link from 'next/link';
 import { Twitter, Instagram, Mail } from 'lucide-react';
 import styles from './Footer.module.css';
