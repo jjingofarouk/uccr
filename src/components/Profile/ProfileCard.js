@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getCases, getComments } from '../../firebase/firestore';
+import { useAuth } from '../../hooks/useAuth';
 import styles from './profileCard.module.css';
 
 export default function ProfileCard({ userData }) {
+  const { user } = useAuth(); // For conditional Edit button
   const [stats, setStats] = useState({
     cases: 0,
     comments: 0,
@@ -17,12 +19,18 @@ export default function ProfileCard({ userData }) {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
+        if (!userData?.userId) {
+          throw new Error('Invalid user data: No userId provided.');
+        }
+
+        console.log('Fetching stats for userId:', userData.userId); // Debug
+
         // Fetch cases
         const allCases = await getCases();
         const userCases = allCases.filter(caseData => caseData.userId === userData.userId);
         const caseCount = userCases.length;
 
-        // Fetch comments across all cases
+        // Fetch comments and reactions
         let commentCount = 0;
         let reactionCount = 0;
         const caseIds = allCases.map(caseData => caseData.id);
@@ -30,12 +38,8 @@ export default function ProfileCard({ userData }) {
           const comments = await getComments(caseId);
           const userComments = comments.filter(comment => comment.userId === userData.userId);
           commentCount += userComments.length;
-
-          // Count reactions (upvotes/downvotes) for user's comments
-          for (const comment of comments) {
-            if (comment.userId === userData.userId) {
-              reactionCount += (comment.upvotes || 0) + (comment.downvotes || 0);
-            }
+          for (const comment of userComments) {
+            reactionCount += (comment.upvotes || 0) + (comment.downvotes || 0);
           }
         }
 
@@ -48,17 +52,12 @@ export default function ProfileCard({ userData }) {
       } catch (err) {
         setError('Failed to load user stats.');
         setLoading(false);
-        console.error('Fetch user stats error:', err);
+        console.error('Fetch user stats error:', err.message);
       }
     };
 
-    if (userData.userId) {
-      fetchUserStats();
-    } else {
-      setError('Invalid user data.');
-      setLoading(false);
-    }
-  }, [userData.userId]);
+    fetchUserStats();
+  }, [userData?.userId]);
 
   if (loading) {
     return <div className={styles.loading}>Loading profile stats...</div>;
@@ -78,7 +77,10 @@ export default function ProfileCard({ userData }) {
             width={96}
             height={96}
             className={styles.profileImage}
-            onError={(e) => console.error('Profile image error:', userData.photoURL)}
+            onError={(e) => {
+              console.error('Profile image error:', userData.photoURL);
+              e.target.src = '/images/doctor-avatar.jpeg';
+            }}
           />
         </div>
         <div className={styles.onlineIndicator}></div>
@@ -107,9 +109,11 @@ export default function ProfileCard({ userData }) {
         <Link href={`/profile/view/${userData.userId}`} className={styles.viewButton}>
           View Profile
         </Link>
-        <Link href="/profile/edit" className={styles.editButton}>
-          Edit
-        </Link>
+        {user && user.uid === userData.userId && (
+          <Link href="/profile/edit" className={styles.editButton}>
+            Edit
+          </Link>
+        )}
       </div>
     </div>
   );
