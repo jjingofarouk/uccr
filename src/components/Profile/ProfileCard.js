@@ -82,18 +82,6 @@ export default function ProfileCard({ userData }) {
                   <span className={styles.infoValue}>{userData.email}</span>
                 </div>
               )}
-              {userData.uid && (
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>User ID:</span>
-                  <span className={styles.infoValue}>{userData.uid}</span>
-                </div>
-              )}
-              {userData.photoURL && (
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>Photo URL:</span>
-                  <span className={styles.infoValue}>{userData.photoURL}</span>
-                </div>
-              )}
             </div>
           </div>
 
