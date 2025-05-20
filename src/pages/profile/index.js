@@ -6,7 +6,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 // Import the shared ProfileSkeleton component (adjust the path as needed)
-import ProfileSkeleton from '../../components/Profile/ProfileSkeleton'; 
+import ProfileSkeleton from '../../components/ProfileSkeleton'; 
 import styles from '../../styles/profile.module.css';
 
 export default function Profile() {
