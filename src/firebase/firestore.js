@@ -145,13 +145,17 @@ export const getCaseById = async (id) => {
   }
 };
 
+// src/firebase/firestore.js
 export const addComment = async (caseId, commentData, parentCommentId = null) => {
   try {
-    if (!commentData.uid) {
-      throw new Error('Missing uid in commentData');
+    if (!commentData.userId) {
+      throw new Error('Missing userId in commentData');
+    }
+    if (!auth.currentUser || auth.currentUser.uid !== commentData.userId) {
+      throw new Error('Authenticated user does not match commentData.userId');
     }
     const comment = {
-      userId: commentData.uid,
+      userId: commentData.userId,
       text: commentData.text || '',
       createdAt: serverTimestamp(),
       parentCommentId,
@@ -162,8 +166,8 @@ export const addComment = async (caseId, commentData, parentCommentId = null) =>
     console.log('Comment added for case:', caseId, 'ID:', docRef.id, 'uid:', comment.userId);
     return docRef.id;
   } catch (error) {
-    console.error('Add comment error:', error.code, error.message);
-    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to add comment' : 'Failed to add comment');
+    console.error('Add comment error:', error.code, error.message, error.stack);
+    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to add comment' : `Failed to add comment: ${error.message}`);
   }
 };
 
