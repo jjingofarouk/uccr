@@ -1,3 +1,4 @@
+// src/components/Chat/Inbox.jsx
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -21,11 +22,20 @@ export default function Inbox() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setError('Please log in to view messages.');
+      return;
+    }
+    console.log('Authenticated user:', user.uid, user.displayName);
 
     const fetchThreads = async () => {
-      const fetchedThreads = await getMessages(user.uid);
-      setThreads(fetchedThreads);
+      try {
+        const fetchedThreads = await getMessages(user.uid);
+        setThreads(fetchedThreads);
+      } catch (err) {
+        setError('Failed to load message threads.');
+        console.error('Fetch threads error:', err);
+      }
     };
     fetchThreads();
   }, [user]);
@@ -34,11 +44,16 @@ export default function Inbox() {
     if (!user) return;
 
     const fetchUsers = async () => {
-      const allUsers = await getUsers();
-      const filtered = allUsers.filter(u => u.uid !== user.uid);
-      console.log('Filtered users:', filtered);
-      setUsers(filtered);
-      setFilteredUsers(filtered);
+      try {
+        const allUsers = await getUsers();
+        const filtered = allUsers.filter(u => u.uid !== user.uid);
+        console.log('Filtered users:', filtered);
+        setUsers(filtered);
+        setFilteredUsers(filtered);
+      } catch (err) {
+        setError('Failed to load users.');
+        console.error('Fetch users error:', err);
+      }
     };
     fetchUsers();
   }, [user]);
@@ -63,8 +78,13 @@ export default function Inbox() {
       return;
     }
     const fetchMessages = async () => {
-      const threadMessages = await getThreadMessages(selectedThread.id);
-      setMessages(threadMessages);
+      try {
+        const threadMessages = await getThreadMessages(selectedThread.id);
+        setMessages(threadMessages);
+      } catch (err) {
+        setError('Failed to load messages.');
+        console.error('Fetch messages error:', err);
+      }
     };
     fetchMessages();
   }, [selectedThread]);
@@ -75,20 +95,24 @@ export default function Inbox() {
     const selectRecipient = async () => {
       const recipient = users.find(u => u.uid === recipientId);
       if (!recipient) {
-        // Fetch recipient profile if not in users collection
-        const profile = await getProfile(recipientId);
-        if (profile.displayName) {
-          const recipientData = {
-            uid: recipientId,
-            displayName: profile.displayName,
-            email: '',
-            photoURL: profile.photoURL,
-          };
-          setUsers(prev => [...prev, recipientData]);
-          setFilteredUsers(prev => [...prev, recipientData]);
-          handleSelectUser(recipientData);
-        } else {
-          setError('User not found.');
+        try {
+          const profile = await getProfile(recipientId);
+          if (profile.displayName) {
+            const recipientData = {
+              uid: recipientId,
+              displayName: profile.displayName,
+              email: profile.email || '',
+              photoURL: profile.photoURL,
+            };
+            setUsers(prev => [...prev, recipientData]);
+            setFilteredUsers(prev => [...prev, recipientData]);
+            handleSelectUser(recipientData);
+          } else {
+            setError('User not found.');
+          }
+        } catch (err) {
+          setError('Failed to load recipient profile.');
+          console.error('Fetch profile error:', err);
         }
         return;
       }
@@ -113,7 +137,6 @@ export default function Inbox() {
     setSearchQuery('');
     setError('');
     setSuccess('');
-    // Clear query param to avoid re-triggering
     router.replace('/inbox', undefined, { shallow: true });
   };
 
@@ -126,6 +149,7 @@ export default function Inbox() {
 
     try {
       const recipientId = selectedThread.id.split('_').find(id => id !== user.uid);
+      console.log('Sending message:', { senderId: user.uid, recipientId, text: messageText });
       await sendMessage({
         senderId: user.uid,
         recipientId,
