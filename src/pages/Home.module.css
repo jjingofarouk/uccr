@@ -1,4 +1,4 @@
-/* src/app/Home.module.css */
+/* src/pages/Home.module.css */
 .container {
   max-width: 1280px;
   margin: 0 auto;
@@ -13,7 +13,12 @@
   text-align: center;
   padding: 3rem 1rem;
   background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 16px;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   animation: fadeIn 0.5s ease-in;
 }
 
