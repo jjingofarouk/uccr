@@ -1,8 +1,7 @@
-// src/components/ProfileCard.jsx
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getUserStats } from '../../firebase/firestore';
+import { subscribeUserStats } from '../../firebase/firestore';
 import { useAuth } from '../../hooks/useAuth';
 import Loading from '../../components/Loading';
 import styles from './profileCard.module.css';
@@ -18,18 +17,18 @@ export default function ProfileCard({ userData }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchUserStats = async () => {
-      try {
-        if (!userData?.uid) throw new Error('Invalid user data: No uid provided');
-        const userStats = await getUserStats(userData.uid);
-        setStats(userStats);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load user stats.');
-        setLoading(false);
-      }
-    };
-    fetchUserStats();
+    if (!userData?.uid) {
+      setError('Invalid user data: No uid provided');
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = subscribeUserStats(userData.uid, (userStats) => {
+      setStats({ ...userStats });
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userData?.uid]);
 
   if (loading) return <Loading />;
