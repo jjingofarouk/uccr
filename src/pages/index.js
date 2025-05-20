@@ -3,9 +3,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCases } from '../hooks/useCases';
 import CaseCard from '../components/Case/CaseCard';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
-import Loading from '../components/Loading';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import styles from './Home.module.css';
+
+// Dynamically import Loading component with SSR disabled
+const Loading = dynamic(() => import('../components/Loading'), { ssr: false });
 
 export default function Home() {
   const { cases, loading, error } = useCases();
