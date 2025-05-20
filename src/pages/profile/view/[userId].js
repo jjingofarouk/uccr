@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../../hooks/useAuth';
-import { getProfile } from '../../firebase/firestore';
-import ProfileCard from '../../components/Profile/ProfileCard';
-import Navbar from '../../components/Navbar';
-import ProtectedRoute from '../../components/Auth/ProtectedRoute';
+import { useAuth } from '../../../hooks/useAuth';
+import { getProfile } from '../../../firebase/firestore';
+import ProfileCard from '../../../components/Profile/ProfileCard';
+import Navbar from '../../../components/Navbar';
+import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
 import Link from 'next/link';
 import styles from '../../../styles/profile.module.css';
 
