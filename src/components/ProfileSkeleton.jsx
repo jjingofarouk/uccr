@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/ProfileSkeleton.module.css';
+import styles from '../styles/ProfileSkeleton.module.css';
 
 export default function ProfileSkeleton() {
   return (
