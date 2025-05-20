@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useCases } from '../../hooks/useCases';
 import CaseDetail from '../../components/Case/CaseDetail';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import CaseSkeleton from '../../components/Case/CaseSkeleton';
+import Loading from '../../components/Loading';
 import styles from '../../styles/casePage.module.css';
 
 function CasePageContent() {
