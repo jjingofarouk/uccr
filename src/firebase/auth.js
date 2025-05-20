@@ -68,9 +68,14 @@ export const updateUserProfile = async (userId, profileData) => {
 export const logout = async () => {
   try {
     await signOut(auth);
-    console.log('User signed out');
+    console.log('User signed out successfully');
+    return { success: true };
   } catch (error) {
-    console.error('Firebase signOut error:', error);
-    throw new Error('Unable to sign out');
+    console.error('Firebase signOut error:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+    });
+    return { success: false, error: error.message || 'Unable to sign out' };
   }
 };
