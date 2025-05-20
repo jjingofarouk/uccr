@@ -5,7 +5,8 @@ import ProfileCard from '../../components/Profile/ProfileCard';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import Loading from '../../components/Loading';
+// Import the shared ProfileSkeleton component (adjust the path as needed)
+import ProfileSkeleton from '../../components/Profile/ProfileSkeleton'; 
 import styles from '../../styles/profile.module.css';
 
 export default function Profile() {
@@ -23,7 +24,7 @@ export default function Profile() {
       }
 
       try {
-        console.log('Fetching profile for uid:', user.uid); // Debug
+        console.log('Fetching profile for uid:', user.uid);
         const profile = await getProfile(user.uid);
         setUserData({
           uid: user.uid,
@@ -37,7 +38,6 @@ export default function Profile() {
           institution: profile.institution || '',
           updatedAt: profile.updatedAt || new Date(),
         });
-        console.log('userData set:', { uid: user.uid, ...userData }); // Debug
         setLoading(false);
       } catch (err) {
         setError('Failed to load profile.');
@@ -54,7 +54,7 @@ export default function Profile() {
       <ProtectedRoute>
         <div className={styles.container}>
           <Navbar />
-          <Loading />
+          <ProfileSkeleton />  {/* Use skeleton loader here */}
           <Footer />
         </div>
       </ProtectedRoute>
@@ -78,6 +78,7 @@ export default function Profile() {
       <div className={styles.container}>
         <Navbar />
         <ProfileCard userData={userData} />
+        <Footer />
       </div>
     </ProtectedRoute>
   );
