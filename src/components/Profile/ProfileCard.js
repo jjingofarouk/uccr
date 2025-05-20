@@ -1,9 +1,9 @@
-// src/components/Profile/ProfileCard.jsx
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getUserStats } from '../../firebase/firestore';
 import { useAuth } from '../../hooks/useAuth';
+import Loading from '../../components/Loading';
 import styles from './profileCard.module.css';
 
 export default function ProfileCard({ userData }) {
@@ -19,31 +19,21 @@ export default function ProfileCard({ userData }) {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        if (!userData?.uid) {
-          throw new Error('Invalid user data: No uid provided');
-        }
-
-        console.log('Fetching stats for uid:', userData.uid); // Debug
+        if (!userData?.uid) throw new Error('Invalid user data: No uid provided');
         const userStats = await getUserStats(userData.uid);
         setStats(userStats);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load user stats. Please try again.');
+        setError('Failed to load user stats.');
         setLoading(false);
-        console.error('Fetch user stats error:', err.message, err.stack); // Debug
+        console.error('Fetch user stats error:', err.message);
       }
     };
-
     fetchUserStats();
   }, [userData?.uid]);
 
-  if (loading) {
-    return <div className={styles.loading}>Loading profile stats...</div>;
-  }
-
-  if (error) {
-    return <div className={styles.error}>{error}</div>;
-  }
+  if (loading) return <Loading />;
+  if (error) return <div className={styles.error}>{error}</div>;
 
   return (
     <div className={styles.card}>
@@ -52,22 +42,28 @@ export default function ProfileCard({ userData }) {
           <Image
             src={userData.photoURL || '/images/doctor-avatar.jpeg'}
             alt="Profile"
-            width={96}
-            height={96}
+            width={120}
+            height={120}
             className={styles.profileImage}
             onError={(e) => {
-              console.error('Profile image error:', userData.photoURL); // Debug
               e.target.src = '/images/doctor-avatar.jpeg';
             }}
           />
         </div>
-        <div className={styles.onlineIndicator}></div>
       </div>
       <div className={styles.cardContent}>
         <h3 className={styles.name}>{userData.displayName || 'User'}</h3>
         <p className={styles.email}>{userData.email || 'No email'}</p>
-        <p className={styles.title}>{userData.title || 'No title'}</p>
-        <p className={styles.specialty}>{userData.specialty || 'No specialty'}</p>
+        {userData.title && <p className={styles.title}>{userData.title}</p>}
+        {userData.specialty && <p className={styles.specialty}>{userData.specialty}</p>}
+        {userData.institution && <p className={styles.institution}>{userData.institution}</p>}
+        {userData.education && <p className={styles.education}>{userData.education}</p>}
+        {userData.bio && <p className={styles.bio}>{userData.bio}</p>}
+        {userData.updatedAt && (
+          <p className={styles.updatedAt}>
+            Last Updated: {new Date(userData.updatedAt).toLocaleDateString()}
+          </p>
+        )}
         <div className={styles.stats}>
           <div className={styles.stat}>
             <span className={styles.statNumber}>{stats.cases}</span>
@@ -89,7 +85,7 @@ export default function ProfileCard({ userData }) {
         </Link>
         {user && user.uid === userData.uid && (
           <Link href="/profile/edit" className={styles.editButton}>
-            Edit
+            Edit Profile
           </Link>
         )}
       </div>
