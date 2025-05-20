@@ -1,3 +1,4 @@
+// src/components/Case/CaseDetail.jsx
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,11 +8,32 @@ import { Award } from 'lucide-react';
 import CommentSection from './CommentSection';
 import styles from '../../styles/caseDetail.module.css';
 
+// Utility function to process text with line breaks and paragraphs
+const formatText = (text) => {
+  if (!text || typeof text !== 'string') return <p>Not specified</p>;
+  // Split on double newlines for paragraphs
+  const paragraphs = text.split('\n\n').filter(p => p.trim());
+  return paragraphs.map((paragraph, index) => (
+    <p key={index} className={styles.paragraph}>
+      {paragraph.split('\n').map((line, i, arr) =>
+        i < arr.length - 1 ? (
+          <span key={i}>
+            {line}
+            <br />
+          </span>
+        ) : (
+          line
+        )
+      )}
+    </p>
+  ));
+};
+
 export default function CaseDetail({ caseData }) {
   const { user } = useAuth();
   const [error, setError] = useState('');
 
-  console.log('CaseDetail caseData:', caseData); // Debug
+  console.log('CaseDetail caseData:', caseData);
 
   const handleVote = async (type) => {
     if (!user) {
@@ -74,7 +96,7 @@ export default function CaseDetail({ caseData }) {
       <section className={styles.content}>
         <div className={styles.section}>
           <h2>Chief Concern</h2>
-          <p>{caseData.presentingComplaint || 'Not specified'}</p>
+          {formatText(caseData.presentingComplaint)}
         </div>
         <div className={styles.section}>
           <h2>Specialty</h2>
@@ -82,15 +104,15 @@ export default function CaseDetail({ caseData }) {
         </div>
         <div className={styles.section}>
           <h2>History</h2>
-          <p>{caseData.history || 'Not provided'}</p>
+          {formatText(caseData.history)}
         </div>
         <div className={styles.section}>
           <h2>Investigations</h2>
-          <p>{caseData.investigations || 'Not provided'}</p>
+          {formatText(caseData.investigations)}
         </div>
         <div className={styles.section}>
           <h2>Management</h2>
-          <p>{caseData.management || 'Not provided'}</p>
+          {formatText(caseData.management)}
         </div>
         <div className={styles.section}>
           <h2>Provisional Diagnosis</h2>
@@ -106,7 +128,7 @@ export default function CaseDetail({ caseData }) {
         </div>
         <div className={styles.section}>
           <h2>Discussion</h2>
-          <p>{caseData.discussion || 'Not provided'}</p>
+          {formatText(caseData.discussion)}
         </div>
       </section>
 
