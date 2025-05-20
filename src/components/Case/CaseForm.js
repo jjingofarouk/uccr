@@ -9,7 +9,7 @@ import Loading from '../../components/Loading';
 import styles from '../../styles/caseForm.module.css';
 
 export default function CaseForm() {
-  const { user } = useAuth();
+  const { user, loading, error: authError } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     presentingComplaint: '',
@@ -30,7 +30,7 @@ export default function CaseForm() {
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
-  const SUBMISSION_LOADING_DURATION = 3000; // 3 seconds for post-submission loading
+  const SUBMISSION_LOADING_DURATION = 3000;
 
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
@@ -83,7 +83,8 @@ export default function CaseForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
+    console.log('User state before submit:', user); // Debug
+    if (!user || !user.uid) {
       setError('You must be logged in to create a case.');
       return;
     }
@@ -126,8 +127,16 @@ export default function CaseForm() {
     }
   }, [forceLoading, loadStart, router]);
 
-  if (isLoading) {
+  if (loading) {
     return <Loading />;
+  }
+
+  if (authError) {
+    return <div>Error: {authError}</div>;
+  }
+
+  if (!user) {
+    return <div>Please log in to create a case.</div>;
   }
 
   return (
