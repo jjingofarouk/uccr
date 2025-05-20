@@ -81,8 +81,8 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
+  padding: 0;
+  border-radius: 50%;
   transition: background 0.3s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
@@ -117,7 +117,7 @@
   box-shadow: -4px 0 12px var(--shadow);
   padding: 1.5rem;
   overflow-y: auto;
-  z-index: 1100; /* Higher than header */
+  z-index: 2000; /* Increased to ensure visibility */
 }
 
 .dark-mode .sidebar {
