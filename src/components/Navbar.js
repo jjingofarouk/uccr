@@ -1,9 +1,8 @@
-// src/components/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
-import { logout } from '../firebase/auth';
-import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun } from 'lucide-react';
+import { logout, getMessages } from '../firebase/firestore';
+import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -13,21 +12,40 @@ export default function Navbar() {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [unreadThreads, setUnreadThreads] = useState([]);
   const sidebarRef = useRef(null);
   const userAvatarRef = useRef(null);
+  const notificationsRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
+    setIsNotificationsOpen(false);
+  };
+
+  const toggleNotifications = () => {
+    setIsNotificationsOpen((prev) => !prev);
+    setIsSidebarOpen(false);
   };
 
   const handleLogout = async () => {
-    try {
-      await logout();
-      setIsSidebarOpen(false);
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
+    await logout();
+    setIsSidebarOpen(false);
   };
+
+  useEffect(() => {
+    const fetchUnreadMessages = async () => {
+      if (!user) return;
+      try {
+        const threads = await getMessages(user.uid);
+        const unread = threads.filter(thread => thread.lastMessage && !thread.read);
+        setUnreadThreads(unread);
+      } catch (err) {
+        console.error('Fetch unread messages error:', err);
+      }
+    };
+    fetchUnreadMessages();
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -35,20 +53,23 @@ export default function Navbar() {
         sidebarRef.current &&
         !sidebarRef.current.contains(event.target) &&
         userAvatarRef.current &&
-        !userAvatarRef.current.contains(event.target)
+        !userAvatarRef.current.contains(event.target) &&
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target)
       ) {
         setIsSidebarOpen(false);
+        setIsNotificationsOpen(false);
       }
     };
 
-    if (isSidebarOpen) {
+    if (isSidebarOpen || isNotificationsOpen) {
       document.addEventListener('click', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, isNotificationsOpen]);
 
   return (
     <header className={styles.header}>
@@ -80,6 +101,47 @@ export default function Navbar() {
               </motion.div>
             )}
           </button>
+          {user && (
+            <div ref={notificationsRef} className={styles.notificationWrapper}>
+              <button
+                onClick={toggleNotifications}
+                className={styles.notificationButton}
+                aria-label="View notifications"
+              >
+                <Bell size={20} />
+                {unreadThreads.length > 0 && (
+                  <span className={styles.notificationBadge}>{unreadThreads.length}</span>
+                )}
+              </button>
+              <AnimatePresence>
+                {isNotificationsOpen && (
+                  <motion.div
+                    className={styles.notificationDropdown}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {unreadThreads.length === 0 ? (
+                      <p className={styles.noNotifications}>No new messages</p>
+                    ) : (
+                      unreadThreads.map(thread => (
+                        <Link
+                          key={thread.id}
+                          href={`/messages/${thread.id}`}
+                          className={styles.notificationItem}
+                          onClick={() => setIsNotificationsOpen(false)}
+                        >
+                          <span>New message from {thread.otherUserName}</span>
+                          <small>{thread.lastMessage}</small>
+                        </Link>
+                      ))
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
           <div ref={userAvatarRef} className={styles.menuButtonWrapper}>
             {user ? (
               <Image
