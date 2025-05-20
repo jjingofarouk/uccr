@@ -14,6 +14,7 @@ export default function CaseForm() {
     title: '',
     presentingComplaint: '',
     history: '',
+    physicalExam: '',
     investigations: '',
     management: '',
     provisionalDiagnosis: '',
@@ -21,6 +22,8 @@ export default function CaseForm() {
     referralCenter: '',
     specialty: '',
     discussion: '',
+    highLevelSummary: '',
+    references: '',
     mediaUrls: [],
   });
   const [error, setError] = useState('');
@@ -58,10 +61,8 @@ export default function CaseForm() {
                   ...prev,
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
-                console.log('Cloudinary case URL:', result.info.secure_url);
               } else if (error) {
                 setError('Image upload failed.');
-                console.error('Cloudinary error:', error);
               }
             }
           );
@@ -76,23 +77,16 @@ export default function CaseForm() {
     }
   }, [user]);
 
-
-
-
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  // Normalize newlines: replace multiple consecutive newlines with \n\n
-  const normalizedValue = name === 'title' || name === 'provisionalDiagnosis' || name === 'hospital' || name === 'referralCenter' || name === 'specialty'
-    ? value
-    : value.replace(/\n{3,}/g, '\n\n').trimEnd();
-  setFormData(prev => ({ ...prev, [name]: normalizedValue }));
-};
-
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const normalizedValue = name === 'title' || name === 'provisionalDiagnosis' || name === 'hospital' || name === 'referralCenter' || name === 'specialty'
+      ? value
+      : value.replace(/\n{3,}/g, '\n\n').trimEnd().replace(/ {2,}/g, ' ');
+    setFormData(prev => ({ ...prev, [name]: normalizedValue }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('User state before submit:', user); // Debug
     if (!user || !user.uid) {
       setError('You must be logged in to create a case.');
       return;
@@ -105,14 +99,11 @@ const handleChange = (e) => {
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
       };
-      console.log('Submitting case:', caseData);
       await addCase(caseData);
-      console.log('Case submitted with mediaUrls:', formData.mediaUrls);
       setLoadStart(Date.now());
       setForceLoading(true);
     } catch (err) {
       setError('Failed to create case: ' + err.message);
-      console.error('Case creation error:', err);
       setIsLoading(false);
     }
   };
@@ -172,6 +163,12 @@ const handleChange = (e) => {
           onChange={handleChange}
         />
         <textarea
+          name="physicalExam"
+          placeholder="Physical Examination"
+          value={formData.physicalExam}
+          onChange={handleChange}
+        />
+        <textarea
           name="investigations"
           placeholder="Investigations"
           value={formData.investigations}
@@ -213,12 +210,52 @@ const handleChange = (e) => {
           <option value="Cardiology">Cardiology</option>
           <option value="Neurology">Neurology</option>
           <option value="Orthopedics">Orthopedics</option>
+          <option value="Oncology">Oncology</option>
+          <option value="Endocrinology">Endocrinology</option>
+          <option value="Gastroenterology">Gastroenterology</option>
+          <option value="Hematology">Hematology</option>
+          <option value="Infectious Diseases">Infectious Diseases</option>
+          <option value="Nephrology">Nephrology</option>
+          <option value="Pulmonology">Pulmonology</option>
+          <option value="Rheumatology">Rheumatology</option>
+          <option value="Dermatology">Dermatology</option>
+          <option value="Ophthalmology">Ophthalmology</option>
+          <option value="Otolaryngology">Otolaryngology</option>
+          <option value="Urology">Urology</option>
+          <option value="Anesthesiology">Anesthesiology</option>
+          <option value="Emergency Medicine">Emergency Medicine</option>
+          <option value="Critical Care Medicine">Critical Care Medicine</option>
+          <option value="Psychiatry">Psychiatry</option>
+          <option value="Radiology">Radiology</option>
+          <option value="Pathology">Pathology</option>
+          <option value="Plastic Surgery">Plastic Surgery</option>
+          <option value="Thoracic Surgery">Thoracic Surgery</option>
+          <option value="Vascular Surgery">Vascular Surgery</option>
+          <option value="Neonatology">Neonatology</option>
+          <option value="Geriatrics">Geriatrics</option>
+          <option value="Allergy & Immunology">Allergy & Immunology</option>
+          <option value="Pain Medicine">Pain Medicine</option>
+          <option value="Sports Medicine">Sports Medicine</option>
+          <option value="Palliative Care">Palliative Care</option>
+          <option value="Medical Genetics">Medical Genetics</option>
           <option value="Other">Other</option>
         </select>
         <textarea
           name="discussion"
           placeholder="Discussion"
           value={formData.discussion}
+          onChange={handleChange}
+        />
+        <textarea
+          name="highLevelSummary"
+          placeholder="High-Level Summary"
+          value={formData.highLevelSummary}
+          onChange={handleChange}
+        />
+        <textarea
+          name="references"
+          placeholder="References"
+          value={formData.references}
           onChange={handleChange}
         />
         <button
@@ -238,13 +275,13 @@ const handleChange = (e) => {
                 alt={`Uploaded media ${index + 1}`}
                 width={100}
                 height={100}
-                onError={(e) => console.error('Form media error:', url)}
               />
             ))}
           </div>
         )}
         <button type="submit">Submit Case</button>
         {error && <p>{error}</p>}
+        {(isLoading || forceLoading) && <Loading />}
       </form>
     </div>
   );
