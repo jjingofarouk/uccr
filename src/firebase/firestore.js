@@ -1,4 +1,3 @@
-// src/firebase/firestore.js
 import { db, auth } from './config';
 import {
   collection,
@@ -16,6 +15,7 @@ import {
   collectionGroup,
 } from 'firebase/firestore';
 
+// Utility function to fetch user photo URL
 const fetchUserPhotoURL = async (uid) => {
   try {
     const profileRef = doc(db, 'profiles', uid);
@@ -186,13 +186,12 @@ export const getComments = async (caseId, uid = null) => {
     const querySnapshot = await getDocs(q);
     const commentsPromises = querySnapshot.docs.map(async (doc) => {
       const data = doc.data();
-      const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/doctor-avatar.jpeg';
-      const profile = data.userId ? await getProfile(data.userId) : { displayName: 'Anonymous' };
+      const profile = data.userId ? await getProfile(data.userId) : { displayName: 'Anonymous', photoURL: '/images/doctor-avatar.jpeg' };
       return {
         id: doc.id,
         userId: data.userId,
         userName: profile.displayName || 'Anonymous',
-        userPhoto: photoURL,
+        userPhoto: profile.photoURL || '/images/doctor-avatar.jpeg',
         text: data.text || '',
         parentCommentId: data.parentCommentId || null,
         upvotes: Number(data.upvotes) || 0,
@@ -242,12 +241,15 @@ export const addReaction = async (caseId, uid, type, commentId = null) => {
 
 export const getUsers = async () => {
   try {
-    const usersSnapshot = await getDocs(collection(db, 'users'));
-    const users = usersSnapshot.docs.map(doc => ({
+    const profilesSnapshot = await getDocs(collection(db, 'profiles'));
+    const users = profilesSnapshot.docs.map(doc => ({
       uid: doc.id,
+      role: doc.data().role || '',
       displayName: doc.data().displayName || 'User',
       email: doc.data().email || '',
       photoURL: doc.data().photoURL || '/images/doctor-avatar.jpeg',
+      levelOfStudy: doc.data().levelOfStudy || '',
+      courseOfStudy: doc.data().courseOfStudy || '',
     }));
     console.log('Fetched users:', users.length);
     return users;
@@ -369,6 +371,7 @@ export const getProfile = async (uid) => {
     const profileData = profileSnap.exists() ? profileSnap.data() : {};
     const validatedProfile = {
       uid,
+      role: profileData.role || '',
       photoURL: profileData.photoURL || '/images/doctor-avatar.jpeg',
       displayName: profileData.displayName || 'User',
       email: profileData.email || '',
@@ -377,6 +380,16 @@ export const getProfile = async (uid) => {
       institution: profileData.institution || '',
       specialty: profileData.specialty || '',
       bio: profileData.bio || '',
+      linkedIn: profileData.linkedIn || '',
+      xProfile: profileData.xProfile || '',
+      researchInterests: Array.isArray(profileData.researchInterests) ? profileData.researchInterests : [],
+      certifications: Array.isArray(profileData.certifications) ? profileData.certifications : [],
+      yearsOfExperience: profileData.yearsOfExperience || '',
+      professionalAffiliations: Array.isArray(profileData.professionalAffiliations)
+        ? profileData.professionalAffiliations
+        : [],
+      levelOfStudy: profileData.levelOfStudy || '',
+      courseOfStudy: profileData.courseOfStudy || '',
       updatedAt: profileData.updatedAt?.toDate?.() || new Date(),
     };
     console.log('Profile fetched for uid:', uid, 'photoURL:', validatedProfile.photoURL);
@@ -385,6 +398,7 @@ export const getProfile = async (uid) => {
     console.error('Get profile error:', error.code, error.message);
     return {
       uid,
+      role: '',
       photoURL: '/images/doctor-avatar.jpeg',
       displayName: 'User',
       email: '',
@@ -393,6 +407,14 @@ export const getProfile = async (uid) => {
       institution: '',
       specialty: '',
       bio: '',
+      linkedIn: '',
+      xProfile: '',
+      researchInterests: [],
+      certifications: [],
+      yearsOfExperience: '',
+      professionalAffiliations: [],
+      levelOfStudy: '',
+      courseOfStudy: '',
       updatedAt: new Date(),
     };
   }
@@ -402,6 +424,7 @@ export const updateProfile = async (uid, profileData) => {
   try {
     const profileRef = doc(db, 'profiles', uid);
     const validatedProfileData = {
+      role: profileData.role || '',
       displayName: profileData.displayName || 'User',
       email: profileData.email || '',
       photoURL: profileData.photoURL || '/images/doctor-avatar.jpeg',
@@ -410,6 +433,16 @@ export const updateProfile = async (uid, profileData) => {
       institution: profileData.institution || '',
       specialty: profileData.specialty || '',
       bio: profileData.bio || '',
+      linkedIn: profileData.linkedIn || '',
+      xProfile: profileData.xProfile || '',
+      researchInterests: Array.isArray(profileData.researchInterests) ? profileData.researchInterests : [],
+      certifications: Array.isArray(profileData.certifications) ? profileData.certifications : [],
+      yearsOfExperience: profileData.yearsOfExperience || '',
+      professionalAffiliations: Array.isArray(profileData.professionalAffiliations)
+        ? profileData.professionalAffiliations
+        : [],
+      levelOfStudy: profileData.levelOfStudy || '',
+      courseOfStudy: profileData.courseOfStudy || '',
       updatedAt: serverTimestamp(),
     };
     await setDoc(profileRef, validatedProfileData, { merge: true });
