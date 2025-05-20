@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getProfile } from '../../firebase/firestore';
 import ProfileCard from '../../components/Profile/ProfileCard';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import ProfileSkeleton from '../../components/ProfileSkeleton';
+import Loading from '../../components/Loading';
 import styles from '../../styles/profile.module.css';
 
 export default function Profile() {
@@ -62,7 +62,7 @@ export default function Profile() {
     return (
       <ProtectedRoute>
         <div className={styles.container}>
-          <ProfileSkeleton />
+          <Loading />
 
         </div>
       </ProtectedRoute>
