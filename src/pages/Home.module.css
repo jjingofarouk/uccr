@@ -1,9 +1,9 @@
 /* src/pages/Home.module.css */
 .container {
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 80px auto 40px;
   padding: 2rem 1rem;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
   gap: 3rem;
@@ -100,7 +100,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 200px;
+  min-height: calc(100vh - 120px);
 }
 
 .errorSection {
@@ -173,6 +173,11 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .container {
+    margin: 70px auto 32px;
+    min-height: calc(100vh - 102px);
+  }
+
   .heroTitle {
     font-size: 2rem;
   }
@@ -191,6 +196,11 @@
 }
 
 @media (max-width: 480px) {
+  .container {
+    margin: 60px auto 24px;
+    min-height: calc(100vh - 84px);
+  }
+
   .hero {
     padding: 2rem 0.5rem;
   }
