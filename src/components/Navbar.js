@@ -1,28 +1,22 @@
-// components/Navbar.jsx
+// src/components/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Moon, Sun } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import styles from '../styles/navbar.module.css';
+import { useTheme } from '../context/ThemeContext';
+import styles from './Navbar.module.css';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const sidebarRef = useRef(null);
-  const userButtonRef = useRef(null);
 
-  const toggleSidebar = (e) => {
-    e.stopPropagation();
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.toggle('dark-mode');
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
   };
 
   const handleLogout = async () => {
@@ -36,12 +30,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
-        userButtonRef.current &&
-        !userButtonRef.current.contains(event.target)
-      ) {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
         setIsSidebarOpen(false);
       }
     };
@@ -63,26 +52,45 @@ export default function Navbar() {
         </Link>
         <div className={styles.headerControls}>
           <button
-            onClick={toggleDarkMode}
+            onClick={toggleTheme}
             className={styles.themeToggle}
-            aria-label="Toggle theme"
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            {theme === 'light' ? (
+              <motion.div
+                initial={{ rotate: 0 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 0.5 }}
+              >
+                <lucide-react.Moon size={20} />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ rotate: 0 }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 0.5 }}
+              >
+                <lucide-react.Sun size={20} />
+              </motion.div>
+            )}
           </button>
           <button
-            ref={userButtonRef}
             onClick={toggleSidebar}
-            className={styles.userButton}
-            aria-label="User menu"
+            className={styles.menuButton}
+            aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
             disabled={loading}
           >
-            <Image
-              src={user?.photoURL || '/images/doctor-avatar.jpeg'}
-              alt="User profile"
-              width={36}
-              height={36}
-              className={styles.userAvatar}
-            />
+            {user ? (
+              <Image
+                src={user.photoURL || '/images/doctor-avatar.jpeg'}
+                alt="User profile"
+                width={36}
+                height={36}
+                className={styles.userAvatar}
+              />
+            ) : (
+              <Menu size={24} />
+            )}
           </button>
         </div>
       </div>
@@ -94,7 +102,7 @@ export default function Navbar() {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             <div className={styles.sidebarHeader}>
               {user && (
@@ -138,7 +146,7 @@ export default function Navbar() {
                 </Link>
               )}
               {user ? (
-                <button onClick={handleLogout} className={styles.sidebarButton}>
+                <button onClick={handleLogout} className={styles.navLink}>
                   <LogOut size={20} className={styles.navIcon} />
                   Logout
                 </button>
