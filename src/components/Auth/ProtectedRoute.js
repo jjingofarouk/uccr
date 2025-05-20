@@ -1,6 +1,8 @@
+// src/components/ProtectedRoute.jsx
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { useEffect } from 'react';
+import Loading from '../components/Loading';
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -12,6 +14,6 @@ export default function ProtectedRoute({ children }) {
     }
   }, [user, loading, router]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
   return user ? children : null;
 }
