@@ -11,6 +11,7 @@ function MyApp({ Component, pageProps }) {
     <AuthProvider>
       <ThemeProvider>
         <Navbar />
+        <Marquee />
         <main style={{ marginTop: '60px' }}>
           <Component {...pageProps} />
         </main>
