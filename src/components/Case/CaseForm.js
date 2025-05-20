@@ -76,10 +76,19 @@ export default function CaseForm() {
     }
   }, [user]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+
+
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  // Normalize newlines: replace multiple consecutive newlines with \n\n
+  const normalizedValue = name === 'title' || name === 'provisionalDiagnosis' || name === 'hospital' || name === 'referralCenter' || name === 'specialty'
+    ? value
+    : value.replace(/\n{3,}/g, '\n\n').trimEnd();
+  setFormData(prev => ({ ...prev, [name]: normalizedValue }));
+};
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
