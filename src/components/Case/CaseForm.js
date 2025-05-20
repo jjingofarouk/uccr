@@ -30,7 +30,7 @@ export default function CaseForm() {
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
-  const SUBMISSION_LOADING_DURATION = 3000;
+  const SUBMISSION_LOADING_DURATION = 1000;
 
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
