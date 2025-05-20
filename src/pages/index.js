@@ -3,19 +3,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCases } from '../hooks/useCases';
 import CaseCard from '../components/Case/CaseCard';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
-import dynamic from 'next/dynamic';
+import Loading from '../components/Loading'; // Direct import
 import Link from 'next/link';
 import Marquee from '../components/Marquee';
 import styles from './Home.module.css';
-
-// Dynamically import Loading component with SSR disabled and a fallback
-const Loading = dynamic(() => import('../components/Loading').catch((err) => {
-  console.error('Failed to load Loading component:', err);
-  return () => <div>Loading failed...</div>;
-}), {
-  ssr: false,
-  loading: () => <div aria-live="polite">Loading...</div>, // Fallback UI while Loading component is being fetched
-});
 
 export default function Home() {
   const { cases, loading, error } = useCases();
@@ -39,6 +30,7 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
+      <Marquee />
       <main className={styles.container}>
         <section className={styles.hero} aria-labelledby="hero-title">
           <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
