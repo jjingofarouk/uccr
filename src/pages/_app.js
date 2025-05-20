@@ -13,7 +13,7 @@ function MyApp({ Component, pageProps }) {
         <Navbar />
         <Marquee />
         <Component {...pageProps} />
-        <Footer />
+
       </ThemeProvider>
     </AuthProvider>
   );
