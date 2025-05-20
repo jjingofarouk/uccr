@@ -1,9 +1,11 @@
+// src/pages/cases/new.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { addCase } from '../../firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
+import Loading from '../../components/Loading';
 import styles from '../../styles/caseForm.module.css';
 
 export default function CaseForm() {
@@ -22,9 +24,13 @@ export default function CaseForm() {
     mediaUrls: [],
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadStart, setLoadStart] = useState(null);
+  const [forceLoading, setForceLoading] = useState(false);
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
+  const SUBMISSION_LOADING_DURATION = 3000; // 3 seconds for post-submission loading
 
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
@@ -81,22 +87,48 @@ export default function CaseForm() {
       setError('You must be logged in to create a case.');
       return;
     }
+    setError('');
+    setIsLoading(true);
     try {
       const caseData = {
         ...formData,
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
-        createdAt: new Date().toISOString(),
       };
-      console.log('Submitting case:', caseData); // Debug
+      console.log('Submitting case:', caseData);
       await addCase(caseData);
       console.log('Case submitted with mediaUrls:', formData.mediaUrls);
-      router.push('/cases');
+      setLoadStart(Date.now());
+      setForceLoading(true);
     } catch (err) {
       setError('Failed to create case: ' + err.message);
       console.error('Case creation error:', err);
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (forceLoading && loadStart) {
+      const elapsed = Date.now() - loadStart;
+      const remaining = SUBMISSION_LOADING_DURATION - elapsed;
+      if (remaining <= 0) {
+        setForceLoading(false);
+        setIsLoading(false);
+        router.push('/cases');
+      } else {
+        const timer = setTimeout(() => {
+          setForceLoading(false);
+          setIsLoading(false);
+          router.push('/cases');
+        }, remaining);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [forceLoading, loadStart, router]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className={styles.caseForm}>
