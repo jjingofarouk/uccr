@@ -80,13 +80,7 @@ export default function Navbar() {
               </motion.div>
             )}
           </button>
-          <button
-            ref={userAvatarRef}
-            onClick={toggleSidebar}
-            className={styles.menuButton}
-            aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
-            disabled={loading}
-          >
+          <div ref={userAvatarRef} className={styles.menuButtonWrapper}>
             {user ? (
               <Image
                 src={user.photoURL || '/images/doctor-avatar.jpeg'}
@@ -94,11 +88,19 @@ export default function Navbar() {
                 width={36}
                 height={36}
                 className={styles.userAvatar}
+                onClick={toggleSidebar}
               />
             ) : (
-              <Menu size={24} />
+              <button
+                onClick={toggleSidebar}
+                className={styles.menuButton}
+                aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
+                disabled={loading}
+              >
+                <Menu size={24} />
+              </button>
             )}
-          </button>
+          </div>
         </div>
       </div>
       <AnimatePresence>
