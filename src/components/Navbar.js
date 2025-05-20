@@ -1,10 +1,10 @@
-// src/components/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
-import { logout, getMessages } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell } from 'lucide-react';
+import { logout } from '../firebase/auth';
+import { getMessages } from '../firebase/firestore';
+import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -35,6 +35,7 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
+    console.log('handleLogout triggered');
     try {
       const result = await logout();
       if (result.success) {
@@ -45,9 +46,13 @@ export default function Navbar() {
         console.error('Logout failed:', result.error);
       }
     } catch (error) {
-      setLogoutError('Failed to log out. Please try again.');
+      setLogoutError(error.message || 'Failed to log out. Please try again.');
       console.error('Unexpected logout error:', error);
     }
+  };
+
+  const clearError = () => {
+    setLogoutError('');
   };
 
   useEffect(() => {
@@ -253,11 +258,26 @@ export default function Navbar() {
                 </Link>
               )}
             </nav>
-            {logoutError && (
-              <div className={styles.error}>
-                <span>{logoutError}</span>
-              </div>
-            )}
+            <AnimatePresence>
+              {logoutError && (
+                <motion.div
+                  className={styles.error}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span>{logoutError}</span>
+                  <button
+                    onClick={clearError}
+                    className={styles.closeError}
+                    aria-label="Dismiss error"
+                  >
+                    <X size={16} />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.aside>
         )}
       </AnimatePresence>
