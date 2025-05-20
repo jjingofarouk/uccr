@@ -34,7 +34,6 @@ export default function MessageThreadPage() {
     return (
       <ProtectedRoute>
         <div className="container">
-          <Navbar />
           <p>{error}</p>
         </div>
       </ProtectedRoute>
