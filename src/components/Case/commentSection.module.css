@@ -182,10 +182,14 @@
 }
 
 .commentText {
+  margin: 0 0 0.75rem;
+}
+
+.commentParagraph {
   font-size: 0.95rem;
   color: var(--text);
-  margin: 0 0 0.75rem;
-  line-height: 1.5;
+  line-height: 1.6;
+  margin-bottom: 1em;
 }
 
 .voteButtons {
@@ -304,6 +308,10 @@
   .reply {
     margin-left: 1.5rem;
   }
+
+  .commentParagraph {
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -340,8 +348,8 @@
     margin-left: 1rem;
   }
 
-  .commentText {
-    font-size: 0.9rem;
+  .commentParagraph {
+    font-size: 0.85rem;
   }
 
   .commentAuthor,
