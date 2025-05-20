@@ -55,8 +55,8 @@ function CasePageContent() {
 
 export default function CasePage() {
   return (
-    <ProtectedRoute>
+
       <CasePageContent />
-    </ProtectedRoute>
+
   );
 }
