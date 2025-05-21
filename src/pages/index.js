@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useCases } from '../../hooks/useCases';
-import ProtectedRoute from '../../components/Auth/ProtectedRoute';
+
 import CaseCard from '../../components/Case/CaseCard';
 import Loading from '../../components/Loading';
 import Link from 'next/link';
@@ -83,7 +83,7 @@ export default function Cases() {
   }
 
   return (
-    <ProtectedRoute>
+
       <div className={styles.container}>
         <h1 className={styles.title}>All Cases</h1>
         <div className={styles.filterSortContainer}>
@@ -168,6 +168,5 @@ export default function Cases() {
           </div>
         )}
       </div>
-    </ProtectedRoute>
   );
 }
