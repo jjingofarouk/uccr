@@ -8,7 +8,7 @@ import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Su
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
-import styles from '../styles/navbar.module.css';
+import styles from '../styles/Navbar.module.css';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
@@ -21,6 +21,8 @@ export default function Navbar() {
   const [logoutError, setLogoutError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState({ cases: [], users: [] });
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState('');
   const sidebarRef = useRef(null);
   const notificationsRef = useRef(null);
   const searchModalRef = useRef(null);
@@ -46,6 +48,7 @@ export default function Navbar() {
     setIsNotificationsOpen(false);
     setSearchQuery('');
     setSearchResults({ cases: [], users: [] });
+    setSearchError('');
     setLogoutError('');
   };
 
@@ -65,6 +68,7 @@ export default function Navbar() {
 
   const clearError = () => {
     setLogoutError('');
+    setSearchError('');
   };
 
   // Fetch unread messages
@@ -85,37 +89,54 @@ export default function Navbar() {
     fetchUnreadMessages();
   }, [user]);
 
-  // Handle search
+  // Handle search with debouncing
   useEffect(() => {
-    const fetchSearchResults = async () => {
+    const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.trim().length < 2) {
         setSearchResults({ cases: [], users: [] });
+        setSearchError('');
+        setIsSearchLoading(false);
         return;
       }
       try {
+        setIsSearchLoading(true);
+        setSearchError('');
         const results = await searchCasesAndUsers(searchQuery);
+        console.log('Search results:', results); // Debug log
         setSearchResults(results);
+        if (results.cases.length === 0 && results.users.length === 0) {
+          setSearchError('No results found. Try a different keyword.');
+        }
       } catch (error) {
         console.error('Search error:', error);
+        setSearchError('Failed to fetch results. Please try again.');
         setSearchResults({ cases: [], users: [] });
+      } finally {
+        setIsSearchLoading(false);
       }
-    };
-    fetchSearchResults();
+    }, 500); // Debounce for 500ms
+
+    return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
   // Close modals on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        sidebarRef.current && !sidebarRef.current.contains(event.target) &&
-        notificationsRef.current && !notificationsRef.current.contains(event.target) &&
-        searchModalRef.current && !searchModalRef.current.contains(event.target) &&
-        userAvatarRef.current && !userAvatarRef.current.contains(event.target)
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target) &&
+        searchModalRef.current &&
+        !searchModalRef.current.contains(event.target) &&
+        userAvatarRef.current &&
+        !userAvatarRef.current.contains(event.target)
       ) {
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
         setIsSearchModalOpen(false);
         setLogoutError('');
+        setSearchError('');
       }
     };
 
@@ -259,10 +280,34 @@ export default function Navbar() {
                 />
               </div>
               <div className={styles.searchResults}>
-                {searchQuery.trim().length < 2 ? (
+                {isSearchLoading ? (
+                  <p className={styles.searchLoading}>Loading...</p>
+                ) : searchQuery.trim().length < 2 ? (
                   <p className={styles.noResults}>Enter at least 2 characters to search</p>
-                ) : searchResults.cases.length === 0 && searchResults.users.length === 0 ? (
-                  <p className={styles.noResults}>No results found</p>
+                ) : searchError ? (
+                  <div className={styles.noResults}>
+                    {searchError}
+                    <div style={{ marginTop: '1rem' }}>
+                      <p>Suggestions:</p>
+                      <ul>
+                        <li>
+                          <Link href="/cases" onClick={toggleSearchModal}>
+                            Browse all cases
+                          </Link>
+                        </li>
+                        <li>
+                          <Link href="/cases?specialty=Cardiology" onClick={toggleSearchModal}>
+                            Explore Cardiology cases
+                          </Link>
+                        </li>
+                        <li>
+                          <Link href="/cases?specialty=Pediatrics" onClick={toggleSearchModal}>
+                            Explore Pediatrics cases
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 ) : (
                   <>
                     {searchResults.cases.length > 0 && (
@@ -295,6 +340,31 @@ export default function Navbar() {
                             <small>{user.specialty || 'No specialty'}</small>
                           </Link>
                         ))}
+                      </div>
+                    )}
+                    {searchResults.cases.length === 0 && searchResults.users.length === 0 && (
+                      <div className={styles.noResults}>
+                        No results found for "{searchQuery}"
+                        <div style={{ marginTop: '1rem' }}>
+                          <p>Suggestions:</p>
+                          <ul>
+                            <li>
+                              <Link href="/cases" onClick={toggleSearchModal}>
+                                Browse all cases
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/cases?specialty=Cardiology" onClick={toggleSearchModal}>
+                                Explore Cardiology cases
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/cases?specialty=Pediatrics" onClick={toggleSearchModal}>
+                                Explore Pediatrics cases
+                              </Link>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
                     )}
                   </>
