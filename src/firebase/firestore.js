@@ -71,9 +71,11 @@ export const addCase = async (caseData) => {
 
 export const getCases = async (uid = null) => {
   try {
-    let q = collection(db, 'cases');
+    let q;
     if (uid) {
       q = query(collection(db, 'cases'), where('userId', '==', uid));
+    } else {
+      q = query(collection(db, 'cases'));
     }
     const querySnapshot = await getDocs(q);
     const casesPromises = querySnapshot.docs.map(async (doc) => {
