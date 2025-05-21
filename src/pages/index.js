@@ -1,172 +1,229 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useCases } from '../hooks/useCases';
-
+import { useAuth } from '../hooks/useAuth';
+import { getUsers, getUserStats } from '../firebase/firestore';
 import CaseCard from '../components/Case/CaseCard';
 import Loading from '../components/Loading';
 import Link from 'next/link';
-import styles from './case.module.css';
+import Marquee from '../components/Marquee';
+import Image from 'next/image';
+import styles from './Home.module.css';
 
-export default function Cases() {
-  const { cases, loading } = useCases();
-  const [filters, setFilters] = useState({
-    specialty: '',
-    author: '',
-    hospital: '',
-    referralCenter: '',
-    dateRange: '',
-  });
-  const [sortBy, setSortBy] = useState('createdAt-desc');
+export default function Home() {
+  const { user } = useAuth();
+  const { cases, loading, error } = useCases();
+  const [caseOfTheDay, setCaseOfTheDay] = useState(null);
+  const [featuredSpecialty, setFeaturedSpecialty] = useState('');
+  const [topContributors, setTopContributors] = useState([]);
 
-  const specialties = [...new Set(cases.map((caseData) => caseData.specialty).filter(Boolean))];
-  const hospitals = [...new Set(cases.map((caseData) => caseData.hospital).filter(Boolean))];
-  const referralCenters = [...new Set(cases.map((caseData) => caseData.referralCenter).filter(Boolean))];
+  useEffect(() => {
+    if (cases.length > 0) {
+      const today = new Date().toISOString().split('T')[0];
+      const seed = today.split('-').reduce((acc, val) => acc + parseInt(val), 0);
+      const randomIndex = seed % cases.length;
+      setCaseOfTheDay(cases[randomIndex]);
+    }
+  }, [cases]);
 
-  const filteredCases = useMemo(() => {
-    return cases.filter((caseData) => {
-      const matchesSpecialty = filters.specialty ? caseData.specialty === filters.specialty : true;
-      const matchesAuthor = filters.author
-        ? caseData.userName.toLowerCase().includes(filters.author.toLowerCase())
-        : true;
-      const matchesHospital = filters.hospital ? caseData.hospital === filters.hospital : true;
-      const matchesReferralCenter = filters.referralCenter
-        ? caseData.referralCenter === filters.referralCenter
-        : true;
-      const matchesDate = filters.dateRange
-        ? (() => {
-            const now = new Date();
-            const caseDate = new Date(caseData.createdAt);
-            if (filters.dateRange === 'last7days') {
-              return caseDate >= new Date(now.setDate(now.getDate() - 7));
-            }
-            if (filters.dateRange === 'last30days') {
-              return caseDate >= new Date(now.setDate(now.getDate() - 30));
-            }
-            if (filters.dateRange === 'lastYear') {
-              return caseDate >= new Date(now.setFullYear(now.getFullYear() - 1));
-            }
-            return true;
-          })()
-        : true;
-      return matchesSpecialty && matchesAuthor && matchesHospital && matchesReferralCenter && matchesDate;
-    });
-  }, [cases, filters]);
+  useEffect(() => {
+    const specialties = [...new Set(cases.map((c) => c.specialty).filter(Boolean))];
+    if (specialties.length > 0) {
+      const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+      setFeaturedSpecialty(specialties[weekNumber % specialties.length]);
+    }
+  }, [cases]);
 
-  const sortedCases = useMemo(() => {
-    return [...filteredCases].sort((a, b) => {
-      if (sortBy === 'createdAt-desc') {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      }
-      if (sortBy === 'createdAt-asc') {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-      }
-      if (sortBy === 'awards-desc') {
-        return (b.awards || 0) - (a.awards || 0);
-      }
-      if (sortBy === 'awards-asc') {
-        return (a.awards || 0) - (b.awards || 0);
-      }
-      return 0;
-    });
-  }, [filteredCases, sortBy]);
+  useEffect(() => {
+    const fetchContributors = async () => {
+      const users = await getUsers();
+      const contributors = await Promise.all(
+        users.map(async (user) => {
+          const stats = await getUserStats(user.uid);
+          return {
+            ...user,
+            caseCount: stats.cases,
+            awards: cases.reduce((sum, c) => sum + (c.userId === user.uid ? c.awards : 0), 0),
+          };
+        })
+      );
+      setTopContributors(contributors.sort((a, b) => b.awards - a.awards).slice(0, 5));
+    };
+    fetchContributors();
+  }, [cases]);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+  const recentCases = useMemo(() => {
+    return cases
+      .slice()
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+  }, [cases]);
 
-  const handleSortChange = (e) => {
-    setSortBy(e.target.value);
-  };
+  const trendingCases = useMemo(() => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    return cases
+      .filter((caseData) => new Date(caseData.createdAt) >= oneWeekAgo)
+      .sort((a, b) => (b.awards || 0) - (a.awards || 0))
+      .slice(0, 3);
+  }, [cases]);
 
-  if (loading) {
-    return <Loading />;
-  }
+  const specialtyCases = useMemo(() => {
+    return cases
+      .filter((caseData) => caseData.specialty === featuredSpecialty)
+      .slice(0, 3);
+  }, [cases, featuredSpecialty]);
+
+  const specialtyCounts = useMemo(() => {
+    const counts = cases.reduce((acc, caseData) => {
+      const specialty = caseData.specialty || 'Other';
+      acc[specialty] = (acc[specialty] || 0) + 1;
+      return acc;
+    }, {});
+    return Object.entries(counts).map(([specialty, count]) => ({ specialty, count }));
+  }, [cases]);
 
   return (
-
-      <div className={styles.container}>
-        <h1 className={styles.title}>All Cases</h1>
-        <div className={styles.filterSortContainer}>
-          <div className={styles.filters}>
-            <select
-              name="specialty"
-              value={filters.specialty}
-              onChange={handleFilterChange}
-              className={styles.filterSelect}
-            >
-              <option value="">All Specialties</option>
-              {specialties.map((specialty) => (
-                <option key={specialty} value={specialty}>
-                  {specialty}
-                </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              name="author"
-              placeholder="Search by author..."
-              value={filters.author}
-              onChange={handleFilterChange}
-              className={styles.filterInput}
-            />
-            <select
-              name="hospital"
-              value={filters.hospital}
-              onChange={handleFilterChange}
-              className={styles.filterSelect}
-            >
-              <option value="">All Hospitals</option>
-              {hospitals.map((hospital) => (
-                <option key={hospital} value={hospital}>
-                  {hospital}
-                </option>
-              ))}
-            </select>
-            <select
-              name="referralCenter"
-              value={filters.referralCenter}
-              onChange={handleFilterChange}
-              className={styles.filterSelect}
-            >
-              <option value="">All Referral Centers</option>
-              {referralCenters.map((center) => (
-                <option key={center} value={center}>
-                  {center}
-                </option>
-              ))}
-            </select>
-            <select
-              name="dateRange"
-              value={filters.dateRange}
-              onChange={handleFilterChange}
-              className={styles.filterSelect}
-            >
-              <option value="">All Dates</option>
-              <option value="last7days">Last 7 Days</option>
-              <option value="last30days">Last 30 Days</option>
-              <option value="lastYear">Last Year</option>
-            </select>
-          </div>
-          <div className={styles.sort}>
-            <select value={sortBy} onChange={handleSortChange} className={styles.sortSelect}>
-              <option value="createdAt-desc">Newest First</option>
-              <option value="createdAt-asc">Oldest First</option>
-              <option value="awards-desc">Most Awards</option>
-              <option value="awards-asc">Least Awards</option>
-            </select>
-          </div>
+    <main className={styles.container}>
+      <Marquee />
+      <section className={styles.hero} aria-labelledby="hero-title">
+        <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
+        <p className={styles.heroSubtitle}>
+          Explore and contribute to a growing database of medical case studies from Uganda.
+        </p>
+        <div className={styles.heroButtons}>
+          <Link href="/cases" className={styles.ctaButtonPrimary}>
+            Browse Cases
+          </Link>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Share a Case
+          </Link>
         </div>
-        {sortedCases.length === 0 ? (
-          <p>
-            No cases match your filters. <Link href="/cases/new">Share a case!</Link>
-          </p>
-        ) : (
-          <div className={styles['case-list']}>
-            {sortedCases.map((caseData) => (
+      </section>
+
+      {loading && (
+        <section className={styles.loadingSection}>
+          <Loading />
+        </section>
+      )}
+
+      {!loading && error && (
+        <section className={styles.errorSection} role="alert">
+          <p className={styles.errorText}>Error: {error}</p>
+        </section>
+      )}
+
+      {!loading && !error && cases.length === 0 && (
+        <section className={styles.emptySection} aria-live="polite">
+          <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Share a Case
+          </Link>
+        </section>
+      )}
+
+      {!loading && !error && caseOfTheDay && (
+        <section className={styles.featuredSection} aria-labelledby="featured-title">
+          <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
+          <div className={styles.featuredCard}>
+            <CaseCard key={caseOfTheDay.id} caseData={caseOfTheDay} />
+          </div>
+        </section>
+      )}
+
+      {!loading && !error && trendingCases.length > 0 && (
+        <section className={styles.trendingSection} aria-labelledby="trending-title">
+          <h2 id="trending-title" className={styles.sectionTitle}>Trending Cases</h2>
+          <div className={styles.caseList}>
+            {trendingCases.map((caseData) => (
               <CaseCard key={caseData.id} caseData={caseData} />
             ))}
           </div>
-        )}
-      </div>
+        </section>
+      )}
+
+      {!loading && !error && recentCases.length > 0 && (
+        <section className={styles.recentSection} aria-labelledby="recent-title">
+          <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
+          <div className={styles.caseList}>
+            {recentCases.map((caseData) => (
+              <CaseCard key={caseData.id} caseData={caseData} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!loading && !error && featuredSpecialty && specialtyCases.length > 0 && (
+        <section className={styles.specialtySection} aria-labelledby="specialty-title">
+          <h2 id="specialty-title" className={styles.sectionTitle}>Specialty Spotlight: {featuredSpecialty}</h2>
+          <div className={styles.caseList}>
+            {specialtyCases.map((caseData) => (
+              <CaseCard key={caseData.id} caseData={caseData} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!loading && !error && topContributors.length > 0 && (
+        <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
+          <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
+          <div className={styles.leaderboard}>
+            {topContributors.map((user) => (
+              <Link key={user.uid} href={`/profile/view/${user.uid}`} className={styles.contributor}>
+                <Image
+                  src={user.photoURL || '/images/doctor-avatar.jpeg'}
+                  alt={user.displayName}
+                  width={40}
+                  height={40}
+                  className={styles.contributorAvatar}
+                />
+                <div>
+                  <span>{user.displayName}</span>
+                  <small>{user.caseCount} cases, {user.awards} awards</small>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!loading && !error && specialtyCounts.length > 0 && (
+        <section className={styles.statsSection} aria-labelledby="stats-title">
+          <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
+          <canvas id="specialtyChart"></canvas>
+          <script>
+            {`
+              const ctx = document.getElementById('specialtyChart').getContext('2d');
+              new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: ${JSON.stringify(specialtyCounts.map((item) => item.specialty))},
+                  datasets: [{
+                    label: 'Cases by Specialty',
+                    data: ${JSON.stringify(specialtyCounts.map((item) => item.count))},
+                    backgroundColor: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'],
+                    borderColor: ['#0056b3', '#218838', '#c82333', '#e0a800', '#138496', '#5a32a3'],
+                    borderWidth: 1
+                  }]
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: { display: true, text: 'Number of Cases' }
+                    },
+                    x: {
+                      title: { display: true, text: 'Specialty' }
+                    }
+                  },
+                  plugins: {
+                    legend: { display: false }
+                  }
+                }
+              });
+            `}
+          </script>
+        </section>
+      )}
+    </main>
   );
 }
