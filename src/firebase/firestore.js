@@ -536,3 +536,43 @@ export const subscribeUserStats = (uid, callback) => {
     return () => {};
   }
 };
+
+export const updateCase = async (caseId, caseData) => {
+  try {
+    console.log('updateCase called with caseId:', caseId, 'caseData:', caseData);
+    if (!caseData.userId) {
+      throw new Error('Missing userId in caseData');
+    }
+    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
+      throw new Error('Authenticated user does not match caseData.userId');
+    }
+    const validatedCaseData = {
+      userId: caseData.userId,
+      userName: caseData.userName || 'Anonymous',
+      title: String(caseData.title || ''),
+      specialty: String(caseData.specialty || ''),
+      presentingComplaint: String(caseData.presentingComplaint || ''),
+      history: String(caseData.history || ''),
+      physicalExam: String(caseData.physicalExam || ''),
+      investigations: String(caseData.investigations || ''),
+      provisionalDiagnosis: String(caseData.provisionalDiagnosis || ''),
+      management: String(caseData.management || ''),
+      discussion: String(caseData.discussion || ''),
+      highLevelSummary: String(caseData.highLevelSummary || ''),
+      references: String(caseData.references || ''),
+      hospital: String(caseData.hospital || ''),
+      referralCenter: String(caseData.referralCenter || ''),
+      mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+      awards: Number(caseData.awards) || 0,
+      updatedAt: serverTimestamp(),
+    };
+    console.log('Validated case data for update:', validatedCaseData);
+    const caseRef = doc(db, 'cases', caseId);
+    await updateDoc(caseRef, validatedCaseData);
+    console.log('Case updated with ID:', caseId, 'userId:', caseData.userId);
+    return caseId;
+  } catch (error) {
+    console.error('Update case error:', { code: error.code, message: error.message, stack: error.stack });
+    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to update case' : `Failed to update case: ${error.message}`);
+  }
+};
