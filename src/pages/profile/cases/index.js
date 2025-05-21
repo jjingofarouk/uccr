@@ -3,11 +3,20 @@ import { useCases } from '../../../hooks/useCases';
 import CaseCard from '../../../components/Case/CaseCard';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
 import Link from 'next/link';
+import Loading from '../../../components/Loading';
 import styles from '../../cases/case.module.css';
 
 export default function MyCases() {
-  const { user } = useAuth();
-  const { cases } = useCases(user?.uid);
+  const { user, loading: authLoading } = useAuth();
+  const { cases, loading: casesLoading } = useCases(user?.uid);
+
+  if (authLoading || casesLoading) {
+    return <Loading />;
+  }
+
+  if (!user) {
+    return <div>Please log in to view your cases.</div>;
+  }
 
   return (
     <ProtectedRoute>
