@@ -496,7 +496,6 @@ export const getUserStats = async (uid) => {
   }
 };
 
-
 export const subscribeUserStats = (uid, callback) => {
   try {
     const casesQuery = query(collection(db, 'cases'), where('userId', '==', uid));
@@ -579,32 +578,40 @@ export const updateCase = async (caseId, caseData) => {
   }
 };
 
-export const getTopContributors = async (limitCount = 5) => {
+export const getTopContributors = async (limitCount = 3) => {
   try {
-    // Get all users
-    const usersRef = collection(db, 'users');
-    const usersSnapshot = await getDocs(usersRef);
+    // Get all profiles
+    const profilesRef = collection(db, 'profiles');
+    const profilesSnapshot = await getDocs(profilesRef);
     const contributors = [];
 
-    // For each user, count their cases
-    for (const userDoc of usersSnapshot.docs) {
-      const userData = userDoc.data();
+    // For each user, count their cases and sum awards
+    for (const profileDoc of profilesSnapshot.docs) {
+      const profileData = profileDoc.data();
       const casesRef = collection(db, 'cases');
-      const userCasesQuery = query(casesRef, where('userId', '==', userDoc.id));
+      const userCasesQuery = query(casesRef, where('userId', '==', profileDoc.id));
       const casesSnapshot = await getDocs(userCasesQuery);
       const caseCount = casesSnapshot.size;
-      const awards = userData.awards || []; // Assuming awards are stored in user document
-
-      contributors.push({
-        uid: userDoc.id,
-        displayName: userData.displayName || 'Anonymous',
-        photoURL: userData.photoURL || '/images/doctor-avatar.jpeg',
-        caseCount,
-        awards,
+      
+      // Sum awards from cases
+      let totalAwards = 0;
+      casesSnapshot.forEach(doc => {
+        const caseData = doc.data();
+        totalAwards += Number(caseData.awards) || 0;
       });
+
+      if (caseCount > 0) { // Only include users with cases
+        contributors.push({
+          uid: profileDoc.id,
+          displayName: profileData.displayName || 'Anonymous',
+          photoURL: profileData.photoURL || '/images/doctor-avatar.jpeg',
+          caseCount,
+          awards: totalAwards,
+        });
+      }
     }
 
-    // Sort by caseCount and limit
+    // Sort by caseCount (descending) and limit to top 3
     return contributors
       .sort((a, b) => b.caseCount - a.caseCount)
       .slice(0, limitCount);
@@ -626,13 +633,15 @@ export const getCaseStatistics = async () => {
       stats[specialty] = (stats[specialty] || 0) + 1;
     });
 
-    return Object.entries(stats).map(([specialty, count]) => ({
-      specialty,
-      count,
-    }));
+    // Sort by count (descending) so specialty with most cases is first
+    return Object.entries(stats)
+      .map(([specialty, count]) => ({
+        specialty,
+        count,
+      }))
+      .sort((a, b) => b.count - a.count);
   } catch (error) {
     console.error('Error fetching case statistics:', error);
     return [];
   }
 };
-
