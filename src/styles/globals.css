@@ -36,8 +36,18 @@ html, body {
 
 main {
   flex: 1 0 auto;
+  margin-top: 0; /* Remove fixed margin; will be handled dynamically */
 }
 
 footer {
   flex-shrink: 0;
+}
+
+/* Ensure marquee container has no default spacing */
+.marquee-container {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  position: relative;
+  top: 0; /* Stick to the top of its container */
 }
