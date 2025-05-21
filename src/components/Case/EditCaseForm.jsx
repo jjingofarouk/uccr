@@ -25,6 +25,7 @@ export default function EditCaseForm({ caseId }) {
     references: '',
     mediaUrls: [],
   });
+  const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [loadStart, setLoadStart] = useState(null);
@@ -33,6 +34,61 @@ export default function EditCaseForm({ caseId }) {
   const widgetRef = useRef();
   const router = useRouter();
   const SUBMISSION_LOADING_DURATION = 1000;
+
+  const steps = [
+    { name: 'title', label: 'Case Title', type: 'input', placeholder: 'Enter case title' },
+    { name: 'presentingComplaint', label: 'Presenting Complaint', type: 'textarea', placeholder: 'Describe the presenting complaint' },
+    { name: 'history', label: 'History', type: 'textarea', placeholder: 'Patient history' },
+    { name: 'physicalExam', label: 'Physical Examination', type: 'textarea', placeholder: 'Physical exam findings' },
+    { name: 'investigations', label: 'Investigations', type: 'textarea', placeholder: 'Investigation results' },
+    { name: 'management', label: 'Management', type: 'textarea', placeholder: 'Management plan' },
+    { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'input', placeholder: 'Enter provisional diagnosis' },
+    { name: 'hospital', label: 'Hospital', type: 'input', placeholder: 'Enter hospital name' },
+    { name: 'referralCenter', label: 'Referral Center', type: 'input', placeholder: 'Enter referral center' },
+    { name: 'specialty', label: 'Specialty', type: 'select', options: [
+      { value: '', label: 'Select Specialty' },
+      { value: 'Internal Medicine', label: 'Internal Medicine' },
+      { value: 'Surgery', label: 'Surgery' },
+      { value: 'Pediatrics', label: 'Pediatrics' },
+      { value: 'Obstetrics & Gynecology', label: 'Obstetrics & Gynecology' },
+      { value: 'Cardiology', label: 'Cardiology' },
+      { value: 'Neurology', label: 'Neurology' },
+      { value: 'Orthopedics', label: 'Orthopedics' },
+      { value: 'Oncology', label: 'Oncology' },
+      { value: 'Endocrinology', label: 'Endocrinology' },
+      { value: 'Gastroenterology', label: 'Gastroenterology' },
+      { value: 'Hematology', label: 'Hematology' },
+      { value: 'Infectious Diseases', label: 'Infectious Diseases' },
+      { value: 'Nephrology', label: 'Nephrology' },
+      { value: 'Pulmonology', label: 'Pulmonology' },
+      { value: 'Rheumatology', label: 'Rheumatology' },
+      { value: 'Dermatology', label: 'Dermatology' },
+      { value: 'Ophthalmology', label: 'Ophthalmology' },
+      { value: 'Otolaryngology', label: 'Otolaryngology' },
+      { value: 'Urology', label: 'Urology' },
+      { value: 'Anesthesiology', label: 'Anesthesiology' },
+      { value: 'Emergency Medicine', label: 'Emergency Medicine' },
+      { value: 'Critical Care Medicine', label: 'Critical Care Medicine' },
+      { value: 'Psychiatry', label: 'Psychiatry' },
+      { value: 'Radiology', label: 'Radiology' },
+      { value: 'Pathology', label: 'Pathology' },
+      { value: 'Plastic Surgery', label: 'Plastic Surgery' },
+      { value: 'Thoracic Surgery', label: 'Thoracic Surgery' },
+      { value: 'Vascular Surgery', label: 'Vascular Surgery' },
+      { value: 'Neonatology', label: 'Neonatology' },
+      { value: 'Geriatrics', label: 'Geriatrics' },
+      { value: 'Allergy & Immunology', label: 'Allergy & Immunology' },
+      { value: 'Pain Medicine', label: 'Pain Medicine' },
+      { value: 'Sports Medicine', label: 'Sports Medicine' },
+      { value: 'Palliative Care', label: 'Palliative Care' },
+      { value: 'Medical Genetics', label: 'Medical Genetics' },
+      { value: 'Other', label: 'Other' },
+    ]},
+    { name: 'discussion', label: 'Discussion', type: 'textarea', placeholder: 'Discuss the case' },
+    { name: 'highLevelSummary', label: 'High-Level Summary', type: 'textarea', placeholder: 'Summarize the case' },
+    { name: 'references', label: 'References', type: 'textarea', placeholder: 'List references' },
+    { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
+  ];
 
   // Fetch case data
   useEffect(() => {
@@ -157,24 +213,17 @@ export default function EditCaseForm({ caseId }) {
     }
   };
 
-  useEffect(() => {
-    if (forceLoading && loadStart) {
-      const elapsed = Date.now() - loadStart;
-      const remaining = SUBMISSION_LOADING_DURATION - elapsed;
-      if (remaining <= 0) {
-        setForceLoading(false);
-        setIsLoading(false);
-        router.push(`/cases/${caseId}`);
-      } else {
-        const timer = setTimeout(() => {
-          setForceLoading(false);
-          setIsLoading(false);
-          router.push(`/cases/${caseId}`);
-        }, remaining);
-        return () => clearTimeout(timer);
-      }
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
-  }, [forceLoading, loadStart, router, caseId]);
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   if (authLoading || isLoading) {
     return <Loading />;
@@ -191,169 +240,146 @@ export default function EditCaseForm({ caseId }) {
   return (
     <div className={styles.caseForm}>
       <h2>Edit Case</h2>
+      <div className={styles.progressBar}>
+        <div
+          className={styles.progress}
+          style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+        ></div>
+      </div>
+      <p className={styles.stepIndicator}>
+        Step {currentStep + 1} of {steps.length}: {steps[currentStep].label}
+      </p>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="title"
-          placeholder="Case Title"
-          value={formData.title}
-          onChange={handleChange}
-        />
-        <textarea
-          name="presentingComplaint"
-          placeholder="Presenting Complaint"
-          value={formData.presentingComplaint}
-          onChange={handleChange}
-        />
-        <textarea
-          name="history"
-          placeholder="History"
-          value={formData.history}
-          onChange={handleChange}
-        />
-        <textarea
-          name="physicalExam"
-          placeholder="Physical Examination"
-          value={formData.physicalExam}
-          onChange={handleChange}
-        />
-        <textarea
-          name="investigations"
-          placeholder="Investigations"
-          value={formData.investigations}
-          onChange={handleChange}
-        />
-        <textarea
-          name="management"
-          placeholder="Management"
-          value={formData.management}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="provisionalDiagnosis"
-          placeholder="Provisional Diagnosis"
-          value={formData.provisionalDiagnosis}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="hospital"
-          placeholder="Hospital"
-          value={formData.hospital}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="referralCenter"
-          placeholder="Referral Center"
-          value={formData.referralCenter}
-          onChange={handleChange}
-        />
-        <select name="specialty" value={formData.specialty} onChange={handleChange}>
-          <option value="">Select Specialty</option>
-          <option value="Internal Medicine">Internal Medicine</option>
-          <option value="Surgery">Surgery</option>
-          <option value="Pediatrics">Pediatrics</option>
-          <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
-          <option value="Cardiology">Cardiology</option>
-          <option value="Neurology">Neurology</option>
-          <option value="Orthopedics">Orthopedics</option>
-          <option value="Oncology">Oncology</option>
-          <option value="Endocrinology">Endocrinology</option>
-          <option value="Gastroenterology">Gastroenterology</option>
-          <option value="Hematology">Hematology</option>
-          <option value="Infectious Diseases">Infectious Diseases</option>
-          <option value="Nephrology">Nephrology</option>
-          <option value="Pulmonology">Pulmonology</option>
-          <option value="Rheumatology">Rheumatology</option>
-          <option value="Dermatology">Dermatology</option>
-          <option value="Ophthalmology">Ophthalmology</option>
-          <option value="Otolaryngology">Otolaryngology</option>
-          <option value="Urology">Urology</option>
-          <option value="Anesthesiology">Anesthesiology</option>
-          <option value="Emergency Medicine">Emergency Medicine</option>
-          <option value="Critical Care Medicine">Critical Care Medicine</option>
-          <option value="Psychiatry">Psychiatry</option>
-          <option value="Radiology">Radiology</option>
-          <option value="Pathology">Pathology</option>
-          <option value="Plastic Surgery">Plastic Surgery</option>
-          <option value="Thoracic Surgery">Thoracic Surgery</option>
-          <option value="Vascular Surgery">Vascular Surgery</option>
-          <option value="Neonatology">Neonatology</option>
-          <option value="Geriatrics">Geriatrics</option>
-          <option value="Allergy & Immunology">Allergy & Immunology</option>
-          <option value="Pain Medicine">Pain Medicine</option>
-          <option value="Sports Medicine">Sports Medicine</option>
-          <option value="Palliative Care">Palliative Care</option>
-          <option value="Medical Genetics">Medical Genetics</option>
-          <option value="Other">Other</option>
-        </select>
-        <textarea
-          name="discussion"
-          placeholder="Discussion"
-          value={formData.discussion}
-          onChange={handleChange}
-        />
-        <textarea
-          name="highLevelSummary"
-          placeholder="High-Level Summary"
-          value={formData.highLevelSummary}
-          onChange={handleChange}
-        />
-        <textarea
-          name="references"
-          placeholder="References"
-          value={formData.references}
-          onChange={handleChange}
-        />
-        <button
-          type="button"
-          onClick={() => widgetRef.current?.open()}
-          disabled={!widgetRef.current}
-        >
-          Upload Media
-        </button>
-        {formData.mediaUrls.length > 0 && (
-          <div>
-            <p>Uploaded media:</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {formData.mediaUrls.map((url, index) => (
-                <div key={index} style={{ position: 'relative', display: 'inline-block' }}>
-                  <Image
-                    src={url}
-                    alt={`Uploaded media ${index + 1}`}
-                    width={100}
-                    height={100}
+        <div className={styles.carousel}>
+          <div
+            className={styles.carouselInner}
+            style={{ transform: `translateX(-${currentStep * 100}%)` }}
+          >
+            {steps.map((step, index) => (
+              <div key={step.name} className={styles.carouselItem}>
+                {step.type === 'input' && (
+                  <input
+                    type="text"
+                    name={step.name}
+                    placeholder={step.placeholder}
+                    value={formData[step.name]}
+                    onChange={handleChange}
                   />
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteMedia(index)}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      background: 'red',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '20px',
-                      height: '20px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
+                )}
+                {step.type === 'textarea' && (
+                  <textarea
+                    name={step.name}
+                    placeholder={step.placeholder}
+                    value={formData[step.name]}
+                    onChange={handleChange}
+                  />
+                )}
+                {step.type === 'select' && (
+                  <select
+                    name={step.name}
+                    value={formData[step.name]}
+                    onChange={handleChange}
                   >
-                    X
-                  </button>
-                </div>
-              ))}
-            </div>
+                    {step.options.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {step.type === 'media' && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => widgetRef.current?.open()}
+                      disabled={!widgetRef.current}
+                    >
+                      Upload Media
+                    </button>
+                    {formData.mediaUrls.length > 0 && (
+                      <div className={styles.mediaPreview}>
+                        <p>Uploaded media:</p>
+                        <div className={styles.mediaGrid}>
+                          {formData.mediaUrls.map((url, index) => (
+                            <div key={index} className={styles.mediaItem}>
+                              <Image
+                                src={url}
+                                alt={`Uploaded media ${index + 1}`}
+                                width={120}
+                                height={120}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteMedia(index)}
+                                className={styles.deleteButton}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-        )}
-        <button type="submit">Update Case</button>
-        {error && <p>{error}</p>}
+        </div>
+        <div className={styles.navigation}>
+          <button
+            type="button"
+            onClick={prevStep}
+            disabled={currentStep === 0}
+            className={styles.navButton}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Previous
+          </button>
+          {currentStep < steps.length - 1 ? (
+            <button
+              type="button"
+              onClick={nextStep}
+              className={styles.navButton}
+            >
+              Next
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          ) : (
+            <button type="submit" className={styles.submitButton}>
+              Update Case
+            </button>
+          )}
+        </div>
+        {error && <p role="alert">{error}</p>}
         {(isLoading || forceLoading) && <Loading />}
       </form>
     </div>
