@@ -240,6 +240,11 @@
   position: relative;
   width: 100%;
   height: 300px;
+  background: var(--background);
+}
+
+.dark-mode .chartWrapper {
+  background: var(--background);
 }
 
 @media (max-width: 768px) {
