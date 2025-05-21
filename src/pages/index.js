@@ -26,46 +26,39 @@ const HeroSection = () => (
   </section>
 );
 
-const FeaturedSection = ({ caseOfTheDay }) => {
-  if (!caseOfTheDay) {
-    return (
-      <section className={styles.featuredSection} aria-labelledby="featured-title">
-        <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
-        <div className={styles.emptySection}>
-          <p className={styles.emptyText}>No featured case available</p>
-          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
-            Share a Case
-          </Link>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className={styles.featuredSection} aria-labelledby="featured-title">
-      <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
+const FeaturedSection = ({ caseOfTheDay }) => (
+  <section className={styles.featuredSection} aria-labelledby="featured-title">
+    <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
+    {caseOfTheDay ? (
       <div className={styles.featuredCard}>
         <CaseCard caseData={caseOfTheDay} />
       </div>
-    </section>
-  );
-};
+    ) : (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No featured case available</p>
+        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          Share a Case
+        </Link>
+      </div>
+    )}
+  </section>
+);
 
 const TrendingSection = ({ trendingCases }) => (
   <section className={styles.trendingSection} aria-labelledby="trending-title">
     <h2 id="trending-title" className={styles.sectionTitle}>Trending Cases</h2>
-    {trendingCases.length === 0 ? (
+    {trendingCases.length > 0 ? (
+      <div className={styles.caseList}>
+        {trendingCases.map((caseData) => (
+          <CaseCard key={caseData.id} caseData={caseData} />
+        ))}
+      </div>
+    ) : (
       <div className={styles.emptySection}>
         <p className={styles.emptyText}>No trending cases available</p>
         <Link href="/cases/new" className={styles.ctaButtonSecondary}>
           Share a Case
         </Link>
-      </div>
-    ) : (
-      <div className={styles.caseList}>
-        {trendingCases.map((caseData) => (
-          <CaseCard key={caseData.id} caseData={caseData} />
-        ))}
       </div>
     )}
   </section>
@@ -74,18 +67,18 @@ const TrendingSection = ({ trendingCases }) => (
 const RecentSection = ({ recentCases }) => (
   <section className={styles.recentSection} aria-labelledby="recent-title">
     <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
-    {recentCases.length === 0 ? (
+    {recentCases.length > 0 ? (
+      <div className={styles.caseList}>
+        {recentCases.map((caseData) => (
+          <CaseCard key={caseData.id} caseData={caseData} />
+        ))}
+      </div>
+    ) : (
       <div className={styles.emptySection}>
         <p className={styles.emptyText}>No recent cases available</p>
         <Link href="/cases/new" className={styles.ctaButtonSecondary}>
           Share a Case
         </Link>
-      </div>
-    ) : (
-      <div className={styles.caseList}>
-        {recentCases.map((caseData) => (
-          <CaseCard key={caseData.id} caseData={caseData} />
-        ))}
       </div>
     )}
   </section>
@@ -96,18 +89,18 @@ const SpecialtySection = ({ specialtyCases, featuredSpecialty }) => (
     <h2 id="specialty-title" className={styles.sectionTitle}>
       Specialty Spotlight: {featuredSpecialty || 'None'}
     </h2>
-    {specialtyCases.length === 0 ? (
+    {specialtyCases.length > 0 ? (
+      <div className={styles.caseList}>
+        {specialtyCases.map((caseData) => (
+          <CaseCard key={caseData.id} caseData={caseData} />
+        ))}
+      </div>
+    ) : (
       <div className={styles.emptySection}>
         <p className={styles.emptyText}>No specialty cases available</p>
         <Link href="/cases/new" className={styles.ctaButtonSecondary}>
           Share a Case
         </Link>
-      </div>
-    ) : (
-      <div className={styles.caseList}>
-        {specialtyCases.map((caseData) => (
-          <CaseCard key={caseData.id} caseData={caseData} />
-        ))}
       </div>
     )}
   </section>
@@ -145,49 +138,47 @@ const LeaderboardSection = () => {
     );
   }
 
-  if (contributors.length === 0) {
-    return (
-      <div className={styles.emptySection} aria-live="polite">
-        <p className={styles.emptyText}>No contributors found</p>
-        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
-          Contribute a Case
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
       <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
-      <div className={styles.leaderboard}>
-        {contributors.map((contributor) => (
-          <Link
-            key={contributor.uid}
-            href={`/profile/view/${contributor.uid}`}
-            className={styles.contributor}
-          >
-            <Image
-              src={contributor.photoURL}
-              alt={`${contributor.displayName}'s avatar`}
-              width={40}
-              height={40}
-              className={styles.contributorAvatar}
-            />
-            <div>
-              <span>{contributor.displayName}</span>
-              <small>
-                {contributor.caseCount} case{contributor.caseCount !== 1 ? 's' : ''} uploaded
-              </small>
-              {contributor.awards?.length > 0 && (
-                <small className={styles.awards}>
-                  {contributor.awards.length} award{contributor.awards.length !== 1 ? 's' : ''}{' '}
-                  <Star size={12} />
+      {contributors.length > 0 ? (
+        <div className={styles.leaderboard}>
+          {contributors.map((contributor) => (
+            <Link
+              key={contributor.uid}
+              href={`/profile/view/${contributor.uid}`}
+              className={styles.contributor}
+            >
+              <Image
+                src={contributor.photoURL}
+                alt={`${contributor.displayName}'s avatar`}
+                width={40}
+                height={40}
+                className={styles.contributorAvatar}
+              />
+              <div>
+                <span>{contributor.displayName}</span>
+                <small>
+                  {contributor.caseCount} case{contributor.caseCount !== 1 ? 's' : ''} uploaded
                 </small>
-              )}
-            </div>
+                {contributor.awards?.length > 0 && (
+                  <small className={styles.awards}>
+                    {contributor.awards.length} award{contributor.awards.length !== 1 ? 's' : ''}{' '}
+                    <Star size={12} />
+                  </small>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.emptySection} aria-live="polite">
+          <p className={styles.emptyText}>No contributors found</p>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Contribute a Case
           </Link>
-        ))}
-      </div>
+        </div>
+      )}
     </section>
   );
 };
@@ -224,80 +215,36 @@ const StatsSection = () => {
     );
   }
 
-  if (stats.length === 0) {
-    return (
-      <div className={styles.emptySection} aria-live="polite">
-        <p className={styles.emptyText}>No case statistics available</p>
-        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
-          Contribute a Case
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <section className={styles.statsSection} aria-labelledby="stats-title">
       <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
-      <div className={styles.chartContainer}>
-        ```chartjs
-        {
-          "type": "bar",
-          "data": {
-            "labels": stats.map(item => item.specialty),
-            "datasets": [{
-              "label": "Cases by Specialty",
-              "data": stats.map(item => item.count),
-              "backgroundColor": [
-                "#007bff",
-                "#28a745",
-                "#dc3545",
-                "#ffc107",
-                "#17a2b8",
-                "#6f42c1"
-              ],
-              "borderColor": [
-                "#0056b3",
-                "#218838",
-                "#c82333",
-                "#e0a800",
-                "#138496",
-                "#5a32a3"
-              ],
-              "borderWidth": 1
-            }]
-          },
-          "options": {
-            "responsive": true,
-            "maintainAspectRatio": false,
-            "scales": {
-              "y": {
-                "beginAtZero": true,
-                "title": {
-                  "display": true,
-                  "text": "Number of Cases"
-                }
-              },
-              "x": {
-                "title": {
-                  "display": true,
-                  "text": "Specialty"
-                }
-              }
-            },
-            "plugins": {
-              "legend": {
-                "display": true,
-                "position": "top"
-              },
-              "title": {
-                "display": true,
-                "text": "Case Distribution by Specialty"
-              }
-            }
-          }
-        }
-        ```
-      </div>
+      {stats.length > 0 ? (
+        <div className={styles.statsContainer}>
+          <table className={styles.statsTable}>
+            <thead>
+              <tr>
+                <th>Specialty</th>
+                <th>Number of Cases</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.specialty}</td>
+                  <td>{item.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className={styles.emptySection} aria-live="polite">
+          <p className={styles.emptyText}>No case statistics available</p>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Contribute a Case
+          </Link>
+        </div>
+      )}
     </section>
   );
 };
@@ -351,47 +298,31 @@ export default function Home() {
     <main className={styles.container}>
       <Marquee />
       <HeroSection />
-
-      {loading && (
+      {loading ? (
         <section className={styles.loadingSection}>
           <div>Loading...</div>
         </section>
-      )}
-
-      {!loading && error && (
+      ) : error ? (
         <section className={styles.errorSection} role="alert">
           <p className={styles.errorText}>Error: {error}</p>
         </section>
-      )}
-
-      {!loading && !error && cases.length === 0 && (
+      ) : cases.length === 0 ? (
         <section className={styles.emptySection} aria-live="polite">
           <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
           <Link href="/cases/new" className={styles.ctaButtonSecondary}>
             Share a Case
           </Link>
         </section>
+      ) : (
+        <>
+          <FeaturedSection caseOfTheDay={caseOfTheDay} />
+          <TrendingSection trendingCases={trendingCases} />
+          <RecentSection recentCases={recentCases} />
+          {featuredSpecialty && <SpecialtySection specialtyCases={specialtyCases} featuredSpecialty={featuredSpecialty} />}
+          <LeaderboardSection />
+          <StatsSection />
+        </>
       )}
-
-      {!loading && !error && caseOfTheDay && (
-        <FeaturedSection caseOfTheDay={caseOfTheDay} />
-      )}
-
-      {!loading && !error && trendingCases.length > 0 && (
-        <TrendingSection trendingCases={trendingCases} />
-      )}
-
-      {!loading && !error && recentCases.length > 0 && (
-        <RecentSection recentCases={recentCases} />
-      )}
-
-      {!loading && !error && featuredSpecialty && specialtyCases.length > 0 && (
-        <SpecialtySection specialtyCases={specialtyCases} featuredSpecialty={featuredSpecialty} />
-      )}
-
-      {!loading && !error && <LeaderboardSection />}
-
-      {!loading && !error && <StatsSection />}
     </main>
   );
 }
