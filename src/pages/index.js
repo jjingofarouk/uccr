@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
-import { useCases } from '../../hooks/useCases';
+import { useCases } from '../hooks/useCases';
 
-import CaseCard from '../../components/Case/CaseCard';
-import Loading from '../../components/Loading';
+import CaseCard from '../components/Case/CaseCard';
+import Loading from '../components/Loading';
 import Link from 'next/link';
 import styles from './case.module.css';
 
