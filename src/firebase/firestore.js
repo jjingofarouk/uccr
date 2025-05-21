@@ -600,13 +600,23 @@ export const getTopContributors = async (limitCount = 3) => {
         totalAwards += Number(caseData.awards) || 0;
       });
 
+      // Categorize awards into tiers
+      const awards = [];
+      if (totalAwards >= 5) {
+        awards.push('Gold');
+      } else if (totalAwards >= 3) {
+        awards.push('Silver');
+      } else if (totalAwards >= 1) {
+        awards.push('Bronze');
+      }
+
       if (caseCount > 0) { // Only include users with cases
         contributors.push({
           uid: profileDoc.id,
           displayName: profileData.displayName || 'Anonymous',
           photoURL: profileData.photoURL || '/images/doctor-avatar.jpeg',
           caseCount,
-          awards: totalAwards,
+          awards, // Array of award types
         });
       }
     }
