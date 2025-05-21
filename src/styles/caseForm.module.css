@@ -234,6 +234,41 @@
   margin-top: 1rem;
 }
 
+/* Media item container */
+.mediaItem {
+  position: relative;
+  display: inline-block;
+}
+
+/* Delete button for media */
+.deleteButton {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.deleteButton:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
+}
+
+.deleteButton svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* Responsive design for mobile */
 @media (max-width: 768px) {
   .caseForm {
@@ -352,6 +387,14 @@
   color: #ffffff;
 }
 
+.dark-mode .deleteButton {
+  background: #dc2626;
+}
+
+.dark-mode .deleteButton:hover {
+  background: #b91c1c;
+}
+
 /* High contrast mode */
 @media (prefers-contrast: high) {
   .caseForm input,
@@ -370,6 +413,15 @@
   .submitButton:hover {
     background: var(--primary);
   }
+
+  .deleteButton {
+    background: var(--text);
+    color: var(--background);
+  }
+
+  .deleteButton:hover {
+    background: var(--primary);
+  }
 }
 
 /* Reduced motion */
@@ -377,6 +429,7 @@
   .carouselInner,
   .navButton,
   .submitButton,
+  .deleteButton,
   .caseForm input:focus,
   .caseForm textarea:focus,
   .caseForm select:focus,
