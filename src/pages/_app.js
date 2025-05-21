@@ -1,4 +1,3 @@
-// src/pages/_app.js
 import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
@@ -11,10 +10,13 @@ function MyApp({ Component, pageProps }) {
     <AuthProvider>
       <ThemeProvider>
         <Navbar />
-        <Marquee />
-        <main style={{ marginTop: '60px' }}>
+        <div className="marquee-container">
+          <Marquee />
+        </div>
+        <main>
           <Component {...pageProps} />
         </main>
+        <Footer />
       </ThemeProvider>
     </AuthProvider>
   );
