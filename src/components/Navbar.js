@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
 import { getMessages, searchCasesAndUsers } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, X, Search } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -16,27 +16,36 @@ export default function Navbar() {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [unreadThreads, setUnreadThreads] = useState([]);
   const [logoutError, setLogoutError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState({ cases: [], users: [] });
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const sidebarRef = useRef(null);
-  const userAvatarRef = useRef(null);
   const notificationsRef = useRef(null);
-  const searchRef = useRef(null);
+  const searchModalRef = useRef(null);
+  const userAvatarRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
     setIsNotificationsOpen(false);
-    setIsSearchFocused(false);
+    setIsSearchModalOpen(false);
     setLogoutError('');
   };
 
   const toggleNotifications = () => {
     setIsNotificationsOpen((prev) => !prev);
     setIsSidebarOpen(false);
-    setIsSearchFocused(false);
+    setIsSearchModalOpen(false);
+    setLogoutError('');
+  };
+
+  const toggleSearchModal = () => {
+    setIsSearchModalOpen((prev) => !prev);
+    setIsSidebarOpen(false);
+    setIsNotificationsOpen(false);
+    setSearchQuery('');
+    setSearchResults({ cases: [], users: [] });
     setLogoutError('');
   };
 
@@ -67,7 +76,7 @@ export default function Navbar() {
       }
       try {
         const threads = await getMessages(user.uid);
-        const unread = threads.filter(thread => thread.lastMessage && !thread.read);
+        const unread = threads.filter((thread) => thread.lastMessage && !thread.read);
         setUnreadThreads(unread);
       } catch (err) {
         console.error('Fetch unread messages error:', err);
@@ -94,30 +103,30 @@ export default function Navbar() {
     fetchSearchResults();
   }, [searchQuery]);
 
-  // Close search, sidebar, and notifications on outside click
+  // Close modals on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         sidebarRef.current && !sidebarRef.current.contains(event.target) &&
-        userAvatarRef.current && !userAvatarRef.current.contains(event.target) &&
         notificationsRef.current && !notificationsRef.current.contains(event.target) &&
-        searchRef.current && !searchRef.current.contains(event.target)
+        searchModalRef.current && !searchModalRef.current.contains(event.target) &&
+        userAvatarRef.current && !userAvatarRef.current.contains(event.target)
       ) {
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
-        setIsSearchFocused(false);
+        setIsSearchModalOpen(false);
         setLogoutError('');
       }
     };
 
-    if (isSidebarOpen || isNotificationsOpen || isSearchFocused) {
+    if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
       document.addEventListener('click', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [isSidebarOpen, isNotificationsOpen, isSearchFocused]);
+  }, [isSidebarOpen, isNotificationsOpen, isSearchModalOpen]);
 
   return (
     <header className={styles.header}>
@@ -127,73 +136,13 @@ export default function Navbar() {
           <span>UCCR</span>
         </Link>
         <div className={styles.headerControls}>
-          <div ref={searchRef} className={styles.searchWrapper}>
-            <input
-              type="text"
-              placeholder="Search cases or users..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              className={styles.searchInput}
-            />
-            <Search size={20} className={styles.searchIcon} />
-            <AnimatePresence>
-              {isSearchFocused && searchQuery.trim().length >= 2 && (
-                <motion.div
-                  className={styles.searchDropdown}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {searchResults.cases.length === 0 && searchResults.users.length === 0 ? (
-                    <p className={styles.noResults}>No results found</p>
-                  ) : (
-                    <>
-                      {searchResults.cases.length > 0 && (
-                        <div className={styles.searchSection}>
-                          <h3>Cases</h3>
-                          {searchResults.cases.map((caseData) => (
-                            <Link
-                              key={caseData.id}
-                              href={`/cases/${caseData.id}`}
-                              className={styles.searchResult}
-                              onClick={() => {
-                                setSearchQuery('');
-                                setIsSearchFocused(false);
-                              }}
-                            >
-                              <span>{caseData.title || 'Untitled Case'}</span>
-                              <small>{caseData.specialty || 'No specialty'}</small>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                      {searchResults.users.length > 0 && (
-                        <div className={styles.searchSection}>
-                          <h3>Users</h3>
-                          {searchResults.users.map((user) => (
-                            <Link
-                              key={user.uid}
-                              href={`/profile/view/${user.uid}`}
-                              className={styles.searchResult}
-                              onClick={() => {
-                                setSearchQuery('');
-                                setIsSearchFocused(false);
-                              }}
-                            >
-                              <span>{user.displayName || 'Anonymous'}</span>
-                              <small>{user.specialty || 'No specialty'}</small>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <button
+            onClick={toggleSearchModal}
+            className={styles.searchButton}
+            aria-label="Open search"
+          >
+            <Search size={20} />
+          </button>
           <button
             onClick={toggleTheme}
             className={styles.themeToggle}
@@ -241,7 +190,7 @@ export default function Navbar() {
                     {unreadThreads.length === 0 ? (
                       <p className={styles.noNotifications}>No new messages</p>
                     ) : (
-                      unreadThreads.map(thread => (
+                      unreadThreads.map((thread) => (
                         <Link
                           key={thread.id}
                           href={`/messages/${thread.id}`}
@@ -281,6 +230,80 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {isSearchModalOpen && (
+          <motion.div
+            className={styles.searchModal}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div ref={searchModalRef} className={styles.searchModalContent}>
+              <button
+                onClick={toggleSearchModal}
+                className={styles.closeSearchButton}
+                aria-label="Close search"
+              >
+                <X size={24} />
+              </button>
+              <div className={styles.searchInputWrapper}>
+                <Search size={20} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Search cases or users..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={styles.searchInput}
+                  autoFocus
+                />
+              </div>
+              <div className={styles.searchResults}>
+                {searchQuery.trim().length < 2 ? (
+                  <p className={styles.noResults}>Enter at least 2 characters to search</p>
+                ) : searchResults.cases.length === 0 && searchResults.users.length === 0 ? (
+                  <p className={styles.noResults}>No results found</p>
+                ) : (
+                  <>
+                    {searchResults.cases.length > 0 && (
+                      <div className={styles.searchSection}>
+                        <h3>Cases</h3>
+                        {searchResults.cases.map((caseData) => (
+                          <Link
+                            key={caseData.id}
+                            href={`/cases/${caseData.id}`}
+                            className={styles.searchResult}
+                            onClick={toggleSearchModal}
+                          >
+                            <span>{caseData.title || 'Untitled Case'}</span>
+                            <small>{caseData.specialty || 'No specialty'}</small>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                    {searchResults.users.length > 0 && (
+                      <div className={styles.searchSection}>
+                        <h3>Users</h3>
+                        {searchResults.users.map((user) => (
+                          <Link
+                            key={user.uid}
+                            href={`/profile/view/${user.uid}`}
+                            className={styles.searchResult}
+                            onClick={toggleSearchModal}
+                          >
+                            <span>{user.displayName || 'Anonymous'}</span>
+                            <small>{user.specialty || 'No specialty'}</small>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.aside
