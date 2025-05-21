@@ -578,3 +578,39 @@ export const updateCase = async (caseId, caseData) => {
     throw new Error(error.code === 'permission-denied' ? 'Missing permissions to update case' : `Failed to update case: ${error.message}`);
   }
 };
+
+export const getTopContributors = async (limitCount = 5) => {
+  try {
+    // Get all users
+    const usersRef = collection(db, 'users');
+    const usersSnapshot = await getDocs(usersRef);
+    const contributors = [];
+
+    // For each user, count their cases
+    for (const userDoc of usersSnapshot.docs) {
+      const userData = userDoc.data();
+      const casesRef = collection(db, 'cases');
+      const userCasesQuery = query(casesRef, where('userId', '==', userDoc.id));
+      const casesSnapshot = await getDocs(userCasesQuery);
+      const caseCount = casesSnapshot.size;
+      const awards = userData.awards || []; // Assuming awards are stored in user document
+
+      contributors.push({
+        uid: userDoc.id,
+        displayName: userData.displayName || 'Anonymous',
+        photoURL: userData.photoURL || '/images/doctor-avatar.jpeg',
+        caseCount,
+        awards,
+      });
+    }
+
+    // Sort by caseCount and limit
+    return contributors
+      .sort((a, b) => b.caseCount - a.caseCount)
+      .slice(0, limitCount);
+  } catch (error) {
+    console.error('Error fetching top contributors:', error);
+    return [];
+  }
+};
+
