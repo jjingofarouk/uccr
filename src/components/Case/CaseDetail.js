@@ -1,7 +1,7 @@
-// src/components/Case/CaseDetail.jsx
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
 import { Award } from 'lucide-react';
@@ -11,7 +11,6 @@ import styles from '../../styles/caseDetail.module.css';
 // Utility function to process text with line breaks and paragraphs
 const formatText = (text) => {
   if (!text || typeof text !== 'string') return <p>Not specified</p>;
-  // Split on double newlines for paragraphs
   const paragraphs = text.split('\n\n').filter(p => p.trim());
   return paragraphs.map((paragraph, index) => (
     <p key={index} className={styles.paragraph}>
@@ -31,9 +30,8 @@ const formatText = (text) => {
 
 export default function CaseDetail({ caseData }) {
   const { user } = useAuth();
+  const router = useRouter();
   const [error, setError] = useState('');
-
-  console.log('CaseDetail caseData:', caseData);
 
   const handleVote = async (type) => {
     if (!user) {
@@ -52,6 +50,15 @@ export default function CaseDetail({ caseData }) {
     <article className={styles.caseDetail}>
       <header className={styles.header}>
         <h1 className={styles.title}>{caseData.title || 'Untitled Case'}</h1>
+        {user && user.uid === caseData.userId && (
+          <button
+            onClick={() => router.push(`/cases/edit/${caseData.id}`)}
+            className={styles.editButton}
+            aria-label="Edit case"
+          >
+            Edit Case
+          </button>
+        )}
         <div className={styles.meta}>
           <div className={styles.author}>
             <Link href={`/profile/view/${caseData.userId}`}>
