@@ -113,7 +113,7 @@ const LeaderboardSection = () => {
   useEffect(() => {
     const fetchContributors = async () => {
       try {
-        const data = await getTopContributors(5);
+        const data = await getTopContributors(3); // Keep limit at 3 as requested
         setContributors(data);
       } catch (err) {
         setError('Failed to load top contributors');
@@ -162,8 +162,20 @@ const LeaderboardSection = () => {
                 </small>
                 {contributor.awards?.length > 0 && (
                   <small className={styles.awards}>
-                    {contributor.awards.length} award{contributor.awards.length !== 1 ? 's' : ''}{' '}
-                    <Star size={12} />
+                    {contributor.awards.map((award, index) => (
+                      <span
+                        key={index}
+                        className={
+                          award === 'Gold'
+                            ? styles.goldAward
+                            : award === 'Silver'
+                            ? styles.silverAward
+                            : styles.bronzeAward
+                        }
+                      >
+                        {award} <Star size={12} />
+                      </span>
+                    ))}
                   </small>
                 )}
               </div>
