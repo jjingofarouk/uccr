@@ -109,22 +109,44 @@
     padding: 1rem;
   }
 }
+
 .caseWrapper {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .editLink {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #007bff;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text);
   text-decoration: none;
-  font-size: 14px;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
 }
 
 .editLink:hover {
-  background-color: #0056b3;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.dark-mode .editLink {
+  border-color: var(--border);
+}
+
+.dark-mode .editLink:hover {
+  background: var(--primary);
+  border-color: var(--primary);
 }
