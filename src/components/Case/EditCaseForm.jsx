@@ -127,6 +127,13 @@ export default function EditCaseForm({ caseId }) {
     setFormData(prev => ({ ...prev, [name]: normalizedValue }));
   };
 
+  const handleDeleteMedia = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user || !user.uid) {
@@ -200,7 +207,6 @@ export default function EditCaseForm({ caseId }) {
         />
         <textarea
           name="history"
-"
           placeholder="History"
           value={formData.history}
           onChange={handleChange}
@@ -311,15 +317,39 @@ export default function EditCaseForm({ caseId }) {
         {formData.mediaUrls.length > 0 && (
           <div>
             <p>Uploaded media:</p>
-            {formData.mediaUrls.map((url, index) => (
-              <Image
-                key={index}
-                src={url}
-                alt={`Uploaded media ${index + 1}`}
-                width={100}
-                height={100}
-              />
-            ))}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {formData.mediaUrls.map((url, index) => (
+                <div key={index} style={{ position: 'relative', display: 'inline-block' }}>
+                  <Image
+                    src={url}
+                    alt={`Uploaded media ${index + 1}`}
+                    width={100}
+                    height={100}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteMedia(index)}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      background: 'red',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
         <button type="submit">Update Case</button>
