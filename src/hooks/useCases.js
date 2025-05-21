@@ -1,19 +1,30 @@
 import { useState, useEffect } from 'react';
 import { getCases, getCaseById } from '../firebase/firestore';
 
-export const useCases = () => {
+export const useCases = (uid = null) => {
   const [cases, setCases] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCases = async () => {
-      const casesData = await getCases();
-      setCases(casesData);
+      setLoading(true);
+      try {
+        const fetchedCases = await getCases(uid);
+        setCases(fetchedCases);
+      } catch (error) {
+        console.error('Error fetching cases:', error);
+        setCases([]);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchCases();
-  }, []);
+    if (uid) {
+      fetchCases();
+    } else {
+      setCases([]);
+      setLoading(false);
+    }
+  }, [uid]);
 
-  return {
-    cases,
-    getCaseById: async (id) => await getCaseById(id),
-  };
+  return { cases, getCaseById, loading };
 };
