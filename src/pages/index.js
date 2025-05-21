@@ -254,6 +254,13 @@ const StatsSection = () => {
       title: {
         display: false,
       },
+      tooltip: {
+        backgroundColor: 'var(--tooltip-background)',
+        titleColor: 'var(--tooltip-text)',
+        bodyColor: 'var(--tooltip-text)',
+        borderColor: 'var(--border)',
+        borderWidth: 1,
+      },
     },
     scales: {
       y: {
@@ -343,9 +350,7 @@ export default function HomePage() {
   }, [cases]);
 
   useEffect(() => {
-    const specialties = [...
-
-new Set(cases.map((c) => c.specialty).filter(Boolean))];
+    const specialties = [...new Set(cases.map((c) => c.specialty).filter(Boolean))];
     if (specialties.length > 0) {
       const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
       setFeaturedSpecialty(specialties[weekNumber % specialties.length]);
