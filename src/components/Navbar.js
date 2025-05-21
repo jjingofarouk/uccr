@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { getMessages } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, X } from 'lucide-react';
+import { getMessages, searchCasesAndUsers } from '../firebase/firestore';
+import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -18,19 +18,25 @@ export default function Navbar() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadThreads, setUnreadThreads] = useState([]);
   const [logoutError, setLogoutError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState({ cases: [], users: [] });
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const sidebarRef = useRef(null);
   const userAvatarRef = useRef(null);
   const notificationsRef = useRef(null);
+  const searchRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
     setIsNotificationsOpen(false);
+    setIsSearchFocused(false);
     setLogoutError('');
   };
 
   const toggleNotifications = () => {
     setIsNotificationsOpen((prev) => !prev);
     setIsSidebarOpen(false);
+    setIsSearchFocused(false);
     setLogoutError('');
   };
 
@@ -52,6 +58,7 @@ export default function Navbar() {
     setLogoutError('');
   };
 
+  // Fetch unread messages
   useEffect(() => {
     const fetchUnreadMessages = async () => {
       if (!user) {
@@ -69,30 +76,48 @@ export default function Navbar() {
     fetchUnreadMessages();
   }, [user]);
 
+  // Handle search
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (searchQuery.trim().length < 2) {
+        setSearchResults({ cases: [], users: [] });
+        return;
+      }
+      try {
+        const results = await searchCasesAndUsers(searchQuery);
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults({ cases: [], users: [] });
+      }
+    };
+    fetchSearchResults();
+  }, [searchQuery]);
+
+  // Close search, sidebar, and notifications on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
-        userAvatarRef.current &&
-        !userAvatarRef.current.contains(event.target) &&
-        notificationsRef.current &&
-        !notificationsRef.current.contains(event.target)
+        sidebarRef.current && !sidebarRef.current.contains(event.target) &&
+        userAvatarRef.current && !userAvatarRef.current.contains(event.target) &&
+        notificationsRef.current && !notificationsRef.current.contains(event.target) &&
+        searchRef.current && !searchRef.current.contains(event.target)
       ) {
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
+        setIsSearchFocused(false);
         setLogoutError('');
       }
     };
 
-    if (isSidebarOpen || isNotificationsOpen) {
+    if (isSidebarOpen || isNotificationsOpen || isSearchFocused) {
       document.addEventListener('click', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [isSidebarOpen, isNotificationsOpen]);
+  }, [isSidebarOpen, isNotificationsOpen, isSearchFocused]);
 
   return (
     <header className={styles.header}>
@@ -102,6 +127,73 @@ export default function Navbar() {
           <span>UCCR</span>
         </Link>
         <div className={styles.headerControls}>
+          <div ref={searchRef} className={styles.searchWrapper}>
+            <input
+              type="text"
+              placeholder="Search cases or users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              className={styles.searchInput}
+            />
+            <Search size={20} className={styles.searchIcon} />
+            <AnimatePresence>
+              {isSearchFocused && searchQuery.trim().length >= 2 && (
+                <motion.div
+                  className={styles.searchDropdown}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {searchResults.cases.length === 0 && searchResults.users.length === 0 ? (
+                    <p className={styles.noResults}>No results found</p>
+                  ) : (
+                    <>
+                      {searchResults.cases.length > 0 && (
+                        <div className={styles.searchSection}>
+                          <h3>Cases</h3>
+                          {searchResults.cases.map((caseData) => (
+                            <Link
+                              key={caseData.id}
+                              href={`/cases/${caseData.id}`}
+                              className={styles.searchResult}
+                              onClick={() => {
+                                setSearchQuery('');
+                                setIsSearchFocused(false);
+                              }}
+                            >
+                              <span>{caseData.title || 'Untitled Case'}</span>
+                              <small>{caseData.specialty || 'No specialty'}</small>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                      {searchResults.users.length > 0 && (
+                        <div className={styles.searchSection}>
+                          <h3>Users</h3>
+                          {searchResults.users.map((user) => (
+                            <Link
+                              key={user.uid}
+                              href={`/profile/view/${user.uid}`}
+                              className={styles.searchResult}
+                              onClick={() => {
+                                setSearchQuery('');
+                                setIsSearchFocused(false);
+                              }}
+                            >
+                              <span>{user.displayName || 'Anonymous'}</span>
+                              <small>{user.specialty || 'No specialty'}</small>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <button
             onClick={toggleTheme}
             className={styles.themeToggle}
