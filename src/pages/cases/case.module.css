@@ -150,3 +150,51 @@
   background: var(--primary);
   border-color: var(--primary);
 }
+
+.filterSortContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filterSelect,
+.filterInput {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.filterSelect {
+  min-width: 150px;
+}
+
+.filterInput {
+  width: 200px;
+}
+
+.sort {
+  display: flex;
+  align-items: center;
+}
+
+.sortSelect {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--background);
+  color: var(--text);
+  min-width: 150px;
+}
