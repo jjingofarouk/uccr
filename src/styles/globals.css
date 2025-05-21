@@ -36,18 +36,19 @@ html, body {
 
 main {
   flex: 1 0 auto;
-  margin-top: 0; /* Remove fixed margin; will be handled dynamically */
+  margin-top: 76px; /* Navbar (~60px) + Marquee (~16px) */
 }
 
 footer {
   flex-shrink: 0;
 }
 
-/* Ensure marquee container has no default spacing */
+/* Ensure marquee container is positioned below navbar */
 .marquee-container {
   margin: 0;
   padding: 0;
   width: 100%;
+  margin-top: 60px; /* Equal to navbar height */
   position: relative;
-  top: 0; /* Stick to the top of its container */
+  z-index: 999; /* Below navbar (z-index: 1000) */
 }
