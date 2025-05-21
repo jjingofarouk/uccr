@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useCases } from '../hooks/useCases';
 import { useAuth } from '../hooks/useAuth';
 import { getTopContributors, getCaseStatistics } from '../firebase/firestore';
-import { Home, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import CaseCard from '../components/Case/CaseCard';
 import Marquee from '../components/Marquee';
 import styles from './Home.module.css';
@@ -249,7 +249,7 @@ const StatsSection = () => {
   );
 };
 
-export default function Home() {
+export default function HomePage() {
   const { user } = useAuth();
   const { cases, loading, error } = useCases();
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
