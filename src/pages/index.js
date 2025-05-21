@@ -1,229 +1,387 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useCases } from '../hooks/useCases';
-import { useAuth } from '../hooks/useAuth';
-import { getUsers, getUserStats } from '../firebase/firestore';
-import CaseCard from '../components/Case/CaseCard';
-import Loading from '../components/Loading';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Marquee from '../components/Marquee';
 import Image from 'next/image';
+import { getFeaturedCase, getRecentCases, getTrendingCases, getSpecialtyCases, getTopContributors, getCaseStatistics } from '../firebase/firestore';
+import { Home, Star } from 'lucide-react';
 import styles from './Home.module.css';
 
-export default function Home() {
-  const { user } = useAuth();
-  const { cases, loading, error } = useCases();
-  const [caseOfTheDay, setCaseOfTheDay] = useState(null);
-  const [featuredSpecialty, setFeaturedSpecialty] = useState('');
-  const [topContributors, setTopContributors] = useState([]);
+const HeroSection = () => (
+  <section className={styles.hero}>
+    <h1 className={styles.heroTitle}>Welcome to UCCR</h1>
+    <p className={styles.heroSubtitle}>
+      Share and explore clinical case reports to advance medical knowledge in Uganda.
+    </p>
+    <div className={styles.heroButtons}>
+      <Link href="/cases" className={styles.ctaButtonPrimary}>
+        Browse Cases
+      </Link>
+      <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+        Submit a Case
+      </Link>
+    </div>
+  </section>
+);
 
-  useEffect(() => {
-    if (cases.length > 0) {
-      const today = new Date().toISOString().split('T')[0];
-      const seed = today.split('-').reduce((acc, val) => acc + parseInt(val), 0);
-      const randomIndex = seed % cases.length;
-      setCaseOfTheDay(cases[randomIndex]);
-    }
-  }, [cases]);
+const FeaturedSection = ({ featuredCase }) => {
+  if (!featuredCase) {
+    return (
+      <section className={styles.featuredSection}>
+        <h2 className={styles.sectionTitle}>Case of the Day</h2>
+        <div className={styles.emptySection}>
+          <p className={styles.emptyText}>No featured case available</p>
+        </div>
+      </section>
+    );
+  }
 
-  useEffect(() => {
-    const specialties = [...new Set(cases.map((c) => c.specialty).filter(Boolean))];
-    if (specialties.length > 0) {
-      const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
-      setFeaturedSpecialty(specialties[weekNumber % specialties.length]);
-    }
-  }, [cases]);
+  return (
+    <section className={styles.featuredSection}>
+      <h2 className={styles.sectionTitle}>Case of the Day</h2>
+      <div className={styles.featuredCard}>
+        <Link href={`/cases/${featuredCase.id}`} className={styles.caseCardWrapper}>
+          <div className={styles.caseCard}>
+            <h3 className={styles.caseTitle}>{featuredCase.title || 'Untitled Case'}</h3>
+            <p className={styles.caseDescription}>
+              {featuredCase.description?.substring(0, 100) || 'No description'}...
+            </p>
+            <p className={styles.caseMeta}>
+              {featuredCase.specialty || 'No specialty'} •{' '}
+              {new Date(featuredCase.createdAt?.seconds * 1000).toLocaleDateString()}
+            </p>
+          </div>
+        </Link>
+      </div>
+    </section>
+  );
+};
+
+const TrendingSection = ({ trendingCases }) => (
+  <section className={styles.trendingSection}>
+    <h2 className={styles.sectionTitle}>Trending Cases</h2>
+    {trendingCases.length === 0 ? (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No trending cases available</p>
+      </div>
+    ) : (
+      <div className={styles.caseList}>
+        {trendingCases.map((caseData) => (
+          <Link
+            key={caseData.id}
+            href={`/cases/${caseData.id}`}
+            className={styles.caseCardWrapper}
+          >
+            <div className={styles.caseCard}>
+              <h3 className={styles.caseTitle}>{caseData.title || 'Untitled Case'}</h3>
+              <p className={styles.caseDescription}>
+                {caseData.description?.substring(0, 100) || 'No description'}...
+              </p>
+              <p className={styles.caseMeta}>
+                {caseData.specialty || 'No specialty'} •{' '}
+                {new Date(caseData.createdAt?.seconds * 1000).toLocaleDateString()}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    )}
+  </section>
+);
+
+const RecentSection = ({ recentCases }) => (
+  <section className={styles.recentSection}>
+    <h2 className={styles.sectionTitle}>Recent Cases</h2>
+    {recentCases.length === 0 ? (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No recent cases available</p>
+      </div>
+    ) : (
+      <div className={styles.caseList}>
+        {recentCases.map((caseData) => (
+          <Link
+            key={caseData.id}
+            href={`/cases/${caseData.id}`}
+            className={styles.caseCardWrapper}
+          >
+            <div className={styles.caseCard}>
+              <h3 className={styles.caseTitle}>{caseData.title || 'Untitled Case'}</h3>
+              <p className={styles.caseDescription}>
+                {caseData.description?.substring(0, 100) || 'No description'}...
+              </p>
+              <p className={styles.caseMeta}>
+                {caseData.specialty || 'No specialty'} •{' '}
+                {new Date(caseData.createdAt?.seconds * 1000).toLocaleDateString()}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    )}
+  </section>
+);
+
+const SpecialtySection = ({ specialtyCases }) => (
+  <section className={styles.specialtySection}>
+    <h2 className={styles.sectionTitle}>Specialty Spotlight</h2>
+    {specialtyCases.length === 0 ? (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No specialty cases available</p>
+      </div>
+    ) : (
+      <div className={styles.caseList}>
+        {specialtyCases.map((caseData) => (
+          <Link
+            key={caseData.id}
+            href={`/cases/${caseData.id}`}
+            className={styles.caseCardWrapper}
+          >
+            <div className={styles.caseCard}>
+              <h3 className={styles.caseTitle}>{caseData.title || 'Untitled Case'}</h3>
+              <p className={styles.caseDescription}>
+                {caseData.description?.substring(0, 100) || 'No description'}...
+              </p>
+              <p className={styles.caseMeta}>
+                {caseData.specialty || 'No specialty'} •{' '}
+                {new Date(caseData.createdAt?.seconds * 1000).toLocaleDateString()}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    )}
+  </section>
+);
+
+const LeaderboardSection = () => {
+  const [contributors, setContributors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchContributors = async () => {
-      const users = await getUsers();
-      const contributors = await Promise.all(
-        users.map(async (user) => {
-          const stats = await getUserStats(user.uid);
-          return {
-            ...user,
-            caseCount: stats.cases,
-            awards: cases.reduce((sum, c) => sum + (c.userId === user.uid ? c.awards : 0), 0),
-          };
-        })
-      );
-      setTopContributors(contributors.sort((a, b) => b.awards - a.awards).slice(0, 5));
+      try {
+        const data = await getTopContributors(5);
+        setContributors(data);
+      } catch (err) {
+        setError('Failed to load top contributors');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchContributors();
-  }, [cases]);
+  }, []);
 
-  const recentCases = useMemo(() => {
-    return cases
-      .slice()
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 5);
-  }, [cases]);
+  if (loading) {
+    return <div className={styles.loadingSection}>Loading...</div>;
+  }
 
-  const trendingCases = useMemo(() => {
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    return cases
-      .filter((caseData) => new Date(caseData.createdAt) >= oneWeekAgo)
-      .sort((a, b) => (b.awards || 0) - (a.awards || 0))
-      .slice(0, 3);
-  }, [cases]);
+  if (error) {
+    return <div className={styles.errorSection}>{error}</div>;
+  }
 
-  const specialtyCases = useMemo(() => {
-    return cases
-      .filter((caseData) => caseData.specialty === featuredSpecialty)
-      .slice(0, 3);
-  }, [cases, featuredSpecialty]);
-
-  const specialtyCounts = useMemo(() => {
-    const counts = cases.reduce((acc, caseData) => {
-      const specialty = caseData.specialty || 'Other';
-      acc[specialty] = (acc[specialty] || 0) + 1;
-      return acc;
-    }, {});
-    return Object.entries(counts).map(([specialty, count]) => ({ specialty, count }));
-  }, [cases]);
+  if (contributors.length === 0) {
+    return (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No contributors found</p>
+        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          Contribute a Case
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <main className={styles.container}>
-      <Marquee />
-      <section className={styles.hero} aria-labelledby="hero-title">
-        <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
-        <p className={styles.heroSubtitle}>
-          Explore and contribute to a growing database of medical case studies from Uganda.
-        </p>
-        <div className={styles.heroButtons}>
-          <Link href="/cases" className={styles.ctaButtonPrimary}>
-            Browse Cases
+    <section className={styles.leaderboardSection}>
+      <h2 className={styles.sectionTitle}>Top Contributors</h2>
+      <div className={styles.leaderboard}>
+        {contributors.map((contributor) => (
+          <Link
+            key={contributor.uid}
+            href={`/profile/view/${contributor.uid}`}
+            className={styles.contributor}
+          >
+            <Image
+              src={contributor.photoURL}
+              alt={`${contributor.displayName}'s avatar`}
+              width={40}
+              height={40}
+              className={styles.contributorAvatar}
+            />
+            <div>
+              <span>{contributor.displayName}</span>
+              <small>
+                {contributor.caseCount} case{contributor.caseCount !== 1 ? 's' : ''} uploaded
+              </small>
+              {contributor.awards?.length > 0 && (
+                <small className={styles.awards}>
+                  {contributor.awards.length} award{contributor.awards.length !== 1 ? 's' : ''}{' '}
+                  <Star size={12} />
+                </small>
+              )}
+            </div>
           </Link>
-          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
-            Share a Case
-          </Link>
-        </div>
-      </section>
+        ))}
+      </div>
+    </section>
+  );
+};
 
-      {loading && (
-        <section className={styles.loadingSection}>
-          <Loading />
-        </section>
-      )}
+const StatsSection = () => {
+  const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-      {!loading && error && (
-        <section className={styles.errorSection} role="alert">
-          <p className={styles.errorText}>Error: {error}</p>
-        </section>
-      )}
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getCaseStatistics();
+        setStats(data);
+      } catch (err) {
+        setError('Failed to load case statistics');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
 
-      {!loading && !error && cases.length === 0 && (
-        <section className={styles.emptySection} aria-live="polite">
-          <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
-          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
-            Share a Case
-          </Link>
-        </section>
-      )}
+  if (loading) {
+    return <div className={styles.loadingSection}>Loading...</div>;
+  }
 
-      {!loading && !error && caseOfTheDay && (
-        <section className={styles.featuredSection} aria-labelledby="featured-title">
-          <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
-          <div className={styles.featuredCard}>
-            <CaseCard key={caseOfTheDay.id} caseData={caseOfTheDay} />
-          </div>
-        </section>
-      )}
+  if (error) {
+    return <div className={styles.errorSection}>{error}</div>;
+  }
 
-      {!loading && !error && trendingCases.length > 0 && (
-        <section className={styles.trendingSection} aria-labelledby="trending-title">
-          <h2 id="trending-title" className={styles.sectionTitle}>Trending Cases</h2>
-          <div className={styles.caseList}>
-            {trendingCases.map((caseData) => (
-              <CaseCard key={caseData.id} caseData={caseData} />
-            ))}
-          </div>
-        </section>
-      )}
+  if (stats.length === 0) {
+    return (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No case statistics available</p>
+        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          Contribute a Case
+        </Link>
+      </div>
+    );
+  }
 
-      {!loading && !error && recentCases.length > 0 && (
-        <section className={styles.recentSection} aria-labelledby="recent-title">
-          <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
-          <div className={styles.caseList}>
-            {recentCases.map((caseData) => (
-              <CaseCard key={caseData.id} caseData={caseData} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {!loading && !error && featuredSpecialty && specialtyCases.length > 0 && (
-        <section className={styles.specialtySection} aria-labelledby="specialty-title">
-          <h2 id="specialty-title" className={styles.sectionTitle}>Specialty Spotlight: {featuredSpecialty}</h2>
-          <div className={styles.caseList}>
-            {specialtyCases.map((caseData) => (
-              <CaseCard key={caseData.id} caseData={caseData} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {!loading && !error && topContributors.length > 0 && (
-        <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
-          <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
-          <div className={styles.leaderboard}>
-            {topContributors.map((user) => (
-              <Link key={user.uid} href={`/profile/view/${user.uid}`} className={styles.contributor}>
-                <Image
-                  src={user.photoURL || '/images/doctor-avatar.jpeg'}
-                  alt={user.displayName}
-                  width={40}
-                  height={40}
-                  className={styles.contributorAvatar}
-                />
-                <div>
-                  <span>{user.displayName}</span>
-                  <small>{user.caseCount} cases, {user.awards} awards</small>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {!loading && !error && specialtyCounts.length > 0 && (
-        <section className={styles.statsSection} aria-labelledby="stats-title">
-          <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
-          <canvas id="specialtyChart"></canvas>
-          <script>
-            {`
-              const ctx = document.getElementById('specialtyChart').getContext('2d');
-              new Chart(ctx, {
-                type: 'bar',
-                data: {
-                  labels: ${JSON.stringify(specialtyCounts.map((item) => item.specialty))},
-                  datasets: [{
-                    label: 'Cases by Specialty',
-                    data: ${JSON.stringify(specialtyCounts.map((item) => item.count))},
-                    backgroundColor: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'],
-                    borderColor: ['#0056b3', '#218838', '#c82333', '#e0a800', '#138496', '#5a32a3'],
-                    borderWidth: 1
-                  }]
-                },
-                options: {
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      title: { display: true, text: 'Number of Cases' }
-                    },
-                    x: {
-                      title: { display: true, text: 'Specialty' }
-                    }
-                  },
-                  plugins: {
-                    legend: { display: false }
-                  }
+  return (
+    <section className={styles.statsSection}>
+      <h2 className={styles.sectionTitle}>Case Statistics</h2>
+      <div className={styles.chartContainer}>
+        ```chartjs
+        {
+          "type": "bar",
+          "data": {
+            "labels": stats.map(item => item.specialty),
+            "datasets": [{
+              "label": "Cases by Specialty",
+              "data": stats.map(item => item.count),
+              "backgroundColor": [
+                "#007bff",
+                "#28a745",
+                "#dc3545",
+                "#ffc107",
+                "#17a2b8"
+              ],
+              "borderColor": [
+                "#0056b3",
+                "#218838",
+                "#c82333",
+                "#e0a800",
+                "#138496"
+              ],
+              "borderWidth": 1
+            }]
+          },
+          "options": {
+            "responsive": true,
+            "maintainAspectRatio": false,
+            "scales": {
+              "y": {
+                "beginAtZero": true,
+                "title": {
+                  "display": true,
+                  "text": "Number of Cases"
                 }
-              });
-            `}
-          </script>
-        </section>
-      )}
-    </main>
+              },
+              "x": {
+                "title": {
+                  "display": true,
+                  "text": "Specialty"
+                }
+              }
+            },
+            "plugins": {
+              "legend": {
+                "display": true,
+                "position": "top"
+              },
+              "title": {
+                "display": true,
+                "text": "Case Distribution by Specialty"
+              }
+            }
+          }
+        }
+        ```
+      </div>
+    </section>
+  );
+};
+
+export default function Home() {
+  const [featuredCase, setFeaturedCase] = useState(null);
+  const [trendingCases, setTrendingCases] = useState([]);
+  const [recentCases, setRecentCases] = useState([]);
+  const [specialtyCases, setSpecialtyCases] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [featured, trending, recent, specialty] = await Promise.all([
+          getFeaturedCase(),
+          getTrendingCases(4),
+          getRecentCases(4),
+          getSpecialtyCases(4),
+        ]);
+        setFeaturedCase(featured);
+        setTrendingCases(trending);
+        setRecentCases(recent);
+        setSpecialtyCases(specialty);
+      } catch (err) {
+        setError('Failed to load content');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div className={styles.loadingSection}>Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className={styles.errorSection}>
+        <p className={styles.errorText}>{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <HeroSection />
+      <FeaturedSection featuredCase={featuredCase} />
+      <TrendingSection trendingCases={trendingCases} />
+      <RecentSection recentCases={recentCases} />
+      <SpecialtySection specialtyCases={specialtyCases} />
+      <LeaderboardSection />
+      <StatsSection />
+    </div>
   );
 }
