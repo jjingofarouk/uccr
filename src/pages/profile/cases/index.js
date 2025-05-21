@@ -3,7 +3,7 @@ import { useCases } from '../../../hooks/useCases';
 import CaseCard from '../../../components/Case/CaseCard';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
 import Link from 'next/link';
-import styles from '../../../styles/case.module.css';
+import styles from '../../cases/case.module.css';
 
 export default function MyCases() {
   const { user } = useAuth();
