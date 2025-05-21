@@ -6,7 +6,12 @@ import { useAuth } from '../hooks/useAuth';
 import { getTopContributors, getCaseStatistics } from '../firebase/firestore';
 import { Star } from 'lucide-react';
 import CaseCard from '../components/Case/CaseCard';
+import CustomLoading from '../components/CustomLoading';
 import styles from './Home.module.css';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const HeroSection = () => (
   <section className={styles.hero} aria-labelledby="hero-title">
@@ -113,7 +118,7 @@ const LeaderboardSection = () => {
   useEffect(() => {
     const fetchContributors = async () => {
       try {
-        const data = await getTopContributors(3); // Keep limit at 3 as requested
+        const data = await getTopContributors(3);
         setContributors(data);
       } catch (err) {
         setError('Failed to load top contributors');
@@ -126,7 +131,7 @@ const LeaderboardSection = () => {
   }, []);
 
   if (loading) {
-    return <div className={styles.loadingSection}>Loading...</div>;
+    return <CustomLoading />;
   }
 
   if (error) {
@@ -226,27 +231,89 @@ const StatsSection = () => {
     );
   }
 
+  const chartData = {
+    labels: stats.map((item) => item.specialty),
+    datasets: [
+      {
+        label: 'Number of Cases',
+        data: stats.map((item) => item.count),
+        backgroundColor: 'var(--primary)',
+        borderColor: 'var(--primary-hover)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Cases',
+          color: 'var(--text)',
+          font: {
+            family: 'Inter, sans-serif',
+            size: 12,
+            weight: '600',
+          },
+        },
+        ticks: {
+          color: 'var(--text)',
+          font: {
+            family: 'Inter, sans-serif',
+            size: 12,
+          },
+        },
+        grid: {
+          color: 'var(--border)',
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Specialty',
+          color: 'var(--text)',
+          font: {
+            family: 'Inter, sans-serif',
+            size: 12,
+            weight: '600',
+          },
+        },
+        ticks: {
+          color: 'var(--text)',
+          font: {
+            family: 'Inter, sans-serif',
+            size: 12,
+          },
+          maxRotation: 45,
+          minRotation: 45,
+        },
+        grid: {
+          display: false,
+        },
+      },
+    },
+  };
+
   return (
     <section className={styles.statsSection} aria-labelledby="stats-title">
       <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
       {stats.length > 0 ? (
         <div className={styles.statsContainer}>
-          <table className={styles.statsTable}>
-            <thead>
-              <tr>
-                <th>Specialty</th>
-                <th>Number of Cases</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.specialty}</td>
-                  <td>{item.count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className={styles.chartWrapper}>
+            <Bar data={chartData} options={chartOptions} />
+          </div>
         </div>
       ) : (
         <div className={styles.emptySection} aria-live="polite">
@@ -276,7 +343,9 @@ export default function HomePage() {
   }, [cases]);
 
   useEffect(() => {
-    const specialties = [...new Set(cases.map((c) => c.specialty).filter(Boolean))];
+    const specialties = [...
+
+new Set(cases.map((c) => c.specialty).filter(Boolean))];
     if (specialties.length > 0) {
       const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
       setFeaturedSpecialty(specialties[weekNumber % specialties.length]);
@@ -329,8 +398,8 @@ export default function HomePage() {
           <TrendingSection trendingCases={trendingCases} />
           <RecentSection recentCases={recentCases} />
           {featuredSpecialty && <SpecialtySection specialtyCases={specialtyCases} featuredSpecialty={featuredSpecialty} />}
-          <LeaderboardSection />
           <StatsSection />
+          <LeaderboardSection />
         </>
       )}
     </main>
