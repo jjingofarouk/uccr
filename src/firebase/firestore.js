@@ -614,3 +614,25 @@ export const getTopContributors = async (limitCount = 5) => {
   }
 };
 
+export const getCaseStatistics = async () => {
+  try {
+    const casesRef = collection(db, 'cases');
+    const snapshot = await getDocs(casesRef);
+    const stats = {};
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const specialty = data.specialty || 'Unknown';
+      stats[specialty] = (stats[specialty] || 0) + 1;
+    });
+
+    return Object.entries(stats).map(([specialty, count]) => ({
+      specialty,
+      count,
+    }));
+  } catch (error) {
+    console.error('Error fetching case statistics:', error);
+    return [];
+  }
+};
+
