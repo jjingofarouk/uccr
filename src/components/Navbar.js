@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -227,6 +226,12 @@ export default function Navbar() {
                 <Link href="/cases/new" onClick={toggleSidebar} className={styles.navLink}>
                   <PlusCircle size={20} className={styles.navIcon} />
                   Add Case
+                </Link>
+              )}
+              {user && (
+                <Link href="/profile/cases" onClick={toggleSidebar} className={styles.navLink}>
+                  <Briefcase size={20} className={styles.navIcon} />
+                  My Cases
                 </Link>
               )}
               {user && (
