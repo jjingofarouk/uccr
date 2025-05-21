@@ -6,7 +6,6 @@ import { useAuth } from '../hooks/useAuth';
 import { getTopContributors, getCaseStatistics } from '../firebase/firestore';
 import { Star } from 'lucide-react';
 import CaseCard from '../components/Case/CaseCard';
-import Marquee from '../components/Marquee';
 import styles from './Home.module.css';
 
 const HeroSection = () => (
@@ -296,7 +295,6 @@ export default function HomePage() {
 
   return (
     <main className={styles.container}>
-      <Marquee />
       <HeroSection />
       {loading ? (
         <section className={styles.loadingSection}>
