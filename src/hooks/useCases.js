@@ -18,12 +18,7 @@ export const useCases = (uid = null) => {
         setLoading(false);
       }
     };
-    if (uid) {
-      fetchCases();
-    } else {
-      setCases([]);
-      setLoading(false);
-    }
+    fetchCases();
   }, [uid]);
 
   return { cases, getCaseById, loading };
