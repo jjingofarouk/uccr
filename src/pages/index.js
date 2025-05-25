@@ -240,7 +240,7 @@ const StatsSection = () => {
       title: {
         display: true,
         text: 'Top 5 Specialties by Case Count',
-        color: 'var(--text)',
+        color: 'var(--text, #1f2937)',
         font: { family: 'Inter, sans-serif', size: 16, weight: '600' },
       },
       tooltip: {
@@ -319,10 +319,20 @@ export default function HomePage() {
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
   const [featuredSpecialty, setFeaturedSpecialty] = useState('');
 
+  // Case of the Day: Universal random selection based on date
   useEffect(() => {
     if (cases.length > 0) {
-      const today = new Date().toISOString().split('T')[0];
-      const seed = today.split('-').reduce((acc, val) => acc + parseInt(val), 0);
+      // Get current date in YYYY-MM-DD format (based on EAT, UTC+3)
+      const now = new Date();
+      // Adjust to EAT by adding 3 hours to UTC
+      const eatOffset = 3 * 60 * 60 * 1000;
+      const eatDate = new Date(now.getTime() + eatOffset);
+      const dateString = eatDate.toISOString().split('T')[0]; // e.g., "2025-05-25"
+
+      // Deterministic seed based on date for universal randomness
+      const seed = dateString
+        .split('-')
+        .reduce((acc, val) => acc + parseInt(val), 0);
       const randomIndex = seed % cases.length;
       setCaseOfTheDay(cases[randomIndex]);
     }
