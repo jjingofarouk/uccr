@@ -5,13 +5,13 @@ import { useCases } from '../hooks/useCases';
 import { useAuth } from '../hooks/useAuth';
 import { getTopContributors, getCaseStatistics } from '../firebase/firestore';
 import { Star } from 'lucide-react';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip } from 'chart.js';
 import CaseCard from '../components/Case/CaseCard';
 import Loading from '../components/Loading';
 import styles from './Home.module.css';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
 const HeroSection = () => (
   <section className={styles.hero} aria-labelledby="hero-title">
@@ -122,7 +122,7 @@ const LeaderboardSection = () => {
         setContributors(data);
       } catch (err) {
         setError('Failed to load top contributors');
-        console.error(err);
+        console.error('Error fetching contributors:', err);
       } finally {
         setLoading(false);
       }
@@ -130,17 +130,12 @@ const LeaderboardSection = () => {
     fetchContributors();
   }, []);
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorSection} role="alert">
-        <p className={styles.errorText}>{error}</p>
-      </div>
-    );
-  }
+  if (loading) return <Loading />;
+  if (error) return (
+    <section className={styles.errorSection} role="alert">
+      <p className={styles.errorText}>{error}</p>
+    </section>
+  );
 
   return (
     <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
@@ -208,10 +203,14 @@ const StatsSection = () => {
     const fetchStats = async () => {
       try {
         const data = await getCaseStatistics();
-        setStats(data);
+        // Sort by count in descending order and take top 5
+        const topStats = data
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+        setStats(topStats);
       } catch (err) {
-        setError('Failed to load case statistics');
-        console.error(err);
+        setError('Unable to load case statistics');
+        console.error('Error fetching case statistics:', err);
       } finally {
         setLoading(false);
       }
@@ -219,27 +218,16 @@ const StatsSection = () => {
     fetchStats();
   }, []);
 
-  if (loading) {
-    return <div className={styles.loadingSection}>Loading...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorSection} role="alert">
-        <p className={styles.errorText}>{error}</p>
-      </div>
-    );
-  }
-
   const chartData = {
     labels: stats.map((item) => item.specialty),
     datasets: [
       {
         label: 'Number of Cases',
         data: stats.map((item) => item.count),
-        backgroundColor: 'var(--primary)',
-        borderColor: 'var(--primary-hover)',
+        backgroundColor: 'rgba(59, 130, 246, 0.6)', // Blue shade for bars
+        borderColor: 'rgba(59, 130, 246, 1)', // Border color
         borderWidth: 1,
+        hoverBackgroundColor: 'rgba(59, 130, 246, 0.8)',
       },
     ],
   };
@@ -248,17 +236,18 @@ const StatsSection = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       title: {
-        display: false,
+        display: true,
+        text: 'Top 5 Specialties by Case Count',
+        color: 'var(--text)',
+        font: { family: 'Inter, sans-serif', size: 16, weight: '600' },
       },
       tooltip: {
-        backgroundColor: 'var(--tooltip-background)',
-        titleColor: 'var(--tooltip-text)',
-        bodyColor: 'var(--tooltip-text)',
-        borderColor: 'var(--border)',
+        backgroundColor: 'var(--tooltip-background, rgba(0, 0, 0, 0.8))',
+        titleColor: 'var(--tooltip-text, #ffffff)',
+        bodyColor: 'var(--tooltip-text, #ffffff)',
+        borderColor: 'var(--border, #e5e7eb)',
         borderWidth: 1,
       },
     },
@@ -268,50 +257,40 @@ const StatsSection = () => {
         title: {
           display: true,
           text: 'Number of Cases',
-          color: 'var(--text)',
-          font: {
-            family: 'Inter, sans-serif',
-            size: 12,
-            weight: '600',
-          },
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
         },
         ticks: {
-          color: 'var(--text)',
-          font: {
-            family: 'Inter, sans-serif',
-            size: 12,
-          },
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12 },
+          stepSize: 1,
         },
-        grid: {
-          color: 'var(--border)',
-        },
+        grid: { color: 'var(--border, #e5e7eb)' },
       },
       x: {
         title: {
           display: true,
           text: 'Specialty',
-          color: 'var(--text)',
-          font: {
-            family: 'Inter, sans-serif',
-            size: 12,
-            weight: '600',
-          },
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
         },
         ticks: {
-          color: 'var(--text)',
-          font: {
-            family: 'Inter, sans-serif',
-            size: 12,
-          },
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12 },
           maxRotation: 45,
           minRotation: 45,
         },
-        grid: {
-          display: false,
-        },
+        grid: { display: false },
       },
     },
   };
+
+  if (loading) return <div className={styles.loadingSection}>Loading...</div>;
+  if (error) return (
+    <section className={styles.errorSection} role="alert">
+      <p className={styles.errorText}>{error}</p>
+    </section>
+  );
 
   return (
     <section className={styles.statsSection} aria-labelledby="stats-title">
@@ -379,18 +358,28 @@ export default function HomePage() {
       .slice(0, 3);
   }, [cases, featuredSpecialty]);
 
+  if (loading) return (
+    <main className={styles.container}>
+      <HeroSection />
+      <section className={styles.loadingSection}>
+        <Loading />
+      </section>
+    </main>
+  );
+
+  if (error) return (
+    <main className={styles.container}>
+      <HeroSection />
+      <section className={styles.errorSection} role="alert">
+        <p className={styles.errorText}>Error: {error}</p>
+      </section>
+    </main>
+  );
+
   return (
     <main className={styles.container}>
       <HeroSection />
-      {loading ? (
-        <section className={styles.loadingSection}>
-          <div>Loading...</div>
-        </section>
-      ) : error ? (
-        <section className={styles.errorSection} role="alert">
-          <p className={styles.errorText}>Error: {error}</p>
-        </section>
-      ) : cases.length === 0 ? (
+      {cases.length === 0 ? (
         <section className={styles.emptySection} aria-live="polite">
           <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
           <Link href="/cases/new" className={styles.ctaButtonSecondary}>
@@ -402,7 +391,12 @@ export default function HomePage() {
           <FeaturedSection caseOfTheDay={caseOfTheDay} />
           <TrendingSection trendingCases={trendingCases} />
           <RecentSection recentCases={recentCases} />
-          {featuredSpecialty && <SpecialtySection specialtyCases={specialtyCases} featuredSpecialty={featuredSpecialty} />}
+          {featuredSpecialty && (
+            <SpecialtySection
+              specialtyCases={specialtyCases}
+              featuredSpecialty={featuredSpecialty}
+            />
+          )}
           <StatsSection />
           <LeaderboardSection />
         </>
