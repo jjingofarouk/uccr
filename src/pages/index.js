@@ -203,7 +203,6 @@ const StatsSection = () => {
     const fetchStats = async () => {
       try {
         const data = await getCaseStatistics();
-        // Sort by count in descending order and take top 5
         const topStats = data
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
@@ -218,16 +217,33 @@ const StatsSection = () => {
     fetchStats();
   }, []);
 
+  // Define an array of colors for the bars
+  const barColors = [
+    'rgba(59, 130, 246, 0.6)', // Blue
+    'rgba(239, 68, 68, 0.6)', // Red
+    'rgba(34, 197, 94, 0.6)', // Green
+    'rgba(249, 115, 22, 0.6)', // Orange
+    'rgba(168, 85, 247, 0.6)', // Purple
+  ];
+
+  const borderColors = [
+    'rgba(59, 130, 246, 1)',
+    'rgba(239, 68, 68, 1)',
+    'rgba(34, 197, 94, 1)',
+    'rgba(249, 115, 22, 1)',
+    'rgba(168, 85, 247, 1)',
+  ];
+
   const chartData = {
     labels: stats.map((item) => item.specialty),
     datasets: [
       {
         label: 'Number of Cases',
         data: stats.map((item) => item.count),
-        backgroundColor: 'rgba(59, 130, 246, 0.6)', // Blue shade for bars
-        borderColor: 'rgba(59, 130, 246, 1)', // Border color
+        backgroundColor: barColors, // Use array of colors
+        borderColor: borderColors, // Use array of border colors
         borderWidth: 1,
-        hoverBackgroundColor: 'rgba(59, 130, 246, 0.8)',
+        hoverBackgroundColor: barColors.map(color => color.replace('0.6', '0.8')), // Adjust opacity for hover
       },
     ],
   };
