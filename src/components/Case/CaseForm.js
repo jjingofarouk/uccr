@@ -9,7 +9,6 @@ import dynamic from 'next/dynamic';
 import styles from '../../styles/caseForm.module.css';
 import 'react-quill/dist/quill.snow.css';
 
-// Dynamically import ReactQuill to avoid SSR issues with Next.js
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function CaseForm() {
@@ -40,7 +39,6 @@ export default function CaseForm() {
   const router = useRouter();
   const SUBMISSION_LOADING_DURATION = 1000;
 
-  // Quill toolbar options
   const quillModules = {
     toolbar: [
       [{ header: [1, 2, false] }],
@@ -121,7 +119,6 @@ export default function CaseForm() {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
-  // Initialize Cloudinary widget
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
@@ -186,6 +183,10 @@ export default function CaseForm() {
       setError('You must be logged in to submit a case.');
       return;
     }
+    if (currentStep !== steps.length - 1) {
+      setError('Please complete all steps before submitting.');
+      return;
+    }
     setError('');
     setIsLoading(true);
     try {
@@ -195,8 +196,9 @@ export default function CaseForm() {
         userName: user.displayName || 'Anonymous',
         photoURL: user.photoURL || '',
         createdAt: new Date().toISOString(),
+        thumbnailUrl: formData.mediaUrls[0] || '',
       };
-      await addCase(caseData);
+      const newCaseId = await addCase(caseData);
       setLoadStart(Date.now());
       setForceLoading(true);
     } catch (err) {
@@ -285,6 +287,7 @@ export default function CaseForm() {
                     onChange={(e) => handleChange(e, step.name)}
                     multiple
                     size="5"
+                    className={styles.selectInput}
                   >
                     {step.options.map(option => (
                       <option key={option.value} value={option.value}>
@@ -294,11 +297,12 @@ export default function CaseForm() {
                   </select>
                 )}
                 {step.type === 'media' && (
-                  <div>
+                  <div className={styles.mediaSection}>
                     <button
                       type="button"
                       onClick={() => widgetRef.current?.open()}
                       disabled={!widgetRef.current}
+                      className={styles.uploadButton}
                     >
                       Upload Media
                     </button>
@@ -313,6 +317,7 @@ export default function CaseForm() {
                                 alt={`Uploaded media ${index + 1}`}
                                 width={120}
                                 height={120}
+                                className={styles.mediaImage}
                               />
                               <button
                                 type="button"
@@ -325,6 +330,7 @@ export default function CaseForm() {
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
                                   strokeWidth="2"
+                                  className={styles.deleteIcon}
                                 >
                                   <path
                                     strokeLinecap="round"
@@ -357,6 +363,7 @@ export default function CaseForm() {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth="2"
+              className={styles.navIcon}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
@@ -375,6 +382,7 @@ export default function CaseForm() {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="2"
+                className={styles.navIcon}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
@@ -385,7 +393,7 @@ export default function CaseForm() {
             </button>
           )}
         </div>
-        {error && <p role="alert">{error}</p>}
+        {error && <p role="alert" className={styles.error}>{error}</p>}
         {(isLoading || forceLoading) && <Loading />}
       </form>
     </div>
