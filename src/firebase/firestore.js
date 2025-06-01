@@ -613,28 +613,26 @@ export const getTopContributors = async (limitCount = 3) => {
 
 export const getCaseStatistics = async () => {
   try {
-    const casesRef = await collection(db, 'CasesRef');
-    const cases = await getDocs(casesRef);
+    const querySnapshot = await getDocs(collection(db, 'cases'));
     const specialtyCounts = {};
-    cases.forEach((doc) => {
+    querySnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      const specialtiesData = Array.isArray(data.specialty) ? data.specialty : data.specialty ? [data.specialty] : [];
-      specialtiesData.forEach((specialty => {
+      const specialties = Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []);
+      specialties.forEach((specialty) => {
         if (specialty) {
           specialtyCounts[specialty] = (specialtyCounts[specialty] || 0) + 1;
         }
       });
-      );
     });
-    return Object.entries(specialtyCounts).map(([specialty, count]) => ({
+    const stats = Object.entries(specialtyCounts).map(([specialty, count]) => ({
       specialty,
       count,
     }));
-    console.log('specialties:', specialtyCounts);
-    return specialtyCounts;
+    console.log('Case statistics:', stats);
+    return stats;
   } catch (error) {
-    console.error('Failed to get case statistics:', error);
-    return [];
+    console.error('Get case statistics error:', error);
+    throw new Error('Failed to fetch case statistics');
   }
 };
 
