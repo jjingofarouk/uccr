@@ -24,7 +24,7 @@ export default function EditCaseForm({ caseId }) {
     provisionalDiagnosis: '',
     hospital: '',
     referralCenter: '',
-    specialty: '',
+    specialty: [],
     discussion: '',
     highLevelSummary: '',
     references: '',
@@ -66,7 +66,6 @@ export default function EditCaseForm({ caseId }) {
       label: 'Specialty',
       type: 'select',
       options: [
-        { value: '', label: 'Select Specialty' },
         { value: 'General Practice', label: 'General Practice' },
         { value: 'Internal Medicine', label: 'Internal Medicine' },
         { value: 'Family Medicine', label: 'Family Medicine' },
@@ -148,7 +147,7 @@ export default function EditCaseForm({ caseId }) {
             provisionalDiagnosis: caseData.provisionalDiagnosis || '',
             hospital: caseData.hospital || '',
             referralCenter: caseData.referralCenter || '',
-            specialty: caseData.specialty || '',
+            specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
             discussion: caseData.discussion || '',
             highLevelSummary: caseData.highLevelSummary || '',
             references: caseData.references || '',
@@ -208,9 +207,12 @@ export default function EditCaseForm({ caseId }) {
   }, [user]);
 
   const handleChange = (value, name) => {
-    // For rich text fields, value is HTML string; for select, it's the selected value
-    const normalizedValue = name === 'specialty' ? value : value;
-    setFormData(prev => ({ ...prev, [name]: normalizedValue }));
+    if (name === 'specialty') {
+      const selectedOptions = Array.from(value.target.selectedOptions).map(option => option.value);
+      setFormData(prev => ({ ...prev, specialty: selectedOptions }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleDeleteMedia = (index) => {
@@ -320,7 +322,9 @@ export default function EditCaseForm({ caseId }) {
                   <select
                     name={step.name}
                     value={formData[step.name]}
-                    onChange={(e) => handleChange(e.target.value, step.name)}
+                    onChange={(e) => handleChange(e, step.name)}
+                    multiple
+                    size="5"
                   >
                     {step.options.map(option => (
                       <option key={option.value} value={option.value}>
