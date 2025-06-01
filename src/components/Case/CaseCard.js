@@ -1,15 +1,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Calendar, Award, User } from 'lucide-react';
+import { Calendar, Award, User, MessageSquare } from 'lucide-react';
+import styles from './CaseCard.module.css';
 
 export default function CaseCard({ caseData }) {
   const renderSpecialtyTags = () => {
-    const specialties = Array.isArray(caseData.specialty) 
-      ? caseData.specialty 
-      : (caseData.specialty && typeof caseData.specialty === 'string' 
-          ? [caseData.specialty] 
+    const specialties = Array.isArray(caseData.specialty)
+      ? caseData.specialty
+      : (caseData.specialty && typeof caseData.specialty === 'string'
+          ? [caseData.specialty]
           : []);
-    
+
     if (specialties.length === 0) {
       return <span className={styles.tag}>Not specified</span>;
     }
@@ -23,6 +24,18 @@ export default function CaseCard({ caseData }) {
 
   return (
     <div className={styles.card}>
+      {caseData.thumbnailUrl && (
+        <div className={styles.imageContainer}>
+          <Image
+            src={caseData.thumbnailUrl}
+            alt={caseData.title || 'Case image'}
+            width={300}
+            height={200}
+            className={styles.caseImage}
+            priority
+          />
+        </div>
+      )}
       <div className={styles.cardHeader}>
         <div className={styles.specialtyTags}>
           {renderSpecialtyTags()}
@@ -41,13 +54,25 @@ export default function CaseCard({ caseData }) {
               <Calendar size={16} />
               <span>
                 {caseData.createdAt instanceof Date
-                  ? caseData.createdAt.toLocaleDateString()
-                  : new Date(caseData.createdAt || Date.now()).toLocaleDateString()}
+                  ? caseData.createdAt.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : new Date(caseData.createdAt || Date.now()).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
               </span>
             </div>
             <div className={styles.metaItem}>
               <Award size={16} />
               <span>{caseData.awards || 0} Awards</span>
+            </div>
+            <div className={styles.metaItem}>
+              <MessageSquare size={16} />
+              <span>{caseData.commentCount || 0} Comments</span>
             </div>
             <div className={styles.metaItem}>
               <User size={16} />
