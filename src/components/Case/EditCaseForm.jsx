@@ -9,7 +9,6 @@ import dynamic from 'next/dynamic';
 import styles from '../../styles/caseForm.module.css';
 import 'react-quill/dist/quill.snow.css';
 
-// Dynamically import ReactQuill to avoid SSR issues with Next.js
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function EditCaseForm({ caseId }) {
@@ -40,7 +39,6 @@ export default function EditCaseForm({ caseId }) {
   const router = useRouter();
   const SUBMISSION_LOADING_DURATION = 1000;
 
-  // Quill toolbar options
   const quillModules = {
     toolbar: [
       [{ header: [1, 2, false] }],
@@ -121,7 +119,6 @@ export default function EditCaseForm({ caseId }) {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
-  // Fetch case data
   useEffect(() => {
     const fetchCase = async () => {
       if (caseId && user) {
@@ -163,7 +160,6 @@ export default function EditCaseForm({ caseId }) {
     fetchCase();
   }, [caseId, user]);
 
-  // Initialize Cloudinary widget
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
@@ -228,6 +224,10 @@ export default function EditCaseForm({ caseId }) {
       setError('You must be logged in to edit a case.');
       return;
     }
+    if (currentStep !== steps.length - 1) {
+      nextStep();
+      return;
+    }
     setError('');
     setIsLoading(true);
     try {
@@ -235,6 +235,7 @@ export default function EditCaseForm({ caseId }) {
         ...formData,
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
+        thumbnailUrl: formData.mediaUrls[0] || '',
       };
       await updateCase(caseId, caseData);
       setLoadStart(Date.now());
@@ -325,6 +326,7 @@ export default function EditCaseForm({ caseId }) {
                     onChange={(e) => handleChange(e, step.name)}
                     multiple
                     size="5"
+                    className={styles.selectInput}
                   >
                     {step.options.map(option => (
                       <option key={option.value} value={option.value}>
@@ -334,11 +336,12 @@ export default function EditCaseForm({ caseId }) {
                   </select>
                 )}
                 {step.type === 'media' && (
-                  <div>
+                  <div className={styles.mediaSection}>
                     <button
                       type="button"
                       onClick={() => widgetRef.current?.open()}
                       disabled={!widgetRef.current}
+                      className={styles.uploadButton}
                     >
                       Upload Media
                     </button>
@@ -353,6 +356,7 @@ export default function EditCaseForm({ caseId }) {
                                 alt={`Uploaded media ${index + 1}`}
                                 width={120}
                                 height={120}
+                                className={styles.mediaImage}
                               />
                               <button
                                 type="button"
@@ -365,6 +369,7 @@ export default function EditCaseForm({ caseId }) {
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
                                   strokeWidth="2"
+                                  className={styles.deleteIcon}
                                 >
                                   <path
                                     strokeLinecap="round"
@@ -397,6 +402,7 @@ export default function EditCaseForm({ caseId }) {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth="2"
+              className={styles.navIcon}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
@@ -415,6 +421,7 @@ export default function EditCaseForm({ caseId }) {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="2"
+                className={styles.navIcon}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
@@ -425,7 +432,7 @@ export default function EditCaseForm({ caseId }) {
             </button>
           )}
         </div>
-        {error && <p role="alert">{error}</p>}
+        {error && <p role="alert" className={styles.error}>{error}</p>}
         {(isLoading || forceLoading) && <Loading />}
       </form>
     </div>
