@@ -72,22 +72,34 @@
 /* Carousel inner wrapper */
 .carouselInner {
   display: flex;
-  width: 100%;
+  width: calc(100% * var(--total-steps)); /* Dynamic width based on number of steps */
+  height: 100%;
   transition: transform 0.5s ease;
   will-change: transform;
 }
 
 /* Individual carousel item */
 .carouselItem {
-  flex: 0 0 100%;
-  width: 100%;
+  flex: 0 0 calc(100% / var(--total-steps)); /* Equal width for each item */
+  width: calc(100% / var(--total-steps));
   padding: 0 1rem;
   box-sizing: border-box;
-  display: none; /* Hide all by default */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Ensure only active item is visible */
+.carouselItem:not(.active) {
+  visibility: hidden;
+  position: absolute;
+  opacity: 0;
 }
 
 .carouselItem.active {
-  display: block; /* Show only the active item */
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Input fields and select */
@@ -117,7 +129,7 @@
 /* Select dropdown specific styling */
 .caseForm select:not([multiple]) {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231f2937' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3(browser: chrome)C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231f2937' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 1.25rem;
@@ -139,6 +151,7 @@
 .quillEditor {
   width: 100%;
   margin-top: 0.5rem;
+  flex-grow: 1;
 }
 
 .quillEditor .ql-container {
