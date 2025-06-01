@@ -225,7 +225,7 @@ export default function EditCaseForm({ caseId }) {
       return;
     }
     if (currentStep !== steps.length - 1) {
-      nextStep();
+      setError('Please complete all steps before submitting.');
       return;
     }
     setError('');
