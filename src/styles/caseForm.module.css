@@ -57,14 +57,14 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  height: calc(100vh - 12rem); /* Adjusted to fit content and buttons */
+  height: calc(100vh - 12rem);
   position: relative;
 }
 
 /* Carousel container */
 .carousel {
   width: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   position: relative;
   flex-grow: 1;
 }
@@ -74,6 +74,7 @@
   display: flex;
   width: 100%;
   transition: transform 0.5s ease;
+  will-change: transform;
 }
 
 /* Individual carousel item */
@@ -82,6 +83,11 @@
   width: 100%;
   padding: 0 1rem;
   box-sizing: border-box;
+  display: none; /* Hide all by default */
+}
+
+.carouselItem.active {
+  display: block; /* Show only the active item */
 }
 
 /* Input fields and select */
@@ -111,7 +117,7 @@
 /* Select dropdown specific styling */
 .caseForm select:not([multiple]) {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231f2937' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231f2937' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3(browser: chrome)C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 1.25rem;
@@ -119,7 +125,7 @@
 
 /* Multi-select specific styling */
 .caseForm select[multiple] {
-  height: 200px; /* Increased size */
+  height: 200px;
   overflow-y: auto;
   padding: 0.5rem;
   appearance: textfield;
@@ -136,7 +142,7 @@
 }
 
 .quillEditor .ql-container {
-  min-height: 300px; /* Increased size */
+  min-height: 300px;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 400;
@@ -149,7 +155,7 @@
 }
 
 .quillEditor .ql-editor {
-  min-height: 260px; /* Adjusted for larger container */
+  min-height: 260px;
   padding: 0.75rem 1rem;
 }
 
