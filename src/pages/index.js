@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -217,12 +219,13 @@ const StatsSection = () => {
     fetchStats();
   }, []);
 
+  // Define an array of colors for the bars
   const barColors = [
-    'rgba(59, 130, 246, 0.6)',
-    'rgba(239, 68, 68, 0.6)',
-    'rgba(34, 197, 94, 0.6)',
-    'rgba(249, 115, 22, 0.6)',
-    'rgba(168, 85, 247, 0.6)',
+    'rgba(59, 130, 246, 0.6)', // Blue
+    'rgba(239, 68, 68, 0.6)', // Red
+    'rgba(34, 197, 94, 0.6)', // Green
+    'rgba(249, 115, 22, 0.6)', // Orange
+    'rgba(168, 85, 247, 0.6)', // Purple
   ];
 
   const borderColors = [
@@ -239,10 +242,10 @@ const StatsSection = () => {
       {
         label: 'Number of Cases',
         data: stats.map((item) => item.count),
-        backgroundColor: barColors,
-        borderColor: borderColors,
+        backgroundColor: barColors, // Use array of colors
+        borderColor: borderColors, // Use array of border colors
         borderWidth: 1,
-        hoverBackgroundColor: barColors.map(color => color.replace('0.6', '0.8')),
+        hoverBackgroundColor: barColors.map(color => color.replace('0.6', '0.8')), // Adjust opacity for hover
       },
     ],
   };
@@ -334,12 +337,17 @@ export default function HomePage() {
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
   const [featuredSpecialty, setFeaturedSpecialty] = useState('');
 
+  // Case of the Day: Universal random selection based on date
   useEffect(() => {
     if (cases.length > 0) {
+      // Get current date in YYYY-MM-DD format (based on EAT, UTC+3)
       const now = new Date();
+      // Adjust to EAT by adding 3 hours to UTC
       const eatOffset = 3 * 60 * 60 * 1000;
       const eatDate = new Date(now.getTime() + eatOffset);
-      const dateString = eatDate.toISOString().split('T')[0];
+      const dateString = eatDate.toISOString().split('T')[0]; // e.g., "2025-05-25"
+
+      // Deterministic seed based on date for universal randomness
       const seed = dateString
         .split('-')
         .reduce((acc, val) => acc + parseInt(val), 0);
@@ -349,13 +357,7 @@ export default function HomePage() {
   }, [cases]);
 
   useEffect(() => {
-    const specialties = [
-      ...new Set(
-        cases
-          .flatMap((c) => Array.isArray(c.specialty) ? c.specialty : [])
-          .filter(Boolean)
-      ),
-    ];
+    const specialties = [...new Set(cases.map((c) => c.specialty).filter(Boolean))];
     if (specialties.length > 0) {
       const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
       setFeaturedSpecialty(specialties[weekNumber % specialties.length]);
@@ -380,7 +382,7 @@ export default function HomePage() {
 
   const specialtyCases = useMemo(() => {
     return cases
-      .filter((caseData) => Array.isArray(caseData.specialty) && caseData.specialty.includes(featuredSpecialty))
+      .filter((caseData) => caseData.specialty === featuredSpecialty)
       .slice(0, 3);
   }, [cases, featuredSpecialty]);
 
@@ -429,4 +431,4 @@ export default function HomePage() {
       )}
     </main>
   );
-}
+} 
