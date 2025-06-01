@@ -42,7 +42,7 @@ export const addCase = async (caseData) => {
       userId: caseData.userId,
       userName: caseData.userName || 'Anonymous',
       title: String(caseData.title || ''),
-      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : (caseData.specialty ? [caseData.specialty] : []),
+      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
       presentingComplaint: String(caseData.presentingComplaint || ''),
       history: String(caseData.history || ''),
       physicalExam: String(caseData.physicalExam || ''),
@@ -55,12 +55,9 @@ export const addCase = async (caseData) => {
       hospital: String(caseData.hospital || ''),
       referralCenter: String(caseData.referralCenter || ''),
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-      thumbnailUrl: caseData.thumbnailUrl || (Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? caseData.mediaUrls[0] : ''),
       awards: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      commentCount: 0,
-      viewCount: 0,
     };
     console.log('Validated case data:', validatedCaseData);
     const docRef = await addDoc(collection(db, 'cases'), validatedCaseData);
@@ -76,9 +73,9 @@ export const getCases = async (uid = null) => {
   try {
     let q;
     if (uid) {
-      q = query(collection(db, 'cases'), where('userId', '==', uid), orderBy('createdAt', 'desc'));
+      q = query(collection(db, 'cases'), where('userId', '==', uid));
     } else {
-      q = query(collection(db, 'cases'), orderBy('createdAt', 'desc'));
+      q = query(collection(db, 'cases'));
     }
     const querySnapshot = await getDocs(q);
     const casesPromises = querySnapshot.docs.map(async (doc) => {
@@ -89,7 +86,7 @@ export const getCases = async (uid = null) => {
         userId: data.userId,
         userName: data.userName || 'Anonymous',
         title: data.title || '',
-        specialty: Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []),
+        specialty: data.specialty || '',
         presentingComplaint: data.presentingComplaint || '',
         history: data.history || '',
         physicalExam: data.physicalExam || '',
@@ -102,12 +99,9 @@ export const getCases = async (uid = null) => {
         hospital: data.hospital || '',
         referralCenter: data.referralCenter || '',
         mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
-        thumbnailUrl: data.thumbnailUrl || (Array.isArray(data.mediaUrls) && data.mediaUrls.length > 0 ? data.mediaUrls[0] : ''),
         awards: Number(data.awards) || 0,
-        commentCount: Number(data.commentCount) || 0,
-        viewCount: Number(data.viewCount) || 0,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date(),
+        createdAt: data.createdAt?.toDate?.() || new Date(),
+        updatedAt: data.updatedAt?.toDate?.() || new Date(),
         photoURL,
       };
     });
@@ -148,15 +142,11 @@ export const getCaseById = async (id) => {
       hospital: data.hospital || '',
       referralCenter: data.referralCenter || '',
       mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
-      thumbnailUrl: data.thumbnailUrl || (Array.isArray(data.mediaUrls) && data.mediaUrls.length > 0 ? data.mediaUrls[0] : ''),
       awards: Number(data.awards) || 0,
-      commentCount: Number(data.commentCount) || 0,
-      viewCount: Number(data.viewCount) || 0,
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date(),
+      createdAt: data.createdAt?.toDate?.() || new Date(),
+      updatedAt: data.updatedAt?.toDate?.() || new Date(),
       photoURL,
     };
-    await updateDoc(docRef, { viewCount: increment(1) });
     console.log('Fetched case:', caseData.id, 'uid:', caseData.userId);
     return caseData;
   } catch (error) {
@@ -182,8 +172,6 @@ export const addComment = async (caseId, commentData, parentCommentId = null) =>
       downvotes: 0,
     };
     const docRef = await addDoc(collection(db, `cases/${caseId}/comments`), comment);
-    const caseRef = doc(db, 'cases', caseId);
-    await updateDoc(caseRef, { commentCount: increment(1) });
     console.log('Comment added for case:', caseId, 'ID:', docRef.id, 'uid:', comment.userId);
     return docRef.id;
   } catch (error) {
@@ -291,9 +279,9 @@ export const sendMessage = async ({ senderId, recipientId, senderName, recipient
 
     console.log('sendMessage inputs:', { senderId, recipientId, senderName, recipientName, text });
 
-    const recipientDoc = await getDoc(doc(db, 'profiles', recipientId));
+    const recipientDoc = await getDoc(doc(db, 'users', recipientId));
     if (!recipientDoc.exists()) {
-      throw new Error(`Recipient user ${recipientId} does not exist in profiles collection`);
+      throw new Error(`Recipient user ${recipientId} does not exist in users collection`);
     }
 
     const threadId = [senderId, recipientId].sort().join('_');
@@ -486,7 +474,7 @@ export const getUserStats = async (uid) => {
 
     const commentsQuery = query(
       collectionGroup(db, 'comments'),
-      where('userId', '==', uid)
+      where('userId mindre end eller lig med', '==', uid)
     );
     const commentsSnapshot = await getDocs(commentsQuery, { source: 'server' });
     const commentCount = commentsSnapshot.size;
@@ -563,7 +551,7 @@ export const updateCase = async (caseId, caseData) => {
       userId: caseData.userId,
       userName: caseData.userName || 'Anonymous',
       title: String(caseData.title || ''),
-      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : (caseData.specialty ? [caseData.specialty] : []),
+      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
       presentingComplaint: String(caseData.presentingComplaint || ''),
       history: String(caseData.history || ''),
       physicalExam: String(caseData.physicalExam || ''),
@@ -576,7 +564,6 @@ export const updateCase = async (caseId, caseData) => {
       hospital: String(caseData.hospital || ''),
       referralCenter: String(caseData.referralCenter || ''),
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-      thumbnailUrl: caseData.thumbnailUrl || (Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? caseData.mediaUrls[0] : ''),
       awards: Number(caseData.awards) || 0,
       updatedAt: serverTimestamp(),
     };
@@ -644,28 +631,6 @@ export const getTopContributors = async (limitCount = 3) => {
   }
 };
 
-export const getAllSpecialties = async () => {
-  try {
-    const casesRef = collection(db, 'cases');
-    const casesSnapshot = await getDocs(casesRef);
-    const specialties = [
-      ...new Set(
-        casesSnapshot.docs
-          .flatMap((doc) => {
-            const data = doc.data();
-            return Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []);
-          })
-          .filter(Boolean)
-      ),
-    ];
-    console.log('specialties:', specialties);
-    return specialties;
-  } catch (error) {
-    console.error('Failed to get specialties:', error);
-    return [];
-  }
-};
-
 export const getCaseStatistics = async () => {
   try {
     const casesRef = collection(db, 'cases');
@@ -674,12 +639,11 @@ export const getCaseStatistics = async () => {
 
     snapshot.forEach((doc) => {
       const data = doc.data();
-      const specialties = Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : ['Unknown']);
-      specialties.forEach(specialty => {
-        stats[specialty] = (stats[specialty] || 0) + 1;
-      });
+      const specialty = data.specialty || 'Unknown';
+      stats[specialty] = (stats[specialty] || 0) + 1;
     });
 
+    // Sort by count (descending) so specialty with most cases is first
     return Object.entries(stats)
       .map(([specialty, count]) => ({
         specialty,
@@ -702,20 +666,18 @@ export const searchCasesAndUsers = async (searchTerm) => {
     const casesSnapshot = await getDocs(casesRef);
     const casePromises = casesSnapshot.docs.map(async (doc) => {
       const data = doc.data();
-      const specialties = Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []);
       const matches =
         (data.title?.toLowerCase().includes(term) ||
-         specialties.some(s => s.toLowerCase().includes(term)) ||
+         data.specialty?.toLowerCase().includes(term) ||
          data.presentingComplaint?.toLowerCase().includes(term) ||
          data.highLevelSummary?.toLowerCase().includes(term));
       if (matches) {
         return {
           id: doc.id,
           title: data.title || 'Untitled Case',
-          specialty: specialties,
+          specialty: data.specialty || 'No specialty',
           userId: data.userId,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          thumbnailUrl: data.thumbnailUrl || (Array.isArray(data.mediaUrls) && data.mediaUrls.length > 0 ? data.mediaUrls[0] : ''),
+          createdAt: data.createdAt?.toDate?.() || new Date(),
         };
       }
       return null;
@@ -727,16 +689,15 @@ export const searchCasesAndUsers = async (searchTerm) => {
     const usersSnapshot = await getDocs(usersRef);
     const userPromises = usersSnapshot.docs.map(async (doc) => {
       const data = doc.data();
-      const specialties = Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []);
       const matches =
         (data.displayName?.toLowerCase().includes(term) ||
-         specialties.some(s => s.toLowerCase().includes(term)) ||
+         data.specialty?.toLowerCase().includes(term) ||
          data.email?.toLowerCase().includes(term));
       if (matches) {
         return {
           uid: doc.id,
           displayName: data.displayName || 'Anonymous',
-          specialty: specialties,
+          specialty: data.specialty || 'No specialty',
           photoURL: data.photoURL || '/images/doctor-avatar.jpeg',
         };
       }
@@ -744,7 +705,7 @@ export const searchCasesAndUsers = async (searchTerm) => {
     });
     results.users = (await Promise.all(userPromises)).filter((u) => u !== null);
 
-    console.log('Search term:', term, 'Results:', results);
+    console.log('Search term:', term, 'Results:', results); // Debug log
     return results;
   } catch (error) {
     console.error('searchCasesAndUsers error:', error);
@@ -752,4 +713,20 @@ export const searchCasesAndUsers = async (searchTerm) => {
   }
 };
 
-
+export const getAllSpecialties = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'cases'));
+    const specialties = [
+      ...new Set(
+        querySnapshot.docs
+          .flatMap((doc) => Array.isArray(doc.data().specialty) ? doc.data().specialty : [])
+          .filter(Boolean)
+      ),
+    ];
+    console.log('Fetched specialties:', specialties);
+    return specialties;
+  } catch (error) {
+    console.error('Get specialties error:', error);
+    throw new Error('Failed to fetch specialties');
+  }
+};
