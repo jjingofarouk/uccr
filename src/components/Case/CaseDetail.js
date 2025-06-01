@@ -6,26 +6,19 @@ import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
 import { Award } from 'lucide-react';
 import CommentSection from './CommentSection';
+import sanitizeHtml from 'sanitize-html';
 import styles from '../../styles/caseDetail.module.css';
 
-// Utility function to process text with line breaks and paragraphs
-const formatText = (text) => {
-  if (!text || typeof text !== 'string') return <p>Not specified</p>;
-  const paragraphs = text.split('\n\n').filter(p => p.trim());
-  return paragraphs.map((paragraph, index) => (
-    <p key={index} className={styles.paragraph}>
-      {paragraph.split('\n').map((line, i, arr) =>
-        i < arr.length - 1 ? (
-          <span key={i}>
-            {line}
-            <br />
-          </span>
-        ) : (
-          line
-        )
-      )}
-    </p>
-  ));
+// Utility function to sanitize and render HTML content
+const renderRichText = (html) => {
+  if (!html || typeof html !== 'string') return <p>Not specified</p>;
+  const sanitizedHtml = sanitizeHtml(html, {
+    allowedTags: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a', 'h1', 'h2'],
+    allowedAttributes: {
+      a: ['href', 'target'],
+    },
+  });
+  return <div className={styles.richText} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
 };
 
 export default function CaseDetail({ caseData }) {
@@ -49,7 +42,7 @@ export default function CaseDetail({ caseData }) {
   return (
     <article className={styles.caseDetail}>
       <header className={styles.header}>
-        <h1 className={styles.title}>{caseData.title || 'Untitled Case'}</h1>
+        <h1 className={styles.title}>{caseData.title ? renderRichText(caseData.title) : 'Untitled Case'}</h1>
         {user && user.uid === caseData.userId && (
           <button
             onClick={() => router.push(`/cases/edit/${caseData.id}`)}
@@ -103,7 +96,7 @@ export default function CaseDetail({ caseData }) {
       <section className={styles.content}>
         <div className={styles.section}>
           <h2>Chief Concern</h2>
-          {formatText(caseData.presentingComplaint)}
+          {renderRichText(caseData.presentingComplaint)}
         </div>
         <div className={styles.section}>
           <h2>Specialty</h2>
@@ -111,31 +104,39 @@ export default function CaseDetail({ caseData }) {
         </div>
         <div className={styles.section}>
           <h2>History</h2>
-          {formatText(caseData.history)}
+          {renderRichText(caseData.history)}
         </div>
         <div className={styles.section}>
           <h2>Investigations</h2>
-          {formatText(caseData.investigations)}
+          {renderRichText(caseData.investigations)}
         </div>
         <div className={styles.section}>
           <h2>Management</h2>
-          {formatText(caseData.management)}
+          {renderRichText(caseData.management)}
         </div>
         <div className={styles.section}>
           <h2>Provisional Diagnosis</h2>
-          <p>{caseData.provisionalDiagnosis || 'Not specified'}</p>
+          {renderRichText(caseData.provisionalDiagnosis)}
         </div>
         <div className={styles.section}>
           <h2>Hospital</h2>
-          <p>{caseData.hospital || 'Not specified'}</p>
+          {renderRichText(caseData.hospital)}
         </div>
         <div className={styles.section}>
           <h2>Referral Center</h2>
-          <p>{caseData.referralCenter || 'Not specified'}</p>
+          {renderRichText(caseData.referralCenter)}
         </div>
         <div className={styles.section}>
           <h2>Discussion</h2>
-          {formatText(caseData.discussion)}
+          {renderRichText(caseData.discussion)}
+        </div>
+        <div className={styles.section}>
+          <h2>High-Level Summary</h2>
+          {renderRichText(caseData.highLevelSummary)}
+        </div>
+        <div className={styles.section}>
+          <h2>References</h2>
+          {renderRichText(caseData.references)}
         </div>
       </section>
 
