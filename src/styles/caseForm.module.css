@@ -56,14 +56,39 @@
   max-width: 720px;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
+  height: calc(100vh - 12rem); /* Adjusted to fit content and buttons */
+  position: relative;
+}
+
+/* Carousel container */
+.carousel {
+  width: 100%;
+  overflow-y: auto;
+  position: relative;
+  flex-grow: 1;
+}
+
+/* Carousel inner wrapper */
+.carouselInner {
+  display: flex;
+  width: 100%;
+  transition: transform 0.5s ease;
+}
+
+/* Individual carousel item */
+.carouselItem {
+  flex: 0 0 100%;
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 /* Input fields and select */
 .caseForm input,
 .caseForm select {
   width: 100%;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 400;
@@ -94,14 +119,14 @@
 
 /* Multi-select specific styling */
 .caseForm select[multiple] {
-  height: 200px;
+  height: 200px; /* Increased size */
   overflow-y: auto;
-  padding: 0.75rem;
+  padding: 0.5rem;
   appearance: textfield;
 }
 
 .caseForm select[multiple] option {
-  padding: 8px;
+  padding: 5px;
 }
 
 /* Quill editor styling */
@@ -111,7 +136,7 @@
 }
 
 .quillEditor .ql-container {
-  min-height: 300px;
+  min-height: 300px; /* Increased size */
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 400;
@@ -124,8 +149,8 @@
 }
 
 .quillEditor .ql-editor {
-  min-height: 260px;
-  padding: 1rem;
+  min-height: 260px; /* Adjusted for larger container */
+  padding: 0.75rem 1rem;
 }
 
 .quillEditor .ql-toolbar {
@@ -150,11 +175,14 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
-  background: none;
+  background: var(--background);
   border: 1px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  position: sticky;
+  bottom: 1rem;
+  z-index: 10;
 }
 
 .navButton:hover {
@@ -187,6 +215,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
+  position: sticky;
+  bottom: 1rem;
+  z-index: 10;
 }
 
 .submitButton:hover {
@@ -205,11 +236,10 @@
   align-items: center;
   margin-top: 1rem;
   position: sticky;
-  bottom: 1rem;
+  bottom: 0;
   background: var(--background);
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 -2px 4px var(--shadow);
+  padding: 0.5rem 0;
+  z-index: 10;
 }
 
 /* Media upload section */
@@ -243,6 +273,30 @@
   box-shadow: 0 2px 4px var(--shadow);
 }
 
+/* Upload button */
+.uploadButton {
+  padding: 0.75rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.uploadButton:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.uploadButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Error message */
 .caseForm p[role="alert"] {
   font-family: 'Inter', sans-serif;
@@ -250,7 +304,7 @@
   font-weight: 500;
   color: #dc2626;
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 /* Media item container */
@@ -286,31 +340,6 @@
 .deleteButton svg {
   width: 16px;
   height: 16px;
-}
-
-/* Upload button */
-.uploadButton {
-  padding: 0.75rem 1.5rem;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: var(--primary);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.uploadButton:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-}
-
-.uploadButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
 }
 
 /* Dark mode adjustments */
@@ -373,14 +402,6 @@
   background: #b91c1c;
 }
 
-.dark-mode .uploadButton {
-  background: var(--primary);
-}
-
-.dark-mode .uploadButton:hover {
-  background: var(--primary-hover);
-}
-
 /* Responsive design for mobile */
 @media (max-width: 768px) {
   .caseForm {
@@ -394,30 +415,30 @@
 
   .caseForm form {
     max-width: 100%;
+    height: calc(100vh - 10rem);
   }
 
   .caseForm input,
   .caseForm select:not([multiple]) {
-    padding: 0.75rem;
+    padding: 0.6rem 0.9rem;
     font-size: 0.95rem;
   }
 
   .caseForm select[multiple] {
-    height: 160px;
+    height: 150px;
     font-size: 0.95rem;
   }
 
   .quillEditor .ql-container {
-    min-height: 250px;
+    min-height: 200px;
   }
 
   .quillEditor .ql-editor {
-    min-height: 210px;
+    min-height: 160px;
   }
 
   .navButton,
-  .submitButton,
-  .uploadButton {
+  .submitButton {
     padding: 0.6rem 1.25rem;
     font-size: 0.95rem;
   }
@@ -436,9 +457,7 @@
   }
 
   .navigation {
-    position: sticky;
-    bottom: 0.75rem;
-    padding: 0.75rem;
+    padding: 0.5rem 0;
   }
 }
 
@@ -454,26 +473,25 @@
 
   .caseForm input,
   .caseForm select:not([multiple]) {
-    padding: 0.6rem;
+    padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
   }
 
   .caseForm select[multiple] {
-    height: 140px;
+    height: 120px;
     font-size: 0.9rem;
   }
 
   .quillEditor .ql-container {
-    min-height: 200px;
+    min-height: 150px;
   }
 
   .quillEditor .ql-editor {
-    min-height: 160px;
+    min-height: 110px;
   }
 
   .navButton,
-  .submitButton,
-  .uploadButton {
+  .submitButton {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
@@ -494,9 +512,7 @@
   .navigation {
     flex-direction: row;
     gap: 0.5rem;
-    position: sticky;
-    bottom: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0;
   }
 }
 
@@ -536,8 +552,8 @@
   .carouselInner,
   .navButton,
   .submitButton,
-  .uploadButton,
   .deleteButton,
+  .uploadButton,
   .caseForm input:focus,
   .caseForm select:focus,
   .quillEditor .ql-container:focus-within,
