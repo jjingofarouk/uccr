@@ -1,4 +1,3 @@
-/* src/styles/caseCard.module.css */
 .card {
   display: flex;
   flex-direction: column;
@@ -85,15 +84,71 @@
   color: var(--text);
 }
 
+.specialty {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.5;
+}
+
+.specialty strong {
+  font-weight: 600;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.25rem 0.75rem;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.tag:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.moreTag {
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+.postedDate {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
 .contributor {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
+  font-weight: 500;
   color: #6b7280;
 }
 
-.dark-mode .contributor {
+.dark-mode .contributor,
+.dark-mode .postedDate,
+.dark-mode .moreTag {
   color: #9ca3af;
 }
 
@@ -124,6 +179,23 @@
   border-color: var(--border);
 }
 
+.dark-mode .specialty,
+.dark-mode .concern,
+.dark-mode .title {
+  color: var(--text);
+}
+
+.dark-mode .tag {
+  background: var(--background-secondary);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.dark-mode .tag:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .card {
@@ -138,10 +210,12 @@
     font-size: 1.1rem;
   }
 
-  .concern {
+  .concern,
+  .specialty {
     font-size: 0.9rem;
   }
 
+  .postedDate,
   .contributor {
     font-size: 0.85rem;
   }
@@ -149,6 +223,11 @@
   .contributorAvatar {
     width: 20px;
     height: 20px;
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
   }
 }
 
@@ -165,12 +244,27 @@
     font-size: 1rem;
   }
 
-  .concern {
+  .concern,
+  .specialty {
     font-size: 0.85rem;
+  }
+
+  .postedDate,
+  .contributor {
+    font-size: 0.8rem;
   }
 
   .error {
     font-size: 0.9rem;
     padding: 0.75rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .tags {
+    gap: 0.4rem;
   }
 }
