@@ -264,12 +264,12 @@ export default function CaseForm() {
       </p>
       <form onSubmit={handleSubmit}>
         <div className={styles.carousel}>
-          <div
-            className={styles.carouselInner}
-            style={{ transform: `translateX(-${currentStep * 100}%)` }}
-          >
+          <div className={styles.carouselInner}>
             {steps.map((step, index) => (
-              <div key={step.name} className={styles.carouselItem}>
+              <div
+                key={step.name}
+                className={`${styles.carouselItem} ${index === currentStep ? styles.active : ''}`}
+              >
                 {step.type === 'richtext' && (
                   <ReactQuill
                     theme="snow"
