@@ -4,7 +4,8 @@ import CaseCard from '../../components/Case/CaseCard';
 import Loading from '../../components/Loading';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X } from 'lucide-react';
+import { Download, X, Eye } from 'lucide-react';
+import Image from 'next/image';
 import styles from './case.module.css';
 
 export default function Cases() {
@@ -98,6 +99,12 @@ export default function Cases() {
       if (sortBy === 'title-desc') {
         return b.title.localeCompare(a.title);
       }
+      if (sortBy === 'comments-desc') {
+        return (b.commentCount || 0) - (a.commentCount || 0);
+      }
+      if (sortBy === 'views-desc') {
+        return (b.viewCount || 0) - (a.viewCount || 0);
+      }
       return 0;
     });
   }, [filteredCases, sortBy]);
@@ -133,6 +140,8 @@ export default function Cases() {
       'Hospital',
       'Referral Center',
       'Awards',
+      'Comments',
+      'Views',
       'Created At',
       'Presenting Complaint',
       'Provisional Diagnosis',
@@ -144,6 +153,8 @@ export default function Cases() {
       caseData.hospital || '',
       caseData.referralCenter || '',
       caseData.awards || 0,
+      caseData.commentCount || 0,
+      caseData.viewCount || 0,
       new Date(caseData.createdAt).toISOString(),
       `"${caseData.presentingComplaint || ''}"`,
       `"${caseData.provisionalDiagnosis || ''}"`,
@@ -269,6 +280,8 @@ export default function Cases() {
             <option value="createdAt-asc">Oldest First</option>
             <option value="awards-desc">Most Awards</option>
             <option value="awards-asc">Least Awards</option>
+            <option value="comments-desc">Most Comments</option>
+            <option value="views-desc">Most Views</option>
             <option value="title-asc">Title A-Z</option>
             <option value="title-desc">Title Z-A</option>
           </select>
@@ -356,6 +369,17 @@ export default function Cases() {
               >
                 <X size={24} />
               </button>
+              {previewCase.thumbnailUrl && (
+                <div className={styles.previewImageContainer}>
+                  <Image
+                    src={previewCase.thumbnailUrl}
+                    alt={previewCase.title || 'Case image'}
+                    width={300}
+                    height={200}
+                    className={styles.previewImage}
+                  />
+                </div>
+              )}
               <h2 className={styles.previewTitle}>{previewCase.title || 'Untitled Case'}</h2>
               <div className={styles.specialtyTags}>
                 {(Array.isArray(previewCase.specialty)
@@ -380,6 +404,12 @@ export default function Cases() {
               </p>
               <p className={styles.previewItem}>
                 <strong>Awards:</strong> {previewCase.awards || 0}
+              </p>
+              <p className={styles.previewItem}>
+                <strong>Comments:</strong> {previewCase.commentCount || 0}
+              </p>
+              <p className={styles.previewItem}>
+                <strong>Views:</strong> {previewCase.viewCount || 0}
               </p>
               <p className={styles.authorDate}>
                 <span>Posted by {previewCase.userName || 'Anonymous'}</span>
