@@ -76,7 +76,7 @@ export const getCases = async (uid = null) => {
     const querySnapshot = await getDocs(query(casesRef, ...queryConstraints));
     const cases = await Promise.all(querySnapshot.docs.map(async (doc) => {
       const data = doc.data();
-      const userDoc = await getDoc(doc(db, 'users', data.userId)));
+      const userDoc = await getDoc(doc(db, 'users', data.userId));
       const photoURL = userDoc.exists() ? userDoc.data().photoURL || '/images/doctor-placeholder.jpg' : '/images/doctor-placeholder.jpg';
       return {
         id: doc.id,
