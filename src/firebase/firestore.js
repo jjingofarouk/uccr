@@ -142,16 +142,16 @@ export const getCaseById = async (id) => {
       hospital: data.hospital || '',
       referralCenter: data.referralCenter || '',
       mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
-      awards: Number(data.awards || 0),
-      createdAt: BigInt(data.createdAt?.toMillis() || 0),
-      updatedAt: BigInt(data.updatedAt?.toMillis() || 0),
+      awards: Number(data.awards) || 0,
+      createdAt: data.createdAt?.toDate?.() || new Date(),
+      updatedAt: data.updatedAt?.toDate?.() || new Date(),
       photoURL,
     };
     console.log('Fetched case:', caseData.id, 'uid:', caseData.userId);
     return caseData;
   } catch (error) {
-    console.error('Get case error:', error);
-    throw new Error(`Failed to fetch case: ${error.message}`);
+    console.error('Get case by ID error:', error.code, error.message);
+    return null;
   }
 };
 
@@ -544,12 +544,12 @@ export const updateCase = async (caseId, caseData) => {
     if (!caseData.userId) {
       throw new Error('Missing userId in caseData');
     }
-    if (!auth.currentUser || auth.currentUser !== caseData.userId) {
+    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
       throw new Error('Authenticated user does not match caseData.userId');
     }
     const validatedCaseData = {
       userId: caseData.userId,
-      userName: String(caseData.userName || 'Anonymous'),
+      userName: caseData.userName || 'Anonymous',
       title: String(caseData.title || ''),
       specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
       presentingComplaint: String(caseData.presentingComplaint || ''),
