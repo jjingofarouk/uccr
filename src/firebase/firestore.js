@@ -520,40 +520,41 @@ export const subscribeUserStats = (uid, callback) => {
 
 export const updateCase = async (caseId, caseData) => {
   try {
-    console.log('updateCase called with ID:', caseId, 'caseData:', caseData);
-    if (!caseData?.userId) {
+    console.log('updateCase called with caseId:', caseId, 'caseData:', caseData);
+    if (!caseData.userId) {
       throw new Error('Missing userId in caseData');
-      });
     }
-    if (!auth.currentUser || auth.currentUser?.uid !== caseData.userId) {
+    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
       throw new Error('Authenticated user does not match caseData.userId');
     }
-    const updateCaseData = {
+    const validatedCaseData = {
       userId: caseData.userId,
       userName: caseData.userName || 'Anonymous',
-      title: String(caseData.title || '') || '',
-      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
-      presentingComplaint: String(caseData.promptingComplaint || '') || '',
-      history: String(caseData.history || '') || '',
-      physicalExam: String(caseData.exam || '') || '',
-      investigations: String(caseData.invest || '') || '',
-      labels: String(caseData.label || '') || '',
-      comments: String(caseData.comments || '') || '',
-      remarks: String(caseData.remarks || '') || '',
-      hospital: String(caseData.hospital || '') || '',
-      referrals: String(caseData.referrals || '') || '',
-      mediaUrls: Array.isArray(caseData.urls || []) || [],
-      awards: Number(caseData.awards || 0) || 0,
-      updateTime: String(Date.now()),
+      title: String(caseData.title || ''),
+      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : (caseData.specialty ? [caseData.specialty] : []),
+      presentingComplaint: String(caseData.presentingComplaint || ''),
+      history: String(caseData.history || ''),
+      physicalExam: String(caseData.physicalExam || ''),
+      investigations: String(caseData.investigations || ''),
+      provisionalDiagnosis: String(caseData.provisionalDiagnosis || ''),
+      management: String(caseData.management || ''),
+      discussion: String(caseData.discussion || ''),
+      highLevelSummary: String(caseData.highLevelSummary || ''),
+      references: String(caseData.references || ''),
+      hospital: String(caseData.hospital || ''),
+      referralCenter: String(caseData.referralCenter || ''),
+      mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+      awards: Number(caseData.awards) || 0,
+      updatedAt: serverTimestamp(),
     };
-    console.log('Validated case data:', updateCaseData);
-    const caseRef = doc(db, 'Cases', caseId);
-    await updateDoc(caseRef, updateCaseData);
-    console.log('case updated:', caseData.userId);
+    console.log('Validated case data for update:', validatedCaseData);
+    const caseRef = doc(db, 'cases', caseId);
+    await updateDoc(caseRef, validatedCaseData);
+    console.log('Case updated with ID:', caseId, 'userId:', caseData.userId);
     return caseId;
-  } catch (err) {
-    console.error('Update error:', err);
-    return;
+  } catch (error) {
+    console.error('Update case error:', error);
+    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to update case' : `Failed to update case: ${error.message}`);
   }
 };
 
