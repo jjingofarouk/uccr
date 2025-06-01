@@ -5,9 +5,13 @@ import { useCases } from '../hooks/useCases';
 import { useAuth } from '../hooks/useAuth';
 import { getTopContributors, getCaseStatistics } from '../firebase/firestore';
 import { Star } from 'lucide-react';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip } from 'chart.js';
 import CaseCard from '../components/Case/CaseCard';
 import Loading from '../components/Loading';
 import styles from './Home.module.css';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
 const HeroSection = () => (
   <section className={styles.hero} aria-labelledby="hero-title">
@@ -213,6 +217,89 @@ const StatsSection = () => {
     fetchStats();
   }, []);
 
+  const barColors = [
+    'rgba(59, 130, 246, 0.6)',
+    'rgba(239, 68, 68, 0.6)',
+    'rgba(34, 197, 94, 0.6)',
+    'rgba(249, 115, 22, 0.6)',
+    'rgba(168, 85, 247, 0.6)',
+  ];
+
+  const borderColors = [
+    'rgba(59, 130, 246, 1)',
+    'rgba(239, 68, 68, 1)',
+    'rgba(34, 197, 94, 1)',
+    'rgba(249, 115, 22, 1)',
+    'rgba(168, 85, 247, 1)',
+  ];
+
+  const chartData = {
+    labels: stats.map((item) => item.specialty),
+    datasets: [
+      {
+        label: 'Number of Cases',
+        data: stats.map((item) => item.count),
+        backgroundColor: barColors,
+        borderColor: borderColors,
+        borderWidth: 1,
+        hoverBackgroundColor: barColors.map(color => color.replace('0.6', '0.8')),
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: 'Top 5 Specialties by Case Count',
+        color: 'var(--text, #1f2937)',
+        font: { family: 'Inter, sans-serif', size: 16, weight: '600' },
+      },
+      tooltip: {
+        backgroundColor: 'var(--tooltip-background, rgba(0, 0, 0, 0.8))',
+        titleColor: 'var(--tooltip-text, #ffffff)',
+        bodyColor: 'var(--tooltip-text, #ffffff)',
+        borderColor: 'var(--border, #e5e7eb)',
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Cases',
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
+        },
+        ticks: {
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12 },
+          stepSize: 1,
+        },
+        grid: { color: 'var(--border, #e5e7eb)' },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Specialty',
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
+        },
+        ticks: {
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12 },
+          maxRotation: 45,
+          minRotation: 45,
+        },
+        grid: { display: false },
+      },
+    },
+  };
+
   if (loading) return <div className={styles.loadingSection}>Loading...</div>;
   if (error) return (
     <section className={styles.errorSection} role="alert">
@@ -225,87 +312,9 @@ const StatsSection = () => {
       <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
       {stats.length > 0 ? (
         <div className={styles.statsContainer}>
-          ```chartjs
-          {
-            "type": "bar",
-            "data": {
-              "labels": [
-                "${stats.map(item => item.specialty).join('","')}"
-              ],
-              "datasets": [{
-                "label": "Number of Cases",
-                "data": [${stats.map(item => item.count).join(',')}],
-                "backgroundColor": [
-                  "rgba(59, 130, 246, 0.6)",
-                  "rgba(239, 68, 68, 0.6)",
-                  "rgba(34, 197, 94, 0.6)",
-                  "rgba(249, 115, 22, 0.6)",
-                  "rgba(168, 85, 247, 0.6)"
-                ],
-                "borderColor": [
-                  "rgba(59, 130, 246, 1)",
-                  "rgba(239, 68, 68, 1)",
-                  "rgba(34, 197, 94, 1)",
-                  "rgba(249, 115, 22, 1)",
-                  "rgba(168, 85, 247, 1)"
-                ],
-                "borderWidth": 1
-              }]
-            },
-            "options": {
-              "responsive": true,
-              "maintainAspectRatio": false,
-              "plugins": {
-                "legend": { "display": false },
-                "title": {
-                  "display": true,
-                  "text": "Top 5 Specialties by Case Count",
-                  "color": "#1f2937",
-                  "font": { "family": "Inter, sans-serif", "size": 16, "weight": "600" }
-                },
-                "tooltip": {
-                  "backgroundColor": "rgba(0, 0, 0, 0.8)",
-                  "titleColor": "#ffffff",
-                  "bodyColor": "#ffffff",
-                  "borderColor": "#e5e7eb",
-                  "borderWidth": 1
-                }
-              },
-              "scales": {
-                "y": {
-                  "beginAtZero": true,
-                  "title": {
-                    "display": true,
-                    "text": "Number of Cases",
-                    "color": "#1f2937",
-                    "font": { "family": "Inter, sans-serif", "size": 12, "weight": "600" }
-                  },
-                  "ticks": {
-                    "color": "#1f2937",
-                    "font": { "family": "Inter, sans-serif", "size": 12 },
-                    "stepSize": 1
-                  },
-                  "grid": { "color": "#e5e7eb" }
-                },
-                "x": {
-                  "title": {
-                    "display": true,
-                    "text": "Specialty",
-                    "color": "#1f2937",
-                    "font": { "family": "Inter, sans-serif", "size": 12, "weight": "600" }
-                  },
-                  "ticks": {
-                    "color": "#1f2937",
-                    "font": { "family": "Inter, sans-serif", "size": 12 },
-                    "maxRotation": 45,
-                    "minRotation": 45
-                  },
-                  "grid": { "display": false }
-                }
-              }
-            }
-          }
-          ```
+          <div className={styles.chartWrapper}>
+            <Bar data={chartData} options={chartOptions} />
+          </div>
         </div>
       ) : (
         <div className={styles.emptySection} aria-live="polite">
