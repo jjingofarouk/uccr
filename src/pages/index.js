@@ -1,363 +1,432 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useCases } from '../../hooks/useCases';
-import CaseCard from '../../components/Case/CaseCard';
-import Loading from '../../components/Loading';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X } from 'lucide-react';
-import styles from './case.module.css';
+import Image from 'next/image';
+import { useCases } from '../hooks/useCases';
+import { useAuth } from '../hooks/useAuth';
+import { getTopContributors, getCaseStatistics } from '../firebase/firestore';
+import { Star } from 'lucide-react';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip } from 'chart.js';
+import CaseCard from '../components/Case/CaseCard';
+import Loading from '../components/Loading';
+import styles from './Home.module.css';
 
-export default function Cases() {
-  const { cases, loading, error } = useCases();
-  const [filters, setFilters] = useState({
-    specialty: '',
-    author: '',
-    hospital: '',
-    referralCenter: '',
-    dateRange: '',
-    awardsMin: '',
-  });
-  const [sortBy, setSortBy] = useState('createdAt-desc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [previewCase, setPreviewCase] = useState(null);
-  const casesPerPage = 12;
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
-  const specialties = [...new Set(cases.flatMap((caseData) => caseData.specialty).filter(Boolean))];
-  const hospitals = [...new Set(cases.map((caseData) => caseData.hospital).filter(Boolean))];
-  const referralCenters = [...new Set(cases.map((caseData) => caseData.referralCenter).filter(Boolean))];
+const HeroSection = () => (
+  <section className={styles.hero} aria-labelledby="hero-title">
+    <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
+    <p className={styles.heroSubtitle}>
+      Explore and contribute to a growing database of medical case studies from Uganda.
+    </p>
+    <div className={styles.heroButtons}>
+      <Link href="/cases" className={styles.ctaButtonPrimary}>
+        Browse Cases
+      </Link>
+      <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+        Share a Case
+      </Link>
+    </div>
+  </section>
+);
 
-  const filteredCases = useMemo(() => {
-    return cases.filter((caseData) => {
-      const matchesSpecialty = filters.specialty
-        ? Array.isArray(caseData.specialty) && caseData.specialty.includes(filters.specialty)
-        : true;
-      const matchesAuthor = filters.author
-        ? caseData.userName.toLowerCase().includes(filters.author.toLowerCase())
-        : true;
-      const matchesHospital = filters.hospital ? caseData.hospital === filters.hospital : true;
-      const matchesReferralCenter = filters.referralCenter
-        ? caseData.referralCenter === filters.referralCenter
-        : true;
-      const matchesDate = filters.dateRange
-        ? (() => {
-            const now = new Date();
-            const caseDate = new Date(caseData.createdAt);
-            if (filters.dateRange === 'last7days') {
-              return caseDate >= new Date(now.setDate(now.getDate() - 7));
-            }
-            if (filters.dateRange === 'last30days') {
-              return caseDate >= new Date(now.setDate(now.getDate() - 30));
-            }
-            if (filters.dateRange === 'lastYear') {
-              return caseDate >= new Date(now.setFullYear(now.getFullYear() - 1));
-            }
-            return true;
-          })()
-        : true;
-      const matchesAwards = filters.awardsMin
-        ? (caseData.awards || 0) >= parseInt(filters.awardsMin)
-        : true;
-      return matchesSpecialty && matchesAuthor && matchesHospital && matchesReferralCenter && matchesDate && matchesAwards;
-    });
-  }, [cases, filters]);
-
-  const sortedCases = useMemo(() => {
-    return [...filteredCases].sort((a, b) => {
-      if (sortBy === 'createdAt-desc') {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      }
-      if (sortBy === 'createdAt-asc') {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-      }
-      if (sortBy === 'awards-desc') {
-        return (b.awards || 0) - (a.awards || 0);
-      }
-      if (sortBy === 'awards-asc') {
-        return (a.awards || 0) - (b.awards || 0);
-      }
-      if (sortBy === 'title-asc') {
-        return a.title.localeCompare(b.title);
-      }
-      if (sortBy === 'title-desc') {
-        return b.title.localeCompare(a.title);
-      }
-      return 0;
-    });
-  }, [filteredCases, sortBy]);
-
-  const paginatedCases = useMemo(() => {
-    const start = (currentPage - 1) * casesPerPage;
-    return sortedCases.slice(start, start + casesPerPage);
-  }, [sortedCases, currentPage]);
-
-  const totalPages = Math.ceil(sortedCases.length / casesPerPage);
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-    setCurrentPage(1);
-  };
-
-  const handleSortChange = (e) => {
-    setSortBy(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleExportCSV = () => {
-    const headers = [
-      'Title',
-      'Specialties',
-      'Author',
-      'Hospital',
-      'Referral Center',
-      'Awards',
-      'Created At',
-      'Presenting Complaint',
-      'Provisional Diagnosis',
-    ];
-    const rows = sortedCases.map((caseData) => [
-      `"${caseData.title || ''}"`,
-      `"${Array.isArray(caseData.specialty) ? caseData.specialty.join(', ') : caseData.specialty || ''}"`,
-      caseData.userName || 'Anonymous',
-      caseData.hospital || '',
-      caseData.referralCenter || '',
-      caseData.awards || 0,
-      new Date(caseData.createdAt).toISOString(),
-      `"${caseData.presentingComplaint || ''}"`,
-      `"${caseData.provisionalDiagnosis || ''}"`,
-    ]);
-    const csvContent = [
-      headers.join(','),
-      ...rows.map((row) => row.join(',')),
-    ].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'uccr_cases_export.csv';
-    link.click();
-  };
-
-  const handlePreviewCase = (caseData) => {
-    setPreviewCase(caseData);
-  };
-
-  const closePreview = () => {
-    setPreviewCase(null);
-  };
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorSection} role="alert">
-        <p className={styles.errorText}>Error: {error}</p>
+const FeaturedSection = ({ caseOfTheDay }) => (
+  <section className={styles.featuredSection} aria-labelledby="featured-title">
+    <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
+    {caseOfTheDay ? (
+      <div className={styles.featuredCard}>
+        <CaseCard caseData={caseOfTheDay} />
       </div>
-    );
-  }
+    ) : (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No featured case available</p>
+        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          Share a Case
+        </Link>
+      </div>
+    )}
+  </section>
+);
+
+const TrendingSection = ({ trendingCases }) => (
+  <section className={styles.trendingSection} aria-labelledby="trending-title">
+    <h2 id="trending-title" className={styles.sectionTitle}>Trending Cases</h2>
+    {trendingCases.length > 0 ? (
+      <div className={styles.caseList}>
+        {trendingCases.map((caseData) => (
+          <CaseCard key={caseData.id} caseData={caseData} />
+        ))}
+      </div>
+    ) : (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No trending cases available</p>
+        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          Share a Case
+        </Link>
+      </div>
+    )}
+  </section>
+);
+
+const RecentSection = ({ recentCases }) => (
+  <section className={styles.recentSection} aria-labelledby="recent-title">
+    <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
+    {recentCases.length > 0 ? (
+      <div className={styles.caseList}>
+        {recentCases.map((caseData) => (
+          <CaseCard key={caseData.id} caseData={caseData} />
+        ))}
+      </div>
+    ) : (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No recent cases available</p>
+        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          Share a Case
+        </Link>
+      </div>
+    )}
+  </section>
+);
+
+const SpecialtySection = ({ specialtyCases, featuredSpecialty }) => (
+  <section className={styles.specialtySection} aria-labelledby="specialty-title">
+    <h2 id="specialty-title" className={styles.sectionTitle}>
+      Specialty Spotlight: {featuredSpecialty || 'None'}
+    </h2>
+    {specialtyCases.length > 0 ? (
+      <div className={styles.caseList}>
+        {specialtyCases.map((caseData) => (
+          <CaseCard key={caseData.id} caseData={caseData} />
+        ))}
+      </div>
+    ) : (
+      <div className={styles.emptySection}>
+        <p className={styles.emptyText}>No specialty cases available</p>
+        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          Share a Case
+        </Link>
+      </div>
+    )}
+  </section>
+);
+
+const LeaderboardSection = () => {
+  const [contributors, setContributors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchContributors = async () => {
+      try {
+        const data = await getTopContributors(3);
+        setContributors(data);
+      } catch (err) {
+        setError('Failed to load top contributors');
+        console.error('Error fetching contributors:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContributors();
+  }, []);
+
+  if (loading) return <Loading />;
+  if (error) return (
+    <section className={styles.errorSection} role="alert">
+      <p className={styles.errorText}>{error}</p>
+    </section>
+  );
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>All Cases</h1>
-      <div className={styles.filterSortContainer}>
-        <div className={styles.filters}>
-          <select
-            name="specialty"
-            value={filters.specialty}
-            onChange={handleFilterChange}
-            className={styles.filterSelect}
-            aria-label="Filter by specialty"
-          >
-            <option value="">All Specialties</option>
-            {specialties.map((specialty) => (
-              <option key={specialty} value={specialty}>
-                {specialty}
-              </option>
-            ))}
-          </select>
-          <input
-            type="text"
-            name="author"
-            placeholder="Search by author..."
-            value={filters.author}
-            onChange={handleFilterChange}
-            className={styles.filterInput}
-            aria-label="Filter by author"
-          />
-          <select
-            name="hospital"
-            value={filters.hospital}
-            onChange={handleFilterChange}
-            className={styles.filterSelect}
-            aria-label="Filter by hospital"
-          >
-            <option value="">All Hospitals</option>
-            {hospitals.map((hospital) => (
-              <option key={hospital} value={hospital}>
-                {hospital}
-              </option>
-            ))}
-          </select>
-          <select
-            name="referralCenter"
-            value={filters.referralCenter}
-            onChange={handleFilterChange}
-            className={styles.filterSelect}
-            aria-label="Filter by referral center"
-          >
-            <option value="">All Referral Centers</option>
-            {referralCenters.map((center) => (
-              <option key={center} value={center}>
-                {center}
-              </option>
-            ))}
-          </select>
-          <select
-            name="dateRange"
-            value={filters.dateRange}
-            onChange={handleFilterChange}
-            className={styles.filterSelect}
-            aria-label="Filter by date range"
-          >
-            <option value="">All Dates</option>
-            <option value="last7days">Last 7 Days</option>
-            <option value="last30days">Last 30 Days</option>
-            <option value="lastYear">Last Year</option>
-          </select>
-          <input
-            type="number"
-            name="awardsMin"
-            placeholder="Min Awards"
-            value={filters.awardsMin}
-            onChange={handleFilterChange}
-            className={styles.filterInput}
-            min="0"
-            aria-label="Filter by minimum awards"
-          />
-        </div>
-        <div className={styles.sortExport}>
-          <select
-            value={sortBy}
-            onChange={handleSortChange}
-            className={styles.sortSelect}
-            aria-label="Sort cases"
-          >
-            <option value="createdAt-desc">Newest First</option>
-            <option value="createdAt-asc">Oldest First</option>
-            <option value="awards-desc">Most Awards</option>
-            <option value="awards-asc">Least Awards</option>
-            <option value="title-asc">Title A-Z</option>
-            <option value="title-desc">Title Z-A</option>
-          </select>
-          <button
-            onClick={handleExportCSV}
-            className={styles.exportButton}
-            disabled={sortedCases.length === 0}
-            aria-label="Export cases as CSV"
-          >
-            <Download size={20} />
-            Export CSV
-          </button>
-        </div>
-      </div>
-      {sortedCases.length === 0 ? (
-        <div className={styles.emptyState}>
-          <p>
-            No cases match your filters. <Link href="/cases/new">Share a case!</Link>
-          </p>
+    <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
+      <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
+      {contributors.length > 0 ? (
+        <div className={styles.leaderboard}>
+          {contributors.map((contributor) => (
+            <Link
+              key={contributor.uid}
+              href={`/profile/view/${contributor.uid}`}
+              className={styles.contributor}
+            >
+              <Image
+                src={contributor.photoURL}
+                alt={`${contributor.displayName}'s avatar`}
+                width={40}
+                height={40}
+                className={styles.contributorAvatar}
+              />
+              <div>
+                <span>{contributor.displayName}</span>
+                <small>
+                  {contributor.caseCount} case{contributor.caseCount !== 1 ? 's' : ''} uploaded
+                </small>
+                {contributor.awards?.length > 0 && (
+                  <small className={styles.awards}>
+                    {contributor.awards.map((award, index) => (
+                      <span
+                        key={index}
+                        className={
+                          award === 'Gold'
+                            ? styles.goldAward
+                            : award === 'Silver'
+                            ? styles.silverAward
+                            : styles.bronzeAward
+                        }
+                      >
+                        {award} <Star size={12} />
+                      </span>
+                    ))}
+                  </small>
+                )}
+              </div>
+            </Link>
+          ))}
         </div>
       ) : (
-        <>
-          <div className={styles['case-list']}>
-            {paginatedCases.map((caseData) => (
-              <div
-                key={caseData.id}
-                className={styles.caseCardWrapper}
-                onClick={() => handlePreviewCase(caseData)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handlePreviewCase(caseData)}
-                aria-label={`Preview case: ${caseData.title || 'Untitled'}`}
-              >
-                <CaseCard caseData={caseData} />
-              </div>
-            ))}
+        <div className={styles.emptySection} aria-live="polite">
+          <p className={styles.emptyText}>No contributors found</p>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Contribute a Case
+          </Link>
+        </div>
+      )}
+    </section>
+  );
+};
+
+const StatsSection = () => {
+  const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getCaseStatistics();
+        const topStats = data
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+        setStats(topStats);
+      } catch (err) {
+        setError('Unable to load case statistics');
+        console.error('Error fetching case statistics:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const barColors = [
+    'rgba(59, 130, 246, 0.6)',
+    'rgba(239, 68, 68, 0.6)',
+    'rgba(34, 197, 94, 0.6)',
+    'rgba(249, 115, 22, 0.6)',
+    'rgba(168, 85, 247, 0.6)',
+  ];
+
+  const borderColors = [
+    'rgba(59, 130, 246, 1)',
+    'rgba(239, 68, 68, 1)',
+    'rgba(34, 197, 94, 1)',
+    'rgba(249, 115, 22, 1)',
+    'rgba(168, 85, 247, 1)',
+  ];
+
+  const chartData = {
+    labels: stats.map((item) => item.specialty),
+    datasets: [
+      {
+        label: 'Number of Cases',
+        data: stats.map((item) => item.count),
+        backgroundColor: barColors,
+        borderColor: borderColors,
+        borderWidth: 1,
+        hoverBackgroundColor: barColors.map(color => color.replace('0.6', '0.8')),
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: 'Top 5 Specialties by Case Count',
+        color: 'var(--text, #1f2937)',
+        font: { family: 'Inter, sans-serif', size: 16, weight: '600' },
+      },
+      tooltip: {
+        backgroundColor: 'var(--tooltip-background, rgba(0, 0, 0, 0.8))',
+        titleColor: 'var(--tooltip-text, #ffffff)',
+        bodyColor: 'var(--tooltip-text, #ffffff)',
+        borderColor: 'var(--border, #e5e7eb)',
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Cases',
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
+        },
+        ticks: {
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12 },
+          stepSize: 1,
+        },
+        grid: { color: 'var(--border, #e5e7eb)' },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Specialty',
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
+        },
+        ticks: {
+          color: 'var(--text, #1f2937)',
+          font: { family: 'Inter, sans-serif', size: 12 },
+          maxRotation: 45,
+          minRotation: 45,
+        },
+        grid: { display: false },
+      },
+    },
+  };
+
+  if (loading) return <div className={styles.loadingSection}>Loading...</div>;
+  if (error) return (
+    <section className={styles.errorSection} role="alert">
+      <p className={styles.errorText}>{error}</p>
+    </section>
+  );
+
+  return (
+    <section className={styles.statsSection} aria-labelledby="stats-title">
+      <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
+      {stats.length > 0 ? (
+        <div className={styles.statsContainer}>
+          <div className={styles.chartWrapper}>
+            <Bar data={chartData} options={chartOptions} />
           </div>
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={styles.pageButton}
-                aria-label="Previous page"
-              >
-                Previous
-              </button>
-              {[...Array(totalPages).keys()].map((page) => (
-                <button
-                  key={page + 1}
-                  onClick={() => handlePageChange(page + 1)}
-                  className={`${styles.pageButton} ${currentPage === page + 1 ? styles.activePage : ''}`}
-                  aria-label={`Page ${page + 1}`}
-                  aria-current={currentPage === page + 1 ? 'page' : undefined}
-                >
-                  {page + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={styles.pageButton}
-                aria-label="Next page"
-              >
-                Next
-              </button>
-            </div>
+        </div>
+      ) : (
+        <div className={styles.emptySection} aria-live="polite">
+          <p className={styles.emptyText}>No case statistics available</p>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Contribute a Case
+          </Link>
+        </div>
+      )}
+    </section>
+  );
+};
+
+export default function HomePage() {
+  const { user } = useAuth();
+  const { cases, loading, error } = useCases();
+  const [caseOfTheDay, setCaseOfTheDay] = useState(null);
+  const [featuredSpecialty, setFeaturedSpecialty] = useState('');
+
+  useEffect(() => {
+    if (cases.length > 0) {
+      const now = new Date();
+      const eatOffset = 3 * 60 * 60 * 1000;
+      const eatDate = new Date(now.getTime() + eatOffset);
+      const dateString = eatDate.toISOString().split('T')[0];
+      const seed = dateString
+        .split('-')
+        .reduce((acc, val) => acc + parseInt(val), 0);
+      const randomIndex = seed % cases.length;
+      setCaseOfTheDay(cases[randomIndex]);
+    }
+  }, [cases]);
+
+  useEffect(() => {
+    const specialties = [
+      ...new Set(
+        cases
+          .flatMap((c) => Array.isArray(c.specialty) ? c.specialty : [])
+          .filter(Boolean)
+      ),
+    ];
+    if (specialties.length > 0) {
+      const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+      setFeaturedSpecialty(specialties[weekNumber % specialties.length]);
+    }
+  }, [cases]);
+
+  const recentCases = useMemo(() => {
+    return cases
+      .slice()
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+  }, [cases]);
+
+  const trendingCases = useMemo(() => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    return cases
+      .filter((caseData) => new Date(caseData.createdAt) >= oneWeekAgo)
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, 3);
+  }, [cases]);
+
+  const specialtyCases = useMemo(() => {
+    return cases
+      .filter((caseData) => Array.isArray(caseData.specialty) && caseData.specialty.includes(featuredSpecialty))
+      .slice(0, 3);
+  }, [cases, featuredSpecialty]);
+
+  if (loading) return (
+    <main className={styles.container}>
+      <HeroSection />
+      <section className={styles.loadingSection}>
+        <Loading />
+      </section>
+    </main>
+  );
+
+  if (error) return (
+    <main className={styles.container}>
+      <HeroSection />
+      <section className={styles.errorSection} role="alert">
+        <p className={styles.errorText}>Error: {error}</p>
+      </section>
+    </main>
+  );
+
+  return (
+    <main className={styles.container}>
+      <HeroSection />
+      {cases.length === 0 ? (
+        <section className={styles.emptySection} aria-live="polite">
+          <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
+          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+            Share a Case
+          </Link>
+        </section>
+      ) : (
+        <>
+          <FeaturedSection caseOfTheDay={caseOfTheDay} />
+          <TrendingSection trendingCases={trendingCases} />
+          <RecentSection recentCases={recentCases} />
+          {featuredSpecialty && (
+            <SpecialtySection
+              specialtyCases={specialtyCases}
+              featuredSpecialty={featuredSpecialty}
+            />
           )}
+          <StatsSection />
+          <LeaderboardSection />
         </>
       )}
-      <AnimatePresence>
-        {previewCase && (
-          <motion.div
-            className={styles.previewModal}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className={styles.previewContent}>
-              <button
-                onClick={closePreview}
-                className={styles.closeButton}
-                aria-label="Close preview"
-              >
-                <X size={24} />
-              </button>
-              <h2>{previewCase.title || 'Untitled Case'}</h2>
-              <p><strong>Specialties:</strong> {Array.isArray(previewCase.specialty) ? previewCase.specialty.join(', ') : previewCase.specialty || 'N/A'}</p>
-              <p><strong>Author:</strong> {previewCase.userName || 'Anonymous'}</p>
-              <p><strong>Hospital:</strong> {previewCase.hospital || 'N/A'}</p>
-              <p><strong>Presenting Complaint:</strong> {previewCase.presentingComplaint || 'N/A'}</p>
-              <p><strong>Provisional Diagnosis:</strong> {previewCase.provisionalDiagnosis || 'N/A'}</p>
-              <p><strong>Awards:</strong> {previewCase.awards || 0}</p>
-              <p><strong>Created:</strong> {new Date(previewCase.createdAt).toLocaleDateString()}</p>
-              <Link
-                href={`/cases/${previewCase.id}`}
-                className={styles.viewFullCase}
-                onClick={closePreview}
-              >
-                View Full Case
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </main>
   );
 }
