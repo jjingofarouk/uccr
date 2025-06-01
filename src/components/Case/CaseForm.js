@@ -161,6 +161,16 @@ export default function CaseForm() {
     }
   }, [user]);
 
+  useEffect(() => {
+    // Set CSS custom property for total steps
+    document.documentElement.style.setProperty('--total-steps', steps.length);
+    // Update transform for carousel
+    const carouselInner = document.querySelector(`.${styles.carouselInner}`);
+    if (carouselInner) {
+      carouselInner.style.transform = `translateX(-${(currentStep * 100) / steps.length}%)`;
+    }
+  }, [currentStep, steps.length]);
+
   const handleChange = (value, name) => {
     if (name === 'specialty') {
       const selectedOptions = Array.from(value.target.selectedOptions).map(option => option.value);
