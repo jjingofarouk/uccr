@@ -5,7 +5,12 @@ import { updateCase, getCaseById } from '../../firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
 import Loading from '../Loading';
+import dynamic from 'next/dynamic';
 import styles from '../../styles/caseForm.module.css';
+import 'react-quill/dist/quill.snow.css';
+
+// Dynamically import ReactQuill to avoid SSR issues with Next.js
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function EditCaseForm({ caseId }) {
   const { user, loading: authLoading, error: authError } = useAuth();
@@ -35,74 +40,85 @@ export default function EditCaseForm({ caseId }) {
   const router = useRouter();
   const SUBMISSION_LOADING_DURATION = 1000;
 
+  // Quill toolbar options
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ['bold', 'italic', 'underline'],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      ['link'],
+      ['clean'],
+    ],
+  };
+
   const steps = [
-    { name: 'title', label: 'Case Title', type: 'input', placeholder: 'Enter case title' },
-    { name: 'presentingComplaint', label: 'Presenting Complaint', type: 'textarea', placeholder: 'Describe the presenting complaint' },
-    { name: 'history', label: 'History', type: 'textarea', placeholder: 'Patient history' },
-    { name: 'physicalExam', label: 'Physical Examination', type: 'textarea', placeholder: 'Physical exam findings' },
-    { name: 'investigations', label: 'Investigations', type: 'textarea', placeholder: 'Investigation results' },
-    { name: 'management', label: 'Management', type: 'textarea', placeholder: 'Management plan' },
-    { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'input', placeholder: 'Enter provisional diagnosis' },
-    { name: 'hospital', label: 'Hospital', type: 'input', placeholder: 'Enter hospital name' },
-    { name: 'referralCenter', label: 'Referral Center', type: 'input', placeholder: 'Enter referral center' },
-{
-  name: 'specialty',
-  label: 'Specialty',
-  type: 'select',
-  options: [
-    { value: '', label: 'Select Specialty' },
-    { value: 'General Practice', label: 'General Practice' },
-    { value: 'Internal Medicine', label: 'Internal Medicine' },
-    { value: 'Family Medicine', label: 'Family Medicine' },
-    { value: 'Pediatrics', label: 'Pediatrics' },
-    { value: 'Obstetrics and Gynecology', label: 'Obstetrics and Gynecology' },
-    { value: 'General Surgery', label: 'General Surgery' },
-    { value: 'Emergency Medicine', label: 'Emergency Medicine' },
-    { value: 'Anesthesiology', label: 'Anesthesiology' },
-    { value: 'Psychiatry', label: 'Psychiatry' },
-    { value: 'Radiology', label: 'Radiology' },
-    { value: 'Pathology', label: 'Pathology' },
-    { value: 'Orthopedic Surgery', label: 'Orthopedic Surgery' },
-    { value: 'Cardiology', label: 'Cardiology' },
-    { value: 'Pulmonology', label: 'Pulmonology' },
-    { value: 'Nephrology', label: 'Nephrology' },
-    { value: 'Gastroenterology', label: 'Gastroenterology' },
-    { value: 'Endocrinology', label: 'Endocrinology' },
-    { value: 'Infectious Diseases', label: 'Infectious Diseases' },
-    { value: 'Dermatology', label: 'Dermatology' },
-    { value: 'Neurology', label: 'Neurology' },
-    { value: 'Urology', label: 'Urology' },
-    { value: 'Ophthalmology', label: 'Ophthalmology' },
-    { value: 'Otolaryngology (ENT)', label: 'Otolaryngology (ENT)' },
-    { value: 'Hematology', label: 'Hematology' },
-    { value: 'Oncology', label: 'Oncology' },
-    { value: 'Rheumatology', label: 'Rheumatology' },
-    { value: 'Plastic Surgery', label: 'Plastic Surgery' },
-    { value: 'Thoracic Surgery', label: 'Thoracic Surgery' },
-    { value: 'Vascular Surgery', label: 'Vascular Surgery' },
-    { value: 'Neurosurgery', label: 'Neurosurgery' },
-    { value: 'Critical Care Medicine', label: 'Critical Care Medicine' },
-    { value: 'Allergy and Immunology', label: 'Allergy and Immunology' },
-    { value: 'Geriatrics', label: 'Geriatrics' },
-    { value: 'Sports Medicine', label: 'Sports Medicine' },
-    { value: 'Rehabilitation Medicine (PM&R)', label: 'Rehabilitation Medicine (PM&R)' },
-    { value: 'Palliative Care', label: 'Palliative Care' },
-    { value: 'Occupational Medicine', label: 'Occupational Medicine' },
-    { value: 'Medical Genetics', label: 'Medical Genetics' },
-    { value: 'Nuclear Medicine', label: 'Nuclear Medicine' },
-    { value: 'Transplant Medicine', label: 'Transplant Medicine' },
-    { value: 'Sleep Medicine', label: 'Sleep Medicine' },
-    { value: 'Pain Medicine', label: 'Pain Medicine' },
-    { value: 'Forensic Medicine', label: 'Forensic Medicine' },
-    { value: 'Hyperbaric Medicine', label: 'Hyperbaric Medicine' },
-    { value: 'Tropical Medicine', label: 'Tropical Medicine' },
-    { value: 'Space Medicine', label: 'Space Medicine' },
-    { value: 'Other', label: 'Other' },
-  ]
-},
-    { name: 'discussion', label: 'Discussion', type: 'textarea', placeholder: 'Discuss the case' },
-    { name: 'highLevelSummary', label: 'High-Level Summary', type: 'textarea', placeholder: 'Summarize the case' },
-    { name: 'references', label: 'References', type: 'textarea', placeholder: 'List references' },
+    { name: 'title', label: 'Case Title', type: 'richtext', placeholder: 'Enter case title' },
+    { name: 'presentingComplaint', label: 'Presenting Complaint', type: 'richtext', placeholder: 'Describe the presenting complaint' },
+    { name: 'history', label: 'History', type: 'richtext', placeholder: 'Patient history' },
+    { name: 'physicalExam', label: 'Physical Examination', type: 'richtext', placeholder: 'Physical exam findings' },
+    { name: 'investigations', label: 'Investigations', type: 'richtext', placeholder: 'Investigation results' },
+    { name: 'management', label: 'Management', type: 'richtext', placeholder: 'Management plan' },
+    { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
+    { name: 'hospital', label: 'Hospital', type: 'richtext', placeholder: 'Enter hospital name' },
+    { name: 'referralCenter', label: 'Referral Center', type: 'richtext', placeholder: 'Enter referral center' },
+    {
+      name: 'specialty',
+      label: 'Specialty',
+      type: 'select',
+      options: [
+        { value: '', label: 'Select Specialty' },
+        { value: 'General Practice', label: 'General Practice' },
+        { value: 'Internal Medicine', label: 'Internal Medicine' },
+        { value: 'Family Medicine', label: 'Family Medicine' },
+        { value: 'Pediatrics', label: 'Pediatrics' },
+        { value: 'Obstetrics and Gynecology', label: 'Obstetrics and Gynecology' },
+        { value: 'General Surgery', label: 'General Surgery' },
+        { value: 'Emergency Medicine', label: 'Emergency Medicine' },
+        { value: 'Anesthesiology', label: 'Anesthesiology' },
+        { value: 'Psychiatry', label: 'Psychiatry' },
+        { value: 'Radiology', label: 'Radiology' },
+        { value: 'Pathology', label: 'Pathology' },
+        { value: 'Orthopedic Surgery', label: 'Orthopedic Surgery' },
+        { value: 'Cardiology', label: 'Cardiology' },
+        { value: 'Pulmonology', label: 'Pulmonology' },
+        { value: 'Nephrology', label: 'Nephrology' },
+        { value: 'Gastroenterology', label: 'Gastroenterology' },
+        { value: 'Endocrinology', label: 'Endocrinology' },
+        { value: 'Infectious Diseases', label: 'Infectious Diseases' },
+        { value: 'Dermatology', label: 'Dermatology' },
+        { value: 'Neurology', label: 'Neurology' },
+        { value: 'Urology', label: 'Urology' },
+        { value: 'Ophthalmology', label: 'Ophthalmology' },
+        { value: 'Otolaryngology (ENT)', label: 'Otolaryngology (ENT)' },
+        { value: 'Hematology', label: 'Hematology' },
+        { value: 'Oncology', label: 'Oncology' },
+        { value: 'Rheumatology', label: 'Rheumatology' },
+        { value: 'Plastic Surgery', label: 'Plastic Surgery' },
+        { value: 'Thoracic Surgery', label: 'Thoracic Surgery' },
+        { value: 'Vascular Surgery', label: 'Vascular Surgery' },
+        { value: 'Neurosurgery', label: 'Neurosurgery' },
+        { value: 'Critical Care Medicine', label: 'Critical Care Medicine' },
+        { value: 'Allergy and Immunology', label: 'Allergy and Immunology' },
+        { value: 'Geriatrics', label: 'Geriatrics' },
+        { value: 'Sports Medicine', label: 'Sports Medicine' },
+        { value: 'Rehabilitation Medicine (PM&R)', label: 'Rehabilitation Medicine (PM&R)' },
+        { value: 'Palliative Care', label: 'Palliative Care' },
+        { value: 'Occupational Medicine', label: 'Occupational Medicine' },
+        { value: 'Medical Genetics', label: 'Medical Genetics' },
+        { value: 'Nuclear Medicine', label: 'Nuclear Medicine' },
+        { value: 'Transplant Medicine', label: 'Transplant Medicine' },
+        { value: 'Sleep Medicine', label: 'Sleep Medicine' },
+        { value: 'Pain Medicine', label: 'Pain Medicine' },
+        { value: 'Forensic Medicine', label: 'Forensic Medicine' },
+        { value: 'Hyperbaric Medicine', label: 'Hyperbaric Medicine' },
+        { value: 'Tropical Medicine', label: 'Tropical Medicine' },
+        { value: 'Space Medicine', label: 'Space Medicine' },
+        { value: 'Other', label: 'Other' },
+      ],
+    },
+    { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
+    { name: 'highLevelSummary', label: 'High-Level Summary', type: 'richtext', placeholder: 'Summarize the case' },
+    { name: 'references', label: 'References', type: 'richtext', placeholder: 'List references' },
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
@@ -191,11 +207,9 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [user]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const normalizedValue = name === 'title' || name === 'provisionalDiagnosis' || name === 'hospital' || name === 'referralCenter' || name === 'specialty'
-      ? value
-      : value.replace(/\n{3,}/g, '\n\n').trimEnd().replace(/ {2,}/g, ' ');
+  const handleChange = (value, name) => {
+    // For rich text fields, value is HTML string; for select, it's the selected value
+    const normalizedValue = name === 'specialty' ? value : value;
     setFormData(prev => ({ ...prev, [name]: normalizedValue }));
   };
 
@@ -228,6 +242,25 @@ export default function EditCaseForm({ caseId }) {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (forceLoading && loadStart) {
+      const elapsed = Date.now() - loadStart;
+      const remaining = SUBMISSION_LOADING_DURATION - elapsed;
+      if (remaining <= 0) {
+        setForceLoading(false);
+        setIsLoading(false);
+        router.push(`/cases/${caseId}`);
+      } else {
+        const timer = setTimeout(() => {
+          setForceLoading(false);
+          setIsLoading(false);
+          router.push(`/cases/${caseId}`);
+        }, remaining);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [forceLoading, loadStart, router, caseId]);
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
@@ -273,28 +306,21 @@ export default function EditCaseForm({ caseId }) {
           >
             {steps.map((step, index) => (
               <div key={step.name} className={styles.carouselItem}>
-                {step.type === 'input' && (
-                  <input
-                    type="text"
-                    name={step.name}
-                    placeholder={step.placeholder}
+                {step.type === 'richtext' && (
+                  <ReactQuill
+                    theme="snow"
                     value={formData[step.name]}
-                    onChange={handleChange}
-                  />
-                )}
-                {step.type === 'textarea' && (
-                  <textarea
-                    name={step.name}
+                    onChange={(value) => handleChange(value, step.name)}
                     placeholder={step.placeholder}
-                    value={formData[step.name]}
-                    onChange={handleChange}
+                    modules={quillModules}
+                    className={styles.quillEditor}
                   />
                 )}
                 {step.type === 'select' && (
                   <select
                     name={step.name}
                     value={formData[step.name]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e.target.value, step.name)}
                   >
                     {step.options.map(option => (
                       <option key={option.value} value={option.value}>
