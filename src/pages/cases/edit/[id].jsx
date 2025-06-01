@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import EditCaseForm from '../../../components/Case/EditCaseForm';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
 import Loading from '../../../components/Loading';
-import styles from '../../../styles/casePage.module.css';
+
 
 export default function EditCasePage() {
   const router = useRouter();
