@@ -1,26 +1,52 @@
-// src/components/Case/CaseCard.js
 import Link from 'next/link';
 import Image from 'next/image';
+import sanitizeHtml from 'sanitize-html';
 import styles from '../../styles/caseCard.module.css';
 
-// Utility function to process text with line breaks
-const formatText = (text) => {
-  if (!text || typeof text !== 'string') return 'Not specified';
-  // For CaseCard, limit to first paragraph and add ellipsis if more exists
-  const paragraphs = text.split('\n\n').filter(p => p.trim());
-  const firstParagraph = paragraphs[0] || '';
-  return firstParagraph.length > 100
-    ? firstParagraph.slice(0, 100) + '...' // Truncate for brevity
-    : firstParagraph.split('\n').map((line, i, arr) =>
-        i < arr.length - 1 ? (
-          <span key={i}>
-            {line}
-            <br />
-          </span>
-        ) : (
-          line
-        )
-      );
+// Utility function to render and truncate rich text for summary
+const renderRichTextSummary = (html) => {
+  if (!html || typeof html !== 'string') return 'Not specified';
+  const cleanText = sanitizeHtml(html, {
+    allowedTags: [],
+    allowedAttributes: {},
+  });
+  return cleanText.length > 100 ? cleanText.slice(0, 100) + '...' : cleanText;
+};
+
+// Utility function to format posted date
+const formatPostedDate = (createdAt) => {
+  if (!createdAt) return 'Unknown date';
+  const date = new Date(createdAt);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+// Utility function to render specialty tags
+const renderSpecialtyTags = (specialties) => {
+  if (!Array.isArray(specialties) || specialties.length === 0) {
+    return <span className={styles.tag}>Not specified</span>;
+  }
+  const maxTags = 3;
+  const visibleTags = specialties.slice(0, maxTags);
+  const remainingCount = specialties.length - maxTags;
+
+  return (
+    <div className={styles.tags}>
+      {visibleTags.map((specialty, index) => (
+        <span key={index} className={styles.tag}>
+          {specialty}
+        </span>
+      ))}
+      {remainingCount > 0 && (
+        <span className={`${styles.tag} ${styles.moreTag}`}>
+          +{remainingCount}
+        </span>
+      )}
+    </div>
+  );
 };
 
 export default function CaseCard({ caseData }) {
@@ -36,14 +62,14 @@ export default function CaseCard({ caseData }) {
     <Link
       href={`/cases/${caseData.id}`}
       className={`${styles.card} ${hasImage ? '' : styles.noImageCard}`}
-      aria-label={`View case: ${caseData.title || 'Untitled Case'}`}
+      aria-label={`View case: ${renderRichTextSummary(caseData.title) || 'Untitled Case'}`}
       role="article"
     >
       {hasImage && (
         <div className={styles.imageContainer}>
           <Image
             src={caseData.mediaUrls[0]}
-            alt={`Image for ${caseData.title || 'case'}`}
+            alt={`Image for ${renderRichTextSummary(caseData.title) || 'case'}`}
             width={280}
             height={180}
             className={styles.image}
@@ -54,13 +80,17 @@ export default function CaseCard({ caseData }) {
         </div>
       )}
       <div className={styles.content}>
-        <h3 className={styles.title}>{caseData.title || 'Untitled Case'}</h3>
+        <h3 className={styles.title}>{renderRichTextSummary(caseData.title) || 'Untitled Case'}</h3>
         <p className={styles.concern}>
-          <strong>Chief Concern:</strong> {formatText(caseData.presentingComplaint)}
+          <strong>Chief Concern:</strong> {renderRichTextSummary(caseData.presentingComplaint)}
         </p>
+        <div className={styles.specialty}>
+          <strong>Specialties:</strong> {renderSpecialtyTags(caseData.specialty)}
+        </div>
+        <p className={styles.postedDate}>{formatPostedDate(caseData.createdAt)}</p>
         <div className={styles.contributor}>
           <Image
-            src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
+            src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
             alt={`Avatar for ${caseData.userName || 'Contributor'}`}
             width={24}
             height={24}
