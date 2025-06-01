@@ -42,7 +42,7 @@ export const addCase = async (caseData) => {
       userId: caseData.userId,
       userName: caseData.userName || 'Anonymous',
       title: String(caseData.title || ''),
-      specialty: String(caseData.specialty || ''),
+      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
       presentingComplaint: String(caseData.presentingComplaint || ''),
       history: String(caseData.history || ''),
       physicalExam: String(caseData.physicalExam || ''),
@@ -129,7 +129,7 @@ export const getCaseById = async (id) => {
       userId: data.userId,
       userName: data.userName || 'Anonymous',
       title: data.title || '',
-      specialty: data.specialty || '',
+      specialty: Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []),
       presentingComplaint: data.presentingComplaint || '',
       history: data.history || '',
       physicalExam: data.physicalExam || '',
@@ -142,16 +142,16 @@ export const getCaseById = async (id) => {
       hospital: data.hospital || '',
       referralCenter: data.referralCenter || '',
       mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
-      awards: Number(data.awards) || 0,
-      createdAt: data.createdAt?.toDate?.() || new Date(),
-      updatedAt: data.updatedAt?.toDate?.() || new Date(),
+      awards: Number(data.awards || 0),
+      createdAt: BigInt(data.createdAt?.toMillis() || 0),
+      updatedAt: BigInt(data.updatedAt?.toMillis() || 0),
       photoURL,
     };
     console.log('Fetched case:', caseData.id, 'uid:', caseData.userId);
     return caseData;
   } catch (error) {
-    console.error('Get case by ID error:', error.code, error.message);
-    return null;
+    console.error('Get case error:', error);
+    throw new Error(`Failed to fetch case: ${error.message}`);
   }
 };
 
@@ -544,14 +544,14 @@ export const updateCase = async (caseId, caseData) => {
     if (!caseData.userId) {
       throw new Error('Missing userId in caseData');
     }
-    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
+    if (!auth.currentUser || auth.currentUser !== caseData.userId) {
       throw new Error('Authenticated user does not match caseData.userId');
     }
     const validatedCaseData = {
       userId: caseData.userId,
-      userName: caseData.userName || 'Anonymous',
+      userName: String(caseData.userName || 'Anonymous'),
       title: String(caseData.title || ''),
-      specialty: String(caseData.specialty || ''),
+      specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
       presentingComplaint: String(caseData.presentingComplaint || ''),
       history: String(caseData.history || ''),
       physicalExam: String(caseData.physicalExam || ''),
