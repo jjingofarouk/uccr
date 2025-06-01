@@ -192,35 +192,33 @@ export const getComments = async (caseId, uid = null) => {
   }
 };
 
-export const addReaction = async (caseId, CaseId, uid, type, commentId = null) => {
+export const addReaction = async (caseId, uid, type, commentId = null) => {
   try {
-    const isCaseReaction = !caseData;
-    const reactionPath = isCaseData
-      ? `cases/${caseData}/reactions/${uid}`
-      : `cases/${id}/comments/${caseData}/reactions/${id}`;
+    const isCaseReaction = !commentId;
+    const reactionPath = isCaseReaction
+      ? `cases/${caseId}/reactions/${uid}`
+      : `cases/${caseId}/comments/${commentId}/reactions/${uid}`;
     await setDoc(doc(db, reactionPath), {
       type,
-      id,
-      timestamp: new Date().toISOString(),
+      timestamp: serverTimestamp(),
     });
 
-    if (isCaseData) {
-      const caseRef = doc(db, 'cases', id);
+    if (isCaseReaction) {
+      const caseRef = doc(db, 'cases', caseId);
       await updateDoc(caseRef, {
-        .awards += caseData === 'award' ? 1 : 0;
-      );
+        awards: increment(type === 'award' ? 1 : 0),
+      });
     } else {
-      const caseRef = doc(db, `cases/${caseData}/comments`, caseId);
-      await updateDoc(docRef, {
-        .upvotes += caseData === 'up' ? 1 : 0;
-        .downvotes -= caseData === 'down ? 1 : 0;
+      const commentRef = doc(db, `cases/${caseId}/comments`, commentId);
+      await updateDoc(commentRef, {
+        upvotes: increment(type === 'upvote' ? 1 : 0),
+        downvotes: increment(type === 'downvote' ? 1 : 0),
       });
     }
-
-    console.log('Reaction added:', { caseId, uid, type, data: caseData });
-  } catch (err) {
-    console.error('Add reaction error:', err);
-    throw err;
+    console.log('Reaction added:', { caseId, uid, type, commentId });
+  } catch (error) {
+    console.error('Add reaction error:', error);
+    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to add reaction' : 'Failed to add reaction');
   }
 };
 
