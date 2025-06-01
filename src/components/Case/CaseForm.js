@@ -24,7 +24,7 @@ export default function CaseForm() {
     provisionalDiagnosis: '',
     hospital: '',
     referralCenter: '',
-    specialty: '',
+    specialty: [],
     discussion: '',
     highLevelSummary: '',
     references: '',
@@ -66,7 +66,6 @@ export default function CaseForm() {
       label: 'Specialty',
       type: 'select',
       options: [
-        { value: '', label: 'Select Specialty' },
         { value: 'General Practice', label: 'General Practice' },
         { value: 'Internal Medicine', label: 'Internal Medicine' },
         { value: 'Family Medicine', label: 'Family Medicine' },
@@ -122,6 +121,7 @@ export default function CaseForm() {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
+  // Initialize Cloudinary widget
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
@@ -165,15 +165,25 @@ export default function CaseForm() {
   }, [user]);
 
   const handleChange = (value, name) => {
-    // For rich text fields, value is HTML string; for select, it's the selected value
-    const normalizedValue = name === 'specialty' ? value : value;
-    setFormData(prev => ({ ...prev, [name]: normalizedValue }));
+    if (name === 'specialty') {
+      const selectedOptions = Array.from(value.target.selectedOptions).map(option => option.value);
+      setFormData(prev => ({ ...prev, specialty: selectedOptions }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleDeleteMedia = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user || !user.uid) {
-      setError('You must be logged in to create a case.');
+      setError('You must be logged in to submit a case.');
       return;
     }
     setError('');
@@ -183,12 +193,14 @@ export default function CaseForm() {
         ...formData,
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
+        photoURL: user.photoURL || '',
+        createdAt: new Date().toISOString(),
       };
       await addCase(caseData);
       setLoadStart(Date.now());
       setForceLoading(true);
     } catch (err) {
-      setError('Failed to create case: ' + err.message);
+      setError('Failed to submit case: ' + err.message);
       setIsLoading(false);
     }
   };
@@ -233,12 +245,12 @@ export default function CaseForm() {
   }
 
   if (!user) {
-    return <div>Please log in to create a case.</div>;
+    return <div>Please log in to submit a case.</div>;
   }
 
   return (
     <div className={styles.caseForm}>
-      <h2>Create Case</h2>
+      <h2>Add New Case</h2>
       <div className={styles.progressBar}>
         <div
           className={styles.progress}
@@ -270,7 +282,9 @@ export default function CaseForm() {
                   <select
                     name={step.name}
                     value={formData[step.name]}
-                    onChange={(e) => handleChange(e.target.value, step.name)}
+                    onChange={(e) => handleChange(e, step.name)}
+                    multiple
+                    size="5"
                   >
                     {step.options.map(option => (
                       <option key={option.value} value={option.value}>
@@ -293,13 +307,33 @@ export default function CaseForm() {
                         <p>Uploaded media:</p>
                         <div className={styles.mediaGrid}>
                           {formData.mediaUrls.map((url, index) => (
-                            <Image
-                              key={index}
-                              src={url}
-                              alt={`Uploaded media ${index + 1}`}
-                              width={120}
-                              height={120}
-                            />
+                            <div key={index} className={styles.mediaItem}>
+                              <Image
+                                src={url}
+                                alt={`Uploaded media ${index + 1}`}
+                                width={120}
+                                height={120}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteMedia(index)}
+                                className={styles.deleteButton}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
                           ))}
                         </div>
                       </div>
