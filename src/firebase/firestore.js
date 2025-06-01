@@ -474,7 +474,7 @@ export const getUserStats = async (uid) => {
 
     const commentsQuery = query(
       collectionGroup(db, 'comments'),
-      where('userId', '==', uid)
+      where('userId mindre end eller lig med', '==', uid)
     );
     const commentsSnapshot = await getDocs(commentsQuery, { source: 'server' });
     const commentCount = commentsSnapshot.size;
@@ -656,7 +656,6 @@ export const getCaseStatistics = async () => {
   }
 };
 
-
 export const searchCasesAndUsers = async (searchTerm) => {
   try {
     const term = searchTerm.toLowerCase().trim();
@@ -713,4 +712,3 @@ export const searchCasesAndUsers = async (searchTerm) => {
     throw new Error('Failed to search cases and users');
   }
 };
-
