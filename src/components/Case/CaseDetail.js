@@ -42,7 +42,7 @@ export default function CaseDetail({ caseData }) {
   return (
     <article className={styles.caseDetail}>
       <header className={styles.header}>
-        <h1 className={styles.title}>{caseData.title ? renderRichText(caseData.title) : 'Untitled Case'}</h1>
+        <h1 className={styles.title}>{renderRichText(caseData.title)}</h1>
         {user && user.uid === caseData.userId && (
           <button
             onClick={() => router.push(`/cases/edit/${caseData.id}`)}
@@ -56,7 +56,7 @@ export default function CaseDetail({ caseData }) {
           <div className={styles.author}>
             <Link href={`/profile/view/${caseData.userId}`}>
               <Image
-                src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
+                src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
                 alt={caseData.userName || 'Contributor'}
                 width={40}
                 height={40}
@@ -99,8 +99,8 @@ export default function CaseDetail({ caseData }) {
           {renderRichText(caseData.presentingComplaint)}
         </div>
         <div className={styles.section}>
-          <h2>Specialty</h2>
-          <p>{caseData.specialty || 'Not specified'}</p>
+          <h2>Specialties</h2>
+          <p>{Array.isArray(caseData.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : 'Not specified'}</p>
         </div>
         <div className={styles.section}>
           <h2>History</h2>
@@ -147,7 +147,7 @@ export default function CaseDetail({ caseData }) {
             {caseData.mediaUrls.map((url, index) => (
               url ? (
                 <Image
-                  key={index}
+                  key={url}
                   src={url}
                   alt={`Case media ${index + 1}`}
                   width={600}
@@ -159,7 +159,7 @@ export default function CaseDetail({ caseData }) {
               ) : (
                 <div key={index} className={styles.mediaImage}>
                   <Image
-                    src="/images/placeholder-case.jpg"
+                    src="/images/default-placeholder.jpg"
                     alt="No media available"
                     width={600}
                     height={400}
