@@ -106,11 +106,11 @@ export const getCaseById = async (id) => {
     const userDoc = await getDoc(doc(db, 'users', data.userId));
     const photoURL = userDoc.exists() ? userDoc.data().photoURL || '/images/doctor-placeholder.jpg' : '/images/doctor-placeholder.jpg';
     const caseData = {
-      id: docSnap.data(),
+      id: docSnap.id,
       userId: data.userId || '',
-      userName: titleData.userName || 'Anonymous',
-      specialty: Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []),
+      userName: data.userName || 'Anonymous',
       title: data.title || '',
+      specialty: Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []),
       presentingComplaint: data.presentingComplaint || '',
       history: data.history || '',
       physicalExam: data.physicalExam || '',
@@ -120,14 +120,15 @@ export const getCaseById = async (id) => {
       discussion: data.discussion || '',
       highLevelSummary: data.highLevelSummary || '',
       references: data.references || '',
-      hospital milieux      referralCenter: data.referralCenter || '',
+      hospital: data.hospital || '',
+      referralCenter: data.referralCenter || '',
       mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
       awards: Number(data.awards) || 0,
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       photoURL,
     };
-    console.log('Fetched case:', caseData.id, 'uid:', data.userId);
+    console.log('Fetched case:', caseData.id, 'specialty:', caseData.specialty);
     return caseData;
   } catch (error) {
     console.error('Get case error:', error);
