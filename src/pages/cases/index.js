@@ -22,14 +22,31 @@ export default function Cases() {
   const [previewCase, setPreviewCase] = useState(null);
   const casesPerPage = 12;
 
-  const specialties = [...new Set(cases.flatMap((caseData) => caseData.specialty).filter(Boolean))];
+  const specialties = [
+    ...new Set(
+      cases
+        .flatMap((caseData) =>
+          Array.isArray(caseData.specialty)
+            ? caseData.specialty
+            : caseData.specialty && typeof caseData.specialty === 'string'
+            ? [caseData.specialty]
+            : []
+        )
+        .filter(Boolean)
+    ),
+  ];
   const hospitals = [...new Set(cases.map((caseData) => caseData.hospital).filter(Boolean))];
   const referralCenters = [...new Set(cases.map((caseData) => caseData.referralCenter).filter(Boolean))];
 
   const filteredCases = useMemo(() => {
     return cases.filter((caseData) => {
+      const specialties = Array.isArray(caseData.specialty)
+        ? caseData.specialty
+        : caseData.specialty && typeof caseData.specialty === 'string'
+        ? [caseData.specialty]
+        : [];
       const matchesSpecialty = filters.specialty
-        ? Array.isArray(caseData.specialty) && caseData.specialty.includes(filters.specialty)
+        ? specialties.includes(filters.specialty)
         : true;
       const matchesAuthor = filters.author
         ? caseData.userName.toLowerCase().includes(filters.author.toLowerCase())
@@ -274,7 +291,7 @@ export default function Cases() {
         </div>
       ) : (
         <>
-          <div className={styles['case-list']}>
+          <div className={styles.caseList}>
             {paginatedCases.map((caseData) => (
               <div
                 key={caseData.id}
@@ -339,14 +356,41 @@ export default function Cases() {
               >
                 <X size={24} />
               </button>
-              <h2>{previewCase.title || 'Untitled Case'}</h2>
-              <p><strong>Specialties:</strong> {Array.isArray(previewCase.specialty) ? previewCase.specialty.join(', ') : previewCase.specialty || 'N/A'}</p>
-              <p><strong>Author:</strong> {previewCase.userName || 'Anonymous'}</p>
-              <p><strong>Hospital:</strong> {previewCase.hospital || 'N/A'}</p>
-              <p><strong>Presenting Complaint:</strong> {previewCase.presentingComplaint || 'N/A'}</p>
-              <p><strong>Provisional Diagnosis:</strong> {previewCase.provisionalDiagnosis || 'N/A'}</p>
-              <p><strong>Awards:</strong> {previewCase.awards || 0}</p>
-              <p><strong>Created:</strong> {new Date(previewCase.createdAt).toLocaleDateString()}</p>
+              <h2 className={styles.previewTitle}>{previewCase.title || 'Untitled Case'}</h2>
+              <div className={styles.specialtyTags}>
+                {(Array.isArray(previewCase.specialty)
+                  ? previewCase.specialty
+                  : previewCase.specialty && typeof previewCase.specialty === 'string'
+                  ? [previewCase.specialty]
+                  : []
+                ).map((specialty, index) => (
+                  <span key={index} className={styles.specialtyTag}>
+                    {specialty}
+                  </span>
+                ))}
+              </div>
+              <p className={styles.previewItem}>
+                <strong>Hospital:</strong> {previewCase.hospital || 'N/A'}
+              </p>
+              <p className={styles.previewItem}>
+                <strong>Presenting Complaint:</strong> {previewCase.presentingComplaint || 'N/A'}
+              </p>
+              <p className={styles.previewItem}>
+                <strong>Provisional Diagnosis:</strong> {previewCase.provisionalDiagnosis || 'N/A'}
+              </p>
+              <p className={styles.previewItem}>
+                <strong>Awards:</strong> {previewCase.awards || 0}
+              </p>
+              <p className={styles.authorDate}>
+                <span>Posted by {previewCase.userName || 'Anonymous'}</span>
+                <span className={styles.date}>
+                  {new Date(previewCase.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              </p>
               <Link
                 href={`/cases/${previewCase.id}`}
                 className={styles.viewFullCase}
