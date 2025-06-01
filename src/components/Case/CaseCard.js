@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, Award, User, MessageSquare } from 'lucide-react';
-import styles from './CaseCard.module.css';
+import styles from '../../styles/caseCard.module.css';
 
 export default function CaseCard({ caseData }) {
   const renderSpecialtyTags = () => {
