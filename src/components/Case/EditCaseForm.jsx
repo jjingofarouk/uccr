@@ -34,6 +34,7 @@ export default function EditCaseForm({ caseId }) {
   const [isLoading, setIsLoading] = useState(true);
   const [loadStart, setLoadStart] = useState(null);
   const [forceLoading, setForceLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
@@ -137,13 +138,18 @@ export default function EditCaseForm({ caseId }) {
               public_id: `case_${uuidv4()}`,
             },
             (error, result) => {
+              if (result && result.event === 'upload-added') {
+                setIsUploading(true);
+              }
               if (!error && result && result.event === 'success') {
                 setFormData((prev) => ({
                   ...prev,
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
+                setIsUploading(false);
               } else if (error) {
                 setError('Image upload failed. Please try again.');
+                setIsUploading(false);
               }
             }
           );
@@ -185,6 +191,10 @@ export default function EditCaseForm({ caseId }) {
       setError('Please fill out the current step before proceeding.');
       return;
     }
+    if (isUploading) {
+      setError('Please wait for media upload to complete.');
+      return;
+    }
     if (currentStep < steps.length - 1) {
       setError('');
       setCurrentStep(currentStep + 1);
@@ -206,6 +216,10 @@ export default function EditCaseForm({ caseId }) {
     }
     if (currentStep !== steps.length - 1) {
       setError('Please complete all steps before submitting.');
+      return;
+    }
+    if (isUploading) {
+      setError('Please wait for media upload to complete before submitting.');
       return;
     }
     const requiredFields = steps
@@ -324,10 +338,10 @@ export default function EditCaseForm({ caseId }) {
                       <button
                         type="button"
                         onClick={() => widgetRef.current?.open()}
-                        disabled={!widgetRef.current}
+                        disabled={!widgetRef.current || isUploading}
                         className={styles.uploadButton}
                       >
-                        Upload Media
+                        {isUploading ? 'Uploading...' : 'Upload Media'}
                       </button>
                       {formData.mediaUrls.length > 0 && (
                         <div className={styles.mediaPreview}>
@@ -345,6 +359,7 @@ export default function EditCaseForm({ caseId }) {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteMedia(index)}
+                                  disabled={isUploading}
                                   className={styles.deleteButton}
                                 >
                                   <svg
@@ -378,7 +393,7 @@ export default function EditCaseForm({ caseId }) {
           <button
             type="button"
             onClick={prevStep}
-            disabled={currentStep === 0}
+            disabled={currentStep === 0 || isUploading}
             className={styles.navButton}
           >
             <svg
@@ -394,7 +409,7 @@ export default function EditCaseForm({ caseId }) {
             Previous
           </button>
           {currentStep < steps.length - 1 ? (
-            <button type="button" onClick={nextStep} className={styles.navButton}>
+            <button type="button" onClick={nextStep} disabled={isUploading} className={styles.navButton}>
               Next
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -408,7 +423,7 @@ export default function EditCaseForm({ caseId }) {
               </svg>
             </button>
           ) : (
-            <button type="submit" disabled={isLoading} className={styles.submitButton}>
+            <button type="submit" disabled={isLoading || isUploading} className={styles.submitButton}>
               Update Case
             </button>
           )}
