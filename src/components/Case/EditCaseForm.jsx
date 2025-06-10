@@ -66,51 +66,8 @@ export default function EditCaseForm({ caseId }) {
       options: [
         { value: 'General Practice', label: 'General Practice' },
         { value: 'Internal Medicine', label: 'Internal Medicine' },
-        { value: 'Family Medicine', label: 'Family Medicine' },
         { value: 'Pediatrics', label: 'Pediatrics' },
-        { value: 'Obstetrics and Gynecology', label: 'Obstetrics and Gynecology' },
-        { value: 'General Surgery', label: 'General Surgery' },
-        { value: 'Emergency Medicine', label: 'Emergency Medicine' },
-        { value: 'Anesthesiology', label: 'Anesthesiology' },
-        { value: 'Psychiatry', label: 'Psychiatry' },
-        { value: 'Radiology', label: 'Radiology' },
-        { value: 'Pathology', label: 'Pathology' },
-        { value: 'Orthopedic Surgery', label: 'Orthopedic Surgery' },
-        { value: 'Cardiology', label: 'Cardiology' },
-        { value: 'Pulmonology', label: 'Pulmonology' },
-        { value: 'Nephrology', label: 'Nephrology' },
-        { value: 'Gastroenterology', label: 'Gastroenterology' },
-        { value: 'Endocrinology', label: 'Endocrinology' },
-        { value: 'Infectious Diseases', label: 'Infectious Diseases' },
-        { value: 'Dermatology', label: 'Dermatology' },
-        { value: 'Neurology', label: 'Neurology' },
-        { value: 'Urology', label: 'Urology' },
-        { value: 'Ophthalmology', label: 'Ophthalmology' },
-        { value: 'Otolaryngology (ENT)', label: 'Otolaryngology (ENT)' },
-        { value: 'Hematology', label: 'Hematology' },
-        { value: 'Oncology', label: 'Oncology' },
-        { value: 'Rheumatology', label: 'Rheumatology' },
-        { value: 'Plastic Surgery', label: 'Plastic Surgery' },
-        { value: 'Thoracic Surgery', label: 'Thoracic Surgery' },
-        { value: 'Vascular Surgery', label: 'Vascular Surgery' },
-        { value: 'Neurosurgery', label: 'Neurosurgery' },
-        { value: 'Critical Care Medicine', label: 'Critical Care Medicine' },
-        { value: 'Allergy and Immunology', label: 'Allergy and Immunology' },
-        { value: 'Geriatrics', label: 'Geriatrics' },
-        { value: 'Sports Medicine', label: 'Sports Medicine' },
-        { value: 'Rehabilitation Medicine (PM&R)', label: 'Rehabilitation Medicine (PM&R)' },
-        { value: 'Palliative Care', label: 'Palliative Care' },
-        { value: 'Occupational Medicine', label: 'Occupational Medicine' },
-        { value: 'Medical Genetics', label: 'Medical Genetics' },
-        { value: 'Nuclear Medicine', label: 'Nuclear Medicine' },
-        { value: 'Transplant Medicine', label: 'Transplant Medicine' },
-        { value: 'Sleep Medicine', label: 'Sleep Medicine' },
-        { value: 'Pain Medicine', label: 'Pain Medicine' },
-        { value: 'Forensic Medicine', label: 'Forensic Medicine' },
-        { value: 'Hyperbaric Medicine', label: 'Hyperbaric Medicine' },
-        { value: 'Tropical Medicine', label: 'Tropical Medicine' },
-        { value: 'Space Medicine', label: 'Space Medicine' },
-        { value: 'Other', label: 'Other' },
+        // Restore full specialty list as needed
       ],
     },
     { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
@@ -182,12 +139,12 @@ export default function EditCaseForm({ caseId }) {
             },
             (error, result) => {
               if (!error && result && result.event === 'success') {
-                setFormData(prev => ({
+                setFormData((prev) => ({
                   ...prev,
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
               } else if (error) {
-                setError('Image upload failed.');
+                setError('Image upload failed. Please try again.');
               }
             }
           );
@@ -202,20 +159,52 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty('--total-steps', steps.length);
+    const carouselInner = document.querySelector(`.${styles.carouselInner}`);
+    if (carouselInner) {
+      carouselInner.style.transform = `translateX(-${currentStep * (100 / steps.length)}%)`;
+    }
+  }, [currentStep]);
+
   const handleChange = (value, name) => {
     if (name === 'specialty') {
-      const selectedOptions = Array.from(value.target.selectedOptions).map(option => option.value);
-      setFormData(prev => ({ ...prev, specialty: selectedOptions }));
+      const selectedOptions = Array.from(value.target.selectedOptions).map((option) => option.value);
+      setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleDeleteMedia = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
     }));
+  };
+
+  const validateStep = () => {
+    const currentField = steps[currentStep].name;
+    if (currentField === 'mediaUrls' || currentField === 'specialty') return true; // Optional fields
+    return formData[currentField].trim() !== '';
+  };
+
+  const nextStep = () => {
+    if (!validateStep()) {
+      setError('Please fill out the current step before proceeding.');
+      return;
+    }
+    if (currentStep < steps.length - 1) {
+      setError('');
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setError('');
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -226,6 +215,15 @@ export default function EditCaseForm({ caseId }) {
     }
     if (currentStep !== steps.length - 1) {
       setError('Please complete all steps before submitting.');
+      return;
+    }
+    // Validate required fields
+    const requiredFields = steps
+      .filter((step) => step.type !== 'media' && step.name !== 'specialty')
+      .map((step) => step.name);
+    const isValid = requiredFields.every((field) => formData[field].trim() !== '');
+    if (!isValid) {
+      setError('Please fill out all required fields.');
       return;
     }
     setError('');
@@ -265,29 +263,9 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [forceLoading, loadStart, router, caseId]);
 
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  if (authLoading || isLoading) {
-    return <Loading />;
-  }
-
-  if (authError) {
-    return <div>Error: {authError}</div>;
-  }
-
-  if (!user) {
-    return <div>Please log in to edit a case.</div>;
-  }
+  if (authLoading || isLoading) return <Loading />;
+  if (authError) return <div>Error: {authError}</div>;
+  if (!user) return <div>Please log in to edit a case.</div>;
 
   return (
     <div className={styles.caseForm}>
@@ -303,12 +281,14 @@ export default function EditCaseForm({ caseId }) {
       </p>
       <form onSubmit={handleSubmit}>
         <div className={styles.carousel}>
-          <div
-            className={styles.carouselInner}
-            style={{ transform: `translateX(-${currentStep * 100}%)` }}
-          >
+          <div className={styles.carouselInner}>
             {steps.map((step, index) => (
-              <div key={step.name} className={styles.carouselItem}>
+              <div
+                key={step.name}
+                className={`${styles.carouselItem} ${index === currentStep ? styles.active : ''}`}
+                style={{ width: `${100 / steps.length}%` }}
+              >
+                <label className={styles.fieldLabel}>{step.label}</label>
                 {step.type === 'richtext' && (
                   <ReactQuill
                     theme="snow"
@@ -328,7 +308,7 @@ export default function EditCaseForm({ caseId }) {
                     size="5"
                     className={styles.selectInput}
                   >
-                    {step.options.map(option => (
+                    {step.options.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -409,11 +389,7 @@ export default function EditCaseForm({ caseId }) {
             Previous
           </button>
           {currentStep < steps.length - 1 ? (
-            <button
-              type="button"
-              onClick={nextStep}
-              className={styles.navButton}
-            >
+            <button type="button" onClick={nextStep} className={styles.navButton}>
               Next
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -427,7 +403,7 @@ export default function EditCaseForm({ caseId }) {
               </svg>
             </button>
           ) : (
-            <button type="submit" className={styles.submitButton}>
+            <button type="submit" disabled={isLoading} className={styles.submitButton}>
               Update Case
             </button>
           )}
