@@ -36,6 +36,7 @@ export default function EditCaseForm({ caseId }) {
   const [forceLoading, setForceLoading] = useState(false);
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
+  const carouselRef = useRef();
   const router = useRouter();
   const SUBMISSION_LOADING_DURATION = 1000;
 
@@ -159,11 +160,13 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [user]);
 
+  // Fixed carousel transform logic
   useEffect(() => {
-    document.documentElement.style.setProperty('--total-steps', steps.length);
-    const carouselInner = document.querySelector(`.${styles.carouselInner}`);
+    const carouselInner = carouselRef.current;
     if (carouselInner) {
-      carouselInner.style.transform = `translateX(-${currentStep * (100 / steps.length)}%)`;
+      // Each step takes full width, so we translate by 100% * currentStep
+      const translateX = -currentStep * 100;
+      carouselInner.style.transform = `translateX(${translateX}%)`;
     }
   }, [currentStep]);
 
@@ -281,90 +284,105 @@ export default function EditCaseForm({ caseId }) {
       </p>
       <form onSubmit={handleSubmit}>
         <div className={styles.carousel}>
-          <div className={styles.carouselInner}>
+          <div 
+            className={styles.carouselInner} 
+            ref={carouselRef}
+            style={{
+              display: 'flex',
+              width: `${steps.length * 100}%`,
+              transition: 'transform 0.3s ease-in-out'
+            }}
+          >
             {steps.map((step, index) => (
               <div
                 key={step.name}
                 className={`${styles.carouselItem} ${index === currentStep ? styles.active : ''}`}
-                style={{ width: `${100 / steps.length}%` }}
+                style={{ 
+                  width: `${100 / steps.length}%`,
+                  flexShrink: 0,
+                  padding: '0 20px',
+                  boxSizing: 'border-box'
+                }}
               >
-                <label className={styles.fieldLabel}>{step.label}</label>
-                {step.type === 'richtext' && (
-                  <ReactQuill
-                    theme="snow"
-                    value={formData[step.name]}
-                    onChange={(value) => handleChange(value, step.name)}
-                    placeholder={step.placeholder}
-                    modules={quillModules}
-                    className={styles.quillEditor}
-                  />
-                )}
-                {step.type === 'select' && (
-                  <select
-                    name={step.name}
-                    value={formData[step.name]}
-                    onChange={(e) => handleChange(e, step.name)}
-                    multiple
-                    size="5"
-                    className={styles.selectInput}
-                  >
-                    {step.options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                {step.type === 'media' && (
-                  <div className={styles.mediaSection}>
-                    <button
-                      type="button"
-                      onClick={() => widgetRef.current?.open()}
-                      disabled={!widgetRef.current}
-                      className={styles.uploadButton}
+                <div className={styles.stepContent}>
+                  <label className={styles.fieldLabel}>{step.label}</label>
+                  {step.type === 'richtext' && (
+                    <ReactQuill
+                      theme="snow"
+                      value={formData[step.name]}
+                      onChange={(value) => handleChange(value, step.name)}
+                      placeholder={step.placeholder}
+                      modules={quillModules}
+                      className={styles.quillEditor}
+                    />
+                  )}
+                  {step.type === 'select' && (
+                    <select
+                      name={step.name}
+                      value={formData[step.name]}
+                      onChange={(e) => handleChange(e, step.name)}
+                      multiple
+                      size="5"
+                      className={styles.selectInput}
                     >
-                      Upload Media
-                    </button>
-                    {formData.mediaUrls.length > 0 && (
-                      <div className={styles.mediaPreview}>
-                        <p>Uploaded media:</p>
-                        <div className={styles.mediaGrid}>
-                          {formData.mediaUrls.map((url, index) => (
-                            <div key={index} className={styles.mediaItem}>
-                              <Image
-                                src={url}
-                                alt={`Uploaded media ${index + 1}`}
-                                width={120}
-                                height={120}
-                                className={styles.mediaImage}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteMedia(index)}
-                                className={styles.deleteButton}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  className={styles.deleteIcon}
+                      {step.options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {step.type === 'media' && (
+                    <div className={styles.mediaSection}>
+                      <button
+                        type="button"
+                        onClick={() => widgetRef.current?.open()}
+                        disabled={!widgetRef.current}
+                        className={styles.uploadButton}
+                      >
+                        Upload Media
+                      </button>
+                      {formData.mediaUrls.length > 0 && (
+                        <div className={styles.mediaPreview}>
+                          <p>Uploaded media:</p>
+                          <div className={styles.mediaGrid}>
+                            {formData.mediaUrls.map((url, index) => (
+                              <div key={index} className={styles.mediaItem}>
+                                <Image
+                                  src={url}
+                                  alt={`Uploaded media ${index + 1}`}
+                                  width={120}
+                                  height={120}
+                                  className={styles.mediaImage}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteMedia(index)}
+                                  className={styles.deleteButton}
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          ))}
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    className={styles.deleteIcon}
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M6 18L18 6M6 6l12 12"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
