@@ -1,4 +1,3 @@
-// pages/cases/edit/[id].jsx
 import { useRouter } from 'next/router';
 import EditCaseForm from '../../../components/Case/EditCaseForm';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
