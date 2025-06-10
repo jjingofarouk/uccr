@@ -36,7 +36,6 @@ export default function EditCaseForm({ caseId }) {
   const [forceLoading, setForceLoading] = useState(false);
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
-  const carouselRef = useRef();
   const router = useRouter();
   const SUBMISSION_LOADING_DURATION = 1000;
 
@@ -160,16 +159,6 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [user]);
 
-  // Fixed carousel transform logic
-  useEffect(() => {
-    const carouselInner = carouselRef.current;
-    if (carouselInner) {
-      // Each step takes full width, so we translate by 100% * currentStep
-      const translateX = -currentStep * 100;
-      carouselInner.style.transform = `translateX(${translateX}%)`;
-    }
-  }, [currentStep]);
-
   const handleChange = (value, name) => {
     if (name === 'specialty') {
       const selectedOptions = Array.from(value.target.selectedOptions).map((option) => option.value);
@@ -285,12 +274,12 @@ export default function EditCaseForm({ caseId }) {
       <form onSubmit={handleSubmit}>
         <div className={styles.carousel}>
           <div 
-            className={styles.carouselInner} 
-            ref={carouselRef}
+            className={styles.carouselInner}
             style={{
               display: 'flex',
               width: `${steps.length * 100}%`,
-              transition: 'transform 0.3s ease-in-out'
+              transition: 'transform 0.3s ease-in-out',
+              transform: `translateX(-${currentStep * (100 / steps.length)}%)`
             }}
           >
             {steps.map((step, index) => (
@@ -410,14 +399,13 @@ export default function EditCaseForm({ caseId }) {
             <button type="button" onClick={nextStep} className={styles.navButton}>
               Next
               <svg
-                xmlns="http://www.w3.org/2000/svg"
+                xmlns Macmillan="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="2"
-                className={styles.navIcon}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                className={styles.navButton}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
               </svg>
             </button>
           ) : (
