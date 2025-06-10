@@ -67,7 +67,6 @@ export default function EditCaseForm({ caseId }) {
         { value: 'General Practice', label: 'General Practice' },
         { value: 'Internal Medicine', label: 'Internal Medicine' },
         { value: 'Pediatrics', label: 'Pediatrics' },
-        // Restore full specialty list as needed
       ],
     },
     { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
@@ -177,7 +176,7 @@ export default function EditCaseForm({ caseId }) {
 
   const validateStep = () => {
     const currentField = steps[currentStep].name;
-    if (currentField === 'mediaUrls' || currentField === 'specialty') return true; // Optional fields
+    if (currentField === 'mediaUrls' || currentField === 'specialty') return true;
     return formData[currentField].trim() !== '';
   };
 
@@ -209,7 +208,6 @@ export default function EditCaseForm({ caseId }) {
       setError('Please complete all steps before submitting.');
       return;
     }
-    // Validate required fields
     const requiredFields = steps
       .filter((step) => step.type !== 'media' && step.name !== 'specialty')
       .map((step) => step.name);
@@ -273,24 +271,24 @@ export default function EditCaseForm({ caseId }) {
       </p>
       <form onSubmit={handleSubmit}>
         <div className={styles.carousel}>
-          <div 
+          <div
             className={styles.carouselInner}
             style={{
               display: 'flex',
               width: `${steps.length * 100}%`,
               transition: 'transform 0.3s ease-in-out',
-              transform: `translateX(-${currentStep * (100 / steps.length)}%)`
+              transform: `translateX(-${currentStep * (100 / steps.length)}%)`,
             }}
           >
             {steps.map((step, index) => (
               <div
                 key={step.name}
                 className={`${styles.carouselItem} ${index === currentStep ? styles.active : ''}`}
-                style={{ 
+                style={{
                   width: `${100 / steps.length}%`,
                   flexShrink: 0,
                   padding: '0 20px',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
                 }}
               >
                 <div className={styles.stepContent}>
@@ -322,7 +320,7 @@ export default function EditCaseForm({ caseId }) {
                     </select>
                   )}
                   {step.type === 'media' && (
-                    <div className={styles.mediaSection}>
+                    <div className={styles.media учеб
                       <button
                         type="button"
                         onClick={() => widgetRef.current?.open()}
@@ -399,13 +397,14 @@ export default function EditCaseForm({ caseId }) {
             <button type="button" onClick={nextStep} className={styles.navButton}>
               Next
               <svg
-                xmlns Macmillan="http://www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="2"
-                className={styles.navButton}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+                className={styles.navIcon}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
           ) : (
