@@ -7,8 +7,9 @@ import { getTopContributors, getCaseStatistics } from '../firebase/firestore';
 import { Star } from 'lucide-react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip } from 'chart.js';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import CaseCard from '../components/Case/CaseCard';
-import Loading from '../components/Loading';
 import styles from './Home.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
@@ -130,12 +131,27 @@ const LeaderboardSection = () => {
     fetchContributors();
   }, []);
 
-  if (loading) return <Loading />;
-  if (error) return (
-    <section className={styles.errorSection} role="alert">
-      <p className={styles.errorText}>{error}</p>
-    </section>
-  );
+  if (loading) {
+    return (
+      <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
+        <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
+        <div className={styles.leaderboard}>
+          <Skeleton height={60} count={3} />
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={styles.errorSection} role="alert">
+        <p className={styles.errorText}>{error}</p>
+        <button onClick={() => window.location.reload()} className={styles.ctaButtonSecondary}>
+          Retry
+        </button>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
@@ -300,12 +316,27 @@ const StatsSection = () => {
     },
   };
 
-  if (loading) return <div className={styles.loadingSection}>Loading...</div>;
-  if (error) return (
-    <section className={styles.errorSection} role="alert">
-      <p className={styles.errorText}>{error}</p>
-    </section>
-  );
+  if (loading) {
+    return (
+      <section className={styles.statsSection} aria-labelledby="stats-title">
+        <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
+        <div className={styles.statsContainer}>
+          <Skeleton height={300} />
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={styles.errorSection} role="alert">
+        <p className={styles.errorText}>{error}</p>
+        <button onClick={() => window.location.reload()} className={styles.ctaButtonSecondary}>
+          Retry
+        </button>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.statsSection} aria-labelledby="stats-title">
@@ -330,7 +361,7 @@ const StatsSection = () => {
 
 export default function HomePage() {
   const { user } = useAuth();
-  const { cases, loading, error } = useCases();
+  const { cases, loading, error, loadMore, hasMore } = useCases(null, 10);
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
   const [featuredSpecialty, setFeaturedSpecialty] = useState('');
 
@@ -384,23 +415,30 @@ export default function HomePage() {
       .slice(0, 3);
   }, [cases, featuredSpecialty]);
 
-  if (loading) return (
-    <main className={styles.container}>
-      <HeroSection />
-      <section className={styles.loadingSection}>
-        <Loading />
-      </section>
-    </main>
-  );
+  if (loading && cases.length === 0) {
+    return (
+      <main className={styles.container}>
+        <HeroSection />
+        <section className={styles.loadingSection}>
+          <Skeleton height={200} count={3} />
+        </section>
+      </main>
+    );
+  }
 
-  if (error) return (
-    <main className={styles.container}>
-      <HeroSection />
-      <section className={styles.errorSection} role="alert">
-        <p className={styles.errorText}>Error: {error}</p>
-      </section>
-    </main>
-  );
+  if (error) {
+    return (
+      <main className={styles.container}>
+        <HeroSection />
+        <section className={styles.errorSection} role="alert">
+          <p className={styles.errorText}>Error: {error}</p>
+          <button onClick={() => window.location.reload()} className={styles.ctaButtonSecondary}>
+            Retry
+          </button>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.container}>
@@ -425,6 +463,17 @@ export default function HomePage() {
           )}
           <StatsSection />
           <LeaderboardSection />
+          {hasMore && (
+            <div className={styles.loadMoreContainer}>
+              <button
+                onClick={loadMore}
+                disabled={loading}
+                className={styles.ctaButtonSecondary}
+              >
+                {loading ? 'Loading...' : 'Load More Cases'}
+              </button>
+            </div>
+          )}
         </>
       )}
     </main>
