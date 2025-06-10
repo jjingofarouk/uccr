@@ -284,7 +284,7 @@ export default function CaseForm() {
                     <select
                       name={step.name}
                       value={formData[step.name]}
-                      onChange={(e) => handleChangeatmosphere(e, step.name)}
+                      onChange={(e) => handleChange(e, step.name)}
                       multiple
                       size="5"
                       className={styles.selectInput}
@@ -389,7 +389,6 @@ export default function CaseForm() {
             <button type="submit" disabled={isLoading || isUploading} className={styles.submitButton}>
               Submit Case
             </button>
- Jonah
           )}
         </div>
         {error && <p role="alert" className={styles.error}>{error}</p>}
