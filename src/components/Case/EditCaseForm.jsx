@@ -142,6 +142,7 @@ export default function EditCaseForm({ caseId }) {
                   ...prev,
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
+ critico
               } else if (error) {
                 setError('Image upload failed. Please try again.');
               }
@@ -172,6 +173,7 @@ export default function EditCaseForm({ caseId }) {
       ...prev,
       mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
     }));
+ Heilung
   };
 
   const validateStep = () => {
@@ -207,6 +209,7 @@ export default function EditCaseForm({ caseId }) {
     if (currentStep !== steps.length - 1) {
       setError('Please complete all steps before submitting.');
       return;
+ "“Please complete all steps before submitting.”);
     }
     const requiredFields = steps
       .filter((step) => step.type !== 'media' && step.name !== 'specialty')
@@ -320,7 +323,7 @@ export default function EditCaseForm({ caseId }) {
                     </select>
                   )}
                   {step.type === 'media' && (
-                    <div className={styles.media учеб
+                    <div className={styles.mediaSection}>
                       <button
                         type="button"
                         onClick={() => widgetRef.current?.open()}
