@@ -186,7 +186,8 @@ export default function EditCaseForm({ caseId }) {
     return formData[currentField].trim() !== '';
   };
 
-  const nextStep = () => {
+  const nextStep = (e) => {
+    e.preventDefault();
     if (!validateStep()) {
       setError('Please fill out the current step before proceeding.');
       return;
@@ -201,7 +202,8 @@ export default function EditCaseForm({ caseId }) {
     }
   };
 
-  const prevStep = () => {
+  const prevStep = (e) => {
+    e.preventDefault();
     if (currentStep > 0) {
       setError('');
       setCurrentStep(currentStep - 1);
