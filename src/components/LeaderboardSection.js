@@ -1,40 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getTopContributors } from '../firebase/firestore';
 import { Star } from 'lucide-react';
-import Loading from './Loading';
+import Skeleton from 'react-loading-skeleton';
+import { getTopContributors } from '../firebase/firestore';
 import styles from '../pages/Home.module.css';
 
-export default function LeaderboardSection() {
-  const [contributors, setContributors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+const LeaderboardSection = () => {
+  const { data: contributors = [], isLoading, error } = useQuery({
+    queryKey: ['topContributors'],
+    queryFn: () => getTopContributors(3),
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    const fetchContributors = async () => {
-      try {
-        const data = await getTopContributors(3);
-        setContributors(data);
-      } catch (err) {
-        setError('Failed to load top contributors');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchContributors();
-  }, []);
-
-  if (loading) {
-    return <Loading />;
+  if (isLoading) {
+    return (
+      <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
+        <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
+        <div className={styles.leaderboard}>
+          <Skeleton height={60} count={3} />
+        </div>
+      </section>
+    );
   }
 
   if (error) {
     return (
-      <div className={styles.errorSection} role="alert">
-        <p className={styles.errorText}>{error}</p>
-      </div>
+      <section className={styles.errorSection} role="alert">
+        <p className={styles.errorText}>Failed to load top contributors</p>
+        <button onClick={() => window.location.reload()} className={styles.ctaButtonSecondary}>
+          Retry
+        </button>
+      </section>
     );
   }
 
@@ -93,4 +92,6 @@ export default function LeaderboardSection() {
       )}
     </section>
   );
-}
+};
+
+export default LeaderboardSection;
