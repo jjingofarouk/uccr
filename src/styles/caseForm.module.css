@@ -72,7 +72,7 @@
 /* Carousel inner wrapper */
 .carouselInner {
   display: flex;
-  width: calc(100% * var(--total-steps)); /* Dynamic width based on number of steps */
+  width: calc(100% * var(--total-steps));
   height: 100%;
   transition: transform 0.5s ease;
   will-change: transform;
@@ -80,7 +80,7 @@
 
 /* Individual carousel item */
 .carouselItem {
-  flex: 0 0 calc(100% / var(--total-steps)); /* Equal width for each item */
+  flex: 0 0 calc(100% / var(--total-steps));
   width: calc(100% / var(--total-steps));
   padding: 0 1rem;
   box-sizing: border-box;
@@ -88,17 +88,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-}
-
-/* Ensure only active item is visible */
-.carouselItem:not(.active) {
-  visibility: hidden;
-  position: absolute;
   opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
+/* Ensure only active item is fully visible */
 .carouselItem.active {
-  visibility: visible;
   opacity: 1;
 }
 
