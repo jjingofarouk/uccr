@@ -37,6 +37,7 @@ export default function CaseForm() {
   const [isUploading, setIsUploading] = useState(false);
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
+  const formContainerRef = useRef();
   const router = useRouter();
   const SUBMISSION_LOADING_DURATION = 1000;
 
@@ -308,150 +309,152 @@ export default function CaseForm() {
     }
   }, [forceLoading, loadStart, router]);
 
+  useEffect(() => {
+    const scrollToActiveEditor = () => {
+      if (formContainerRef.current) {
+        const activeItem = formContainerRef.current.querySelector(`.${styles.carouselItem}.active`);
+        if (activeItem) {
+          const quillEditor = activeItem.querySelector(`.${styles.quillEditor} .ql-editor`);
+          if (quillEditor) {
+            quillEditor.focus();
+            quillEditor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }
+    };
+    scrollToActiveEditor();
+  }, [currentStep]);
+
   if (authLoading || isLoading) return <Loading />;
   if (authError) return <div>Error: {authError}</div>;
   if (!user) return <div>Please log in to submit a case.</div>;
 
   return (
-    <div className={styles.caseForm}>
-      <h2>Add New Case</h2>
-      <div className={styles.progressBar}>
-        <div
-          className={styles.progress}
-          style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-        ></div>
-      </div>
-      <p className={styles.stepIndicator}>
-        Step {currentStep + 1} of {steps.length}: {steps[currentStep].label}
-      </p>
-      <form onSubmit={handleSubmit}>
-        <div className={styles.carousel}>
+    <div className={styles.caseFormWrapper}>
+      <div className={styles.caseForm} ref={formContainerRef}>
+        <h2>Add New Case</h2>
+        <div className={styles.progressBar}>
           <div
-            className={styles.carouselInner}
-            style={{
-              display: 'flex',
-              width: `${steps.length * 100}%`,
-              transition: 'transform 0.3s ease-in-out',
-              transform: `translateX(-${currentStep * (100 / steps.length)}%)`,
-            }}
-          >
-            {steps.map((step, index) => (
-              <div
-                key={step.name}
-                className={`${styles.carouselItem} ${index === currentStep ? styles.active : ''}`}
-                style={{
-                  width: `${100 / steps.length}%`,
-                  flexShrink: 0,
-                  padding: '0 20px',
-                  boxSizing: 'border-box',
-                }}
-              >
-                <div className={styles.stepContent}>
-                  <label className={styles.fieldLabel}>{step.label}</label>
-                  {step.type === 'richtext' && (
-                    <ReactQuill
-                      theme="snow"
-                      value={formData[step.name]}
-                      onChange={(value) => handleChange(value, step.name)}
-                      placeholder={step.placeholder}
-                      modules={quillModules}
-                      className={styles.quillEditor}
-                    />
-                  )}
-                  {step.type === 'select' && (
-                    <select
-                      name={step.name}
-                      value={formData[step.name]}
-                      onChange={(e) => handleChange(e, step.name)}
-                      multiple
-                      size="5"
-                      className={styles.selectInput}
-                    >
-                      {step.options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  {step.type === 'media' && (
-                    <div className={styles.mediaSection}>
-                      <button
-                        type="button"
-                        onClick={() => widgetRef.current?.open()}
-                        disabled={!widgetRef.current || isUploading}
-                        className={styles.uploadButton}
-                      >
-                        {isUploading ? 'Uploading...' : 'Upload Media'}
-                      </button>
-                      {formData.mediaUrls.length > 0 && (
-                        <div className={styles.mediaPreview}>
-                          <p>Uploaded media:</p>
-                          <div className={styles.mediaGrid}>
-                            {formData.mediaUrls.map((url, index) => (
-                              <div key={index} className={styles.mediaItem}>
-                                <Image
-                                  src={url}
-                                  alt={`Uploaded media ${index + 1}`}
-                                  width={120}
-                                  height={120}
-                                  className={styles.mediaImage}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteMedia(index)}
-                                  disabled={isUploading}
-                                  className={styles.deleteButton}
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    className={styles.deleteIcon}
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M6 18L18 6M6 6l12 12"
-                                    />
-                                  </svg>
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+            className={styles.progress}
+            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+          ></div>
         </div>
-        <div className={styles.navigation}>
-          <button
-            type="button"
-            onClick={prevStep}
-            disabled={currentStep === 0 || isUploading}
-            className={styles.navButton}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-              className={styles.navIcon}
+        <p className={styles.stepIndicator}>
+          Step {currentStep + 1} of {steps.length}: {steps[currentStep].label}
+        </p>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.carousel}>
+            <div
+              className={styles.carouselInner}
+              style={{
+                display: 'flex',
+                width: `${steps.length * 100}%`,
+                transition: 'transform 0.3s ease-in-out',
+                transform: `translateX(-${currentStep * (100 / steps.length)}%)`,
+              }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Previous
-          </button>
-          {currentStep < steps.length - 1 ? (
-            <button type="button" onClick={nextStep} disabled={isUploading} className={styles.navButton}>
-              Next
+              {steps.map((step, index) => (
+                <div
+                  key={step.name}
+                  className={`${styles.carouselItem} ${index === currentStep ? styles.active : ''}`}
+                  style={{
+                    width: `${100 / steps.length}%`,
+                    flexShrink: 0,
+                    padding: '0 20px',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <div className={styles.stepContent}>
+                    <label className={styles.fieldLabel}>{step.label}</label>
+                    {step.type === 'richtext' && (
+                      <ReactQuill
+                        theme="snow"
+                        value={formData[step.name]}
+                        onChange={(value) => handleChange(value, step.name)}
+                        placeholder={step.placeholder}
+                        modules={quillModules}
+                        className={styles.quillEditor}
+                      />
+                    )}
+                    {step.type === 'select' && (
+                      <select
+                        name={step.name}
+                        value={formData[step.name]}
+                        onChange={(e) => handleChange(e, step.name)}
+                        multiple
+                        size="5"
+                        className={styles.selectInput}
+                      >
+                        {step.options.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    {step.type === 'media' && (
+                      <div className={styles.mediaSection}>
+                        <button
+                          type="button"
+                          onClick={() => widgetRef.current?.open()}
+                          disabled={!widgetRef.current || isUploading}
+                          className={styles.uploadButton}
+                        >
+                          {isUploading ? 'Uploading...' : 'Upload Media'}
+                        </button>
+                        {formData.mediaUrls.length > 0 && (
+                          <div className={styles.mediaPreview}>
+                            <p>Uploaded media:</p>
+                            <div className={styles.mediaGrid}>
+                              {formData.mediaUrls.map((url, index) => (
+                                <div key={index} className={styles.mediaItem}>
+                                  <Image
+                                    src={url}
+                                    alt={`Uploaded media ${index + 1}`}
+                                    width={120}
+                                    height={120}
+                                    className={styles.mediaImage}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteMedia(index)}
+                                    disabled={isUploading}
+                                    className={styles.deleteButton}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      className={styles.deleteIcon}
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 18L18 6M6 6l12 12"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.navigation}>
+            <button
+              type="button"
+              onClick={prevStep}
+              disabled={currentStep === 0 || isUploading}
+              className={styles.navButton}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -460,18 +463,34 @@ export default function CaseForm() {
                 strokeWidth="2"
                 className={styles.navIcon}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
+              Previous
             </button>
-          ) : (
-            <button type="submit" disabled={isLoading || isUploading} className={styles.submitButton}>
-              Submit Case
-            </button>
-          )}
-        </div>
-        {error && <p role="alert" className={styles.error}>{error}</p>}
-        {(isLoading || forceLoading) && <Loading />}
-      </form>
+            {currentStep < steps.length - 1 ? (
+              <button type="button" onClick={nextStep} disabled={isUploading} className={styles.navButton}>
+                Next
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className={styles.navIcon}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ) : (
+              <button type="submit" disabled={isLoading || isUploading} className={styles.submitButton}>
+                Submit Case
+              </button>
+            )}
+          </div>
+          {error && <p role="alert" className={styles.error}>{error}</p>}
+          {(isLoading || forceLoading) && <Loading />}
+        </form>
+      </div>
     </div>
   );
 }
