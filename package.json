@@ -1,5 +1,5 @@
 {
-  "name": "medical-cases-platform",
+  "name": "uccr",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,16 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.3.0",
     "chart.js": "^4.4.4",
     "cloudinary": "^2.5.1",
     "firebase": "^10.14.1",
     "framer-motion": "^11.11.8",
     "lottie-react": "^2.4.0",
     "lucide-react": "^0.441.0",
-    "next": "14.2.3",
+    "next": "^15.0.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-loading-skeleton": "^3.5.0",
     "react-quill": "^2.0.0",
     "sanitize-html": "^2.13.1",
     "uuid": "^10.0.0"
