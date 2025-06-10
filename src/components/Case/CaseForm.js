@@ -12,7 +12,7 @@ import 'react-quill/dist/quill.snow.css';
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function CaseForm() {
-  const { user, loading, error: authError } = useAuth();
+  const { user, loading: authLoading, error: authError } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     presentingComplaint: '',
@@ -34,6 +34,7 @@ export default function CaseForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadStart, setLoadStart] = useState(null);
   const [forceLoading, setForceLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
@@ -67,7 +68,6 @@ export default function CaseForm() {
         { value: 'General Practice', label: 'General Practice' },
         { value: 'Internal Medicine', label: 'Internal Medicine' },
         { value: 'Pediatrics', label: 'Pediatrics' },
-        // Add other specialties as needed
       ],
     },
     { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
@@ -97,13 +97,18 @@ export default function CaseForm() {
               public_id: `case_${uuidv4()}`,
             },
             (error, result) => {
+              if (result && result.event === 'upload-added') {
+                setIsUploading(true);
+              }
               if (!error && result && result.event === 'success') {
                 setFormData((prev) => ({
                   ...prev,
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
+                setIsUploading(false);
               } else if (error) {
                 setError('Image upload failed. Please try again.');
+                setIsUploading(false);
               }
             }
           );
@@ -117,14 +122,6 @@ export default function CaseForm() {
       };
     }
   }, [user]);
-
-  useEffect(() => {
-    document.documentElement.style.setProperty('--total-steps', steps.length);
-    const carouselInner = document.querySelector(`.${styles.carouselInner}`);
-    if (carouselInner) {
-      carouselInner.style.transform = `translateX(-${currentStep * (100 / steps.length)}%)`;
-    }
-  }, [currentStep]);
 
   const handleChange = (value, name) => {
     if (name === 'specialty') {
@@ -144,13 +141,18 @@ export default function CaseForm() {
 
   const validateStep = () => {
     const currentField = steps[currentStep].name;
-    if (currentField === 'mediaUrls' || currentField === 'specialty') return true; // Optional fields
+    if (currentField === 'mediaUrls' || currentField === 'specialty') return true;
     return formData[currentField].trim() !== '';
   };
 
-  const nextStep = () => {
+  const nextStep = (e) => {
+    e.preventDefault();
     if (!validateStep()) {
       setError('Please fill out the current step before proceeding.');
+      return;
+    }
+    if (isUploading) {
+      setError('Please wait for media upload to complete.');
       return;
     }
     if (currentStep < steps.length - 1) {
@@ -159,7 +161,8 @@ export default function CaseForm() {
     }
   };
 
-  const prevStep = () => {
+  const prevStep = (e) => {
+    e.preventDefault();
     if (currentStep > 0) {
       setError('');
       setCurrentStep(currentStep - 1);
@@ -176,7 +179,10 @@ export default function CaseForm() {
       setError('Please complete all steps before submitting.');
       return;
     }
-    // Validate required fields
+    if (isUploading) {
+      setError('Please wait for media upload to complete before submitting.');
+      return;
+    }
     const requiredFields = steps
       .filter((step) => step.type !== 'media' && step.name !== 'specialty')
       .map((step) => step.name);
@@ -224,7 +230,7 @@ export default function CaseForm() {
     }
   }, [forceLoading, loadStart, router]);
 
-  if (loading) return <Loading />;
+  if (authLoading || isLoading) return <Loading />;
   if (authError) return <div>Error: {authError}</div>;
   if (!user) return <div>Please log in to submit a case.</div>;
 
@@ -242,90 +248,106 @@ export default function CaseForm() {
       </p>
       <form onSubmit={handleSubmit}>
         <div className={styles.carousel}>
-          <div className={styles.carouselInner}>
+          <div
+            className={styles.carouselInner}
+            style={{
+              display: 'flex',
+              width: `${steps.length * 100}%`,
+              transition: 'transform 0.3s ease-in-out',
+              transform: `translateX(-${currentStep * (100 / steps.length)}%)`,
+            }}
+          >
             {steps.map((step, index) => (
               <div
                 key={step.name}
                 className={`${styles.carouselItem} ${index === currentStep ? styles.active : ''}`}
-                style={{ width: `${100 / steps.length}%` }}
+                style={{
+                  width: `${100 / steps.length}%`,
+                  flexShrink: 0,
+                  padding: '0 20px',
+                  boxSizing: 'border-box',
+                }}
               >
-                <label className={styles.fieldLabel}>{step.label}</label>
-                {step.type === 'richtext' && (
-                  <ReactQuill
-                    theme="snow"
-                    value={formData[step.name]}
-                    onChange={(value) => handleChange(value, step.name)}
-                    placeholder={step.placeholder}
-                    modules={quillModules}
-                    className={styles.quillEditor}
-                  />
-                )}
-                {step.type === 'select' && (
-                  <select
-                    name={step.name}
-                    value={formData[step.name]}
-                    onChange={(e) => handleChange(e, step.name)}
-                    multiple
-                    size="5"
-                    className={styles.selectInput}
-                  >
-                    {step.options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                {step.type === 'media' && (
-                  <div className={styles.mediaSection}>
-                    <button
-                      type="button"
-                      onClick={() => widgetRef.current?.open()}
-                      disabled={!widgetRef.current}
-                      className={styles.uploadButton}
+                <div className={styles.stepContent}>
+                  <label className={styles.fieldLabel}>{step.label}</label>
+                  {step.type === 'richtext' && (
+                    <ReactQuill
+                      theme="snow"
+                      value={formData[step.name]}
+                      onChange={(value) => handleChange(value, step.name)}
+                      placeholder={step.placeholder}
+                      modules={quillModules}
+                      className={styles.quillEditor}
+                    />
+                  )}
+                  {step.type === 'select' && (
+                    <select
+                      name={step.name}
+                      value={formData[step.name]}
+                      onChange={(e) => handleChangeatmosphere(e, step.name)}
+                      multiple
+                      size="5"
+                      className={styles.selectInput}
                     >
-                      Upload Media
-                    </button>
-                    {formData.mediaUrls.length > 0 && (
-                      <div className={styles.mediaPreview}>
-                        <p>Uploaded media:</p>
-                        <div className={styles.mediaGrid}>
-                          {formData.mediaUrls.map((url, index) => (
-                            <div key={index} className={styles.mediaItem}>
-                              <Image
-                                src={url}
-                                alt={`Uploaded media ${index + 1}`}
-                                width={120}
-                                height={120}
-                                className={styles.mediaImage}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteMedia(index)}
-                                className={styles.deleteButton}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  className={styles.deleteIcon}
+                      {step.options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {step.type === 'media' && (
+                    <div className={styles.mediaSection}>
+                      <button
+                        type="button"
+                        onClick={() => widgetRef.current?.open()}
+                        disabled={!widgetRef.current || isUploading}
+                        className={styles.uploadButton}
+                      >
+                        {isUploading ? 'Uploading...' : 'Upload Media'}
+                      </button>
+                      {formData.mediaUrls.length > 0 && (
+                        <div className={styles.mediaPreview}>
+                          <p>Uploaded media:</p>
+                          <div className={styles.mediaGrid}>
+                            {formData.mediaUrls.map((url, index) => (
+                              <div key={index} className={styles.mediaItem}>
+                                <Image
+                                  src={url}
+                                  alt={`Uploaded media ${index + 1}`}
+                                  width={120}
+                                  height={120}
+                                  className={styles.mediaImage}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteMedia(index)}
+                                  disabled={isUploading}
+                                  className={styles.deleteButton}
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          ))}
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    className={styles.deleteIcon}
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M6 18L18 6M6 6l12 12"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -334,7 +356,7 @@ export default function CaseForm() {
           <button
             type="button"
             onClick={prevStep}
-            disabled={currentStep === 0}
+            disabled={currentStep === 0 || isUploading}
             className={styles.navButton}
           >
             <svg
@@ -350,7 +372,7 @@ export default function CaseForm() {
             Previous
           </button>
           {currentStep < steps.length - 1 ? (
-            <button type="button" onClick={nextStep} className={styles.navButton}>
+            <button type="button" onClick={nextStep} disabled={isUploading} className={styles.navButton}>
               Next
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -364,9 +386,10 @@ export default function CaseForm() {
               </svg>
             </button>
           ) : (
-            <button type="submit" disabled={isLoading} className={styles.submitButton}>
+            <button type="submit" disabled={isLoading || isUploading} className={styles.submitButton}>
               Submit Case
             </button>
+ Jonah
           )}
         </div>
         {error && <p role="alert" className={styles.error}>{error}</p>}
