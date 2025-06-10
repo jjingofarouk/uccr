@@ -170,7 +170,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: 0 2px 4px var(--shadow);
-  overflow-y: auto;
+  overflow-y: auto; /* Make the container scrollable */
   flex-grow: 1;
 }
 
@@ -178,7 +178,8 @@
   min-height: 260px;
   max-height: 360px;
   padding: 0.75rem 1rem;
-  overflow-y: auto;
+  overflow-y: auto; /* Ensure the editor content is scrollable */
+  white-space: pre-wrap; /* Preserve whitespace and wrap text */
 }
 
 .quillEditor .ql-toolbar {
