@@ -1,13 +1,14 @@
+// pages/cases/edit/[id].jsx
 import { useRouter } from 'next/router';
 import EditCaseForm from '../../../components/Case/EditCaseForm';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
 import Loading from '../../../components/Loading';
-import styles from '../../../styles/caseForm.module.css'; // Add this import
+import styles from '../../../styles/caseForm.module.css';
 
 export default function EditCasePage() {
   const router = useRouter();
   const { id } = router.query;
-  
+
   if (!id) {
     return (
       <section className={styles.loadingSection}>
@@ -18,9 +19,9 @@ export default function EditCasePage() {
 
   return (
     <ProtectedRoute>
-      <div className={styles.container}>
+      <main className={styles.caseFormWrapper}>
         <EditCaseForm caseId={id} />
-      </div>
+      </main>
     </ProtectedRoute>
   );
 }
