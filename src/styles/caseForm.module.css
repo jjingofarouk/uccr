@@ -11,7 +11,22 @@
   background: var(--background);
   box-sizing: border-box;
 }
+/* styles/caseForm.module.css */
+.caseFormWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
 
+.loadingSection {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 /* Form heading */
 .caseForm h2 {
   font-family: 'Inter', sans-serif;
