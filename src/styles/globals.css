@@ -1,29 +1,29 @@
 :root {
-  --background: #ffffff;
-  --text: #0f172a;
-  --primary: #0f4c75;
-  --primary-hover: #083a5a;
-  --primary-light: #3282b8;
-  --primary-dark: #082c42;
-  --secondary: #bbdefb;
-  --border: #e1f5fe;
-  --shadow: rgba(15, 76, 117, 0.12);
-  --surface: #f8fcff;
-  --accent: #1976d2;
+  --background: #fafafa; /* Soft off-white for a clean background */
+  --text: #1a1a1a; /* Deep charcoal for readability */
+  --primary: #00695c; /* Hospital dark teal for trust and professionalism */
+  --primary-hover: #004d40; /* Darker teal for hover states */
+  --primary-light: #4db6ac; /* Lighter teal for highlights */
+  --primary-dark: #003d33; /* Deep teal for depth */
+  --secondary: #e0f2f1; /* Pale teal for subtle accents */
+  --border: #e0e0e0; /* Light gray for clean separation */
+  --shadow: rgba(26, 26, 26, 0.1); /* Subtle shadow for depth */
+  --surface: #ffffff; /* Pure white for cards and surfaces */
+  --accent: #0288d1; /* Vibrant blue for key actions */
 }
 
 .dark-mode {
-  --background: #0f172a;
-  --text: #f8fafc;
-  --primary: #4fc3f7;
-  --primary-hover: #29b6f6;
-  --primary-light: #81d4fa;
-  --primary-dark: #0277bd;
-  --secondary: #263238;
-  --border: #37474f;
-  --shadow: rgba(79, 195, 247, 0.15);
-  --surface: #1e293b;
-  --accent: #03a9f4;
+  --background: #121212; /* Deep black for true dark mode */
+  --text: #e0e0e0; /* Light gray for readable text */
+  --primary: #4db6ac; /* Brighter teal for visibility in dark mode */
+  --primary-hover: #80cbc4; /* Lighter teal for hover states */
+  --primary-light: #b2dfdb; /* Very light teal for highlights */
+  --primary-dark: #00695c; /* Dark teal ties to light mode primary */
+  --secondary: #00695c; /* Muted teal for secondary elements */
+  --border: #424242; /* Dark gray for borders */
+  --shadow: rgba(77, 182, 172, 0.2); /* Subtle teal-tinted shadow */
+  --surface: #1e1e1e; /* Dark surface for cards */
+  --accent: #29b6f6; /* Bright blue for accents, contrasting with teal */
 }
 
 html, body {
