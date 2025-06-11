@@ -1,38 +1,29 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+
+
+import { useState, useEffect } from 'react';
 import { getCases, getCaseById } from '../firebase/firestore';
 
-export const useCases = (uid = null, pageSize = 10) => {
-  const queryKey = ['cases', uid || 'all'];
+export const useCases = (uid = null) => {
+  const [cases, setCases] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isLoading,
-    isFetchingNextPage,
-    error,
-  } = useInfiniteQuery({
-    queryKey,
-    queryFn: async ({ pageParam = null }) => {
-      const { cases, lastDoc } = await getCases(uid, pageSize, pageParam);
-      return { cases, nextCursor: lastDoc };
-    },
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
-    cacheTime: 10 * 60 * 1000, // Keep cache for 10 minutes
-    retry: 1, // Retry failed requests once
-    refetchOnWindowFocus: false, // Prevent refetch on tab focus
-  });
+  useEffect(() => {
+    const fetchCases = async () => {
+      setLoading(true);
+      try {
+        const fetchedCases = await getCases(uid);
+        setCases(fetchedCases);
+      } catch (error) {
+        console.error('Error fetching cases:', error);
+        setCases([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCases();
+  }, [uid]);
 
-  // Flatten pages into a single array of cases
-  const cases = data?.pages.flatMap((page) => page.cases) || [];
-
-  return {
-    cases,
-    getCaseById,
-    loading: isLoading || isFetchingNextPage,
-    error: error?.message || null,
-    loadMore: fetchNextPage,
-    hasMore: hasNextPage,
-  };
+  return { cases, getCaseById, loading };
 };
+
+
