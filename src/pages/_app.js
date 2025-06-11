@@ -1,4 +1,4 @@
-Update import '../styles/globals.css';
+import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import Navbar from '../components/Navbar';
