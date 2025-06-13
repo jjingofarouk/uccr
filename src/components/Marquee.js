@@ -1,8 +1,6 @@
-// components/Marquee.jsx
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import styles from './Marquee.module.css';
-import { researchFindings } from './ResearchFindings';
 
 export default function Marquee() {
   const marqueeRef = useRef(null);
@@ -24,14 +22,21 @@ export default function Marquee() {
     const marquee = marqueeRef.current;
     if (!marquee) return;
 
-    const shuffled = [...researchFindings].sort(() => Math.random() - 0.5);
-    marquee.innerHTML = [...shuffled, ...shuffled]
-      .map((msg) => `<span>${msg}</span>`)
-      .join('');
+    fetch('/api/medical-headlines')
+      .then(res => res.json())
+      .then(data => {
+        const shuffled = [...data.headlines].sort(() => Math.random() - 0.5);
+        marquee.innerHTML = [...shuffled, ...shuffled]
+          .map(msg => `<span>${msg}</span>`)
+          .join('');
 
-    const totalWidth = shuffled.length * 300;
-    marquee.style.setProperty('--marquee-width', `${totalWidth}px`);
-    marquee.style.setProperty('--marquee-duration', `${totalWidth / 60}s`);
+        const totalWidth = shuffled.length * 300;
+        marquee.style.setProperty('--marquee-width', `${totalWidth}px`);
+        marquee.style.setProperty('--marquee-duration', `${totalWidth / 60}s`);
+      })
+      .catch(err => {
+        console.error('Failed to load headlines:', err);
+      });
   }, []);
 
   return (
