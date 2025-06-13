@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
 import { getMessages, searchCasesAndUsers } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -634,7 +634,7 @@ export default function Navbar() {
   }} 
   className={styles.navLink}
 >
-  <User size={20} className={styles.navIcon} />
+  <Info size={20} className={styles.navIcon} />
   About
 </Link>
               )}
