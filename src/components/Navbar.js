@@ -626,6 +626,17 @@ export default function Navbar() {
                   <LogIn size={20} className={styles.navIcon} />
                   Log In / Sign Up
                 </Link>
+                <Link 
+  href="/about" 
+  onClick={() => {
+    handleNavigationClick('about');
+    toggleSidebar();
+  }} 
+  className={styles.navLink}
+>
+  <User size={20} className={styles.navIcon} />
+  About
+</Link>
               )}
             </nav>
             <AnimatePresence>
