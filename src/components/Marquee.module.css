@@ -1,11 +1,15 @@
 .marqueeContainer {
   overflow: hidden;
   width: 100%;
-  background: var(--marquee-bg, #f97316);
-  padding: 0.1rem 0;
-  box-shadow: 0 1px 3px var(--shadow);
+  background: var(--marquee-bg, #e0f2f1); /* Pale teal from theme */
+  padding: 0.5rem 0; /* Slightly increased padding for better spacing */
+  box-shadow: 0 1px 3px var(--shadow); /* Theme shadow */
   transition: opacity 0.3s ease, transform 0.3s ease;
-  margin: 0; /* Ensure no extra margin */
+  margin: 0;
+  position: fixed; /* Ensure marquee stays at top */
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
 .marquee {
@@ -13,12 +17,12 @@
   align-items: center;
   white-space: nowrap;
   animation: marquee var(--marquee-duration, 20s) linear infinite;
-  color: var(--marquee-text, #ffffff);
+  color: var(--marquee-text, #003d33); /* Deep teal for high contrast */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.65rem;
+  font-size: 0.75rem; /* Slightly larger for readability */
   font-weight: 500;
   letter-spacing: -0.01em;
-  line-height: 1;
+  line-height: 1.2;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -26,7 +30,17 @@
 
 .marquee span {
   display: inline-block;
-  margin: 0 1rem;
+  margin: 0 1.5rem; /* Increased spacing for clarity */
+}
+
+.marquee a {
+  color: var(--marquee-link, #0288d1); /* Vibrant blue for links */
+  text-decoration: none;
+}
+
+.marquee a:hover {
+  color: var(--marquee-link-hover, #004d40); /* Darker teal on hover */
+  text-decoration: underline;
 }
 
 .visible {
@@ -39,6 +53,13 @@
   transform: translateY(-100%);
 }
 
+.error {
+  text-align: center;
+  color: var(--marquee-error, #d32f2f); /* Red for errors, consistent across themes */
+  font-size: 0.75rem;
+  padding: 0.5rem;
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -49,19 +70,27 @@
 }
 
 .dark-mode .marqueeContainer {
-  --marquee-bg: #c2410c;
-  --marquee-text: #fef3c7;
+  --marquee-bg: #1e1e1e; /* Dark surface from theme */
+  --marquee-text: #b2dfdb; /* Light teal for readability */
+  --marquee-link: #29b6f6; /* Bright blue for links */
+  --marquee-link-hover: #80cbc4; /* Lighter teal on hover */
+  --marquee-error: #ef5350; /* Slightly lighter red for dark mode */
 }
 
 @media (max-width: 768px) {
   .marqueeContainer {
-    padding: 0.05rem 0;
+    padding: 0.3rem 0; /* Reduced padding for mobile */
   }
   .marquee {
-    font-size: 0.6rem;
-    line-height: 1;
+    font-size: 0.65rem; /* Slightly smaller for mobile */
+    line-height: 1.2;
   }
   .marquee span {
-    margin: 0 0.75rem;
+    margin: 0 1rem; /* Adjusted spacing for mobile */
   }
+}
+
+/* Optional: Pause animation on hover for accessibility */
+.marquee:hover {
+  animation-play-state: paused;
 }
