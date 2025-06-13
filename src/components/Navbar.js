@@ -10,6 +10,17 @@ import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
 import styles from '../styles/navbar.module.css';
 
+// Google Analytics tracking function
+const trackEvent = (action, category, label, value) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
+    });
+  }
+};
+
 export default function Navbar() {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -29,41 +40,78 @@ export default function Navbar() {
   const userAvatarRef = useRef(null);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
+    const newState = !isSidebarOpen;
+    setIsSidebarOpen(newState);
     setIsNotificationsOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
+    
+    // Track sidebar toggle
+    trackEvent('sidebar_toggle', 'navigation', newState ? 'open' : 'close');
   };
 
   const toggleNotifications = () => {
-    setIsNotificationsOpen((prev) => !prev);
+    const newState = !isNotificationsOpen;
+    setIsNotificationsOpen(newState);
     setIsSidebarOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
+    
+    // Track notifications toggle
+    trackEvent('notifications_toggle', 'navigation', newState ? 'open' : 'close');
   };
 
   const toggleSearchModal = () => {
-    setIsSearchModalOpen((prev) => !prev);
+    const newState = !isSearchModalOpen;
+    setIsSearchModalOpen(newState);
     setIsSidebarOpen(false);
     setIsNotificationsOpen(false);
     setSearchQuery('');
     setSearchResults({ cases: [], users: [] });
     setSearchError('');
     setLogoutError('');
+    
+    // Track search modal toggle
+    trackEvent('search_modal_toggle', 'navigation', newState ? 'open' : 'close');
   };
 
   const handleLogout = async () => {
     try {
+      // Track logout attempt
+      trackEvent('logout_attempt', 'authentication', 'user_initiated');
+      
       const result = await logout();
       if (result.success) {
         setIsSidebarOpen(false);
+        trackEvent('logout_success', 'authentication', 'completed');
         router.push('/auth');
       } else {
         setLogoutError(result.error);
+        trackEvent('logout_error', 'authentication', result.error);
       }
     } catch (error) {
-      setLogoutError('Failed to log out. Please try again.');
+      const errorMessage = 'Failed to log out. Please try again.';
+      setLogoutError(errorMessage);
+      trackEvent('logout_error', 'authentication', errorMessage);
     }
+  };
+
+  const handleThemeToggle = () => {
+    toggleTheme();
+    // Track theme toggle
+    trackEvent('theme_toggle', 'user_preference', theme === 'light' ? 'to_dark' : 'to_light');
+  };
+
+  const handleSearchResultClick = (type, itemId, itemTitle) => {
+    // Track search result clicks
+    trackEvent('search_result_click', 'search', `${type}_${itemId}`, 1);
+    trackEvent('search_conversion', 'search', `query: ${searchQuery} -> ${type}: ${itemTitle}`);
+    toggleSearchModal();
+  };
+
+  const handleNavigationClick = (destination) => {
+    // Track navigation clicks
+    trackEvent('navigation_click', 'navigation', destination);
   };
 
   const clearError = () => {
@@ -82,8 +130,14 @@ export default function Navbar() {
         const threads = await getMessages(user.uid);
         const unread = threads.filter((thread) => thread.lastMessage && !thread.read);
         setUnreadThreads(unread);
+        
+        // Track unread message count
+        if (unread.length > 0) {
+          trackEvent('unread_messages', 'messaging', 'count', unread.length);
+        }
       } catch (err) {
         console.error('Fetch unread messages error:', err);
+        trackEvent('fetch_messages_error', 'messaging', err.message);
       }
     };
     fetchUnreadMessages();
@@ -98,19 +152,30 @@ export default function Navbar() {
         setIsSearchLoading(false);
         return;
       }
+      
       try {
         setIsSearchLoading(true);
         setSearchError('');
+        
+        // Track search query
+        trackEvent('search_query', 'search', searchQuery);
+        
         const results = await searchCasesAndUsers(searchQuery);
         console.log('Search results:', results); // Debug log
         setSearchResults(results);
+        
+        // Track search results
+        trackEvent('search_results', 'search', 'results_found', results.cases.length + results.users.length);
+        
         if (results.cases.length === 0 && results.users.length === 0) {
           setSearchError('No results found. Try a different keyword.');
+          trackEvent('search_no_results', 'search', searchQuery);
         }
       } catch (error) {
         console.error('Search error:', error);
         setSearchError('Failed to fetch results. Please try again.');
         setSearchResults({ cases: [], users: [] });
+        trackEvent('search_error', 'search', error.message);
       } finally {
         setIsSearchLoading(false);
       }
@@ -119,19 +184,24 @@ export default function Navbar() {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
-  // Close modals on outside click
+  // Enhanced outside click handler with better performance
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
-        notificationsRef.current &&
-        !notificationsRef.current.contains(event.target) &&
-        searchModalRef.current &&
-        !searchModalRef.current.contains(event.target) &&
-        userAvatarRef.current &&
-        !userAvatarRef.current.contains(event.target)
-      ) {
+      const clickedElement = event.target;
+      
+      // Check if click is outside all modals and their triggers
+      const isOutsideSidebar = sidebarRef.current && !sidebarRef.current.contains(clickedElement);
+      const isOutsideNotifications = notificationsRef.current && !notificationsRef.current.contains(clickedElement);
+      const isOutsideSearch = searchModalRef.current && !searchModalRef.current.contains(clickedElement);
+      const isOutsideUserAvatar = userAvatarRef.current && !userAvatarRef.current.contains(clickedElement);
+      
+      // Close modals if click is outside all of them
+      if (isOutsideSidebar && isOutsideNotifications && isOutsideSearch && isOutsideUserAvatar) {
+        if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
+          // Track outside clicks
+          trackEvent('outside_click_close', 'navigation', 'modal_closed');
+        }
+        
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
         setIsSearchModalOpen(false);
@@ -140,19 +210,42 @@ export default function Navbar() {
       }
     };
 
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
+          trackEvent('escape_key_close', 'navigation', 'modal_closed');
+        }
+        
+        setIsSidebarOpen(false);
+        setIsNotificationsOpen(false);
+        setIsSearchModalOpen(false);
+        setLogoutError('');
+        setSearchError('');
+      }
+    };
+
+    // Add event listeners only when modals are open for better performance
     if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('keydown', handleEscapeKey);
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isSidebarOpen, isNotificationsOpen, isSearchModalOpen]);
 
   return (
     <header className={styles.header}>
       <div className={styles.headerContent}>
-        <Link href="/" className={styles.logo}>
+        <Link 
+          href="/" 
+          className={styles.logo}
+          onClick={() => handleNavigationClick('home_logo')}
+        >
           <Image src="/logo.jpg" alt="UCCR Logo" width={40} height={40} />
           <span>UCCR</span>
         </Link>
@@ -165,7 +258,7 @@ export default function Navbar() {
             <Search size={20} />
           </button>
           <button
-            onClick={toggleTheme}
+            onClick={handleThemeToggle}
             className={styles.themeToggle}
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
@@ -216,7 +309,10 @@ export default function Navbar() {
                           key={thread.id}
                           href={`/messages/${thread.id}`}
                           className={styles.notificationItem}
-                          onClick={() => setIsNotificationsOpen(false)}
+                          onClick={() => {
+                            handleNavigationClick('notification_message');
+                            setIsNotificationsOpen(false);
+                          }}
                         >
                           <span>New message from {thread.otherUserName}</span>
                           <small>{thread.lastMessage}</small>
@@ -291,17 +387,35 @@ export default function Navbar() {
                       <p>Suggestions:</p>
                       <ul>
                         <li>
-                          <Link href="/cases" onClick={toggleSearchModal}>
+                          <Link 
+                            href="/cases" 
+                            onClick={() => {
+                              handleNavigationClick('browse_all_cases');
+                              toggleSearchModal();
+                            }}
+                          >
                             Browse all cases
                           </Link>
                         </li>
                         <li>
-                          <Link href="/cases?specialty=Cardiology" onClick={toggleSearchModal}>
+                          <Link 
+                            href="/cases?specialty=Cardiology" 
+                            onClick={() => {
+                              handleNavigationClick('browse_cardiology');
+                              toggleSearchModal();
+                            }}
+                          >
                             Explore Cardiology cases
                           </Link>
                         </li>
                         <li>
-                          <Link href="/cases?specialty=Pediatrics" onClick={toggleSearchModal}>
+                          <Link 
+                            href="/cases?specialty=Pediatrics" 
+                            onClick={() => {
+                              handleNavigationClick('browse_pediatrics');
+                              toggleSearchModal();
+                            }}
+                          >
                             Explore Pediatrics cases
                           </Link>
                         </li>
@@ -318,7 +432,7 @@ export default function Navbar() {
                             key={caseData.id}
                             href={`/cases/${caseData.id}`}
                             className={styles.searchResult}
-                            onClick={toggleSearchModal}
+                            onClick={() => handleSearchResultClick('case', caseData.id, caseData.title)}
                           >
                             <span>{caseData.title || 'Untitled Case'}</span>
                             <small>{caseData.specialty || 'No specialty'}</small>
@@ -334,7 +448,7 @@ export default function Navbar() {
                             key={user.uid}
                             href={`/profile/view/${user.uid}`}
                             className={styles.searchResult}
-                            onClick={toggleSearchModal}
+                            onClick={() => handleSearchResultClick('user', user.uid, user.displayName)}
                           >
                             <span>{user.displayName || 'Anonymous'}</span>
                             <small>{user.specialty || 'No specialty'}</small>
@@ -349,17 +463,35 @@ export default function Navbar() {
                           <p>Suggestions:</p>
                           <ul>
                             <li>
-                              <Link href="/cases" onClick={toggleSearchModal}>
+                              <Link 
+                                href="/cases" 
+                                onClick={() => {
+                                  handleNavigationClick('browse_all_cases_fallback');
+                                  toggleSearchModal();
+                                }}
+                              >
                                 Browse all cases
                               </Link>
                             </li>
                             <li>
-                              <Link href="/cases?specialty=Cardiology" onClick={toggleSearchModal}>
+                              <Link 
+                                href="/cases?specialty=Cardiology" 
+                                onClick={() => {
+                                  handleNavigationClick('browse_cardiology_fallback');
+                                  toggleSearchModal();
+                                }}
+                              >
                                 Explore Cardiology cases
                               </Link>
                             </li>
                             <li>
-                              <Link href="/cases?specialty=Pediatrics" onClick={toggleSearchModal}>
+                              <Link 
+                                href="/cases?specialty=Pediatrics" 
+                                onClick={() => {
+                                  handleNavigationClick('browse_pediatrics_fallback');
+                                  toggleSearchModal();
+                                }}
+                              >
                                 Explore Pediatrics cases
                               </Link>
                             </li>
@@ -399,34 +531,76 @@ export default function Navbar() {
               )}
             </div>
             <nav className={styles.sidebarNav}>
-              <Link href="/" onClick={toggleSidebar} className={styles.navLink}>
+              <Link 
+                href="/" 
+                onClick={() => {
+                  handleNavigationClick('home');
+                  toggleSidebar();
+                }} 
+                className={styles.navLink}
+              >
                 <Home size={20} className={styles.navIcon} />
                 Home
               </Link>
-              <Link href="/cases" onClick={toggleSidebar} className={styles.navLink}>
+              <Link 
+                href="/cases" 
+                onClick={() => {
+                  handleNavigationClick('cases');
+                  toggleSidebar();
+                }} 
+                className={styles.navLink}
+              >
                 <Briefcase size={20} className={styles.navIcon} />
                 Cases
               </Link>
               {user && (
-                <Link href="/cases/new" onClick={toggleSidebar} className={styles.navLink}>
+                <Link 
+                  href="/cases/new" 
+                  onClick={() => {
+                    handleNavigationClick('add_case');
+                    toggleSidebar();
+                  }} 
+                  className={styles.navLink}
+                >
                   <PlusCircle size={20} className={styles.navIcon} />
                   Add Case
                 </Link>
               )}
               {user && (
-                <Link href="/profile/cases" onClick={toggleSidebar} className={styles.navLink}>
+                <Link 
+                  href="/profile/cases" 
+                  onClick={() => {
+                    handleNavigationClick('my_cases');
+                    toggleSidebar();
+                  }} 
+                  className={styles.navLink}
+                >
                   <Briefcase size={20} className={styles.navIcon} />
                   My Cases
                 </Link>
               )}
               {user && (
-                <Link href="/profile" onClick={toggleSidebar} className={styles.navLink}>
+                <Link 
+                  href="/profile" 
+                  onClick={() => {
+                    handleNavigationClick('profile');
+                    toggleSidebar();
+                  }} 
+                  className={styles.navLink}
+                >
                   <User size={20} className={styles.navIcon} />
                   Profile
                 </Link>
               )}
               {user && (
-                <Link href="/inbox" onClick={toggleSidebar} className={styles.navLink}>
+                <Link 
+                  href="/inbox" 
+                  onClick={() => {
+                    handleNavigationClick('inbox');
+                    toggleSidebar();
+                  }} 
+                  className={styles.navLink}
+                >
                   <Inbox size={20} className={styles.navIcon} />
                   Inbox
                 </Link>
@@ -441,7 +615,14 @@ export default function Navbar() {
                   Logout
                 </button>
               ) : (
-                <Link href="/auth" onClick={toggleSidebar} className={styles.navLink}>
+                <Link 
+                  href="/auth" 
+                  onClick={() => {
+                    handleNavigationClick('login');
+                    toggleSidebar();
+                  }} 
+                  className={styles.navLink}
+                >
                   <LogIn size={20} className={styles.navIcon} />
                   Log In / Sign Up
                 </Link>
