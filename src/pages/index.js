@@ -11,6 +11,8 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 import CaseCard from '../components/Case/CaseCard';
 import Loading from '../components/Loading';
 import styles from './Home.module.css';
+import { GoogleAnalytics } from '@next/third-parties/google';
+ 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
@@ -330,6 +332,7 @@ const StatsSection = () => {
 };
 
 export default function HomePage() {
+  
   const { user } = useAuth();
   const { cases, loading, error } = useCases();
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
@@ -405,6 +408,7 @@ export default function HomePage() {
 
   return (
     <main className={styles.container}>
+      <GoogleAnalytics gaId="G-JGQE2H2LRK" />
       <HeroSection />
       {cases.length === 0 ? (
         <section className={styles.emptySection} aria-live="polite">
