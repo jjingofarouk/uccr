@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,9 +11,36 @@ import CaseCard from '../components/Case/CaseCard';
 import Loading from '../components/Loading';
 import styles from './Home.module.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
- 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
+
+// Google Analytics tracking functions
+const trackEvent = (action, category, label = '', value = 0) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
+    });
+  }
+};
+
+const trackPageView = (page_title, page_location) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('config', 'G-GLWW8HX76X', {
+      page_title: page_title,
+      page_location: page_location,
+    });
+  }
+};
+
+const trackClick = (element_name, section) => {
+  trackEvent('click', 'navigation', `${section}_${element_name}`);
+};
+
+const trackEngagement = (action, section, details = '') => {
+  trackEvent(action, 'engagement', `${section}_${details}`);
+};
 
 const HeroSection = () => (
   <section className={styles.hero} aria-labelledby="hero-title">
@@ -23,10 +49,18 @@ const HeroSection = () => (
       Explore and contribute to a growing database of medical case studies from Uganda.
     </p>
     <div className={styles.heroButtons}>
-      <Link href="/cases" className={styles.ctaButtonPrimary}>
+      <Link 
+        href="/cases" 
+        className={styles.ctaButtonPrimary}
+        onClick={() => trackClick('browse_cases_button', 'hero')}
+      >
         Browse Cases
       </Link>
-      <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+      <Link 
+        href="/cases/new" 
+        className={styles.ctaButtonSecondary}
+        onClick={() => trackClick('share_case_button', 'hero')}
+      >
         Share a Case
       </Link>
     </div>
@@ -37,13 +71,20 @@ const FeaturedSection = ({ caseOfTheDay }) => (
   <section className={styles.featuredSection} aria-labelledby="featured-title">
     <h2 id="featured-title" className={styles.sectionTitle}>Case of the Day</h2>
     {caseOfTheDay ? (
-      <div className={styles.featuredCard}>
+      <div 
+        className={styles.featuredCard}
+        onClick={() => trackEngagement('view', 'featured_case', caseOfTheDay.id)}
+      >
         <CaseCard caseData={caseOfTheDay} />
       </div>
     ) : (
       <div className={styles.emptySection}>
         <p className={styles.emptyText}>No featured case available</p>
-        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+        <Link 
+          href="/cases/new" 
+          className={styles.ctaButtonSecondary}
+          onClick={() => trackClick('share_case_button', 'featured_empty')}
+        >
           Share a Case
         </Link>
       </div>
@@ -56,14 +97,23 @@ const TrendingSection = ({ trendingCases }) => (
     <h2 id="trending-title" className={styles.sectionTitle}>Trending Cases</h2>
     {trendingCases.length > 0 ? (
       <div className={styles.caseList}>
-        {trendingCases.map((caseData) => (
-          <CaseCard key={caseData.id} caseData={caseData} />
+        {trendingCases.map((caseData, index) => (
+          <div
+            key={caseData.id}
+            onClick={() => trackEngagement('view', 'trending_case', `${caseData.id}_position_${index + 1}`)}
+          >
+            <CaseCard caseData={caseData} />
+          </div>
         ))}
       </div>
     ) : (
       <div className={styles.emptySection}>
         <p className={styles.emptyText}>No trending cases available</p>
-        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+        <Link 
+          href="/cases/new" 
+          className={styles.ctaButtonSecondary}
+          onClick={() => trackClick('share_case_button', 'trending_empty')}
+        >
           Share a Case
         </Link>
       </div>
@@ -76,14 +126,23 @@ const RecentSection = ({ recentCases }) => (
     <h2 id="recent-title" className={styles.sectionTitle}>Recently Published Cases</h2>
     {recentCases.length > 0 ? (
       <div className={styles.caseList}>
-        {recentCases.map((caseData) => (
-          <CaseCard key={caseData.id} caseData={caseData} />
+        {recentCases.map((caseData, index) => (
+          <div
+            key={caseData.id}
+            onClick={() => trackEngagement('view', 'recent_case', `${caseData.id}_position_${index + 1}`)}
+          >
+            <CaseCard caseData={caseData} />
+          </div>
         ))}
       </div>
     ) : (
       <div className={styles.emptySection}>
         <p className={styles.emptyText}>No recent cases available</p>
-        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+        <Link 
+          href="/cases/new" 
+          className={styles.ctaButtonSecondary}
+          onClick={() => trackClick('share_case_button', 'recent_empty')}
+        >
           Share a Case
         </Link>
       </div>
@@ -98,14 +157,23 @@ const SpecialtySection = ({ specialtyCases, featuredSpecialty }) => (
     </h2>
     {specialtyCases.length > 0 ? (
       <div className={styles.caseList}>
-        {specialtyCases.map((caseData) => (
-          <CaseCard key={caseData.id} caseData={caseData} />
+        {specialtyCases.map((caseData, index) => (
+          <div
+            key={caseData.id}
+            onClick={() => trackEngagement('view', 'specialty_case', `${featuredSpecialty}_${caseData.id}_position_${index + 1}`)}
+          >
+            <CaseCard caseData={caseData} />
+          </div>
         ))}
       </div>
     ) : (
       <div className={styles.emptySection}>
         <p className={styles.emptyText}>No specialty cases available</p>
-        <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+        <Link 
+          href="/cases/new" 
+          className={styles.ctaButtonSecondary}
+          onClick={() => trackClick('share_case_button', 'specialty_empty')}
+        >
           Share a Case
         </Link>
       </div>
@@ -121,10 +189,13 @@ const LeaderboardSection = () => {
   useEffect(() => {
     const fetchContributors = async () => {
       try {
+        trackEngagement('load_start', 'leaderboard');
         const data = await getTopContributors(3);
         setContributors(data);
+        trackEngagement('load_success', 'leaderboard', `${data.length}_contributors`);
       } catch (err) {
         setError('Failed to load top contributors');
+        trackEngagement('load_error', 'leaderboard', err.message);
         console.error('Error fetching contributors:', err);
       } finally {
         setLoading(false);
@@ -145,11 +216,12 @@ const LeaderboardSection = () => {
       <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
       {contributors.length > 0 ? (
         <div className={styles.leaderboard}>
-          {contributors.map((contributor) => (
+          {contributors.map((contributor, index) => (
             <Link
               key={contributor.uid}
               href={`/profile/view/${contributor.uid}`}
               className={styles.contributor}
+              onClick={() => trackClick('contributor_profile', 'leaderboard', `${contributor.displayName}_position_${index + 1}`)}
             >
               <Image
                 src={contributor.photoURL}
@@ -165,9 +237,9 @@ const LeaderboardSection = () => {
                 </small>
                 {contributor.awards?.length > 0 && (
                   <small className={styles.awards}>
-                    {contributor.awards.map((award, index) => (
+                    {contributor.awards.map((award, awardIndex) => (
                       <span
-                        key={index}
+                        key={awardIndex}
                         className={
                           award === 'Gold'
                             ? styles.goldAward
@@ -175,6 +247,10 @@ const LeaderboardSection = () => {
                             ? styles.silverAward
                             : styles.bronzeAward
                         }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          trackEngagement('award_click', 'leaderboard', `${award}_${contributor.displayName}`);
+                        }}
                       >
                         {award} <Star size={12} />
                       </span>
@@ -188,7 +264,11 @@ const LeaderboardSection = () => {
       ) : (
         <div className={styles.emptySection} aria-live="polite">
           <p className={styles.emptyText}>No contributors found</p>
-          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          <Link 
+            href="/cases/new" 
+            className={styles.ctaButtonSecondary}
+            onClick={() => trackClick('contribute_case_button', 'leaderboard_empty')}
+          >
             Contribute a Case
           </Link>
         </div>
@@ -205,13 +285,21 @@ const StatsSection = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        trackEngagement('load_start', 'stats');
         const data = await getCaseStatistics();
         const topStats = data
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
         setStats(topStats);
+        trackEngagement('load_success', 'stats', `${topStats.length}_specialties`);
+        
+        // Track the top specialties
+        topStats.forEach((stat, index) => {
+          trackEvent('specialty_stat', 'stats', `${stat.specialty}_rank_${index + 1}`, stat.count);
+        });
       } catch (err) {
         setError('Unable to load case statistics');
+        trackEngagement('load_error', 'stats', err.message);
         console.error('Error fetching case statistics:', err);
       } finally {
         setLoading(false);
@@ -219,6 +307,16 @@ const StatsSection = () => {
     };
     fetchStats();
   }, []);
+
+  // Chart interaction tracking
+  const handleChartClick = (event, elements) => {
+    if (elements.length > 0) {
+      const elementIndex = elements[0].index;
+      const specialty = stats[elementIndex]?.specialty;
+      const count = stats[elementIndex]?.count;
+      trackEngagement('chart_click', 'stats', `${specialty}_${count}_cases`);
+    }
+  };
 
   const barColors = [
     'rgba(59, 130, 246, 0.6)',
@@ -253,6 +351,14 @@ const StatsSection = () => {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    onClick: handleChartClick,
+    onHover: (event, elements) => {
+      if (elements.length > 0) {
+        const elementIndex = elements[0].index;
+        const specialty = stats[elementIndex]?.specialty;
+        trackEngagement('chart_hover', 'stats', specialty);
+      }
+    },
     plugins: {
       legend: { display: false },
       title: {
@@ -267,6 +373,13 @@ const StatsSection = () => {
         bodyColor: 'var(--tooltip-text, #ffffff)',
         borderColor: 'var(--border, #e5e7eb)',
         borderWidth: 1,
+        callbacks: {
+          afterLabel: function(context) {
+            // Track tooltip views
+            trackEngagement('tooltip_view', 'stats', `${context.label}_${context.parsed.y}_cases`);
+            return '';
+          }
+        }
       },
     },
     scales: {
@@ -322,7 +435,11 @@ const StatsSection = () => {
       ) : (
         <div className={styles.emptySection} aria-live="polite">
           <p className={styles.emptyText}>No case statistics available</p>
-          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          <Link 
+            href="/cases/new" 
+            className={styles.ctaButtonSecondary}
+            onClick={() => trackClick('contribute_case_button', 'stats_empty')}
+          >
             Contribute a Case
           </Link>
         </div>
@@ -332,11 +449,36 @@ const StatsSection = () => {
 };
 
 export default function HomePage() {
-  
   const { user } = useAuth();
   const { cases, loading, error } = useCases();
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
   const [featuredSpecialty, setFeaturedSpecialty] = useState('');
+
+  // Track page view on component mount
+  useEffect(() => {
+    trackPageView('Homepage', window.location.href);
+    trackEngagement('page_load', 'homepage');
+  }, []);
+
+  // Track user authentication status
+  useEffect(() => {
+    if (user) {
+      trackEvent('user_status', 'authentication', 'logged_in');
+    } else {
+      trackEvent('user_status', 'authentication', 'anonymous');
+    }
+  }, [user]);
+
+  // Track cases loading
+  useEffect(() => {
+    if (!loading) {
+      if (error) {
+        trackEngagement('data_load_error', 'cases', error);
+      } else {
+        trackEngagement('data_load_success', 'cases', `${cases.length}_total_cases`);
+      }
+    }
+  }, [loading, error, cases]);
 
   useEffect(() => {
     if (cases.length > 0) {
@@ -348,7 +490,11 @@ export default function HomePage() {
         .split('-')
         .reduce((acc, val) => acc + parseInt(val), 0);
       const randomIndex = seed % cases.length;
-      setCaseOfTheDay(cases[randomIndex]);
+      const selectedCase = cases[randomIndex];
+      setCaseOfTheDay(selectedCase);
+      
+      // Track case of the day selection
+      trackEngagement('case_of_day_selected', 'featured', selectedCase.id);
     }
   }, [cases]);
 
@@ -362,31 +508,113 @@ export default function HomePage() {
     ];
     if (specialties.length > 0) {
       const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
-      setFeaturedSpecialty(specialties[weekNumber % specialties.length]);
+      const selectedSpecialty = specialties[weekNumber % specialties.length];
+      setFeaturedSpecialty(selectedSpecialty);
+      
+      // Track featured specialty selection
+      trackEngagement('specialty_featured', 'specialty_spotlight', selectedSpecialty);
     }
   }, [cases]);
 
   const recentCases = useMemo(() => {
-    return cases
+    const recent = cases
       .slice()
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5);
+    
+    // Track recent cases count
+    if (recent.length > 0) {
+      trackEvent('content_loaded', 'recent_cases', 'count', recent.length);
+    }
+    
+    return recent;
   }, [cases]);
 
   const trendingCases = useMemo(() => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    return cases
+    const trending = cases
       .filter((caseData) => new Date(caseData.createdAt) >= oneWeekAgo)
       .sort((a, b) => (b.views || 0) - (a.views || 0))
       .slice(0, 3);
+    
+    // Track trending cases
+    if (trending.length > 0) {
+      trackEvent('content_loaded', 'trending_cases', 'count', trending.length);
+      const totalViews = trending.reduce((sum, c) => sum + (c.views || 0), 0);
+      trackEvent('content_loaded', 'trending_cases', 'total_views', totalViews);
+    }
+    
+    return trending;
   }, [cases]);
 
   const specialtyCases = useMemo(() => {
-    return cases
+    const filtered = cases
       .filter((caseData) => Array.isArray(caseData.specialty) && caseData.specialty.includes(featuredSpecialty))
       .slice(0, 3);
+    
+    // Track specialty cases count
+    if (filtered.length > 0 && featuredSpecialty) {
+      trackEvent('content_loaded', 'specialty_cases', featuredSpecialty, filtered.length);
+    }
+    
+    return filtered;
   }, [cases, featuredSpecialty]);
+
+  // Track scroll depth
+  useEffect(() => {
+    let maxScroll = 0;
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = Math.round((scrollTop / scrollHeight) * 100);
+      
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent;
+        
+        // Track scroll milestones
+        if (scrollPercent >= 25 && maxScroll < 25) {
+          trackEngagement('scroll_depth', 'homepage', '25_percent');
+        } else if (scrollPercent >= 50 && maxScroll < 50) {
+          trackEngagement('scroll_depth', 'homepage', '50_percent');
+        } else if (scrollPercent >= 75 && maxScroll < 75) {
+          trackEngagement('scroll_depth', 'homepage', '75_percent');
+        } else if (scrollPercent >= 90 && maxScroll < 90) {
+          trackEngagement('scroll_depth', 'homepage', '90_percent');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Track time on page
+  useEffect(() => {
+    const startTime = Date.now();
+    
+    const trackTimeOnPage = () => {
+      const timeSpent = Math.round((Date.now() - startTime) / 1000);
+      trackEvent('timing', 'homepage', 'time_on_page', timeSpent);
+    };
+
+    // Track time on page before user leaves
+    window.addEventListener('beforeunload', trackTimeOnPage);
+    
+    // Also track at regular intervals for active users
+    const interval = setInterval(() => {
+      const timeSpent = Math.round((Date.now() - startTime) / 1000);
+      if (timeSpent > 0 && timeSpent % 30 === 0) { // Every 30 seconds
+        trackEvent('timing', 'homepage', 'active_time', timeSpent);
+      }
+    }, 30000);
+
+    return () => {
+      window.removeEventListener('beforeunload', trackTimeOnPage);
+      clearInterval(interval);
+      trackTimeOnPage();
+    };
+  }, []);
 
   if (loading) return (
     <main className={styles.container}>
@@ -413,7 +641,11 @@ export default function HomePage() {
       {cases.length === 0 ? (
         <section className={styles.emptySection} aria-live="polite">
           <p className={styles.emptyText}>No cases available yet. Be the first to share a case!</p>
-          <Link href="/cases/new" className={styles.ctaButtonSecondary}>
+          <Link 
+            href="/cases/new" 
+            className={styles.ctaButtonSecondary}
+            onClick={() => trackClick('share_case_button', 'empty_state')}
+          >
             Share a Case
           </Link>
         </section>
