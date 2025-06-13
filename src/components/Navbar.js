@@ -10,17 +10,6 @@ import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
 import styles from '../styles/navbar.module.css';
 
-// Google Analytics tracking function
-const trackEvent = (action, category, label, value) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value,
-    });
-  }
-};
-
 export default function Navbar() {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -45,9 +34,6 @@ export default function Navbar() {
     setIsNotificationsOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
-    
-    // Track sidebar toggle
-    trackEvent('sidebar_toggle', 'navigation', newState ? 'open' : 'close');
   };
 
   const toggleNotifications = () => {
@@ -56,9 +42,6 @@ export default function Navbar() {
     setIsSidebarOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
-    
-    // Track notifications toggle
-    trackEvent('notifications_toggle', 'navigation', newState ? 'open' : 'close');
   };
 
   const toggleSearchModal = () => {
@@ -70,56 +53,38 @@ export default function Navbar() {
     setSearchResults({ cases: [], users: [] });
     setSearchError('');
     setLogoutError('');
-    
-    // Track search modal toggle
-    trackEvent('search_modal_toggle', 'navigation', newState ? 'open' : 'close');
   };
 
   const handleLogout = async () => {
     try {
-      // Track logout attempt
-      trackEvent('logout_attempt', 'authentication', 'user_initiated');
-      
       const result = await logout();
       if (result.success) {
         setIsSidebarOpen(false);
-        trackEvent('logout_success', 'authentication', 'completed');
         router.push('/auth');
       } else {
         setLogoutError(result.error);
-        trackEvent('logout_error', 'authentication', result.error);
       }
     } catch (error) {
       const errorMessage = 'Failed to log out. Please try again.';
       setLogoutError(errorMessage);
-      trackEvent('logout_error', 'authentication', errorMessage);
     }
   };
 
   const handleThemeToggle = () => {
     toggleTheme();
-    // Track theme toggle
-    trackEvent('theme_toggle', 'user_preference', theme === 'light' ? 'to_dark' : 'to_light');
   };
 
-  const handleSearchResultClick = (type, itemId, itemTitle) => {
-    // Track search result clicks
-    trackEvent('search_result_click', 'search', `${type}_${itemId}`, 1);
-    trackEvent('search_conversion', 'search', `query: ${searchQuery} -> ${type}: ${itemTitle}`);
+  const handleSearchResultClick = () => {
     toggleSearchModal();
   };
 
-  const handleNavigationClick = (destination) => {
-    // Track navigation clicks
-    trackEvent('navigation_click', 'navigation', destination);
-  };
+  const handleNavigationClick = () => {};
 
   const clearError = () => {
     setLogoutError('');
     setSearchError('');
   };
 
-  // Fetch unread messages
   useEffect(() => {
     const fetchUnreadMessages = async () => {
       if (!user) {
@@ -130,20 +95,13 @@ export default function Navbar() {
         const threads = await getMessages(user.uid);
         const unread = threads.filter((thread) => thread.lastMessage && !thread.read);
         setUnreadThreads(unread);
-        
-        // Track unread message count
-        if (unread.length > 0) {
-          trackEvent('unread_messages', 'messaging', 'count', unread.length);
-        }
       } catch (err) {
         console.error('Fetch unread messages error:', err);
-        trackEvent('fetch_messages_error', 'messaging', err.message);
       }
     };
     fetchUnreadMessages();
   }, [user]);
 
-  // Handle search with debouncing
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.trim().length < 2) {
@@ -152,56 +110,35 @@ export default function Navbar() {
         setIsSearchLoading(false);
         return;
       }
-      
       try {
         setIsSearchLoading(true);
         setSearchError('');
-        
-        // Track search query
-        trackEvent('search_query', 'search', searchQuery);
-        
         const results = await searchCasesAndUsers(searchQuery);
-        console.log('Search results:', results); // Debug log
         setSearchResults(results);
-        
-        // Track search results
-        trackEvent('search_results', 'search', 'results_found', results.cases.length + results.users.length);
-        
         if (results.cases.length === 0 && results.users.length === 0) {
           setSearchError('No results found. Try a different keyword.');
-          trackEvent('search_no_results', 'search', searchQuery);
         }
       } catch (error) {
         console.error('Search error:', error);
         setSearchError('Failed to fetch results. Please try again.');
         setSearchResults({ cases: [], users: [] });
-        trackEvent('search_error', 'search', error.message);
       } finally {
         setIsSearchLoading(false);
       }
-    }, 500); // Debounce for 500ms
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
-  // Enhanced outside click handler with better performance
   useEffect(() => {
     const handleClickOutside = (event) => {
       const clickedElement = event.target;
-      
-      // Check if click is outside all modals and their triggers
       const isOutsideSidebar = sidebarRef.current && !sidebarRef.current.contains(clickedElement);
       const isOutsideNotifications = notificationsRef.current && !notificationsRef.current.contains(clickedElement);
       const isOutsideSearch = searchModalRef.current && !searchModalRef.current.contains(clickedElement);
       const isOutsideUserAvatar = userAvatarRef.current && !userAvatarRef.current.contains(clickedElement);
       
-      // Close modals if click is outside all of them
       if (isOutsideSidebar && isOutsideNotifications && isOutsideSearch && isOutsideUserAvatar) {
-        if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
-          // Track outside clicks
-          trackEvent('outside_click_close', 'navigation', 'modal_closed');
-        }
-        
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
         setIsSearchModalOpen(false);
@@ -212,10 +149,6 @@ export default function Navbar() {
 
     const handleEscapeKey = (event) => {
       if (event.key === 'Escape') {
-        if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
-          trackEvent('escape_key_close', 'navigation', 'modal_closed');
-        }
-        
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
         setIsSearchModalOpen(false);
@@ -224,7 +157,6 @@ export default function Navbar() {
       }
     };
 
-    // Add event listeners only when modals are open for better performance
     if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('touchstart', handleClickOutside);
@@ -615,28 +547,30 @@ export default function Navbar() {
                   Logout
                 </button>
               ) : (
-                <Link 
-                  href="/auth" 
-                  onClick={() => {
-                    handleNavigationClick('login');
-                    toggleSidebar();
-                  }} 
-                  className={styles.navLink}
-                >
-                  <LogIn size={20} className={styles.navIcon} />
-                  Log In / Sign Up
-                </Link>
-                <Link 
-  href="/about" 
-  onClick={() => {
-    handleNavigationClick('about');
-    toggleSidebar();
-  }} 
-  className={styles.navLink}
->
-  <Info size={20} className={styles.navIcon} />
-  About
-</Link>
+                <>
+                  <Link 
+                    href="/auth" 
+                    onClick={() => {
+                      handleNavigationClick('login');
+                      toggleSidebar();
+                    }} 
+                    className={styles.navLink}
+                  >
+                    <LogIn size={20} className={styles.navIcon} />
+                    Log In / Sign Up
+                  </Link>
+                  <Link 
+                    href="/about" 
+                    onClick={() => {
+                      handleNavigationClick('about');
+                      toggleSidebar();
+                    }} 
+                    className={styles.navLink}
+                  >
+                    <Info size={20} className={styles.navIcon} />
+                    About
+                  </Link>
+                </>
               )}
             </nav>
             <AnimatePresence>
