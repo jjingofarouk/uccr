@@ -22,7 +22,7 @@ export default function MyApp({ Component, pageProps }) {
           <Footer />
         </ThemeProvider>
       </AuthProvider>
-      <GoogleAnalytics gaId="G-JGQE2H2LRK" />
+      <GoogleAnalytics gaId="G-GLWW8HX76X" />
       <Analytics /> {/* Add this component */}
     </>
   );
