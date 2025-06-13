@@ -29,7 +29,8 @@
     "rss-parser": "^3.13.0",
     "@mui/material": "^5.14.0",
     "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0"
+    "@emotion/styled": "^11.11.0",
+    "react-gtag": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
