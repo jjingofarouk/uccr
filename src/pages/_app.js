@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import Navbar from '../components/Navbar';
+import Marquee from '../components/Marquee'; // <-- Add this line
 import Footer from '../components/Footer';
 
 import { useEffect } from 'react';
@@ -43,6 +44,9 @@ function MyApp({ Component, pageProps }) {
       <AuthProvider>
         <ThemeProvider>
           <Navbar />
+          <div className="marquee-container">
+            <Marquee />
+          </div>
           <main>
             <Component {...pageProps} />
           </main>
