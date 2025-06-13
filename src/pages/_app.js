@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Marquee from '../components/Marquee';
 import Footer from '../components/Footer';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { Analytics } from '@vercel/analytics/react'; // Add this import
 
 export default function MyApp({ Component, pageProps }) {
   return (
@@ -22,6 +23,7 @@ export default function MyApp({ Component, pageProps }) {
         </ThemeProvider>
       </AuthProvider>
       <GoogleAnalytics gaId="G-JGQE2H2LRK" />
+      <Analytics /> {/* Add this component */}
     </>
   );
 }
