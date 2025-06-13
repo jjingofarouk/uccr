@@ -2,14 +2,15 @@
   overflow: hidden;
   width: 100%;
   background: var(--marquee-bg, #e0f2f1); /* Pale teal from theme */
-  padding: 0.5rem 0; /* Slightly increased padding for better spacing */
+  padding: 0.5rem 0; /* Minimal padding for content */
   box-shadow: 0 1px 3px var(--shadow); /* Theme shadow */
   transition: opacity 0.3s ease, transform 0.3s ease;
-  margin: 0;
-  position: fixed; /* Ensure marquee stays at top */
-  top: 0;
+  margin: 0; /* No margin to prevent gaps */
+  position: fixed;
+  top: 64px; /* Matches navbar height: 0.75rem padding-top + 0.75rem padding-bottom + 1px border + ~40px content height */
   left: 0;
-  z-index: 10;
+  right: 0;
+  z-index: 999; /* Below navbar (1000) but above content */
 }
 
 .marquee {
@@ -19,7 +20,7 @@
   animation: marquee var(--marquee-duration, 20s) linear infinite;
   color: var(--marquee-text, #003d33); /* Deep teal for high contrast */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.75rem; /* Slightly larger for readability */
+  font-size: 0.75rem; /* Matches navbar’s compact aesthetic */
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -30,7 +31,7 @@
 
 .marquee span {
   display: inline-block;
-  margin: 0 1.5rem; /* Increased spacing for clarity */
+  margin: 0 1.5rem; /* Spacing between headlines */
 }
 
 .marquee a {
@@ -55,7 +56,7 @@
 
 .error {
   text-align: center;
-  color: var(--marquee-error, #d32f2f); /* Red for errors, consistent across themes */
+  color: var(--marquee-error, #d32f2f); /* Red for errors */
   font-size: 0.75rem;
   padding: 0.5rem;
 }
@@ -79,18 +80,33 @@
 
 @media (max-width: 768px) {
   .marqueeContainer {
-    padding: 0.3rem 0; /* Reduced padding for mobile */
+    padding: 0.3rem 0; /* Reduced for mobile */
+    top: 56px; /* Adjusted for smaller navbar height: 0.5rem padding + ~36px content */
   }
   .marquee {
-    font-size: 0.65rem; /* Slightly smaller for mobile */
+    font-size: 0.65rem; /* Smaller for mobile */
     line-height: 1.2;
   }
   .marquee span {
-    margin: 0 1rem; /* Adjusted spacing for mobile */
+    margin: 0 1rem; /* Reduced spacing for mobile */
   }
 }
 
-/* Optional: Pause animation on hover for accessibility */
+@media (max-width: 480px) {
+  .marqueeContainer {
+    top: 50px; /* Further adjusted for smaller navbar: 0.5rem padding + ~30px content */
+  }
+  .marquee {
+    font-size: 0.6rem;
+  }
+}
+
+/* Pause animation on hover for accessibility */
 .marquee:hover {
   animation-play-state: paused;
+}
+
+/* Ensure no gaps caused by body or parent elements */
+body {
+  margin-top: 0 !important; /* Prevent body margin from creating gaps */
 }
