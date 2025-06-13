@@ -1,13 +1,13 @@
 .marqueeContainer {
   overflow: hidden;
   width: 100%;
-  background: var(--marquee-bg, #e0f2f1); /* Pale teal from theme */
+  background: #e0f2f1; /* Pale teal from theme's --secondary, replaces orange */
   padding: 0.5rem 0; /* Minimal padding for content */
-  box-shadow: 0 1px 3px var(--shadow); /* Theme shadow */
+  box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1); /* Theme shadow, hardcoded */
   transition: opacity 0.3s ease, transform 0.3s ease;
   margin: 0; /* No margin to prevent gaps */
   position: fixed;
-  top: 64px; /* Matches navbar height: 0.75rem padding-top + 0.75rem padding-bottom + 1px border + ~40px content height */
+  top: 64px; /* Matches navbar height: 0.75rem * 2 padding + 1px border + ~40px content */
   left: 0;
   right: 0;
   z-index: 999; /* Below navbar (1000) but above content */
@@ -18,7 +18,7 @@
   align-items: center;
   white-space: nowrap;
   animation: marquee var(--marquee-duration, 20s) linear infinite;
-  color: var(--marquee-text, #003d33); /* Deep teal for high contrast */
+  color: #003d33; /* Deep teal from theme's --primary-dark */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.75rem; /* Matches navbar’s compact aesthetic */
   font-weight: 500;
@@ -35,12 +35,12 @@
 }
 
 .marquee a {
-  color: var(--marquee-link, #0288d1); /* Vibrant blue for links */
+  color: #0288d1; /* Vibrant blue from theme's --accent */
   text-decoration: none;
 }
 
 .marquee a:hover {
-  color: var(--marquee-link-hover, #004d40); /* Darker teal on hover */
+  color: #004d40; /* Darker teal from theme's --primary-hover */
   text-decoration: underline;
 }
 
@@ -56,7 +56,7 @@
 
 .error {
   text-align: center;
-  color: var(--marquee-error, #d32f2f); /* Red for errors */
+  color: #d32f2f; /* Red for errors */
   font-size: 0.75rem;
   padding: 0.5rem;
 }
@@ -71,17 +71,30 @@
 }
 
 .dark-mode .marqueeContainer {
-  --marquee-bg: #1e1e1e; /* Dark surface from theme */
-  --marquee-text: #b2dfdb; /* Light teal for readability */
-  --marquee-link: #29b6f6; /* Bright blue for links */
-  --marquee-link-hover: #80cbc4; /* Lighter teal on hover */
-  --marquee-error: #ef5350; /* Slightly lighter red for dark mode */
+  background: #1e1e1e; /* Dark surface from theme's --surface, replaces orange */
+  box-shadow: 0 1px 3px rgba(77, 182, 172, 0.2); /* Theme shadow, hardcoded */
+}
+
+.dark-mode .marquee {
+  color: #b2dfdb; /* Light teal from theme's --primary-light */
+}
+
+.dark-mode .marquee a {
+  color: #29b6f6; /* Bright blue from theme's --accent */
+}
+
+.dark-mode .marquee a:hover {
+  color: #80cbc4; /* Lighter teal from theme's --primary-hover */
+}
+
+.dark-mode .error {
+  color: #ef5350; /* Slightly lighter red for dark mode */
 }
 
 @media (max-width: 768px) {
   .marqueeContainer {
     padding: 0.3rem 0; /* Reduced for mobile */
-    top: 56px; /* Adjusted for smaller navbar height: 0.5rem padding + ~36px content */
+    top: 56px; /* Adjusted for smaller navbar: 0.5rem padding + ~36px content */
   }
   .marquee {
     font-size: 0.65rem; /* Smaller for mobile */
