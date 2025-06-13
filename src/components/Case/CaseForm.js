@@ -155,6 +155,17 @@ export default function CaseForm() {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
+  // Track pageview when component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_title: 'Case Form',
+        page_location: window.location.href,
+        page_path: router.asPath,
+      });
+    }
+  }, [router.asPath]);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
@@ -178,6 +189,12 @@ export default function CaseForm() {
             (error, result) => {
               if (result && result.event === 'upload-added') {
                 setIsUploading(true);
+                if (window.gtag) {
+                  window.gtag('event', 'media_upload_started', {
+                    event_category: 'CaseForm',
+                    event_label: 'Media Upload Initiated',
+                  });
+                }
               }
               if (!error && result && result.event === 'success') {
                 setFormData((prev) => ({
@@ -185,9 +202,23 @@ export default function CaseForm() {
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
                 setIsUploading(false);
+                if (window.gtag) {
+                  window.gtag('event', 'media_upload_success', {
+                    event_category: 'CaseForm',
+                    event_label: 'Media Upload Completed',
+                    value: result.info.secure_url,
+                  });
+                }
               } else if (error) {
                 setError('Image upload failed. Please try again.');
                 setIsUploading(false);
+                if (window.gtag) {
+                  window.gtag('event', 'media_upload_failed', {
+                    event_category: 'CaseForm',
+                    event_label: 'Media Upload Error',
+                    value: error.message,
+                  });
+                }
               }
             }
           );
@@ -206,22 +237,50 @@ export default function CaseForm() {
     if (name === 'specialty') {
       const selectedOptions = Array.from(value.target.selectedOptions).map((option) => option.value);
       setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
+      if (window.gtag) {
+        window.gtag('event', 'specialty_selected', {
+          event_category: 'CaseForm',
+          event_label: 'Specialty Selection',
+          value: selectedOptions.join(', '),
+        });
+      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
+      if (window.gtag) {
+        window.gtag('event', 'form_field_updated', {
+          event_category: 'CaseForm',
+          event_label: `Field Updated: ${name}`,
+        });
+      }
     }
   };
 
   const handleDeleteMedia = (index) => {
+    const deletedUrl = formData.mediaUrls[index];
     setFormData((prev) => ({
       ...prev,
       mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
     }));
+    if (window.gtag) {
+      window.gtag('event', 'media_deleted', {
+        event_category: 'CaseForm',
+        event_label: 'Media Deleted',
+        value: deletedUrl,
+      });
+    }
   };
 
   const validateStep = () => {
     const currentField = steps[currentStep].name;
     if (currentField === 'mediaUrls' || currentField === 'specialty') return true;
-    return formData[currentField].trim() !== '';
+    const isValid = formData[currentField].trim() !== '';
+    if (!isValid && window.gtag) {
+      window.gtag('event', 'validation_failed', {
+        event_category: 'CaseForm',
+        event_label: `Validation Failed: ${currentField}`,
+      });
+    }
+    return isValid;
   };
 
   const nextStep = (e) => {
@@ -232,11 +291,24 @@ export default function CaseForm() {
     }
     if (isUploading) {
       setError('Please wait for media upload to complete.');
+      if (window.gtag) {
+        window.gtag('event', 'navigation_blocked', {
+          event_category: 'CaseForm',
+          event_label: 'Navigation Blocked: Media Uploading',
+        });
+      }
       return;
     }
     if (currentStep < steps.length - 1) {
       setError('');
       setCurrentStep(currentStep + 1);
+      if (window.gtag) {
+        window.gtag('event', 'form_step_next', {
+          event_category: 'CaseForm',
+          event_label: `Step ${currentStep + 1}: ${steps[currentStep].label}`,
+          value: currentStep + 2,
+        });
+      }
     }
   };
 
@@ -245,6 +317,13 @@ export default function CaseForm() {
     if (currentStep > 0) {
       setError('');
       setCurrentStep(currentStep - 1);
+      if (window.gtag) {
+        window.gtag('event', 'form_step_previous', {
+          event_category: 'CaseForm',
+          event_label: `Step ${currentStep - 1}: ${steps[currentStep - 1].label}`,
+          value: currentStep,
+        });
+      }
     }
   };
 
@@ -252,14 +331,32 @@ export default function CaseForm() {
     e.preventDefault();
     if (!user || !user.uid) {
       setError('You must be logged in to submit a case.');
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'CaseForm',
+          event_label: 'Submission Failed: Not Logged In',
+        });
+      }
       return;
     }
     if (currentStep !== steps.length - 1) {
       setError('Please complete all steps before submitting.');
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'CaseForm',
+          event_label: 'Submission Failed: Incomplete Steps',
+        });
+      }
       return;
     }
     if (isUploading) {
       setError('Please wait for media upload to complete before submitting.');
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'CaseForm',
+          event_label: 'Submission Failed: Media Uploading',
+        });
+      }
       return;
     }
     const requiredFields = steps
@@ -268,10 +365,22 @@ export default function CaseForm() {
     const isValid = requiredFields.every((field) => formData[field].trim() !== '');
     if (!isValid) {
       setError('Please fill out all required fields.');
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'CaseForm',
+          event_label: 'Submission Failed: Missing Required Fields',
+        });
+      }
       return;
     }
     setError('');
     setIsLoading(true);
+    if (window.gtag) {
+      window.gtag('event', 'submission_started', {
+        event_category: 'CaseForm',
+        event_label: 'Case Submission Started',
+      });
+    }
     try {
       const caseData = {
         ...formData,
@@ -284,9 +393,22 @@ export default function CaseForm() {
       await addCase(caseData);
       setLoadStart(Date.now());
       setForceLoading(true);
+      if (window.gtag) {
+        window.gtag('event', 'submission_success', {
+          event_category: 'CaseForm',
+          event_label: 'Case Submission Successful',
+        });
+      }
     } catch (err) {
       setError('Failed to submit case: ' + err.message);
       setIsLoading(false);
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'CaseForm',
+          event_label: 'Submission Failed: Error',
+          value: err.message,
+        });
+      }
     }
   };
 
@@ -326,8 +448,25 @@ export default function CaseForm() {
   }, [currentStep]);
 
   if (authLoading || isLoading) return <Loading />;
-  if (authError) return <div>Error: {authError}</div>;
-  if (!user) return <div>Please log in to submit a case.</div>;
+  if (authError) {
+    if (window.gtag) {
+      window.gtag('event', 'auth_error', {
+        event_category: 'CaseForm',
+        event_label: 'Authentication Error',
+        value: authError,
+      });
+    }
+    return <div>Error: {authError}</div>;
+  }
+  if (!user) {
+    if (window.gtag) {
+      window.gtag('event', 'auth_error', {
+        event_category: 'CaseForm',
+        event_label: 'User Not Logged In',
+      });
+    }
+    return <div>Please log in to submit a case.</div>;
+  }
 
   return (
     <div className={styles.caseFormWrapper}>
@@ -396,7 +535,15 @@ export default function CaseForm() {
                       <div className={styles.mediaSection}>
                         <button
                           type="button"
-                          onClick={() => widgetRef.current?.open()}
+                          onClick={() => {
+                            widgetRef.current?.open();
+                            if (window.gtag) {
+                              window.gtag('event', 'media_upload_button_clicked', {
+                                event_category: 'CaseForm',
+                                event_label: 'Upload Media Button Clicked',
+                              });
+                            }
+                          }}
                           disabled={!widgetRef.current || isUploading}
                           className={styles.uploadButton}
                         >
@@ -424,7 +571,7 @@ export default function CaseForm() {
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       fill="none"
-                                      viewBox="0 0 24 24"
+                                      viewBox="0 24 24"
                                       stroke="currentColor"
                                       strokeWidth="2"
                                       className={styles.deleteIcon}
@@ -468,7 +615,12 @@ export default function CaseForm() {
               Previous
             </button>
             {currentStep < steps.length - 1 ? (
-              <button type="button" onClick={nextStep} disabled={isUploading} className={styles.navButton}>
+              <button
+                type="button"
+                onClick={nextStep}
+                disabled={isUploading}
+                className={styles.navButton}
+              >
                 Next
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -482,12 +634,26 @@ export default function CaseForm() {
                 </svg>
               </button>
             ) : (
-              <button type="submit" disabled={isLoading || isUploading} className={styles.submitButton}>
+              <button
+                type="submit"
+                disabled={isLoading || isUploading}
+                className={styles.submitButton}
+              >
                 Submit Case
               </button>
             )}
           </div>
-          {error && <p role="alert" className={styles.error}>{error}</p>}
+          {error && (
+            <p role="alert" className={styles.error}>
+              {error}
+              {window.gtag &&
+                window.gtag('event', 'form_error', {
+                  event_category: 'CaseForm',
+                  event_label: 'Form Error Displayed',
+                  value: error,
+                })}
+            </p>
+          )}
           {(isLoading || forceLoading) && <Loading />}
         </form>
       </div>
