@@ -408,7 +408,7 @@ export default function HomePage() {
 
   return (
     <main className={styles.container}>
-      <GoogleAnalytics gaId="G-JGQE2H2LRK" />
+      <GoogleAnalytics gaId="G-GLWW8HX76X" />
       <HeroSection />
       {cases.length === 0 ? (
         <section className={styles.emptySection} aria-live="polite">
