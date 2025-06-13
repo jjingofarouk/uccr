@@ -4,9 +4,9 @@ import { ThemeProvider } from '../context/ThemeContext';
 import Navbar from '../components/Navbar';
 import Marquee from '../components/Marquee';
 import Footer from '../components/Footer';
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
-function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }) {
   return (
     <>
       <AuthProvider>
@@ -21,9 +21,7 @@ function MyApp({ Component, pageProps }) {
           <Footer />
         </ThemeProvider>
       </AuthProvider>
-      <GoogleTagManager gtmId="G-JGQE2H2LRK" />
+      <GoogleAnalytics gaId="G-JGQE2H2LRK" />
     </>
   );
 }
-
-export default MyApp;
