@@ -1,26 +1,28 @@
+/* Container for the marquee */
 .marqueeContainer {
   overflow: hidden;
   width: 100%;
-  background: #e0f2f1; /* Pale teal from theme's --secondary, replaces orange */
-  padding: 0.5rem 0; /* Minimal padding for content */
-  box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1); /* Theme shadow, hardcoded */
+  background: #e0f2f1; /* Pale teal */
+  padding: 0.5rem 0;
+  box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
   transition: opacity 0.3s ease, transform 0.3s ease;
-  margin: 0; /* No margin to prevent gaps */
+  margin: 0;
   position: fixed;
-  top: 64px; /* Matches navbar height: 0.75rem * 2 padding + 1px border + ~40px content */
+  top: 64px; /* Matches navbar height */
   left: 0;
   right: 0;
-  z-index: 999; /* Below navbar (1000) but above content */
+  z-index: 999; /* Below navbar but above content */
 }
 
+/* Styling for the marquee text */
 .marquee {
   display: flex;
   align-items: center;
   white-space: nowrap;
   animation: marquee var(--marquee-duration, 20s) linear infinite;
-  color: #003d33; /* Deep teal from theme's --primary-dark */
+  color: #003d33; /* Deep teal */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.75rem; /* Matches navbar’s compact aesthetic */
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -29,21 +31,24 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Spacing between marquee items */
 .marquee span {
   display: inline-block;
-  margin: 0 1.5rem; /* Spacing between headlines */
+  margin: 0 1.5rem;
 }
 
+/* Links inside the marquee */
 .marquee a {
-  color: #0288d1; /* Vibrant blue from theme's --accent */
+  color: #0288d1; /* Vibrant blue */
   text-decoration: none;
 }
 
 .marquee a:hover {
-  color: #004d40; /* Darker teal from theme's --primary-hover */
+  color: #004d40; /* Darker teal on hover */
   text-decoration: underline;
 }
 
+/* Visibility transitions */
 .visible {
   opacity: 1;
   transform: translateY(0);
@@ -54,6 +59,7 @@
   transform: translateY(-100%);
 }
 
+/* Error message styling */
 .error {
   text-align: center;
   color: #d32f2f; /* Red for errors */
@@ -61,6 +67,7 @@
   padding: 0.5rem;
 }
 
+/* Marquee animation */
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -70,44 +77,47 @@
   }
 }
 
+/* Dark mode adjustments */
 .dark-mode .marqueeContainer {
-  background: #1e1e1e; /* Dark surface from theme's --surface, replaces orange */
-  box-shadow: 0 1px 3px rgba(77, 182, 172, 0.2); /* Theme shadow, hardcoded */
+  background: #1e1e1e; /* Dark surface */
+  box-shadow: 0 1px 3px rgba(77, 182, 172, 0.2);
 }
 
 .dark-mode .marquee {
-  color: #b2dfdb; /* Light teal from theme's --primary-light */
+  color: #b2dfdb; /* Light teal */
 }
 
 .dark-mode .marquee a {
-  color: #29b6f6; /* Bright blue from theme's --accent */
+  color: #29b6f6; /* Bright blue */
 }
 
 .dark-mode .marquee a:hover {
-  color: #80cbc4; /* Lighter teal from theme's --primary-hover */
+  color: #80cbc4; /* Lighter teal */
 }
 
 .dark-mode .error {
-  color: #ef5350; /* Slightly lighter red for dark mode */
+  color: #ef5350; /* Lighter red for dark mode */
 }
 
+/* Mobile responsiveness (up to 768px) */
 @media (max-width: 768px) {
   .marqueeContainer {
-    padding: 0.3rem 0; /* Reduced for mobile */
-    top: 56px; /* Adjusted for smaller navbar: 0.5rem padding + ~36px content */
+    padding: 0.3rem 0;
+    top: 56px; /* Adjusted for smaller navbar */
   }
   .marquee {
-    font-size: 0.65rem; /* Smaller for mobile */
+    font-size: 0.65rem;
     line-height: 1.2;
   }
   .marquee span {
-    margin: 0 1rem; /* Reduced spacing for mobile */
+    margin: 0 1rem; /* Reduced spacing */
   }
 }
 
+/* Smaller devices (up to 480px) */
 @media (max-width: 480px) {
   .marqueeContainer {
-    top: 50px; /* Further adjusted for smaller navbar: 0.5rem padding + ~30px content */
+    top: 50px; /* Adjusted for even smaller navbar */
   }
   .marquee {
     font-size: 0.6rem;
@@ -117,9 +127,4 @@
 /* Pause animation on hover for accessibility */
 .marquee:hover {
   animation-play-state: paused;
-}
-
-/* Ensure no gaps caused by body or parent elements */
-body {
-  margin-top: 0 !important; /* Prevent body margin from creating gaps */
 }
