@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -8,6 +8,32 @@ import { Award } from 'lucide-react';
 import CommentSection from './CommentSection';
 import sanitizeHtml from 'sanitize-html';
 import styles from '../../styles/caseDetail.module.css';
+
+// Google Analytics tracking functions
+const trackEvent = (action, category, label, value) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
+    });
+  }
+};
+
+const trackPageView = (caseId, title) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('config', 'G-GLWW8HX76X', {
+      page_title: `Case: ${title}`,
+      page_location: window.location.href,
+      custom_map: {
+        case_id: caseId,
+      },
+    });
+    
+    // Track case view event
+    trackEvent('view_case', 'Case', caseId, 1);
+  }
+};
 
 // Utility function to sanitize and render HTML content
 const renderRichText = (html) => {
@@ -26,6 +52,13 @@ export default function CaseDetail({ caseData }) {
   const router = useRouter();
   const [error, setError] = useState('');
 
+  // Track page view when component mounts
+  useEffect(() => {
+    if (caseData && caseData.id) {
+      trackPageView(caseData.id, caseData.title || 'Untitled Case');
+    }
+  }, [caseData]);
+
   const handleVote = async (type) => {
     if (!user) {
       setError('You must be logged in to vote.');
@@ -34,9 +67,32 @@ export default function CaseDetail({ caseData }) {
     try {
       await addReaction(caseData.id, user.uid, type);
       setError('');
+      
+      // Track vote event
+      trackEvent('vote', 'Case Interaction', `${type}_${caseData.id}`, 1);
     } catch (err) {
       setError('Failed to record vote. Please try again.');
+      
+      // Track error event
+      trackEvent('vote_error', 'Case Interaction', `${type}_${caseData.id}`, 1);
     }
+  };
+
+  const handleEditClick = () => {
+    router.push(`/cases/edit/${caseData.id}`);
+    
+    // Track edit event
+    trackEvent('edit_case', 'Case Management', caseData.id, 1);
+  };
+
+  const handleAuthorClick = (userId) => {
+    // Track author profile view
+    trackEvent('view_author', 'Profile', userId, 1);
+  };
+
+  const handleMediaView = (mediaIndex) => {
+    // Track media view
+    trackEvent('view_media', 'Case Media', `${caseData.id}_media_${mediaIndex}`, 1);
   };
 
   return (
@@ -45,7 +101,7 @@ export default function CaseDetail({ caseData }) {
         <h1 className={styles.title}>{renderRichText(caseData.title)}</h1>
         {user && user.uid === caseData.userId && (
           <button
-            onClick={() => router.push(`/cases/edit/${caseData.id}`)}
+            onClick={handleEditClick}
             className={styles.editButton}
             aria-label="Edit case"
           >
@@ -54,7 +110,7 @@ export default function CaseDetail({ caseData }) {
         )}
         <div className={styles.meta}>
           <div className={styles.author}>
-            <Link href={`/profile/view/${caseData.userId}`}>
+            <Link href={`/profile/view/${caseData.userId}`} onClick={() => handleAuthorClick(caseData.userId)}>
               <Image
                 src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
                 alt={caseData.userName || 'Contributor'}
@@ -64,7 +120,7 @@ export default function CaseDetail({ caseData }) {
                 onError={(e) => console.error('Author image error:', caseData.photoURL)}
               />
             </Link>
-            <Link href={`/profile/view/${caseData.userId}`}>
+            <Link href={`/profile/view/${caseData.userId}`} onClick={() => handleAuthorClick(caseData.userId)}>
               <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
             </Link>
           </div>
@@ -154,6 +210,8 @@ export default function CaseDetail({ caseData }) {
                   height={400}
                   className={styles.mediaImage}
                   objectFit="contain"
+                  onClick={() => handleMediaView(index)}
+                  style={{ cursor: 'pointer' }}
                   onError={(e) => console.error('Media image error:', url)}
                 />
               ) : (
