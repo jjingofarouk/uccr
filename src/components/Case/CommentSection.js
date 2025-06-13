@@ -1,4 +1,3 @@
-// src/components/Case/CommentSection.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { addComment, getComments, addReaction } from '../../firebase/firestore';
@@ -6,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import styles from './commentSection.module.css';
+import { useRouter } from 'next/router';
 
 // Utility function to process comment text with line breaks and paragraphs
 const formatCommentText = (text) => {
@@ -34,16 +34,40 @@ export default function CommentSection({ caseId }) {
   const [replyComment, setReplyComment] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [error, setError] = useState('');
+  const router = useRouter();
+
+  // Track pageview when component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_title: `Comment Section - Case ${caseId}`,
+        page_location: window.location.href,
+        page_path: router.asPath,
+      });
+    }
+  }, [router.asPath, caseId]);
 
   useEffect(() => {
     const fetchComments = async () => {
-      const commentsData = await getComments(caseId);
-      setComments(
-        commentsData.map((comment) => ({
-          ...comment,
-          createdAt: comment.createdAt?.toDate ? comment.createdAt.toDate() : new Date(comment.createdAt),
-        }))
-      );
+      try {
+        const commentsData = await getComments(caseId);
+        setComments(
+          commentsData.map((comment) => ({
+            ...comment,
+            createdAt: comment.createdAt?.toDate ? comment.createdAt.toDate() : new Date(comment.createdAt),
+          }))
+        );
+      } catch (err) {
+        setError('Failed to load comments. Please try again.');
+        console.error('Fetch comments error:', err);
+        if (window.gtag) {
+          window.gtag('event', 'fetch_comments_failed', {
+            event_category: 'CommentSection',
+            event_label: 'Fetch Comments Error',
+            value: err.message,
+          });
+        }
+      }
     };
     fetchComments();
   }, [caseId]);
@@ -51,7 +75,26 @@ export default function CommentSection({ caseId }) {
   const handleSubmit = async (e, parentCommentId = null) => {
     e.preventDefault();
     const text = parentCommentId ? replyComment : newComment;
-    if (!user || !text.trim()) return;
+    if (!user) {
+      setError('You must be logged in to comment.');
+      if (window.gtag) {
+        window.gtag('event', 'comment_submit_failed', {
+          event_category: 'CommentSection',
+          event_label: 'Comment Submission Failed: Not Logged In',
+        });
+      }
+      return;
+    }
+    if (!text.trim()) {
+      setError('Comment cannot be empty.');
+      if (window.gtag) {
+        window.gtag('event', 'comment_submit_failed', {
+          event_category: 'CommentSection',
+          event_label: 'Comment Submission Failed: Empty Comment',
+        });
+      }
+      return;
+    }
     try {
       await addComment(caseId, {
         text: text.replace(/\n{3,}/g, '\n\n').trimEnd(),
@@ -61,6 +104,13 @@ export default function CommentSection({ caseId }) {
         upvotes: 0,
         downvotes: 0,
       }, parentCommentId);
+      if (window.gtag) {
+        window.gtag('event', parentCommentId ? 'reply_submitted' : 'comment_submitted', {
+          event_category: 'CommentSection',
+          event_label: parentCommentId ? 'Reply Submitted' : 'Comment Submitted',
+          value: caseId,
+        });
+      }
       if (parentCommentId) {
         setReplyComment('');
         setReplyingTo(null);
@@ -78,16 +128,36 @@ export default function CommentSection({ caseId }) {
     } catch (err) {
       setError('Failed to post comment. Please try again.');
       console.error('Comment submit error:', err);
+      if (window.gtag) {
+        window.gtag('event', 'comment_submit_failed', {
+          event_category: 'CommentSection',
+          event_label: 'Comment Submission Failed: Error',
+          value: err.message,
+        });
+      }
     }
   };
 
   const handleVote = async (commentId, type) => {
     if (!user) {
       setError('You must be logged in to vote.');
+      if (window.gtag) {
+        window.gtag('event', 'vote_failed', {
+          event_category: 'CommentSection',
+          event_label: 'Vote Failed: Not Logged In',
+        });
+      }
       return;
     }
     try {
       await addReaction(caseId, user.uid, type, commentId);
+      if (window.gtag) {
+        window.gtag('event', type === 'upvote' ? 'upvote' : 'downvote', {
+          event_category: 'CommentSection',
+          event_label: `${type.charAt(0).toUpperCase() + type.slice(1)} on Comment`,
+          value: commentId,
+        });
+      }
       const updatedComments = await getComments(caseId);
       setComments(
         updatedComments.map((comment) => ({
@@ -98,6 +168,13 @@ export default function CommentSection({ caseId }) {
     } catch (err) {
       setError('Failed to record vote. Please try again.');
       console.error('Vote error:', err);
+      if (window.gtag) {
+        window.gtag('event', 'vote_failed', {
+          event_category: 'CommentSection',
+          event_label: 'Vote Failed: Error',
+          value: err.message,
+        });
+      }
     }
   };
 
@@ -173,7 +250,17 @@ export default function CommentSection({ caseId }) {
           </button>
         </div>
         <button
-          onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+          onClick={() => {
+            const newReplyingTo = replyingTo === comment.id ? null : comment.id;
+            setReplyingTo(newReplyingTo);
+            if (window.gtag) {
+              window.gtag('event', 'reply_toggle', {
+                event_category: 'CommentSection',
+                event_label: newReplyingTo ? 'Reply Form Opened' : 'Reply Form Closed',
+                value: comment.id,
+              });
+            }
+          }}
           className={styles.replyButton}
         >
           {replyingTo === comment.id ? 'Cancel' : 'Reply'}
@@ -234,7 +321,15 @@ export default function CommentSection({ caseId }) {
           <textarea
             placeholder={user ? 'Add a comment...' : 'Please log in to comment'}
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={(e) => {
+              setNewComment(e.target.value);
+              if (window.gtag) {
+                window.gtag('event', 'comment_text_updated', {
+                  event_category: 'CommentSection',
+                  event_label: 'Comment Text Updated',
+                });
+              }
+            }}
             className={styles.textarea}
             disabled={!user}
             required
@@ -247,7 +342,17 @@ export default function CommentSection({ caseId }) {
         >
           Post Comment
         </button>
-        {error && <p className={styles.error}>{error}</p>}
+        {error && (
+          <p className={styles.error}>
+            {error}
+            {window.gtag &&
+              window.gtag('event', 'error_displayed', {
+                event_category: 'CommentSection',
+                event_label: 'Error Displayed',
+                value: error,
+              })}
+          </p>
+        )}
       </form>
       <div className={styles.comments}>
         {commentTree.length > 0 ? (
