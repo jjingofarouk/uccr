@@ -8,6 +8,7 @@ export default function Marquee() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [headlines, setHeadlines] = useState([]);
   const [error, setError] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Handle scroll to show/hide marquee
   useEffect(() => {
@@ -20,6 +21,15 @@ export default function Marquee() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
+
+  // Dynamically set marquee position below navbar
+  useEffect(() => {
+    const navbar = document.querySelector('.header');
+    if (navbar && marqueeRef.current) {
+      const navbarHeight = navbar.offsetHeight;
+      marqueeRef.current.style.top = `${navbarHeight}px`;
+    }
+  }, []);
 
   // Fetch headlines from the API
   useEffect(() => {
@@ -45,7 +55,7 @@ export default function Marquee() {
     fetchHeadlines();
   }, []);
 
-  // Update marquee content when headlines change
+  // Update marquee content and animation
   useEffect(() => {
     const marquee = marqueeRef.current;
     if (!marquee || headlines.length === 0) return;
@@ -65,12 +75,35 @@ export default function Marquee() {
 
     marquee.innerHTML = marqueeContent;
 
-    // Calculate total width based on content (approximate per headline)
-    const avgHeadlineWidth = 400; // Adjust based on average headline length (in pixels)
-    const totalWidth = headlines.length * avgHeadlineWidth;
-    marquee.style.setProperty('--marquee-width', `${totalWidth}px`);
-    marquee.style.setProperty('--marquee-duration', `${totalWidth / 60}s`); // Adjust speed as needed
+    // Calculate total width more accurately
+    const spans = marquee.querySelectorAll('span');
+    let totalWidth = 0;
+    spans.forEach((span) => {
+      totalWidth += span.offsetWidth + 48; // Include margin (1.5rem * 2 = 24px * 2)
+    });
+    marquee.style.setProperty('--marquee-width', `${totalWidth / 2}px`); // Divide by 2 since content is duplicated
+    marquee.style.setProperty('--marquee-duration', `${totalWidth / 120}s`); // Adjusted speed for smoother scrolling
   }, [headlines]);
+
+  // Handle keyboard pause/resume for accessibility
+  useEffect(() => {
+    const handleKeydown = (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault(); // Prevent page scroll
+        setIsPaused((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, []);
+
+  // Apply pause state to animation
+  useEffect(() => {
+    if (marqueeRef.current) {
+      marqueeRef.current.style.animationPlayState = isPaused ? 'paused' : 'running';
+    }
+  }, [isPaused]);
 
   return (
     <div
@@ -82,7 +115,11 @@ export default function Marquee() {
       {error ? (
         <div className={styles.error}>{error}</div>
       ) : (
-        <div className={styles.marquee} ref={marqueeRef}>
+        <div
+          className={styles.marquee}
+          ref={marqueeRef}
+          style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
+        >
           {/* Fallback content while loading */}
           {headlines.length === 0 && !error && (
             <span>Loading medical news...</span>
