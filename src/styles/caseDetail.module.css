@@ -1,14 +1,14 @@
 .caseDetail {
   max-width: 100%;
-  margin: 0 1rem;
-  padding: 2rem 0;
+  margin: 0;
+  padding: 1rem 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   box-sizing: border-box;
 }
 
 .header {
-  margin-bottom: 2rem;
-  padding: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -69,8 +69,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
-  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
 }
 
 .voteButton {
@@ -119,19 +119,19 @@
 }
 
 .content {
-  margin-bottom: 2rem;
-  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
 }
 
 .section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .section h2 {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text);
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
   letter-spacing: -0.015em;
 }
 
@@ -194,15 +194,15 @@
 }
 
 .media {
-  margin-bottom: 2rem;
-  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
 }
 
 .media h2 {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text);
-  margin: 0 0 1rem;
+  margin: 0 0 0.75rem;
 }
 
 .mediaGrid {
@@ -225,11 +225,46 @@
   background: #1f2937;
 }
 
-/* Responsive adjustments */
+.editButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  margin-left: auto;
+}
+
+.editButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.dark-mode .editButton {
+  border-color: var(--border);
+}
+
+.dark-mode .editButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Responsive adjustments - further minimized */
 @media (max-width: 768px) {
   .caseDetail {
-    margin: 0 0.75rem;
-    padding: 1.5rem 0;
+    margin: 0;
+    padding: 0.75rem 0;
+  }
+
+  .header {
+    padding: 0.25rem;
   }
 
   .title {
@@ -252,12 +287,28 @@
   .mediaGrid {
     grid-template-columns: 1fr;
   }
+
+  .voteSection {
+    padding: 0 0.25rem;
+  }
+
+  .content {
+    padding: 0 0.25rem;
+  }
+
+  .media {
+    padding: 0 0.25rem;
+  }
 }
 
 @media (max-width: 480px) {
   .caseDetail {
-    margin: 0 0.5rem;
-    padding: 1rem 0;
+    margin: 0;
+    padding: 0.5rem 0;
+  }
+
+  .header {
+    padding: 0.1rem;
   }
 
   .title {
@@ -299,35 +350,16 @@
   .media h2 {
     font-size: 1.25rem;
   }
-}
 
-.editButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: var(--text);
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-  margin-left: auto;
-}
+  .voteSection {
+    padding: 0 0.1rem;
+  }
 
-.editButton:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #ffffff;
-  transform: translateY(-2px);
-}
+  .content {
+    padding: 0 0.1rem;
+  }
 
-.dark-mode .editButton {
-  border-color: var(--border);
-}
-
-.dark-mode .editButton:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  .media {
+    padding: 0 0.1rem;
+  }
 }
