@@ -19,7 +19,6 @@ export default function MyApp({ Component, pageProps }) {
           <main>
             <Component {...pageProps} />
           </main>
-          <Footer />
         </ThemeProvider>
       </AuthProvider>
       <GoogleAnalytics gaId="G-GLWW8HX76X" />
