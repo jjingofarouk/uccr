@@ -30,7 +30,7 @@
     "@mui/material": "^5.14.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "react-material-ui-carousel": "^3.3.3" // Added dependency
+    "react-material-ui-carousel": "^3.3.3" 
   },
   "devDependencies": {
     "eslint": "^8.57.0",
