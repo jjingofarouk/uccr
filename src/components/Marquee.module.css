@@ -22,10 +22,10 @@
   animation: marquee var(--marquee-duration, 20s) linear infinite;
   color: var(--text); /* Adapts to light or dark mode */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.9rem; /* Slightly increased for better readability */
   font-weight: 500;
   letter-spacing: -0.01em;
-  line-height: 1.2;
+  line-height: 1.3;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -46,6 +46,26 @@
 .marquee a:hover {
   color: var(--primary-hover); /* Dynamic hover color */
   text-decoration: underline;
+}
+
+/* Loading text styling */
+.loadingText {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 1rem 0;
+  animation: fadeIn 1.5s ease-out infinite alternate;
+}
+
+/* Keyframes for fade-in animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Visibility transitions */
@@ -89,11 +109,14 @@
     top: 56px; /* Adjusted for smaller navbar */
   }
   .marquee {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     line-height: 1.2;
   }
   .marquee span {
     margin: 0 1rem; /* Reduced spacing */
+  }
+  .loadingText {
+    font-size: 0.85rem;
   }
 }
 
@@ -103,7 +126,10 @@
     top: 50px; /* Adjusted for very small navbar */
   }
   .marquee {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
+  }
+  .loadingText {
+    font-size: 0.8rem;
   }
 }
 
