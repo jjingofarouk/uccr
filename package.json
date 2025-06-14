@@ -30,7 +30,6 @@
     "@mui/material": "^5.14.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-"react-gtag": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
