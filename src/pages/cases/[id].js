@@ -33,9 +33,42 @@ function CasePageContent() {
     return (
       <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
         <section className={styles.loadingSection}>
-          <Skeleton height={40} width={300} />
-          <Skeleton height={20} count={3} style={{ marginTop: '10px' }} />
-          <Skeleton height={200} style={{ marginTop: '20px' }} />
+          <article className={styles.caseDetail}>
+            <header className={styles.header}>
+              <Skeleton height={40} width="80%" />
+              <div className={styles.meta}>
+                <div className={styles.author}>
+                  <Skeleton circle width={40} height={40} />
+                  <Skeleton width={100} />
+                </div>
+                <Skeleton width={150} />
+              </div>
+            </header>
+
+            <div className={styles.voteSection}>
+              <Skeleton height={40} width={100} />
+            </div>
+
+            <section className={styles.content}>
+              {[...Array(11)].map((_, index) => (
+                <div key={index} className={styles.section}>
+                  <Skeleton height={24} width="50%" />
+                  <Skeleton count={3} />
+                </div>
+              ))}
+            </section>
+
+            <section className={styles.media}>
+              <Skeleton height={24} width="50%" />
+              <div className={styles.mediaGrid}>
+                {[...Array(3)].map((_, index) => (
+                  <Skeleton key={index} width={600} height={400} />
+                ))}
+              </div>
+            </section>
+
+            <Skeleton height={100} count={3} />
+          </article>
         </section>
       </SkeletonTheme>
     );
