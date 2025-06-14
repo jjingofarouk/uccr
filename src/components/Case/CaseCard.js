@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import sanitizeHtml from 'sanitize-html';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../../styles/caseCard.module.css';
 
 // Utility function to render and truncate rich text for summary
@@ -49,8 +51,25 @@ const renderSpecialtyTags = (specialties) => {
   );
 };
 
-export default function CaseCard({ caseData }) {
+export default function CaseCard({ caseData, isLoading }) {
   console.log(`CaseCard caseData (ID: ${caseData?.id || 'unknown'}):`, caseData);
+
+  if (isLoading) {
+    return (
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+        <div className={`${styles.card} ${styles.noImageCard}`}>
+          <Skeleton height={180} />
+          <div className={styles.content}>
+            <Skeleton height={24} width="80%" />
+            <Skeleton height={16} count={2} style={{ marginTop: '10px' }} />
+            <Skeleton height={16} width="60%" style={{ marginTop: '10px' }} />
+            <Skeleton circle width={24} height={24} style={{ marginTop: '10px' }} />
+            <Skeleton height={16} width="40%" style={{ marginTop: '10px' }} />
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
 
   if (!caseData?.id) {
     return <div className={styles.error}>Error: Invalid case data</div>;
