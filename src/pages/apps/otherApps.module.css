@@ -49,6 +49,14 @@
   box-shadow: 0 6px 20px var(--shadow);
 }
 
+.appImage {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
 .appTitle {
   font-family: 'Inter', sans-serif;
   font-size: 1.5rem;
@@ -137,6 +145,10 @@
 
   .appCard {
     padding: 0.75rem;
+  }
+
+  .appImage {
+    height: 120px;
   }
 }
 
