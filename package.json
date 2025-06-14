@@ -25,6 +25,7 @@
     "react-dom": "^18.2.0",
     "react-loading-skeleton": "^3.5.0",
     "react-quill": "^2.0.0",
+    "recharts": "^2.12.7",
     "sanitize-html": "^2.13.1",
     "uuid": "^10.0.0",
     "rss-parser": "^3.13.0",
