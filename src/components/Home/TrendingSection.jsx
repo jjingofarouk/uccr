@@ -1,51 +1,36 @@
 import { useState, useEffect, memo } from 'react';
 import Link from 'next/link';
-import { debounce } from 'lodash';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CaseCard from '../Case/CaseCard';
-import { trackClick, trackEngagement } from '../../utils/analytics';
-import { getTrendingCases } from '../../firebase/firestore'; // Updated import
+import { trackEngagement } from '../../events';
+import { getTrendingCases } from '../../firebase/firestore';
 import styles from '../../pages/Home.module.css';
 
-// Memoized wrapper for CaseCard to prevent unnecessary re-renders
-const CaseCardWrapper = memo(({ caseData, index }) => {
-  const debouncedTrackEngagement = debounce(trackEngagement, 300);
-
-  return (
-    <div
-      onClick={() =>
-        debouncedTrackEngagement('view', 'trending_case', `${caseData.id}_position_${index + 1}`)
-      }
-    >
-      <CaseCard caseData={caseData} />
-    </div>
-  );
-});
+const CaseCardWrapper = memo(({ caseData, index }) => (
+  <div onClick={() => trackEngagement('click', 'trending', `${caseData.id}_position_${index}`)}>
+    <CaseCard caseData={caseData} />
+  </div>
+));
 
 const TrendingSection = () => {
   const [trendingCases, setTrendingCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const casesLimit = 3; // Match getTrendingCases default
-
-  const fetchTrendingCases = async () => {
-    try {
-      setLoading(true);
-      trackEngagement('load_start', 'trending');
-      const data = await getTrendingCases(casesLimit);
-      setTrendingCases(data);
-      trackEngagement('load_success', 'trending', `${data.length}_cases`);
-    } catch (err) {
-      setError('Failed to load trending cases');
-      trackEngagement('load_error', 'trending', err.message);
-      console.error('Error fetching trending cases:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const casesLimit = 3;
 
   useEffect(() => {
+    const fetchTrendingCases = async () => {
+      try {
+        setLoading(true);
+        const data = await getTrendingCases(casesLimit);
+        setTrendingCases(data);
+      } catch (err) {
+        setError('Failed to load trending cases');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchTrendingCases();
   }, []);
 
@@ -72,7 +57,11 @@ const TrendingSection = () => {
         <p className={styles.errorText}>{error}</p>
         <button
           className={styles.retryButton}
-          onClick={fetchTrendingCases}
+          onClick={() => {
+            setLoading(true);
+            setError('');
+            fetchTrendingCases();
+          }}
           disabled={loading}
           aria-label="Retry loading trending cases"
         >
@@ -93,11 +82,11 @@ const TrendingSection = () => {
         </div>
       ) : (
         <div className={styles.emptySection} aria-live="polite">
-          <p className={styles.emptyText}>No trending cases available</p>
+          <p className={styles.emptyText}>No cases available</p>
           <Link
             href="/cases/new"
             className={styles.ctaButtonSecondary}
-            onClick={() => trackClick('share_case_button', 'trending_empty')}
+            onClick={() => trackEngagement('click', 'trending_empty', 'share_case')}
           >
             Share a Case
           </Link>
