@@ -27,7 +27,7 @@ const About = () => (
           zIndex: -1,
         }}
       />
-      
+
       <Typography
         variant="h2"
         sx={{
@@ -37,7 +37,7 @@ const About = () => (
           textAlign: 'center',
         }}
       >
-        About Dwaliro
+        About UCCR
       </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -51,9 +51,7 @@ const About = () => (
             margin: '0 auto',
           }}
         >
-          Dwaliro is revolutionizing medical research by seamlessly connecting patients, researchers, and healthcare
-          providers with global clinical trial opportunities. Our vision is to democratize access to medical research
-          worldwide.
+          **UCCR (Uganda Clinical Case Reports)** is a collaborative web platform designed to empower healthcare professionals, medical students, and doctors to share, discuss, and learn from clinical cases in Uganda. By providing a structured and secure environment to document cases, engage in interactive discussions, and network with peers, UCCR fosters medical education and professional growth.
         </Typography>
 
         <Box
@@ -78,8 +76,7 @@ const About = () => (
                   Our Mission
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
-                  To deliver transparent, accessible, and real-time clinical study information, fostering trust and
-                  collaboration in the global medical community.
+                  To provide a secure and accessible platform for healthcare professionals to share clinical knowledge, collaborate on complex cases, and advance medical education in Uganda.
                 </Typography>
               </CardContent>
             </Card>
@@ -97,11 +94,10 @@ const About = () => (
             >
               <CardContent>
                 <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
-                  Our Impact
+                  Our Vision
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
-                  Since our launch, Dwaliro has facilitated thousands of connections, driving medical research forward
-                  and improving patient outcomes worldwide.
+                  To bridge the gap in medical knowledge sharing by creating a digital space where clinical expertise is accessible to all healthcare professionals in Uganda and beyond.
                 </Typography>
               </CardContent>
             </Card>
@@ -110,7 +106,7 @@ const About = () => (
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant="h4" sx={{ fontWeight: 700, color: 'var(--primary)' }}>
-            Our Team
+            Meet the Founder
           </Typography>
           <Typography
             variant="body2"
@@ -120,21 +116,7 @@ const About = () => (
               lineHeight: 1.7,
             }}
           >
-            Led by a passionate group of innovators, including our founder{' '}
-            <Link
-              href="https://ug.linkedin.com/in/farouk-jjingo-0341b01a5"
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{
-                color: 'var(--accent)',
-                textDecoration: 'none',
-                '&:hover': { color: 'var(--primary-hover)' },
-              }}
-              aria-label="Farouk Jjingo's LinkedIn profile"
-            >
-              Farouk Jjingo
-            </Link>
-            , Dwaliro blends expertise in technology and healthcare to create transformative impact.
+            **Farouk Jjingo**, the creator of UCCR, is a visionary full-stack developer and former medical officer with a deep understanding of both healthcare and technology. Farouk has combined his clinical expertise and programming skills to develop UCCR as a tool to enhance medical collaboration and education. His dedication to solving real-world healthcare challenges drives the success of this platform.
           </Typography>
         </Box>
 
@@ -147,7 +129,7 @@ const About = () => (
               mb: 3,
             }}
           >
-            Meet Our Founder
+            How to Connect
           </Typography>
           <Box
             sx={{
@@ -161,7 +143,7 @@ const About = () => (
               <Box
                 component="img"
                 src="/farouk.png"
-                alt="Farouk Jjingo, Founder of Dwaliro"
+                alt="Farouk Jjingo, Founder of UCCR"
                 loading="lazy"
                 sx={{
                   width: { xs: '10rem', md: '14rem' },
@@ -177,8 +159,7 @@ const About = () => (
             </motion.div>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Typography variant="body2" sx={{ color: 'var(--text)', lineHeight: 1.7 }}>
-                Farouk Jjingo, a Full Stack Developer and former medical officer, merges clinical insight with technical
-                prowess to lead Dwaliro’s mission of tackling critical healthcare challenges through innovation.
+                Farouk Jjingo is available for collaboration, discussions, and feedback. You can connect with him through:
               </Typography>
               <List sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <ListItem disablePadding>
