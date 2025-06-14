@@ -6,7 +6,7 @@ import styles from './otherApps.module.css';
 const OtherApps = () => {
   const apps = [
     {
-      title: 'CareWave System',
+      title: 'CareWave',
       description: 'An enterprise-grade hospital management system for streamlining clinical, administrative, and operational workflows.',
       link: 'https://carewave-doctor.vercel.app',
       image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/carewave/landing.png',
@@ -24,22 +24,10 @@ const OtherApps = () => {
       image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/mediq/home.png',
     },
     {
-      title: 'Zano!',
-      description: 'An online shoe shop with a modern design, offering a seamless shopping experience for the latest styles.',
-      link: 'https://zanoug.vercel.app/',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/zano/home_zano.jpg',
-    },
-    {
       title: 'Clinical Calculators',
       description: 'A mobile app with over 90 specialized calculators for healthcare professionals across multiple specialties.',
       link: 'https://clinical-calculators.vercel.app/',
       image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/clinical-calculators/home.png',
-    },
-    {
-      title: 'Matatu Tracker',
-      description: 'A PWA for real-time tracking and booking of minibuses in Uganda, with admin and passenger features.',
-      link: 'https://matatu-tracker.vercel.app/',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/matatu/home.jpg',
     },
     {
       title: 'Dwaliro',
@@ -66,7 +54,7 @@ const OtherApps = () => {
       image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/litshelf/home.png',
     },
     {
-      title: 'Dr. Jingo',
+      title: 'Dr. Osler',
       description: 'A PWA offering clinical mentorship through a virtual Ugandan clinician, powered by the Gemini API.',
       link: 'https://oslermentor.onrender.com/',
       image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/osler/home.png',
@@ -76,12 +64,6 @@ const OtherApps = () => {
       description: 'A PWA connecting blood donors and recipients in Uganda with geolocation-based matching and notifications.',
       link: 'https://bloodmatchug.vercel.app/',
       image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/BloodMatch/home.png',
-    },
-    {
-      title: 'Touched Hearts',
-      description: 'A platform for an NGO focused on education and healthcare in East & Central Africa, with dynamic content.',
-      link: 'https://www.touchedhearts.org/',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/touched-hearts/home.png',
     },
   ];
 
