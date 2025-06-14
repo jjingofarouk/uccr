@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getCaseStatistics } from '../../firebase/firestore';
-import { trackEngagement, trackEvent } from '../../events';
+import { trackEngagement, trackEvent } from '../../utils/analytics';
 import styles from '../../pages/Home.module.css';
 import Link from 'next/link';
 
@@ -33,27 +33,33 @@ const StatsSection = () => {
   }, []);
 
   const barColors = [
-    'rgba(59, 130, 246,  'rgba(239, 68, 68,    0.6)',
-    'rgba(34, 197, 94,    0.6)',    'rgba(249, 115, 22,   0.6)',
-    'rgba(168, 85, 247,   0.6)',
+    'rgba(59, 130, 246, 0.6)',
+    'rgba(239, 68, 68, 0.6)',
+    'rgba(34, 197, 94, 0.6)',
+    'rgba(249, 115, 22, 0.6)',
+    'rgba(168, 85, 247, 0.6)',
   ];
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload?.length) {
       trackEngagement('tooltip_view', 'stats', `${payload[0].payload.specialty}_${payload[0].value}_specialty`);
       return (
-        <div style={{
-          backgroundColor: 'var(--tooltip-background, rgba(0, 0, 0, 0.8))',
-          border: '1px solid var(--border, #e5e7eb)',
-          padding: '8px',
-          borderRadius: '4px'
-        }}>
-          <p style={{
-            color: 'var(--tooltip-text, #ffffff)',
-            margin: 0,
-            fontFamily: 'Inter',
-            fontSize: '12px'
-          }}>{`${payload[0].payload.specialty}: ${payload[0].value} cases`}</p>
+        <div
+          style={{
+            backgroundColor: 'var(--tooltip-background, rgba(0, 0, 0, 0.8))',
+            border: '1px solid var(--border, #e5e7eb)',
+            padding: '8px',
+            borderRadius: '4px',
+          }}
+        >
+          <p
+            style={{
+              color: 'var(--tooltip-text, #ffffff)',
+              margin: 0,
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '12px',
+            }}
+          >{`${payload[0].payload.specialty}: ${payload[0].value} cases`}</p>
         </div>
       );
     }
@@ -72,28 +78,32 @@ const StatsSection = () => {
     }
   };
 
-  if (loading) return (
-    <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
-      <section className={styles.statsSection}>
-        <Skeleton height={30} width={200} />
-        <div className={styles.statsContainer}>
-          <div className={styles.chartWrapper}>
-            <Skeleton height={300} />
+  if (loading)
+    return (
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+        <section className={styles.statsSection}>
+          <Skeleton height={30} width={200} />
+          <div className={styles.statsContainer}>
+            <div className={styles.chartWrapper}>
+              <Skeleton height={300} />
+            </div>
           </div>
-        </div>
-      </section>
-    </SkeletonTheme>
-  );
+        </section>
+      </SkeletonTheme>
+    );
 
-  if (error) return (
-    <section className={styles.errorSection} role="alert">
-      <p className={styles.errorText}>{error}</p>
-    </section>
-  );
+  if (error)
+    return (
+      <section className={styles.errorSection} role="alert">
+        <p className={styles.errorText}>{error}</p>
+      </section>
+    );
 
   return (
     <section className={styles.statsSection} aria-labelledby="stats-title">
-      <h2 id="stats-title" className={styles.sectionTitle}>Case Statistics</h2>
+      <h2 id="stats-title" className={styles.sectionTitle}>
+        Case Statistics
+      </h2>
       {stats.length > 0 ? (
         <div className={styles.statsContainer}>
           <div className={styles.chartWrapper}>
@@ -105,44 +115,39 @@ const StatsSection = () => {
                   textAnchor="end"
                   interval={0}
                   height={80}
-                  tick={{ 
-                    fill: 'var(--text, #1f2937)', 
-                    fontFamily: 'Inter', 
+                  tick={{
+                    fill: 'var(--text, #1f2937)',
+                    fontFamily: 'Inter, sans-serif',
                     fontSize: 12,
                     width: 100,
-                    dy: 10
+                    dy: 10,
                   }}
-                  tickFormatter={(value) => value.length > 15 ? `${value.substring(0, 12)}...` : value}
+                  tickFormatter={(value) => (value.length > 15 ? `${value.substring(0, 12)}...` : value)}
                   label={{
                     value: 'Specialty',
                     position: 'bottom',
                     fill: 'var(--text, #1f2937)',
-                    fontFamily: 'Inter',
+                    fontFamily: 'Inter, sans-serif',
                     fontSize: 12,
-                    fontWeight: 600
+                    fontWeight: 600,
                   }}
                 />
                 <YAxis
                   dataKey="count"
                   allowDecimals={false}
-                  tick={{ fill: 'var(--text, #1f2937)', fontFamily: 'Inter', fontSize: 12 }}
+                  tick={{ fill: 'var(--text, #1f2937)', fontFamily: 'Inter, sans-serif', fontSize: 12 }}
                   label={{
                     value: 'Number of Cases',
                     angle: -90,
                     position: 'insideLeft',
                     fill: 'var(--text, #1f2937)',
-                    fontFamily: 'Inter',
+                    fontFamily: 'Inter, sans-serif',
                     fontSize: 12,
-                    fontWeight: 600
+                    fontWeight: 600,
                   }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar
-                  dataKey="count"
-                  name="Number of Cases"
-                  onClick={handleBarClick}
-                  onMouseEnter={handleMouseEnter}
-                >
+                <Bar dataKey="count" name="Number of Cases" onClick={handleBarClick} onMouseEnter={handleMouseEnter}>
                   {stats.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
@@ -155,14 +160,16 @@ const StatsSection = () => {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <div style={{
-              textAlign: 'center',
-              marginTop: '8px',
-              color: 'var(--text, #1f2937)',
-              fontFamily: 'Inter',
-              fontSize: '16px',
-              fontWeight: 600
-            }}>
+            <div
+              style={{
+                textAlign: 'center',
+                marginTop: '8px',
+                color: 'var(--text, #1f2937)',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '16px',
+                fontWeight: 600,
+              }}
+            >
               Top Specialties by Case Count
             </div>
           </div>
