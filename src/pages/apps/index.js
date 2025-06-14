@@ -91,7 +91,7 @@ const OtherApps = () => {
         Other Apps by Farouk Jjingo
       </Typography>
       <Typography variant="body1" className={styles.subtitle}>
-        Explore innovative apps developed by Farouk Jjingo, leveraging technology to solve real-world problems in healthcare, education, and beyond.
+ Explore innovative apps developed by Farouk Jjingo that solve real-world problems in healthcare, education, and beyond. Some of these apps are still under active development, with new features and improvements being added regularly.
       </Typography>
       <Box className={styles.appsGrid}>
         {apps.map((app, index) => (
