@@ -1,10 +1,10 @@
-// src/pages/profile/index.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile } from '../../firebase/firestore';
 import ProfileCard from '../../components/Profile/ProfileCard';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import Loading from '../../components/Loading';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../../styles/profile.module.css';
 
 export default function Profile() {
@@ -61,10 +61,13 @@ export default function Profile() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className={styles.container}>
-          <Loading />
-
-        </div>
+        <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+          <div className={styles.container}>
+            <Skeleton circle width={100} height={100} />
+            <Skeleton height={40} width={300} style={{ marginTop: '20px' }} />
+            <Skeleton height={20} count={4} style={{ marginTop: '10px' }} />
+          </div>
+        </SkeletonTheme>
       </ProtectedRoute>
     );
   }
@@ -73,9 +76,7 @@ export default function Profile() {
     return (
       <ProtectedRoute>
         <div className={styles.container}>
-          <Navbar />
           <div className={styles.error}>{error || 'Invalid user data.'}</div>
-          <Footer />
         </div>
       </ProtectedRoute>
     );
@@ -85,7 +86,6 @@ export default function Profile() {
     <ProtectedRoute>
       <div className={styles.container}>
         <ProfileCard userData={userData} />
-
       </div>
     </ProtectedRoute>
   );
