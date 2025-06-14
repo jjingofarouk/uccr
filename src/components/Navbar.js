@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
 import { getMessages, searchCasesAndUsers } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X, Shield, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -157,18 +157,16 @@ export default function Navbar() {
       }
     };
 
-    if (isSidebarOpen || isNotificationsOpen || isSearchModalOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
-      document.addEventListener('keydown', handleEscapeKey);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [isSidebarOpen, isNotificationsOpen, isSearchModalOpen]);
+  }, []);
 
   return (
     <header className={styles.header}>
@@ -537,6 +535,39 @@ export default function Navbar() {
                   Inbox
                 </Link>
               )}
+              <Link 
+                href="/about" 
+                onClick={() => {
+                  handleNavigationClick('about');
+                  toggleSidebar();
+                }} 
+                className={styles.navLink}
+              >
+                <Info size={20} className={styles.navIcon} />
+                About
+              </Link>
+              <Link 
+                href="/how-it-works" 
+                onClick={() => {
+                  handleNavigationClick('how_it_works');
+                  toggleSidebar();
+                }} 
+                className={styles.navLink}
+              >
+                <BookOpen size={20} className={styles.navIcon} />
+                How It Works
+              </Link>
+              <Link 
+                href="/privacy" 
+                onClick={() => {
+                  handleNavigationClick('privacy');
+                  toggleSidebar();
+                }} 
+                className={styles.navLink}
+              >
+                <Shield size={20} className={styles.navIcon} />
+                Privacy
+              </Link>
               {user ? (
                 <button
                   onClick={handleLogout}
@@ -547,30 +578,17 @@ export default function Navbar() {
                   Logout
                 </button>
               ) : (
-                <>
-                  <Link 
-                    href="/auth" 
-                    onClick={() => {
-                      handleNavigationClick('login');
-                      toggleSidebar();
-                    }} 
-                    className={styles.navLink}
-                  >
-                    <LogIn size={20} className={styles.navIcon} />
-                    Log In / Sign Up
-                  </Link>
-                  <Link 
-                    href="/about" 
-                    onClick={() => {
-                      handleNavigationClick('about');
-                      toggleSidebar();
-                    }} 
-                    className={styles.navLink}
-                  >
-                    <Info size={20} className={styles.navIcon} />
-                    About
-                  </Link>
-                </>
+                <Link 
+                  href="/auth" 
+                  onClick={() => {
+                    handleNavigationClick('login');
+                    toggleSidebar();
+                  }} 
+                  className={styles.navLink}
+                >
+                  <LogIn size={20} className={styles.navIcon} />
+                  Log In / Sign Up
+                </Link>
               )}
             </nav>
             <AnimatePresence>
