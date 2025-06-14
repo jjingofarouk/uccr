@@ -1,6 +1,6 @@
 {
   "name": "uccr",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -29,7 +29,8 @@
     "rss-parser": "^3.13.0",
     "@mui/material": "^5.14.0",
     "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0"
+    "@emotion/styled": "^11.11.0",
+    "react-material-ui-carousel": "^3.3.3" // Added dependency
   },
   "devDependencies": {
     "eslint": "^8.57.0",
