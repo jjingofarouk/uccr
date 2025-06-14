@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "next-sitemap", 
     "start": "next start",
     "lint": "next lint"
   },
@@ -30,7 +31,8 @@
     "@mui/material": "^5.14.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "react-material-ui-carousel": "^3.3.3" 
+    "react-material-ui-carousel": "^3.3.3",
+    "next-sitemap": "^4.2.1"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
