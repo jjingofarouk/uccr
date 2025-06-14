@@ -8,7 +8,8 @@ import { Star } from 'lucide-react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip } from 'chart.js';
 import CaseCard from '../components/Case/CaseCard';
-import Loading from '../components/Loading';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import styles from './Home.module.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 
@@ -204,7 +205,25 @@ const LeaderboardSection = () => {
     fetchContributors();
   }, []);
 
-  if (loading) return <Loading />;
+  if (loading) return (
+    <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+      <section className={styles.leaderboardSection}>
+        <Skeleton height={30} width={200} />
+        <div className={styles.leaderboard}>
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className={styles.contributor}>
+              <Skeleton circle width={40} height={40} />
+              <div>
+                <Skeleton width={100} height={20} />
+                <Skeleton width={80} height={15} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </SkeletonTheme>
+  );
+
   if (error) return (
     <section className={styles.errorSection} role="alert">
       <p className={styles.errorText}>{error}</p>
@@ -293,7 +312,6 @@ const StatsSection = () => {
         setStats(topStats);
         trackEngagement('load_success', 'stats', `${topStats.length}_specialties`);
         
-        // Track the top specialties
         topStats.forEach((stat, index) => {
           trackEvent('specialty_stat', 'stats', `${stat.specialty}_rank_${index + 1}`, stat.count);
         });
@@ -308,7 +326,6 @@ const StatsSection = () => {
     fetchStats();
   }, []);
 
-  // Chart interaction tracking
   const handleChartClick = (event, elements) => {
     if (elements.length > 0) {
       const elementIndex = elements[0].index;
@@ -375,7 +392,6 @@ const StatsSection = () => {
         borderWidth: 1,
         callbacks: {
           afterLabel: function(context) {
-            // Track tooltip views
             trackEngagement('tooltip_view', 'stats', `${context.label}_${context.parsed.y}_cases`);
             return '';
           }
@@ -416,7 +432,19 @@ const StatsSection = () => {
     },
   };
 
-  if (loading) return <div className={styles.loadingSection}>Loading...</div>;
+  if (loading) return (
+    <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+      <section className={styles.statsSection}>
+        <Skeleton height={30} width={200} />
+        <div className={styles.statsContainer}>
+          <div className={styles.chartWrapper}>
+            <Skeleton height={300} />
+          </div>
+        </div>
+      </section>
+    </SkeletonTheme>
+  );
+
   if (error) return (
     <section className={styles.errorSection} role="alert">
       <p className={styles.errorText}>{error}</p>
@@ -454,13 +482,11 @@ export default function HomePage() {
   const [caseOfTheDay, setCaseOfTheDay] = useState(null);
   const [featuredSpecialty, setFeaturedSpecialty] = useState('');
 
-  // Track page view on component mount
   useEffect(() => {
     trackPageView('Homepage', window.location.href);
     trackEngagement('page_load', 'homepage');
   }, []);
 
-  // Track user authentication status
   useEffect(() => {
     if (user) {
       trackEvent('user_status', 'authentication', 'logged_in');
@@ -469,7 +495,6 @@ export default function HomePage() {
     }
   }, [user]);
 
-  // Track cases loading
   useEffect(() => {
     if (!loading) {
       if (error) {
@@ -492,8 +517,6 @@ export default function HomePage() {
       const randomIndex = seed % cases.length;
       const selectedCase = cases[randomIndex];
       setCaseOfTheDay(selectedCase);
-      
-      // Track case of the day selection
       trackEngagement('case_of_day_selected', 'featured', selectedCase.id);
     }
   }, [cases]);
@@ -510,8 +533,6 @@ export default function HomePage() {
       const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
       const selectedSpecialty = specialties[weekNumber % specialties.length];
       setFeaturedSpecialty(selectedSpecialty);
-      
-      // Track featured specialty selection
       trackEngagement('specialty_featured', 'specialty_spotlight', selectedSpecialty);
     }
   }, [cases]);
@@ -521,12 +542,9 @@ export default function HomePage() {
       .slice()
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5);
-    
-    // Track recent cases count
     if (recent.length > 0) {
       trackEvent('content_loaded', 'recent_cases', 'count', recent.length);
     }
-    
     return recent;
   }, [cases]);
 
@@ -537,14 +555,11 @@ export default function HomePage() {
       .filter((caseData) => new Date(caseData.createdAt) >= oneWeekAgo)
       .sort((a, b) => (b.views || 0) - (a.views || 0))
       .slice(0, 3);
-    
-    // Track trending cases
     if (trending.length > 0) {
       trackEvent('content_loaded', 'trending_cases', 'count', trending.length);
       const totalViews = trending.reduce((sum, c) => sum + (c.views || 0), 0);
       trackEvent('content_loaded', 'trending_cases', 'total_views', totalViews);
     }
-    
     return trending;
   }, [cases]);
 
@@ -552,16 +567,12 @@ export default function HomePage() {
     const filtered = cases
       .filter((caseData) => Array.isArray(caseData.specialty) && caseData.specialty.includes(featuredSpecialty))
       .slice(0, 3);
-    
-    // Track specialty cases count
     if (filtered.length > 0 && featuredSpecialty) {
       trackEvent('content_loaded', 'specialty_cases', featuredSpecialty, filtered.length);
     }
-    
     return filtered;
   }, [cases, featuredSpecialty]);
 
-  // Track scroll depth
   useEffect(() => {
     let maxScroll = 0;
     const handleScroll = () => {
@@ -571,8 +582,6 @@ export default function HomePage() {
       
       if (scrollPercent > maxScroll) {
         maxScroll = scrollPercent;
-        
-        // Track scroll milestones
         if (scrollPercent >= 25 && maxScroll < 25) {
           trackEngagement('scroll_depth', 'homepage', '25_percent');
         } else if (scrollPercent >= 50 && maxScroll < 50) {
@@ -589,7 +598,6 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Track time on page
   useEffect(() => {
     const startTime = Date.now();
     
@@ -598,13 +606,10 @@ export default function HomePage() {
       trackEvent('timing', 'homepage', 'time_on_page', timeSpent);
     };
 
-    // Track time on page before user leaves
     window.addEventListener('beforeunload', trackTimeOnPage);
-    
-    // Also track at regular intervals for active users
     const interval = setInterval(() => {
       const timeSpent = Math.round((Date.now() - startTime) / 1000);
-      if (timeSpent > 0 && timeSpent % 30 === 0) { // Every 30 seconds
+      if (timeSpent > 0 && timeSpent % 30 === 0) {
         trackEvent('timing', 'homepage', 'active_time', timeSpent);
       }
     }, 30000);
@@ -617,12 +622,14 @@ export default function HomePage() {
   }, []);
 
   if (loading) return (
-    <main className={styles.container}>
-      <HeroSection />
-      <section className={styles.loadingSection}>
-        <Loading />
-      </section>
-    </main>
+    <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+      <main className={styles.container}>
+        <HeroSection />
+        <section className={styles.loadingSection}>
+          <Skeleton height={300} count={3} />
+        </section>
+      </main>
+    </SkeletonTheme>
   );
 
   if (error) return (
