@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CaseCard from '../Case/CaseCard';
-import { trackEngagement } from '../../events';
+import { trackEngagement } from '../../utils/analytics';
 import { getTrendingCases } from '../../firebase/firestore';
 import styles from '../../pages/Home.module.css';
 
