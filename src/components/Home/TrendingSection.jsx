@@ -73,7 +73,9 @@ const TrendingSection = () => {
 
   return (
     <section className={styles.trendingSection} aria-labelledby="trending-title">
-      <h2 id="trending-title" className={styles.sectionTitle}>Trending Cases</h2>
+      <h2 id="trending-title" className={styles.sectionTitle}>
+        Trending Cases
+      </h2>
       {trendingCases.length > 0 ? (
         <div className={styles.caseList}>
           {trendingCases.map((caseData, index) => (
