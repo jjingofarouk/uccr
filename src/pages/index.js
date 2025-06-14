@@ -6,13 +6,13 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { useCases } from '../hooks/useCases';
 import { useAuth } from '../hooks/useAuth';
 import { trackPageView, trackEvent, trackEngagement } from '../utils/analytics';
-import HeroSection from '../components/HeroSection';
-import FeaturedSection from '../components/FeaturedSection';
-import TrendingSection from '../components/TrendingSection';
-import RecentSection from '../components/RecentSection';
-import SpecialtySection from '../components/SpecialtySection';
-import StatsSection from '../components/StatsSection';
-import LeaderboardSection from '../components/LeaderboardSection';
+import HeroSection from '../components/Home/HeroSection';
+import FeaturedSection from '../components/Home/FeaturedSection';
+import TrendingSection from '../components/Home/TrendingSection';
+import RecentSection from '../components/Home/RecentSection';
+import SpecialtySection from '../components/Home/SpecialtySection';
+import StatsSection from '../components/Home/StatsSection';
+import LeaderboardSection from '../components/Home/LeaderboardSection';
 import styles from './Home.module.css';
 
 export default function HomePage() {
