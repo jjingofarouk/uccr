@@ -3,7 +3,8 @@ import { useCases } from '../../../hooks/useCases';
 import CaseCard from '../../../components/Case/CaseCard';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
 import Link from 'next/link';
-import Loading from '../../../components/Loading';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../../cases/case.module.css';
 
 export default function MyCases() {
@@ -11,7 +12,18 @@ export default function MyCases() {
   const { cases, loading: casesLoading } = useCases(user?.uid);
 
   if (authLoading || casesLoading) {
-    return <Loading />;
+    return (
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+        <div className={styles.container}>
+          <Skeleton height={40} width={200} />
+          <div className={styles['case-list']}>
+            {[...Array(3)].map((_, index) => (
+              <Skeleton key={index} height={200} />
+            ))}
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
   }
 
   if (!user) {
