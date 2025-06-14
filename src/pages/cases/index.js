@@ -5,7 +5,7 @@ import Loading from '../../components/Loading';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
-import { gtag } from 'ga-gtag';
+import { GoogleAnalytics, sendGAEvent } from '@next/third-parties/google';
 import styles from './case.module.css';
 
 export default function Cases() {
@@ -27,25 +27,24 @@ export default function Cases() {
   const hospitals = [...new Set(cases.map((caseData) => caseData.hospital).filter(Boolean))];
   const referralCenters = [...new Set(cases.map((caseData) => caseData.referralCenter).filter(Boolean))];
 
-  // Track page view on component mount
+  // Track page view and time spent on page
   useEffect(() => {
-    gtag('event', 'page_view', {
+    sendGAEvent('event', 'page_view', {
       page_title: 'Cases List',
       page_location: window.location.href,
-      content_group1: 'Cases',
-      custom_parameter_1: cases.length,
-      custom_parameter_2: 'cases_page'
+      content_group: 'Cases',
+      case_count: cases.length,
+      page_type: 'cases_page'
     });
 
-    // Track time spent on page
     const startTime = Date.now();
     return () => {
       const timeSpent = Math.round((Date.now() - startTime) / 1000);
-      gtag('event', 'time_on_page', {
+      sendGAEvent('event', 'time_on_page', {
         event_category: 'engagement',
         event_label: 'cases_page',
         value: timeSpent,
-        custom_parameter_1: timeSpent
+        time_spent: timeSpent
       });
     };
   }, [cases.length]);
@@ -54,13 +53,13 @@ export default function Cases() {
   useEffect(() => {
     const activeFilters = Object.entries(filters).filter(([_, value]) => value !== '').length;
     if (activeFilters > 0) {
-      gtag('event', 'search', {
+      sendGAEvent('event', 'search', {
         search_term: JSON.stringify(filters),
         event_category: 'cases',
         event_label: 'filter_applied',
         value: activeFilters,
-        custom_parameter_1: activeFilters,
-        custom_parameter_2: 'cases_filter'
+        filter_count: activeFilters,
+        filter_type: 'cases_filter'
       });
     }
   }, [filters]);
@@ -99,14 +98,13 @@ export default function Cases() {
       return matchesSpecialty && matchesAuthor && matchesHospital && matchesReferralCenter && matchesDate && matchesAwards;
     });
 
-    // Track filter results
-    gtag('event', 'view_search_results', {
+    sendGAEvent('event', 'view_search_results', {
       search_term: JSON.stringify(filters),
       event_category: 'cases',
       event_label: 'filter_results',
       value: filtered.length,
-      custom_parameter_1: filtered.length,
-      custom_parameter_2: cases.length
+      result_count: filtered.length,
+      total_cases: cases.length
     });
 
     return filtered;
@@ -135,12 +133,11 @@ export default function Cases() {
       return 0;
     });
 
-    // Track sorting usage
-    gtag('event', 'sort', {
+    sendGAEvent('event', 'sort', {
       event_category: 'cases',
       event_label: sortBy,
-      custom_parameter_1: sortBy,
-      custom_parameter_2: sorted.length
+      sort_type: sortBy,
+      case_count: sorted.length
     });
 
     return sorted;
@@ -158,12 +155,11 @@ export default function Cases() {
     setFilters((prev) => ({ ...prev, [name]: value }));
     setCurrentPage(1);
 
-    // Track individual filter changes
-    gtag('event', 'filter_change', {
+    sendGAEvent('event', 'filter_change', {
       event_category: 'cases',
       event_label: name,
-      custom_parameter_1: name,
-      custom_parameter_2: value || 'cleared',
+      filter_name: name,
+      filter_value: value || 'cleared',
       value: value ? 1 : 0
     });
   };
@@ -173,12 +169,11 @@ export default function Cases() {
     setSortBy(newSortBy);
     setCurrentPage(1);
 
-    // Track sort changes
-    gtag('event', 'sort_change', {
+    sendGAEvent('event', 'sort_change', {
       event_category: 'cases',
       event_label: newSortBy,
-      custom_parameter_1: newSortBy,
-      custom_parameter_2: 'sort_changed'
+      sort_type: newSortBy,
+      action: 'sort_changed'
     });
   };
 
@@ -186,13 +181,12 @@ export default function Cases() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Track pagination usage
-    gtag('event', 'page_change', {
+    sendGAEvent('event', 'page_change', {
       event_category: 'navigation',
       event_label: 'pagination',
       value: page,
-      custom_parameter_1: page,
-      custom_parameter_2: totalPages
+      page_number: page,
+      total_pages: totalPages
     });
   };
 
@@ -229,70 +223,66 @@ export default function Cases() {
     link.download = 'uccr_cases_export.csv';
     link.click();
 
-    // Track CSV export
-    gtag('event', 'file_download', {
+    sendGAEvent('event', 'file_download', {
       file_name: 'uccr_cases_export.csv',
       file_extension: 'csv',
       event_category: 'engagement',
       event_label: 'csv_export',
       value: sortedCases.length,
-      custom_parameter_1: sortedCases.length,
-      custom_parameter_2: 'cases_export'
+      export_count: sortedCases.length,
+      action: 'cases_export'
     });
   };
 
   const handlePreviewCase = (caseData) => {
     setPreviewCase(caseData);
 
-    // Track case preview
-    gtag('event', 'select_content', {
+    sendGAEvent('event', 'select_content', {
       content_type: 'case',
       item_id: caseData.id,
       content_id: caseData.id,
       event_category: 'cases',
       event_label: 'case_preview',
-      custom_parameter_1: caseData.specialty?.[0] || 'unknown',
-      custom_parameter_2: caseData.awards || 0
+      specialty: caseData.specialty?.[0] || 'unknown',
+      awards: caseData.awards || 0
     });
   };
 
   const closePreview = () => {
-    // Track preview close
     if (previewCase) {
-      gtag('event', 'close_preview', {
+      sendGAEvent('event', 'close_preview', {
         event_category: 'cases',
         event_label: 'preview_closed',
         content_id: previewCase.id,
-        custom_parameter_1: previewCase.id,
-        custom_parameter_2: 'modal_closed'
+        case_id: previewCase.id,
+        action: 'modal_closed'
       });
     }
     setPreviewCase(null);
   };
 
   const handleViewFullCase = (caseData) => {
-    // Track full case view
-    gtag('event', 'select_content', {
+    sendGAEvent('event', 'select_content', {
       content_type: 'case',
       item_id: caseData.id,
       content_id: caseData.id,
       event_category: 'cases',
       event_label: 'view_full_case',
-      custom_parameter_1: caseData.specialty?.[0] || 'unknown',
-      custom_parameter_2: 'full_view'
+      specialty: caseData.specialty?.[0] || 'unknown',
+      action: 'full_view'
     });
   };
 
   // Track errors
   useEffect(() => {
     if (error) {
-      gtag('event', 'exception', {
+      sendGAEvent('event', 'exception', {
         description: error,
         fatal: false,
         event_category: 'error',
         event_label: 'cases_loading_error',
-        custom_parameter_1: error,
-        custom_parameter_2: 'cases_page'
+        error_message: error,
+        page: 'cases_page'
       });
     }
   }, [error]);
@@ -300,19 +290,19 @@ export default function Cases() {
   // Track loading states
   useEffect(() => {
     if (loading) {
-      gtag('event', 'begin_checkout', {
+      sendGAEvent('event', 'begin_checkout', {
         event_category: 'performance',
         event_label: 'cases_loading_start',
-        custom_parameter_1: 'loading_started',
-        custom_parameter_2: 'cases'
+        action: 'loading_started',
+        context: 'cases'
       });
     } else if (cases.length > 0) {
-      gtag('event', 'purchase', {
+      sendGAEvent('event', 'purchase', {
         event_category: 'performance',
         event_label: 'cases_loading_complete',
         value: cases.length,
-        custom_parameter_1: 'loading_completed',
-        custom_parameter_2: cases.length
+        action: 'loading_completed',
+        case_count: cases.length
       });
     }
   }, [loading, cases.length]);
@@ -340,11 +330,11 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by specialty"
-            onFocus={() => gtag('event', 'focus', {
+            onFocus={() => sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'specialty_filter',
-              custom_parameter_1: 'specialty',
-              custom_parameter_2: 'filter_focused'
+              filter: 'specialty',
+              action: 'filter_focused'
             })}
           >
             <option value="">All Specialties</option>
@@ -362,11 +352,11 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterInput}
             aria-label="Filter by author"
-            onFocus={() => gtag('event', 'focus', {
+            onFocus={() => sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'author_search',
-              custom_parameter_1: 'author',
-              custom_parameter_2: 'search_focused'
+              filter: 'author',
+              action: 'search_focused'
             })}
           />
           <select
@@ -375,11 +365,11 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by hospital"
-            onFocus={() => gtag('event', 'focus', {
+            onFocus={() => sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'hospital_filter',
-              custom_parameter_1: 'hospital',
-              custom_parameter_2: 'filter_focused'
+              filter: 'hospital',
+              action: 'filter_focused'
             })}
           >
             <option value="">All Hospitals</option>
@@ -395,11 +385,11 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by referral center"
-            onFocus={() => gtag('event', 'focus', {
+            onFocus={() => sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'referral_center_filter',
-              custom_parameter_1: 'referralCenter',
-              custom_parameter_2: 'filter_focused'
+              filter: 'referralCenter',
+              action: 'filter_focused'
             })}
           >
             <option value="">All Referral Centers</option>
@@ -415,11 +405,11 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by date range"
-            onFocus={() => gtag('event', 'focus', {
+            onFocus={() => sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'date_range_filter',
-              custom_parameter_1: 'dateRange',
-              custom_parameter_2: 'filter_focused'
+              filter: 'dateRange',
+              action: 'filter_focused'
             })}
           >
             <option value="">All Dates</option>
@@ -436,11 +426,11 @@ export default function Cases() {
             className={styles.filterInput}
             min="0"
             aria-label="Filter by minimum awards"
-            onFocus={() => gtag('event', 'focus', {
+            onFocus={() => sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'awards_filter',
-              custom_parameter_1: 'awardsMin',
-              custom_parameter_2: 'filter_focused'
+              filter: 'awardsMin',
+              action: 'filter_focused'
             })}
           />
         </div>
@@ -450,11 +440,11 @@ export default function Cases() {
             onChange={handleSortChange}
             className={styles.sortSelect}
             aria-label="Sort cases"
-            onFocus={() => gtag('event', 'focus', {
+            onFocus={() => sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'sort_dropdown',
-              custom_parameter_1: 'sort',
-              custom_parameter_2: 'sort_focused'
+              element: 'sort',
+              action: 'sort_focused'
             })}
           >
             <option value="createdAt-desc">Newest First</option>
@@ -469,11 +459,11 @@ export default function Cases() {
             className={styles.exportButton}
             disabled={sortedCases.length === 0}
             aria-label="Export cases as CSV"
-            onMouseEnter={() => gtag('event', 'hover', {
+            onMouseEnter={() => sendGAEvent('event', 'hover', {
               event_category: 'button',
               event_label: 'export_csv_hover',
-              custom_parameter_1: 'export',
-              custom_parameter_2: 'button_hovered'
+              element: 'export',
+              action: 'button_hovered'
             })}
           >
             <Download size={20} />
@@ -484,15 +474,18 @@ export default function Cases() {
       {sortedCases.length === 0 ? (
         <div className={styles.emptyState}>
           <p>
-            No cases match your filters. <Link 
+            No cases match your filters.{' '}
+            <Link
               href="/cases/new"
-              onClick={() => gtag('event', 'click', {
+              onClick={() => sendGAEvent('event', 'click', {
                 event_category: 'navigation',
                 event_label: 'create_new_case',
-                custom_parameter_1: 'empty_state',
-                custom_parameter_2: 'new_case_link'
+                context: 'empty_state',
+                action: 'new_case_link'
               })}
-            >Share a case!</Link>
+            >
+              Share a case!
+            </Link>
           </p>
         </div>
       ) : (
@@ -507,12 +500,12 @@ export default function Cases() {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && handlePreviewCase(caseData)}
                 aria-label={`Preview case: ${caseData.title || 'Untitled'}`}
-                onMouseEnter={() => gtag('event', 'hover', {
+                onMouseEnter={() => sendGAEvent('event', 'hover', {
                   event_category: 'cases',
                   event_label: 'case_card_hover',
                   content_id: caseData.id,
-                  custom_parameter_1: caseData.specialty?.[0] || 'unknown',
-                  custom_parameter_2: 'card_hovered'
+                  specialty: caseData.specialty?.[0] || 'unknown',
+                  action: 'card_hovered'
                 })}
               >
                 <CaseCard caseData={caseData} />
@@ -526,11 +519,11 @@ export default function Cases() {
                 disabled={currentPage === 1}
                 className={styles.pageButton}
                 aria-label="Previous page"
-                onMouseEnter={() => gtag('event', 'hover', {
+                onMouseEnter={() => sendGAEvent('event', 'hover', {
                   event_category: 'navigation',
                   event_label: 'pagination_previous_hover',
-                  custom_parameter_1: 'pagination',
-                  custom_parameter_2: 'previous_button'
+                  element: 'pagination',
+                  action: 'previous_button'
                 })}
               >
                 Previous
@@ -542,12 +535,12 @@ export default function Cases() {
                   className={`${styles.pageButton} ${currentPage === page + 1 ? styles.activePage : ''}`}
                   aria-label={`Page ${page + 1}`}
                   aria-current={currentPage === page + 1 ? 'page' : undefined}
-                  onMouseEnter={() => gtag('event', 'hover', {
+                  onMouseEnter={() => sendGAEvent('event', 'hover', {
                     event_category: 'navigation',
                     event_label: 'pagination_number_hover',
                     value: page + 1,
-                    custom_parameter_1: 'pagination',
-                    custom_parameter_2: page + 1
+                    element: 'pagination',
+                    page: page + 1
                   })}
                 >
                   {page + 1}
@@ -558,11 +551,11 @@ export default function Cases() {
                 disabled={currentPage === totalPages}
                 className={styles.pageButton}
                 aria-label="Next page"
-                onMouseEnter={() => gtag('event', 'hover', {
+                onMouseEnter={() => sendGAEvent('event', 'hover', {
                   event_category: 'navigation',
                   event_label: 'pagination_next_hover',
-                  custom_parameter_1: 'pagination',
-                  custom_parameter_2: 'next_button'
+                  element: 'pagination',
+                  action: 'next_button'
                 })}
               >
                 Next
@@ -579,12 +572,12 @@ export default function Cases() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3 }}
-            onAnimationComplete={() => gtag('event', 'view_item', {
+            onAnimationComplete={() => sendGAEvent('event', 'view_item', {
               event_category: 'cases',
               event_label: 'preview_modal_opened',
               content_id: previewCase.id,
-              custom_parameter_1: previewCase.specialty?.[0] || 'unknown',
-              custom_parameter_2: 'modal_animation_complete'
+              specialty: previewCase.specialty?.[0] || 'unknown',
+              action: 'modal_animation_complete'
             })}
           >
             <div className={styles.previewContent}>
@@ -592,11 +585,11 @@ export default function Cases() {
                 onClick={closePreview}
                 className={styles.closeButton}
                 aria-label="Close preview"
-                onMouseEnter={() => gtag('event', 'hover', {
+                onMouseEnter={() => sendGAEvent('event', 'hover', {
                   event_category: 'modal',
                   event_label: 'close_button_hover',
-                  custom_parameter_1: 'preview_modal',
-                  custom_parameter_2: 'close_button'
+                  context: 'preview_modal',
+                  action: 'close_button'
                 })}
               >
                 <X size={24} />
@@ -616,12 +609,12 @@ export default function Cases() {
                   handleViewFullCase(previewCase);
                   closePreview();
                 }}
-                onMouseEnter={() => gtag('event', 'hover', {
+                onMouseEnter={() => sendGAEvent('event', 'hover', {
                   event_category: 'cases',
                   event_label: 'view_full_case_hover',
                   content_id: previewCase.id,
-                  custom_parameter_1: 'full_case_link',
-                  custom_parameter_2: 'link_hovered'
+                  element: 'full_case_link',
+                  action: 'link_hovered'
                 })}
               >
                 View Full Case
@@ -630,6 +623,7 @@ export default function Cases() {
           </motion.div>
         )}
       </AnimatePresence>
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
     </div>
   );
 }
