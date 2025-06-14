@@ -78,19 +78,17 @@ export const getCaseStatistics = async () => {
 
     snapshot.forEach((doc) => {
       const data = doc.data();
-      const specialties = Array.isArray(data.specialty) ? data.specialty : typeof data.specialty === 'string' && data.specialty ? [data.specialty] : ['Unknown'];
+      // Handle specialty as an array or single string
+      const specialties = Array.isArray(data.specialty) 
+        ? data.specialty 
+        : typeof data.specialty === 'string' && data.specialty 
+          ? data.specialty.split(',').map(s => s.trim()) // Split only on commas
+          : ['Unknown'];
 
       specialties.forEach((spec) => {
         if (spec && typeof spec === 'string') {
-          // Split combined specialties (e.g., "Tropical Medicine and Infectious Diseases")
-          const splitSpecialties = spec
-            .split(/and|,|\s+/)
-            .map((s) => s.trim())
-            .filter((s) => s);
-          
-          splitSpecialties.forEach((splitSpec) => {
-            stats[splitSpec] = (stats[splitSpec] || 0) + 1;
-          });
+          // Use the full specialty string without further splitting
+          stats[spec] = (stats[spec] || 0) + 1;
         } else {
           // Handle cases with no valid specialty
           stats['Unknown'] = (stats['Unknown'] || 0) + 1;
