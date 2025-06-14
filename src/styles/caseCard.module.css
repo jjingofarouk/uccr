@@ -130,10 +130,23 @@
 
 .postedDate {
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 400;
-  color: var(--text-secondary);
-  margin: 0;
+  font-size: 0.9rem; /* Standard for secondary text */
+  font-weight: 400; /* Regular font weight */
+  color: var(--text-secondary); /* Subtle color */
+  margin: 0.5rem 0; /* Adds spacing above and below */
+  display: block; /* Ensures it appears on its own line */
+  text-align: left; /* Aligns text for better readability */
+  letter-spacing: 0.02em; /* Slightly increases spacing */
+  line-height: 1.5; /* Improves readability */
+  background: var(--background-secondary); /* Subtle background */
+  padding: 0.3rem 0.6rem; /* Adds padding for visibility */
+  border-radius: 4px; /* Gives a rounded look */
+  transition: color 0.3s ease, background 0.3s ease; /* Smooth hover effect */
+}
+
+.postedDate:hover {
+  color: var(--primary); /* Changes text color on hover */
+  background: var(--primary-light); /* Highlights background on hover */
 }
 
 .contributor {
