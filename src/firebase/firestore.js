@@ -7,6 +7,7 @@ import { sendMessage, getMessages, getThreadMessages } from './messages';
 import { addReaction } from './reactions';
 import { getUserStats, subscribeUserStats, getCaseStatistics } from './stats';
 import { getTopContributors } from './contributors';
+import { getTrendingCases } from './trending'; // New import
 import { searchCasesAndUsers } from './search';
 import { getAllSpecialties } from './specialties';
 
@@ -32,6 +33,7 @@ export {
   subscribeUserStats,
   getCaseStatistics,
   getTopContributors,
+  getTrendingCases, // New export
   searchCasesAndUsers,
   getAllSpecialties,
 };
