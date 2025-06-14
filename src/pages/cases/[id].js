@@ -1,10 +1,9 @@
-// src/pages/cases/[id].jsx
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useCases } from '../../hooks/useCases';
 import CaseDetail from '../../components/Case/CaseDetail';
-import ProtectedRoute from '../../components/Auth/ProtectedRoute';
-import Loading from '../../components/Loading';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../../styles/casePage.module.css';
 
 function CasePageContent() {
@@ -32,9 +31,13 @@ function CasePageContent() {
 
   if (loading) {
     return (
-      <section className={styles.loadingSection}>
-        <Loading />
-      </section>
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+        <section className={styles.loadingSection}>
+          <Skeleton height={40} width={300} />
+          <Skeleton height={20} count={3} style={{ marginTop: '10px' }} />
+          <Skeleton height={200} style={{ marginTop: '20px' }} />
+        </section>
+      </SkeletonTheme>
     );
   }
 
@@ -55,8 +58,6 @@ function CasePageContent() {
 
 export default function CasePage() {
   return (
-
-      <CasePageContent />
-
+    <CasePageContent />
   );
 }
