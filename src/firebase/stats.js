@@ -78,16 +78,35 @@ export const getCaseStatistics = async () => {
 
     snapshot.forEach((doc) => {
       const data = doc.data();
-      const specialty = data.specialty || 'Unknown';
-      stats[specialty] = (stats[specialty] || 0) + 1;
+      const specialties = Array.isArray(data.specialty) ? data.specialty : typeof data.specialty === 'string' && data.specialty ? [data.specialty] : ['Unknown'];
+
+      specialties.forEach((spec) => {
+        if (spec && typeof spec === 'string') {
+          // Split combined specialties (e.g., "Tropical Medicine and Infectious Diseases")
+          const splitSpecialties = spec
+            .split(/and|,|\s+/)
+            .map((s) => s.trim())
+            .filter((s) => s);
+          
+          splitSpecialties.forEach((splitSpec) => {
+            stats[splitSpec] = (stats[splitSpec] || 0) + 1;
+          });
+        } else {
+          // Handle cases with no valid specialty
+          stats['Unknown'] = (stats['Unknown'] || 0) + 1;
+        }
+      });
     });
 
-    return Object.entries(stats)
+    const result = Object.entries(stats)
       .map(([specialty, count]) => ({
         specialty,
         count,
       }))
       .sort((a, b) => b.count - a.count);
+
+    console.log('Fetched case statistics:', result);
+    return result;
   } catch (error) {
     console.error('Error fetching case statistics:', error);
     return [];
