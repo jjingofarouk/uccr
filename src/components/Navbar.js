@@ -557,6 +557,7 @@ export default function Navbar() {
                 <BookOpen size={20} className={styles.navIcon} />
                 How It Works
               </Link>
+              
               <Link 
                 href="/privacy" 
                 onClick={() => {
@@ -567,6 +568,17 @@ export default function Navbar() {
               >
                 <Shield size={20} className={styles.navIcon} />
                 Privacy
+              </Link>
+                            <Link 
+                href="/apps" 
+                onClick={() => {
+                  handleNavigationClick('apps');
+                  toggleSidebar();
+                }} 
+                className={styles.navLink}
+              >
+                <BookOpen size={20} className={styles.navIcon} />
+                Other Apps
               </Link>
               {user ? (
                 <button
