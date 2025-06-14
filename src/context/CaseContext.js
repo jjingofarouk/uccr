@@ -5,22 +5,36 @@ import { getCases } from '../firebase/firestore';
 const CaseContext = createContext();
 
 export function CaseProvider({ children }) {
-  const [cases, setCases] = useState(() => {
-    // Load cached cases from localStorage
-    const cachedCases = localStorage.getItem('cases');
-    return cachedCases ? JSON.parse(cachedCases) : [];
-  });
-  const [loading, setLoading] = useState(!localStorage.getItem('cases')); // Set loading based on cached data
+  // Initialize cases with an empty array
+  const [cases, setCases] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCases = async () => {
       try {
         setLoading(true);
-        const fetchedCases = await getCases();
-        setCases(fetchedCases);
-        // Persist fetched cases to localStorage
-        localStorage.setItem('cases', JSON.stringify(fetchedCases));
+
+        // Check if localStorage is accessible (client-side only)
+        let cachedCases = [];
+        if (typeof window !== 'undefined') {
+          const cached = localStorage.getItem('cases');
+          if (cached) {
+            cachedCases = JSON.parse(cached);
+            setCases(cachedCases); // Load cases from cache
+          }
+        }
+
+        // Fetch cases from Firebase if cache is empty
+        if (cachedCases.length === 0) {
+          const fetchedCases = await getCases();
+          setCases(fetchedCases);
+
+          // Persist fetched cases to localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('cases', JSON.stringify(fetchedCases));
+          }
+        }
       } catch (err) {
         setError(err.message || 'Failed to fetch cases');
       } finally {
