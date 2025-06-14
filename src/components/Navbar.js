@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
 import { getMessages, searchCasesAndUsers } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X, Shield, BookOpen } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X, Shield, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
@@ -577,7 +577,7 @@ export default function Navbar() {
                 }} 
                 className={styles.navLink}
               >
-                <BookOpen size={20} className={styles.navIcon} />
+                <Grid size={20} className={styles.navIcon} />
                 Other Apps
               </Link>
               {user ? (
