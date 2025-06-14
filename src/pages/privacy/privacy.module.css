@@ -1,0 +1,155 @@
+/* privacy.module.css */
+.privacyContainer {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  background: var(--background);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.title {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionIcon {
+  margin-right: 0.75rem;
+  width: 32px;
+  height: 32px;
+}
+
+.sectionTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.listItem {
+  padding: 0.25rem 0;
+}
+
+.listItemIcon {
+  min-width: 32px;
+}
+
+.listItemText {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.article {
+  margin-top: 1.5rem;
+}
+
+.articleTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.articleText {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .privacyContainer {
+    padding: 1rem 0.75rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.25rem;
+  }
+
+  .listItemText {
+    font-size: 0.9rem;
+  }
+
+  .articleTitle {
+    font-size: 1.125rem;
+  }
+
+  .articleText {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacyContainer {
+    padding: 1rem 0.5rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sectionIcon {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .privacyContainer {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .title {
+    -webkit-text-fill-color: var(--text);
+    background: none;
+  }
+
+  .sectionTitle {
+    color: var(--text);
+  }
+}
