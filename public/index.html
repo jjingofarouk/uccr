@@ -2,54 +2,171 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Uganda Clinical Case Reports | Medical Case Studies, Research & Healthcare in Uganda</title>
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <title>Uganda Clinical Case Reports | Medical Case Studies & Clinical Research in Uganda</title>
+    <!-- Updated logo reference to logo.jpg -->
+    <link rel="icon" href="%PUBLIC_URL%/logo.jpg" type="image/jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#2563eb" />
-    <meta name="description" content="Uganda Clinical Case Reports is the leading open database for medical case studies, case sharing, and clinical research in Uganda. Join our growing medical community—explore, contribute, and learn from real-world clinical experiences and research in Uganda." />
-    <meta name="keywords" content="Uganda Clinical Case Reports, medical case studies Uganda, Ugandan medical research, clinical research Uganda, healthcare Uganda, rare diseases Uganda, medical education Uganda, medical students Uganda, healthcare professionals Uganda, case sharing platform, medical community Uganda, open clinical database, evidence-based medicine Uganda, medical case contributions, Ugandan hospitals, clinical case repository, medical case reports Africa, medical collaboration Uganda, continuing medical education Uganda, trending medical cases, specialty case studies, top contributors medical, case statistics Uganda, clinical specialties Uganda, patient case studies, African medical cases, Ugandan case studies, Ugandan clinical specialties, medical teaching Uganda, publish case report Uganda, medical research Africa, healthcare innovation Uganda" />
+    <meta
+      name="description"
+      content="Explore Uganda Clinical Case Reports, the premier open-access database for medical case studies and clinical research in Uganda. Contribute, share, and learn from real-world cases to advance healthcare and medical education."
+    />
+    <meta
+      name="keywords"
+      content="Uganda Clinical Case Reports, medical case studies Uganda, clinical research Uganda, Ugandan medical research, healthcare Uganda, rare diseases Uganda, medical education Uganda, medical students Uganda, healthcare professionals Uganda, case sharing platform, medical community Uganda, open clinical database, evidence-based medicine Uganda, medical case contributions, Ugandan hospitals, clinical case repository, medical case reports Africa, medical collaboration Uganda, continuing medical education Uganda, trending medical cases, specialty case studies, top contributors medical, case statistics Uganda, clinical specialties Uganda, patient case studies, African medical cases, Ugandan case studies, Ugandan clinical specialties, medical teaching Uganda, publish case report Uganda, medical research Africa, healthcare innovation Uganda, tropical medicine Uganda, public health Uganda"
+    />
     <meta name="author" content="Uganda Clinical Case Reports Team" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="bingbot" content="index, follow" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:title" content="Uganda Clinical Case Reports | Medical Case Studies in Uganda" />
-    <meta property="og:description" content="Explore and contribute to the largest collection of medical case studies and clinical research from Uganda. Join the medical community and advance healthcare together." />
-    <meta property="og:image" content="%PUBLIC_URL%/logo192.png" />
+    <meta
+      property="og:description"
+      content="Join the largest open database of medical case studies in Uganda. Explore, contribute, and collaborate with healthcare professionals to advance clinical research and patient care."
+    />
+    <!-- Updated logo reference to logo.jpg -->
+    <meta property="og:image" content="%PUBLIC_URL%/logo.jpg" />
+    <meta property="og:image:alt" content="Uganda Clinical Case Reports Logo" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://ugandacasereports.org" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Uganda Clinical Case Reports" />
+    <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
     <meta name="twitter:title" content="Uganda Clinical Case Reports" />
-    <meta name="twitter:description" content="Discover, share, and learn from real-world medical case studies in Uganda. Free access to trending cases, specialties, statistics, and more." />
-    <meta name="twitter:image" content="%PUBLIC_URL%/logo192.png" />
+    <meta
+      name="twitter:description"
+      content="Discover and share medical case studies from Uganda. Access trending cases, clinical specialties, and statistics to enhance medical knowledge and collaboration."
+    />
+    <!-- Updated logo reference to logo.jpg -->
+    <meta name="twitter:image" content="%PUBLIC_URL%/logo.jpg" />
+    <meta name="twitter:image:alt" content="Uganda Clinical Case Reports Logo" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@UgandaCaseReports" />
+    <meta name="twitter:creator" content="@UgandaCaseReports" />
 
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!-- Apple Touch Icon -->
+    <!-- Updated logo reference to logo.jpg -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.jpg" />
+    <!-- Manifest for Progressive Web App -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!-- Canonical URL -->
     <link rel="canonical" href="https://ugandacasereports.org" />
+    <!-- Alternate language support -->
     <link rel="alternate" href="https://ugandacasereports.org" hreflang="en" />
+    <link rel="alternate" href="https://ugandacasereports.org/sw" hreflang="sw" />
 
-    <!-- Structured Data (JSON-LD) -->
+    <!-- Structured Data (JSON-LD) for WebSite -->
     <script type="application/ld+json">
       {
         "@context": "http://schema.org",
         "@type": "WebSite",
         "name": "Uganda Clinical Case Reports",
         "url": "https://ugandacasereports.org",
-        "description": "A growing open database of medical case studies, research, and healthcare innovation in Uganda.",
+        "description": "A comprehensive open-access database of medical case studies, clinical research, and healthcare innovations from Uganda.",
         "publisher": {
           "@type": "Organization",
-          "name": "Uganda Clinical Case Reports"
+          "name": "Uganda Clinical Case Reports",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "%PUBLIC_URL%/logo.jpg",
+            "width": 1200,
+            "height": 630
+          }
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ugandacasereports.org/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
         }
       }
     </script>
+
+    <!-- Structured Data (JSON-LD) for MedicalWebPage -->
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "MedicalWebPage",
+        "name": "Uganda Clinical Case Reports",
+        "url": "https://ugandacasereports.org",
+        "description": "Explore and contribute to a growing database of medical case studies from Uganda, supporting clinical research, medical education, and healthcare innovation.",
+        "about": {
+          "@type": "MedicalCondition",
+          "name": "Various Medical Conditions",
+          "description": "A collection of case studies covering rare diseases, tropical medicine, and other clinical specialties in Uganda."
+        },
+        "audience": [
+          "Healthcare Professionals",
+          "Medical Students",
+          "Researchers",
+          "Public Health Officials"
+        ],
+        "specialty": [
+          "Internal Medicine",
+          "Pediatrics",
+          "Surgery",
+          "Tropical Medicine",
+          "Public Health"
+        ],
+        "datePublished": "2023-01-01",
+        "lastReviewed": "2025-06-14"
+      }
+    </script>
+
+    <!-- Structured Data (JSON-LD) for BreadcrumbList -->
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://ugandacasereports.org"
+          }
+        ]
+      }
+    </script>
+
+    <!-- Structured Data (JSON-LD) for Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "Organization",
+        "name": "Uganda Clinical Case Reports",
+        "url": "https://ugandacasereports.org",
+        "logo": "%PUBLIC_URL%/logo.jpg",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "info@ugandacasereports.org",
+          "contactType": "Customer Support"
+        },
+        "sameAs": [
+          "https://twitter.com/UgandaCaseReports",
+          "https://www.linkedin.com/company/uganda-clinical-case-reports",
+          "https://www.facebook.com/UgandaCaseReports"
+        ]
+      }
+    </script>
+
+    <!-- Preload logo for faster rendering -->
+    <link rel="preload" href="%PUBLIC_URL%/logo.jpg" as="image" />
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JGQE2H2LRK"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-JGQE2H2LRK');
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-JGQE2H2LRK");
     </script>
   </head>
   <body>
