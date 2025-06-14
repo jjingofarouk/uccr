@@ -3,8 +3,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getCaseStatistics } from '../../firebase/firestore';
-import { trackEngagement, trackEvent } from '../../utils/analytics';
+import { trackEngagement, trackEvent } from '../../events';
 import styles from '../../pages/Home.module.css';
+import Link from 'next/link';
 
 const StatsSection = () => {
   const [stats, setStats] = useState([]);
@@ -16,18 +17,14 @@ const StatsSection = () => {
       try {
         trackEngagement('load_start', 'stats');
         const data = await getCaseStatistics();
-        const topStats = data
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
-        setStats(topStats);
-        trackEngagement('load_success', 'stats', `${topStats.length}_specialties`);
-        topStats.forEach((stat, index) => {
-          trackEvent('specialty_stat', 'stats', `${stat.specialty}_rank_${index + 1}`, stat.count);
+        setStats(data.slice(0, 5));
+        trackEngagement('load_success', 'stats', `${data.length}_specialties`);
+        data.slice(0, 5).forEach((stat, index) => {
+          trackEvent('specialty_title', 'stats', `${stat.specialty}_rank_${index + 1}`, stat.count);
         });
       } catch (err) {
         setError('Unable to load case statistics');
         trackEngagement('load_error', 'stats', err.message);
-        console.error('Error fetching case statistics:', err);
       } finally {
         setLoading(false);
       }
@@ -36,16 +33,14 @@ const StatsSection = () => {
   }, []);
 
   const barColors = [
-    'rgba(59, 130, 246, 0.6)',
-    'rgba(239, 68, 68, 0.6)',
-    'rgba(34, 197, 94, 0.6)',
-    'rgba(249, 115, 22, 0.6)',
-    'rgba(168, 85, 247, 0.6)',
+    'rgba(59, 130, 246,  'rgba(239, 68, 68,    0.6)',
+    'rgba(34, 197, 94,    0.6)',    'rgba(249, 115, 22,   0.6)',
+    'rgba(168, 85, 247,   0.6)',
   ];
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      trackEngagement('tooltip_view', 'stats', `${label}_${payload[0].value}_cases`);
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload?.length) {
+      trackEngagement('tooltip_view', 'stats', `${payload[0].payload.specialty}_${payload[0].value}_specialty`);
       return (
         <div style={{
           backgroundColor: 'var(--tooltip-background, rgba(0, 0, 0, 0.8))',
@@ -56,24 +51,24 @@ const StatsSection = () => {
           <p style={{
             color: 'var(--tooltip-text, #ffffff)',
             margin: 0,
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'Inter',
             fontSize: '12px'
-          }}>{`${label}: ${payload[0].value} cases`}</p>
+          }}>{`${payload[0].payload.specialty}: ${payload[0].value} cases`}</p>
         </div>
       );
     }
     return null;
   };
 
-  const handleBarClick = (data, index) => {
+  const handleBarClick = (data) => {
     if (data) {
-      trackEngagement('chart_click', 'stats', `${data.specialty}_${data.count}_cases`);
+      trackEngagement('click', 'stats', `${data.specialty}_${data.count}_specialty`);
     }
   };
 
-  const handleMouseEnter = (data, index) => {
+  const handleMouseEnter = (data) => {
     if (data) {
-      trackEngagement('chart_hover', 'stats', data.specialty);
+      trackEngagement('hover', 'stats', data.specialty);
     }
   };
 
@@ -103,22 +98,26 @@ const StatsSection = () => {
         <div className={styles.statsContainer}>
           <div className={styles.chartWrapper}>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={stats}
-                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-              >
+              <BarChart data={stats} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
                 <XAxis
                   dataKey="specialty"
                   angle={-45}
                   textAnchor="end"
                   interval={0}
-                  height={60}
-                  tick={{ fill: 'var(--text, #1f2937)', fontFamily: 'Inter, sans-serif', fontSize: 12 }}
+                  height={80}
+                  tick={{ 
+                    fill: 'var(--text, #1f2937)', 
+                    fontFamily: 'Inter', 
+                    fontSize: 12,
+                    width: 100,
+                    dy: 10
+                  }}
+                  tickFormatter={(value) => value.length > 15 ? `${value.substring(0, 12)}...` : value}
                   label={{
                     value: 'Specialty',
                     position: 'bottom',
                     fill: 'var(--text, #1f2937)',
-                    fontFamily: 'Inter, sans-serif',
+                    fontFamily: 'Inter',
                     fontSize: 12,
                     fontWeight: 600
                   }}
@@ -126,13 +125,13 @@ const StatsSection = () => {
                 <YAxis
                   dataKey="count"
                   allowDecimals={false}
-                  tick={{ fill: 'var(--text, #1f2937)', fontFamily: 'Inter, sans-serif', fontSize: 12 }}
+                  tick={{ fill: 'var(--text, #1f2937)', fontFamily: 'Inter', fontSize: 12 }}
                   label={{
                     value: 'Number of Cases',
                     angle: -90,
                     position: 'insideLeft',
                     fill: 'var(--text, #1f2937)',
-                    fontFamily: 'Inter, sans-serif',
+                    fontFamily: 'Inter',
                     fontSize: 12,
                     fontWeight: 600
                   }}
@@ -144,7 +143,7 @@ const StatsSection = () => {
                   onClick={handleBarClick}
                   onMouseEnter={handleMouseEnter}
                 >
-                  {stats.map((entry, index) => (
+                  {stats.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={barColors[index % barColors.length]}
@@ -160,11 +159,11 @@ const StatsSection = () => {
               textAlign: 'center',
               marginTop: '8px',
               color: 'var(--text, #1f2937)',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'Inter',
               fontSize: '16px',
               fontWeight: 600
             }}>
-              Top 5 Specialties by Case Count
+              Top Specialties by Case Count
             </div>
           </div>
         </div>
@@ -174,7 +173,7 @@ const StatsSection = () => {
           <Link
             href="/cases/new"
             className={styles.ctaButtonSecondary}
-            onClick={() => trackClick('contribute_case_button', 'stats_empty')}
+            onClick={() => trackEngagement('click', 'stats_empty', 'contribute_case')}
           >
             Contribute a Case
           </Link>
