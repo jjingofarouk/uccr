@@ -1,4 +1,3 @@
-// src/context/CaseContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getCases } from '../firebase/firestore';
 
@@ -15,26 +14,9 @@ export function CaseProvider({ children }) {
       try {
         setLoading(true);
 
-        // Check if localStorage is accessible (client-side only)
-        let cachedCases = [];
-        if (typeof window !== 'undefined') {
-          const cached = localStorage.getItem('cases');
-          if (cached) {
-            cachedCases = JSON.parse(cached);
-            setCases(cachedCases); // Load cases from cache
-          }
-        }
-
-        // Fetch cases from Firebase if cache is empty
-        if (cachedCases.length === 0) {
-          const fetchedCases = await getCases();
-          setCases(fetchedCases);
-
-          // Persist fetched cases to localStorage
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('cases', JSON.stringify(fetchedCases));
-          }
-        }
+        // Fetch cases directly from Firebase
+        const fetchedCases = await getCases();
+        setCases(fetchedCases);
       } catch (err) {
         setError(err.message || 'Failed to fetch cases');
       } finally {
