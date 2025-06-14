@@ -1,0 +1,157 @@
+/* works.module.css */
+.worksContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background: var(--background);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.carousel {
+  position: relative;
+}
+
+.carouselCard {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.carouselCard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.iconWrapper {
+  margin-right: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--secondary);
+}
+
+.title {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+.cardTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--primary-dark);
+}
+
+.cardDescription {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .worksContainer {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .carouselCard {
+    padding: 1rem;
+  }
+
+  .iconWrapper {
+    margin-right: 1rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .cardTitle {
+    font-size: 1.25rem;
+  }
+
+  .cardDescription {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .worksContainer {
+    padding: 1rem 0.5rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    font-size: 0.95rem;
+  }
+
+  .carouselCard {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .iconWrapper {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .carouselCard {
+    transition: none;
+  }
+
+  .carouselCard:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .title {
+    -webkit-text-fill-color: var(--text);
+    background: none;
+  }
+
+  .carouselCard {
+    border-color: var(--text);
+  }
+}
