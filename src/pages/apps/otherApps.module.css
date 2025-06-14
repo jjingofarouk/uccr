@@ -1,0 +1,166 @@
+/* otherApps.module.css */
+.otherAppsContainer {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  background: var(--background);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.title {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+.appsGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.appCard {
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 14px var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.appCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px var(--shadow);
+}
+
+.appTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+}
+
+.appDescription {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.appButton {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #ffffff;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.appButton:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.appButton:active {
+  transform: translateY(0);
+}
+
+.buttonIcon {
+  margin-left: 0.5rem;
+  width: 16px;
+  height: 16px;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .otherAppsContainer {
+    padding: 1rem 0.75rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .appTitle {
+    font-size: 1.25rem;
+  }
+
+  .appDescription {
+    font-size: 0.9rem;
+  }
+
+  .appButton {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .otherAppsContainer {
+    padding: 1rem 0.5rem;
+  }
+
+  .appsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .appCard {
+    padding: 0.75rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .appCard,
+  .appButton {
+    transition: none;
+  }
+
+  .appCard:hover,
+  .appButton:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .title {
+    -webkit-text-fill-color: var(--text);
+    background: none;
+  }
+
+  .appButton {
+    background: var(--text);
+    color: var(--background);
+  }
+}
