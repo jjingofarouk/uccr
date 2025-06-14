@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useCases } from '../../hooks/useCases';
 import CaseCard from '../../components/Case/CaseCard';
-import Loading from '../../components/Loading';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
@@ -332,7 +333,29 @@ export default function Cases() {
   }, [loading, cases.length]);
 
   if (loading) {
-    return <Loading />;
+    return (
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+        <div className={styles.container}>
+          <Skeleton height={40} width={200} />
+          <div className={styles.filterSortContainer}>
+            <div className={styles.filters}>
+              {[...Array(6)].map((_, index) => (
+                <Skeleton key={index} height={40} width={150} />
+              ))}
+            </div>
+            <div className={styles.sortExport}>
+              <Skeleton height={40} width={150} />
+              <Skeleton height={40} width={100} />
+            </div>
+          </div>
+          <div className={styles['case-list']}>
+            {[...Array(casesPerPage)].map((_, index) => (
+              <Skeleton key={index} height={200} />
+            ))}
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
   }
 
   if (error) {
