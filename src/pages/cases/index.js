@@ -5,7 +5,7 @@ import Loading from '../../components/Loading';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
-import { GoogleAnalytics, sendGAEvent } from '@next/third-parties/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import styles from './case.module.css';
 
 export default function Cases() {
@@ -27,8 +27,13 @@ export default function Cases() {
   const hospitals = [...new Set(cases.map((caseData) => caseData.hospital).filter(Boolean))];
   const referralCenters = [...new Set(cases.map((caseData) => caseData.referralCenter).filter(Boolean))];
 
+  // Custom sendGAEvent wrapper to check for window
+  const sendGAEvent = typeof window !== 'undefined' ? require('@next/third-parties/google').sendGAEvent : () => {};
+
   // Track page view and time spent on page
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     sendGAEvent('event', 'page_view', {
       page_title: 'Cases List',
       page_location: window.location.href,
@@ -51,6 +56,8 @@ export default function Cases() {
 
   // Track search/filter usage
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const activeFilters = Object.entries(filters).filter(([_, value]) => value !== '').length;
     if (activeFilters > 0) {
       sendGAEvent('event', 'search', {
@@ -98,14 +105,16 @@ export default function Cases() {
       return matchesSpecialty && matchesAuthor && matchesHospital && matchesReferralCenter && matchesDate && matchesAwards;
     });
 
-    sendGAEvent('event', 'view_search_results', {
-      search_term: JSON.stringify(filters),
-      event_category: 'cases',
-      event_label: 'filter_results',
-      value: filtered.length,
-      result_count: filtered.length,
-      total_cases: cases.length
-    });
+    if (typeof window !== 'undefined') {
+      sendGAEvent('event', 'view_search_results', {
+        search_term: JSON.stringify(filters),
+        event_category: 'cases',
+        event_label: 'filter_results',
+        value: filtered.length,
+        result_count: filtered.length,
+        total_cases: cases.length
+      });
+    }
 
     return filtered;
   }, [cases, filters]);
@@ -133,12 +142,14 @@ export default function Cases() {
       return 0;
     });
 
-    sendGAEvent('event', 'sort', {
-      event_category: 'cases',
-      event_label: sortBy,
-      sort_type: sortBy,
-      case_count: sorted.length
-    });
+    if (typeof window !== 'undefined') {
+      sendGAEvent('event', 'sort', {
+        event_category: 'cases',
+        event_label: sortBy,
+        sort_type: sortBy,
+        case_count: sorted.length
+      });
+    }
 
     return sorted;
   }, [filteredCases, sortBy]);
@@ -155,13 +166,15 @@ export default function Cases() {
     setFilters((prev) => ({ ...prev, [name]: value }));
     setCurrentPage(1);
 
-    sendGAEvent('event', 'filter_change', {
-      event_category: 'cases',
-      event_label: name,
-      filter_name: name,
-      filter_value: value || 'cleared',
-      value: value ? 1 : 0
-    });
+    if (typeof window !== 'undefined') {
+      sendGAEvent('event', 'filter_change', {
+        event_category: 'cases',
+        event_label: name,
+        filter_name: name,
+        filter_value: value || 'cleared',
+        value: value ? 1 : 0
+      });
+    }
   };
 
   const handleSortChange = (e) => {
@@ -169,28 +182,33 @@ export default function Cases() {
     setSortBy(newSortBy);
     setCurrentPage(1);
 
-    sendGAEvent('event', 'sort_change', {
-      event_category: 'cases',
-      event_label: newSortBy,
-      sort_type: newSortBy,
-      action: 'sort_changed'
-    });
+    if (typeof window !== 'undefined') {
+      sendGAEvent('event', 'sort_change', {
+        event_category: 'cases',
+        event_label: newSortBy,
+        sort_type: newSortBy,
+        action: 'sort_changed'
+      });
+    }
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    sendGAEvent('event', 'page_change', {
-      event_category: 'navigation',
-      event_label: 'pagination',
-      value: page,
-      page_number: page,
-      total_pages: totalPages
-    });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      sendGAEvent('event', 'page_change', {
+        event_category: 'navigation',
+        event_label: 'pagination',
+        value: page,
+        page_number: page,
+        total_pages: totalPages
+      });
+    }
   };
 
   const handleExportCSV = () => {
+    if (typeof window === 'undefined') return;
+
     const headers = [
       'Title',
       'Specialties',
@@ -237,19 +255,21 @@ export default function Cases() {
   const handlePreviewCase = (caseData) => {
     setPreviewCase(caseData);
 
-    sendGAEvent('event', 'select_content', {
-      content_type: 'case',
-      item_id: caseData.id,
-      content_id: caseData.id,
-      event_category: 'cases',
-      event_label: 'case_preview',
-      specialty: caseData.specialty?.[0] || 'unknown',
-      awards: caseData.awards || 0
-    });
+    if (typeof window !== 'undefined') {
+      sendGAEvent('event', 'select_content', {
+        content_type: 'case',
+        item_id: caseData.id,
+        content_id: caseData.id,
+        event_category: 'cases',
+        event_label: 'case_preview',
+        specialty: caseData.specialty?.[0] || 'unknown',
+        awards: caseData.awards || 0
+      });
+    }
   };
 
   const closePreview = () => {
-    if (previewCase) {
+    if (previewCase && typeof window !== 'undefined') {
       sendGAEvent('event', 'close_preview', {
         event_category: 'cases',
         event_label: 'preview_closed',
@@ -262,20 +282,22 @@ export default function Cases() {
   };
 
   const handleViewFullCase = (caseData) => {
-    sendGAEvent('event', 'select_content', {
-      content_type: 'case',
-      item_id: caseData.id,
-      content_id: caseData.id,
-      event_category: 'cases',
-      event_label: 'view_full_case',
-      specialty: caseData.specialty?.[0] || 'unknown',
-      action: 'full_view'
-    });
+    if (typeof window !== 'undefined') {
+      sendGAEvent('event', 'select_content', {
+        content_type: 'case',
+        item_id: caseData.id,
+        content_id: caseData.id,
+        event_category: 'cases',
+        event_label: 'view_full_case',
+        specialty: caseData.specialty?.[0] || 'unknown',
+        action: 'full_view'
+      });
+    }
   };
 
   // Track errors
   useEffect(() => {
-    if (error) {
+    if (error && typeof window !== 'undefined') {
       sendGAEvent('event', 'exception', {
         description: error,
         fatal: false,
@@ -289,6 +311,8 @@ export default function Cases() {
 
   // Track loading states
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     if (loading) {
       sendGAEvent('event', 'begin_checkout', {
         event_category: 'performance',
@@ -330,7 +354,7 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by specialty"
-            onFocus={() => sendGAEvent('event', 'focus', {
+            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'specialty_filter',
               filter: 'specialty',
@@ -352,7 +376,7 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterInput}
             aria-label="Filter by author"
-            onFocus={() => sendGAEvent('event', 'focus', {
+            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'author_search',
               filter: 'author',
@@ -365,7 +389,7 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by hospital"
-            onFocus={() => sendGAEvent('event', 'focus', {
+            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'hospital_filter',
               filter: 'hospital',
@@ -385,7 +409,7 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by referral center"
-            onFocus={() => sendGAEvent('event', 'focus', {
+            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'referral_center_filter',
               filter: 'referralCenter',
@@ -405,7 +429,7 @@ export default function Cases() {
             onChange={handleFilterChange}
             className={styles.filterSelect}
             aria-label="Filter by date range"
-            onFocus={() => sendGAEvent('event', 'focus', {
+            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'date_range_filter',
               filter: 'dateRange',
@@ -426,7 +450,7 @@ export default function Cases() {
             className={styles.filterInput}
             min="0"
             aria-label="Filter by minimum awards"
-            onFocus={() => sendGAEvent('event', 'focus', {
+            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'awards_filter',
               filter: 'awardsMin',
@@ -440,7 +464,7 @@ export default function Cases() {
             onChange={handleSortChange}
             className={styles.sortSelect}
             aria-label="Sort cases"
-            onFocus={() => sendGAEvent('event', 'focus', {
+            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
               event_category: 'form',
               event_label: 'sort_dropdown',
               element: 'sort',
@@ -459,7 +483,7 @@ export default function Cases() {
             className={styles.exportButton}
             disabled={sortedCases.length === 0}
             aria-label="Export cases as CSV"
-            onMouseEnter={() => sendGAEvent('event', 'hover', {
+            onMouseEnter={() => typeof window !== 'undefined' && sendGAEvent('event', 'hover', {
               event_category: 'button',
               event_label: 'export_csv_hover',
               element: 'export',
@@ -477,7 +501,7 @@ export default function Cases() {
             No cases match your filters.{' '}
             <Link
               href="/cases/new"
-              onClick={() => sendGAEvent('event', 'click', {
+              onClick={() => typeof window !== 'undefined' && sendGAEvent('event', 'click', {
                 event_category: 'navigation',
                 event_label: 'create_new_case',
                 context: 'empty_state',
@@ -500,7 +524,7 @@ export default function Cases() {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && handlePreviewCase(caseData)}
                 aria-label={`Preview case: ${caseData.title || 'Untitled'}`}
-                onMouseEnter={() => sendGAEvent('event', 'hover', {
+                onMouseEnter={() => typeof window !== 'undefined' && sendGAEvent('event', 'hover', {
                   event_category: 'cases',
                   event_label: 'case_card_hover',
                   content_id: caseData.id,
@@ -519,7 +543,7 @@ export default function Cases() {
                 disabled={currentPage === 1}
                 className={styles.pageButton}
                 aria-label="Previous page"
-                onMouseEnter={() => sendGAEvent('event', 'hover', {
+                onMouseEnter={() => typeof window !== 'undefined' && sendGAEvent('event', 'hover', {
                   event_category: 'navigation',
                   event_label: 'pagination_previous_hover',
                   element: 'pagination',
@@ -535,7 +559,7 @@ export default function Cases() {
                   className={`${styles.pageButton} ${currentPage === page + 1 ? styles.activePage : ''}`}
                   aria-label={`Page ${page + 1}`}
                   aria-current={currentPage === page + 1 ? 'page' : undefined}
-                  onMouseEnter={() => sendGAEvent('event', 'hover', {
+                  onMouseEnter={() => typeof window !== 'undefined' && sendGAEvent('event', 'hover', {
                     event_category: 'navigation',
                     event_label: 'pagination_number_hover',
                     value: page + 1,
@@ -551,7 +575,7 @@ export default function Cases() {
                 disabled={currentPage === totalPages}
                 className={styles.pageButton}
                 aria-label="Next page"
-                onMouseEnter={() => sendGAEvent('event', 'hover', {
+                onMouseEnter={() => typeof window !== 'undefined' && sendGAEvent('event', 'hover', {
                   event_category: 'navigation',
                   event_label: 'pagination_next_hover',
                   element: 'pagination',
@@ -572,7 +596,7 @@ export default function Cases() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3 }}
-            onAnimationComplete={() => sendGAEvent('event', 'view_item', {
+            onAnimationComplete={() => typeof window !== 'undefined' && sendGAEvent('event', 'view_item', {
               event_category: 'cases',
               event_label: 'preview_modal_opened',
               content_id: previewCase.id,
@@ -585,7 +609,7 @@ export default function Cases() {
                 onClick={closePreview}
                 className={styles.closeButton}
                 aria-label="Close preview"
-                onMouseEnter={() => sendGAEvent('event', 'hover', {
+                onMouseEnter={() => typeof window !== 'undefined' && sendGAEvent('event', 'hover', {
                   event_category: 'modal',
                   event_label: 'close_button_hover',
                   context: 'preview_modal',
@@ -609,7 +633,7 @@ export default function Cases() {
                   handleViewFullCase(previewCase);
                   closePreview();
                 }}
-                onMouseEnter={() => sendGAEvent('event', 'hover', {
+                onMouseEnter={() => typeof window !== 'undefined' && sendGAEvent('event', 'hover', {
                   event_category: 'cases',
                   event_label: 'view_full_case_hover',
                   content_id: previewCase.id,
