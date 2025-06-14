@@ -51,7 +51,7 @@ const About = () => (
             margin: '0 auto',
           }}
         >
-          **UCCR (Uganda Clinical Case Reports)** is a collaborative web platform designed to empower healthcare professionals, medical students, and doctors to share, discuss, and learn from clinical cases in Uganda. By providing a structured and secure environment to document cases, engage in interactive discussions, and network with peers, UCCR fosters medical education and professional growth.
+          UCCR (Uganda Clinical Case Reports) is a collaborative web platform designed to empower healthcare professionals, medical students, and doctors to share, discuss, and learn from clinical cases in Uganda. The platform provides a structured and secure environment to document cases, engage in interactive discussions, and network with peers to promote medical education and professional growth.
         </Typography>
 
         <Box
@@ -116,7 +116,7 @@ const About = () => (
               lineHeight: 1.7,
             }}
           >
-            **Farouk Jjingo**, the creator of UCCR, is a visionary full-stack developer and former medical officer with a deep understanding of both healthcare and technology. Farouk has combined his clinical expertise and programming skills to develop UCCR as a tool to enhance medical collaboration and education. His dedication to solving real-world healthcare challenges drives the success of this platform.
+            Farouk Jjingo is a visionary medical doctor full-stack developer with a deep understanding of both healthcare and technology. Farouk has combined his clinical expertise and programming skills to develop UCCR (and dozens of other applications) as a tool to enhance medical collaboration and education. He is a dedicated leader solving real-world healthcare challenges, which drives the success of this platform.
           </Typography>
         </Box>
 
