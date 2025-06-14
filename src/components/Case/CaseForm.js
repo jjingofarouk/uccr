@@ -4,7 +4,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { addCase } from '../../firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
-import Loading from '../../components/Loading';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import dynamic from 'next/dynamic';
 import styles from '../../styles/caseForm.module.css';
 import 'react-quill/dist/quill.snow.css';
@@ -235,7 +236,7 @@ export default function CaseForm() {
 
   const handleChange = (value, name) => {
     if (name === 'specialty') {
-      const selectedOptions = Array.from(value.target.selectedOptions).map((option) => option.value);
+      const selectedOptions = Array.from(value.target.selectedOptions).map((opt) => opt.value);
       setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
       if (window.gtag) {
         window.gtag('event', 'specialty_selected', {
@@ -447,7 +448,16 @@ export default function CaseForm() {
     scrollToActiveEditor();
   }, [currentStep]);
 
-  if (authLoading || isLoading) return <Loading />;
+  if (authLoading || isLoading) {
+    return (
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+        <div className={styles.caseFormWrapper}>
+          <Skeleton height={40} width={300} />
+          <Skeleton height={20} count={5} style={{ marginTop: '10px' }} />
+        </div>
+      </SkeletonTheme>
+    );
+  }
   if (authError) {
     if (window.gtag) {
       window.gtag('event', 'auth_error', {
@@ -571,7 +581,7 @@ export default function CaseForm() {
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       fill="none"
-                                      viewBox="0 24 24"
+                                      viewBox="0 0 24 24"
                                       stroke="currentColor"
                                       strokeWidth="2"
                                       className={styles.deleteIcon}
@@ -654,7 +664,12 @@ export default function CaseForm() {
                 })}
             </p>
           )}
-          {(isLoading || forceLoading) && <Loading />}
+          {(isLoading || forceLoading) && (
+            <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+              <Skeleton height={40} width={300} />
+              <Skeleton height={20} count={5} style={{ marginTop: '10px' }} />
+            </SkeletonTheme>
+          )}
         </form>
       </div>
     </div>
