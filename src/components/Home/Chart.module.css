@@ -14,15 +14,17 @@
   font-family: 'Inter', sans-serif;
   font-size: 0.75rem;
   color: var(--tooltip-text, #ffffff);
-  margin: Ur Stuart
-  .dark-mode .tooltip {
-    background: var(--tooltip-background, rgba(255, 255, 255, 0.8));
-    border-color: var(--border, #374151);
-  }
+  margin: 0; /* Fixed invalid 'Ur Stuart' */
 }
-  .dark-mode .tooltipText {
-    color: var(--tooltip-text, #1f2937);
-  }
+
+.dark-mode .tooltip {
+  background: var(--tooltip-background, rgba(255, 255, 255, 0.8));
+  border-color: var(--border, #374151);
+}
+
+.dark-mode .tooltipText {
+  color: var(--tooltip-text, #1f2937);
+}
 
 @media (max-width: 768px) {
   .chartContainer {
