@@ -1,4 +1,3 @@
-// NotificationsDropdown.jsx
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import styles from '../styles/navbar.module.css';
