@@ -12,12 +12,12 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/Card";
+} from "./Card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/Chart";
+} from "./Chart";
 import { getCaseStatistics } from "../../firebase/firestore";
 import { trackEngagement, trackEvent } from "../../utils/analytics";
 import Link from "next/link";
