@@ -62,8 +62,7 @@
 
 .trendingSection,
 .recentSection,
-.specialtySection,
-.leaderboardSection {
+.specialtySection {
   padding: 1.5rem 0;
 }
 
@@ -71,54 +70,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
-}
-
-.leaderboard {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.contributor {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  text-decoration: none;
-  color: var(--text);
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-}
-
-.contributor:hover {
-  background: var(--primary-shadow);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px var(--shadow);
-}
-
-.contributorAvatar {
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.contributor div {
-  display: flex;
-  flex-direction: column;
-}
-
-.contributor span {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.contributor small {
-  font-size: 0.7rem;
-  color: var(--text);
-  opacity: 0.7;
 }
 
 .loadMoreContainer {
@@ -145,19 +96,13 @@
 
   .trendingSection,
   .recentSection,
-  .specialtySection,
-  .leaderboardSection {
+  .specialtySection {
     padding: 1rem 0;
   }
 
   .caseList {
     grid-template-columns: 1fr;
     gap: 0.75rem;
-  }
-
-  .contributor {
-    flex: 1 1 100%;
-    padding: 0.5rem;
   }
 }
 
@@ -180,16 +125,5 @@
   .statDivider {
     width: 20px;
     height: 1px;
-  }
-}
-
-/* Accessibility & Performance */
-@media (prefers-reduced-motion: reduce) {
-  .contributor {
-    transition: none;
-  }
-  
-  .contributor:hover {
-    transform: none;
   }
 }
