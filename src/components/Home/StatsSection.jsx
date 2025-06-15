@@ -4,7 +4,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getCaseStatistics } from '../../firebase/firestore';
 import { trackEngagement, trackEvent } from '../../utils/analytics';
-import styles from '../../pages/Home.module.css';
+import styles from './StatsSection.module.css';
 import Link from 'next/link';
 
 const StatsSection = () => {
