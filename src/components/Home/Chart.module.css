@@ -19,7 +19,7 @@
     background: var(--tooltip-background, rgba(255, 255, 255, 0.8));
     border-color: var(--border, #374151);
   }
-
+}
   .dark-mode .tooltipText {
     color: var(--tooltip-text, #1f2937);
   }
