@@ -1,14 +1,18 @@
+// Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { getMessages, searchCasesAndUsers } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X, Shield, BookOpen, Heart } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { getMessages } from '../firebase/firestore';
+import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
 import styles from '../styles/navbar.module.css';
+import SearchModal from './SearchModal';
+import NotificationsDropdown from './NotificationsDropdown';
+import Sidebar from './Sidebar';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
@@ -19,39 +23,28 @@ export default function Navbar() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [unreadThreads, setUnreadThreads] = useState([]);
   const [logoutError, setLogoutError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState({ cases: [], users: [] });
-  const [isSearchLoading, setIsSearchLoading] = useState(false);
-  const [searchError, setSearchError] = useState('');
   const sidebarRef = useRef(null);
   const notificationsRef = useRef(null);
-  const searchModalRef = useRef(null);
   const userAvatarRef = useRef(null);
 
   const toggleSidebar = () => {
-    const newState = !isSidebarOpen;
-    setIsSidebarOpen(newState);
+    setIsSidebarOpen(!isSidebarOpen);
     setIsNotificationsOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
   };
 
   const toggleNotifications = () => {
-    const newState = !isNotificationsOpen;
-    setIsNotificationsOpen(newState);
+    setIsNotificationsOpen(!isNotificationsOpen);
     setIsSidebarOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
   };
 
   const toggleSearchModal = () => {
-    const newState = !isSearchModalOpen;
-    setIsSearchModalOpen(newState);
+    setIsSearchModalOpen(!isSearchModalOpen);
     setIsSidebarOpen(false);
     setIsNotificationsOpen(false);
-    setSearchQuery('');
-    setSearchResults({ cases: [], users: [] });
-    setSearchError('');
     setLogoutError('');
   };
 
@@ -65,8 +58,7 @@ export default function Navbar() {
         setLogoutError(result.error);
       }
     } catch (error) {
-      const errorMessage = 'Failed to log out. Please try again.';
-      setLogoutError(errorMessage);
+      setLogoutError('Failed to log out. Please try again.');
     }
   };
 
@@ -74,15 +66,10 @@ export default function Navbar() {
     toggleTheme();
   };
 
-  const handleSearchResultClick = () => {
-    toggleSearchModal();
-  };
-
-  const handleNavigationClick = () => {};
+  const handleNavigationClick = (navType) => {};
 
   const clearError = () => {
     setLogoutError('');
-    setSearchError('');
   };
 
   useEffect(() => {
@@ -103,47 +90,17 @@ export default function Navbar() {
   }, [user]);
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(async () => {
-      if (searchQuery.trim().length < 2) {
-        setSearchResults({ cases: [], users: [] });
-        setSearchError('');
-        setIsSearchLoading(false);
-        return;
-      }
-      try {
-        setIsSearchLoading(true);
-        setSearchError('');
-        const results = await searchCasesAndUsers(searchQuery);
-        setSearchResults(results);
-        if (results.cases.length === 0 && results.users.length === 0) {
-          setSearchError('No results found. Try a different keyword.');
-        }
-      } catch (error) {
-        console.error('Search error:', error);
-        setSearchError('Failed to fetch results. Please try again.');
-        setSearchResults({ cases: [], users: [] });
-      } finally {
-        setIsSearchLoading(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
-
-  useEffect(() => {
     const handleClickOutside = (event) => {
       const clickedElement = event.target;
       const isOutsideSidebar = sidebarRef.current && !sidebarRef.current.contains(clickedElement);
       const isOutsideNotifications = notificationsRef.current && !notificationsRef.current.contains(clickedElement);
-      const isOutsideSearch = searchModalRef.current && !searchModalRef.current.contains(clickedElement);
       const isOutsideUserAvatar = userAvatarRef.current && !userAvatarRef.current.contains(clickedElement);
       
-      if (isOutsideSidebar && isOutsideNotifications && isOutsideSearch && isOutsideUserAvatar) {
+      if (isOutsideSidebar && isOutsideNotifications && isOutsideUserAvatar) {
         setIsSidebarOpen(false);
         setIsNotificationsOpen(false);
         setIsSearchModalOpen(false);
         setLogoutError('');
-        setSearchError('');
       }
     };
 
@@ -153,7 +110,6 @@ export default function Navbar() {
         setIsNotificationsOpen(false);
         setIsSearchModalOpen(false);
         setLogoutError('');
-        setSearchError('');
       }
     };
 
@@ -222,36 +178,12 @@ export default function Navbar() {
                   <span className={styles.notificationBadge}>{unreadThreads.length}</span>
                 )}
               </button>
-              <AnimatePresence>
-                {isNotificationsOpen && (
-                  <motion.div
-                    className={styles.notificationDropdown}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {unreadThreads.length === 0 ? (
-                      <p className={styles.noNotifications}>No new messages</p>
-                    ) : (
-                      unreadThreads.map((thread) => (
-                        <Link
-                          key={thread.id}
-                          href={`/messages/${thread.id}`}
-                          className={styles.notificationItem}
-                          onClick={() => {
-                            handleNavigationClick('notification_message');
-                            setIsNotificationsOpen(false);
-                          }}
-                        >
-                          <span>New message from {thread.otherUserName}</span>
-                          <small>{thread.lastMessage}</small>
-                        </Link>
-                      ))
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <NotificationsDropdown
+                isOpen={isNotificationsOpen}
+                toggleNotifications={toggleNotifications}
+                unreadThreads={unreadThreads}
+                handleNavigationClick={handleNavigationClick}
+              />
             </div>
           )}
           <div ref={userAvatarRef} className={styles.menuButtonWrapper}>
@@ -277,366 +209,21 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      <AnimatePresence>
-        {isSearchModalOpen && (
-          <motion.div
-            className={styles.searchModal}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div ref={searchModalRef} className={styles.searchModalContent}>
-              <button
-                onClick={toggleSearchModal}
-                className={styles.closeSearchButton}
-                aria-label="Close search"
-              >
-                <X size={24} />
-              </button>
-              <div className={styles.searchInputWrapper}>
-                <Search size={20} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder="Search cases or users..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={styles.searchInput}
-                  autoFocus
-                />
-              </div>
-              <div className={styles.searchResults}>
-                {isSearchLoading ? (
-                  <p className={styles.searchLoading}>Loading...</p>
-                ) : searchQuery.trim().length < 2 ? (
-                  <p className={styles.noResults}>Enter at least 2 characters to search</p>
-                ) : searchError ? (
-                  <div className={styles.noResults}>
-                    {searchError}
-                    <div style={{ marginTop: '1rem' }}>
-                      <p>Suggestions:</p>
-                      <ul>
-                        <li>
-                          <Link 
-                            href="/cases" 
-                            onClick={() => {
-                              handleNavigationClick('browse_all_cases');
-                              toggleSearchModal();
-                            }}
-                          >
-                            Browse all cases
-                          </Link>
-                        </li>
-                        <li>
-                          <Link 
-                            href="/cases?specialty=Cardiology" 
-                            onClick={() => {
-                              handleNavigationClick('browse_cardiology');
-                              toggleSearchModal();
-                            }}
-                          >
-                            Explore Cardiology cases
-                          </Link>
-                        </li>
-                        <li>
-                          <Link 
-                            href="/cases?specialty=Pediatrics" 
-                            onClick={() => {
-                              handleNavigationClick('browse_pediatrics');
-                              toggleSearchModal();
-                            }}
-                          >
-                            Explore Pediatrics cases
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {searchResults.cases.length > 0 && (
-                      <div className={styles.searchSection}>
-                        <h3>Cases</h3>
-                        {searchResults.cases.map((caseData) => (
-                          <Link
-                            key={caseData.id}
-                            href={`/cases/${caseData.id}`}
-                            className={styles.searchResult}
-                            onClick={() => handleSearchResultClick('case', caseData.id, caseData.title)}
-                          >
-                            <span>{caseData.title || 'Untitled Case'}</span>
-                            <small>{caseData.specialty || 'No specialty'}</small>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                    {searchResults.users.length > 0 && (
-                      <div className={styles.searchSection}>
-                        <h3>Users</h3>
-                        {searchResults.users.map((user) => (
-                          <Link
-                            key={user.uid}
-                            href={`/profile/view/${user.uid}`}
-                            className={styles.searchResult}
-                            onClick={() => handleSearchResultClick('user', user.uid, user.displayName)}
-                          >
-                            <span>{user.displayName || 'Anonymous'}</span>
-                            <small>{user.specialty || 'No specialty'}</small>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                    {searchResults.cases.length === 0 && searchResults.users.length === 0 && (
-                      <div className={styles.noResults}>
-                        No results found for "{searchQuery}"
-                        <div style={{ marginTop: '1rem' }}>
-                          <p>Suggestions:</p>
-                          <ul>
-                            <li>
-                              <Link 
-                                href="/cases" 
-                                onClick={() => {
-                                  handleNavigationClick('browse_all_cases_fallback');
-                                  toggleSearchModal();
-                                }}
-                              >
-                                Browse all cases
-                              </Link>
-                            </li>
-                            <li>
-                              <Link 
-                                href="/cases?specialty=Cardiology" 
-                                onClick={() => {
-                                  handleNavigationClick('browse_cardiology_fallback');
-                                  toggleSearchModal();
-                                }}
-                              >
-                                Explore Cardiology cases
-                              </Link>
-                            </li>
-                            <li>
-                              <Link 
-                                href="/cases?specialty=Pediatrics" 
-                                onClick={() => {
-                                  handleNavigationClick('browse_pediatrics_fallback');
-                                  toggleSearchModal();
-                                }}
-                              >
-                                Explore Pediatrics cases
-                              </Link>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.aside
-            ref={sidebarRef}
-            className={styles.sidebar}
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <div className={styles.sidebarHeader}>
-              {user && (
-                <div className={styles.userInfo}>
-                  <Image
-                    src={user.photoURL || '/images/doctor-avatar.jpeg'}
-                    alt="User profile"
-                    width={48}
-                    height={48}
-                    className={styles.sidebarAvatar}
-                  />
-                  <span className={styles.userName}>{user.displayName || 'User'}</span>
-                </div>
-              )}
-            </div>
-            <nav className={styles.sidebarNav}>
-              <Link 
-                href="/" 
-                onClick={() => {
-                  handleNavigationClick('home');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <Home size={20} className={styles.navIcon} />
-                Home
-              </Link>
-              <Link 
-                href="/cases" 
-                onClick={() => {
-                  handleNavigationClick('cases');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <Briefcase size={20} className={styles.navIcon} />
-                Cases
-              </Link>
-              {user && (
-                <Link 
-                  href="/cases/new" 
-                  onClick={() => {
-                    handleNavigationClick('add_case');
-                    toggleSidebar();
-                  }} 
-                  className={styles.navLink}
-                >
-                  <PlusCircle size={20} className={styles.navIcon} />
-                  Add Case
-                </Link>
-              )}
-              {user && (
-                <Link 
-                  href="/profile/cases" 
-                  onClick={() => {
-                    handleNavigationClick('my_cases');
-                    toggleSidebar();
-                  }} 
-                  className={styles.navLink}
-                >
-                  <Briefcase size={20} className={styles.navIcon} />
-                  My Cases
-                </Link>
-              )}
-              {user && (
-                <Link 
-                  href="/profile" 
-                  onClick={() => {
-                    handleNavigationClick('profile');
-                    toggleSidebar();
-                  }} 
-                  className={styles.navLink}
-                >
-                  <User size={20} className={styles.navIcon} />
-                  Profile
-                </Link>
-              )}
-              {user && (
-                <Link 
-                  href="/inbox" 
-                  onClick={() => {
-                    handleNavigationClick('inbox');
-                    toggleSidebar();
-                  }} 
-                  className={styles.navLink}
-                >
-                  <Inbox size={20} className={styles.navIcon} />
-                  Inbox
-                </Link>
-              )}
-              <Link 
-                href="/about" 
-                onClick={() => {
-                  handleNavigationClick('about');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <Info size={20} className={styles.navIcon} />
-                About
-              </Link>
-              <Link 
-                href="/how-it-works" 
-                onClick={() => {
-                  handleNavigationClick('how_it_works');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <BookOpen size={20} className={styles.navIcon} />
-                How It Works
-              </Link>
-              
-              <Link 
-                href="/privacy" 
-                onClick={() => {
-                  handleNavigationClick('privacy');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <Shield size={20} className={styles.navIcon} />
-                Privacy
-              </Link>
-                            <Link 
-                href="/apps" 
-                onClick={() => {
-                  handleNavigationClick('apps');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <Grid size={20} className={styles.navIcon} />
-                Other Apps
-              </Link>
-                            <Link 
-                href="/support" 
-                onClick={() => {
-                  handleNavigationClick('support');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <Heart size={20} className={styles.navIcon} />
-                Support This Project
-              </Link>
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className={`${styles.navLink} ${styles.logoutButton}`}
-                  disabled={loading}
-                >
-                  <LogOut size={20} className={styles.navIcon} />
-                  Logout
-                </button>
-              ) : (
-                <Link 
-                  href="/auth" 
-                  onClick={() => {
-                    handleNavigationClick('login');
-                    toggleSidebar();
-                  }} 
-                  className={styles.navLink}
-                >
-                  <LogIn size={20} className={styles.navIcon} />
-                  Log In / Sign Up
-                </Link>
-              )}
-            </nav>
-            <AnimatePresence>
-              {logoutError && (
-                <motion.div
-                  className={styles.error}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span>{logoutError}</span>
-                  <button
-                    onClick={clearError}
-                    className={styles.closeError}
-                    aria-label="Dismiss error"
-                  >
-                    <X size={16} />
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.aside>
-        )}
-      </AnimatePresence>
+      <SearchModal
+        isOpen={isSearchModalOpen}
+        toggleModal={toggleSearchModal}
+        handleNavigationClick={handleNavigationClick}
+      />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        user={user}
+        loading={loading}
+        handleNavigationClick={handleNavigationClick}
+        handleLogout={handleLogout}
+        logoutError={logoutError}
+        clearError={clearError}
+      />
     </header>
   );
 }
