@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useState, useEffect, useMemo } from 'react';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getCaseStatistics } from '../../firebase/firestore';
 import { trackEngagement, trackEvent } from '../../utils/analytics';
-import styles from './StatsSection.module.css';
 import Link from 'next/link';
+import styles from './StatsSection.module.css';
+
+// Register Chart.js components
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const StatsSection = () => {
   const [stats, setStats] = useState([]);
@@ -33,71 +37,120 @@ const StatsSection = () => {
   }, []);
 
   const barColors = [
-    'rgba(59, 130, 246, 0.6)',
-    'rgba(239, 68, 68, 0.6)',
-    'rgba(34, 197, 94, 0.6)',
-    'rgba(249, 115, 22, 0.6)',
-    'rgba(168, 85, 247, 0.6)',
+    'rgba(59, 130, 246, 0.6)', // Blue
+    'rgba(239, 68, 68, 0.6)', // Red
+    'rgba(34, 197, 94, 0.6)', // Green
+    'rgba(249, 115, 22, 0.6)', // Orange
+    'rgba(168, 85, 247, 0.6)', // Purple
   ];
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload?.length) {
-      trackEngagement('tooltip_view', 'stats', `${payload[0].payload.specialty}_${payload[0].value}_specialty`);
-      return (
-        <div
-          style={{
-            backgroundColor: 'var(--tooltip-background, rgba(0, 0, 0, 0.8))',
-            border: '1px solid var(--border, #e5e7eb)',
-            padding: '8px',
-            borderRadius: '4px',
-          }}
-        >
-          <p
-            style={{
-              color: 'var(--tooltip-text, #ffffff)',
-              margin: 0,
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '12px',
-            }}
-          >{`${payload[0].payload.specialty}: ${payload[0].value} cases`}</p>
-        </div>
-      );
-    }
-    return null;
+  // Memoize chart data to optimize performance
+  const chartData = useMemo(() => ({
+    labels: stats.map(s => s.specialty.length > 15 ? `${s.specialty.substring(0, 12)}...` : s.specialty),
+    datasets: [{
+      label: 'Number of Cases',
+      data: stats.map(s => s.count),
+      backgroundColor: stats.map((_, i) => {
+        const ctx = document.createElement('canvas').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+        gradient.addColorStop(0, barColors[i % barColors.length].replace('0.6', '0.8'));
+        gradient.addColorStop(1, barColors[i % barColors.length].replace('0.6', '0.2'));
+        return gradient;
+      }),
+      borderColor: barColors.map(c => c.replace('0.6', '1')),
+      borderWidth: 1,
+      hoverBackgroundColor: barColors.map(c => c.replace('0.6', '0.8')),
+    }],
+  }), [stats]);
+
+  const chartOptions = {
+    animation: {
+      duration: 1500,
+      easing: 'easeOutBounce',
+      onComplete: () => trackEngagement('animation_complete', 'stats'),
+    },
+    plugins: {
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleFont: { family: 'Inter, sans-serif', size: 12 },
+        bodyFont: { family: 'Inter, sans-serif', size: 12 },
+        callbacks: {
+          label: (context) => {
+            trackEngagement('tooltip_view', 'stats', `${context.label}_${context.raw}_specialty`);
+            return `${context.label}: ${context.raw} cases`;
+          },
+        },
+      },
+      legend: { display: false },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Specialty',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
+          color: 'var(--text, #1f2937)',
+        },
+        ticks: {
+          font: { family: 'Inter, sans-serif', size: 12 },
+          color: 'var(--text, #1f2937)',
+          maxRotation: 45,
+          minRotation: 45,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Number of Cases',
+          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
+          color: 'var(--text, #1f2937)',
+        },
+        ticks: {
+          font: { family: 'Inter, sans-serif', size: 12 },
+          color: 'var(--text, #1f2937)',
+          stepSize: 1,
+        },
+      },
+    },
+    onClick: (event, elements) => {
+      if (elements.length) {
+        const index = elements[0].index;
+        const data = stats[index];
+        trackEngagement('click', 'stats', `${data.specialty}_${data.count}_specialty`);
+      }
+    },
+    onHover: (event, elements) => {
+      if (elements.length) {
+        const index = elements[0].index;
+        const data = stats[index];
+        trackEngagement('hover', 'stats', data.specialty);
+      }
+    },
+    maintainAspectRatio: false,
   };
 
-  const handleBarClick = (data) => {
-    if (data) {
-      trackEngagement('click', 'stats', `${data.specialty}_${data.count}_specialty`);
-    }
-  };
-
-  const handleMouseEnter = (data) => {
-    if (data) {
-      trackEngagement('hover', 'stats', data.specialty);
-    }
-  };
-
-  if (loading)
+  if (loading) {
     return (
       <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
         <section className={styles.statsSection}>
           <Skeleton height={30} width={200} />
           <div className={styles.statsContainer}>
             <div className={styles.chartWrapper}>
-              <Skeleton height={350} /> {/* Updated height to match chartWrapper */}
+              <Skeleton height={350} />
             </div>
           </div>
         </section>
       </SkeletonTheme>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <section className={styles.errorSection} role="alert">
         <p className={styles.errorText}>{error}</p>
       </section>
     );
+  }
 
   return (
     <section className={styles.statsSection} aria-labelledby="stats-title">
@@ -107,74 +160,8 @@ const StatsSection = () => {
       {stats.length > 0 ? (
         <div className={styles.statsContainer}>
           <div className={styles.chartWrapper}>
-            <ResponsiveContainer width="100%" height={350}> {/* Increased height */}
-              <BarChart
-                data={stats}
-                margin={{ top: 20, right: 30, left: 20, bottom: 100 }} // Increased bottom margin for labels
-              >
-                <XAxis
-                  dataKey="specialty"
-                  angle={-45}
-                  textAnchor="end"
-                  interval={0}
-                  height={100} // Increased height for XAxis to accommodate labels
-                  tick={{
-                    fill: 'var(--text, #1f2937)',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: 12,
-                    width: 100,
-                    dy: 10,
-                  }}
-                  tickFormatter={(value) => (value.length > 15 ? `${value.substring(0, 12)}...` : value)}
-                  label={{
-                    value: 'Specialty',
-                    position: 'bottom',
-                    offset: 40, // Adjusted offset for better label placement
-                    fill: 'var(--text, #1f2937)',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: 12,
-                    fontWeight: 600,
-                  }}
-                />
-                <YAxis
-                  dataKey="count"
-                  allowDecimals={false}
-                  tick={{ fill: 'var(--text, #1f2937)', fontFamily: 'Inter, sans-serif', fontSize: 12 }}
-                  label={{
-                    value: 'Number of Cases',
-                    angle: -90,
-                    position: 'insideLeft',
-                    offset: -10, // Adjusted for better visibility
-                    fill: 'var(--text, #1f2937)',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: 12,
-                    fontWeight: 600,
-                  }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" name="Number of Cases" onClick={handleBarClick} onMouseEnter={handleMouseEnter}>
-                  {stats.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={barColors[index % barColors.length]}
-                      fillOpacity={0.6}
-                      stroke={barColors[index % barColors.length].replace('0.6', '1')}
-                      strokeWidth={1}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <div
-              style={{
-                textAlign: 'center',
-                marginTop: '8px',
-                color: 'var(--text, #1f2937)',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-                fontWeight: 600,
-              }}
-            >
+            <Bar data={chartData} options={chartOptions} />
+            <div className={styles.chartCaption}>
               Top Specialties by Case Count
             </div>
           </div>
