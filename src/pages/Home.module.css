@@ -131,17 +131,11 @@
   min-height: calc(100vh - 60px);
 }
 
-.featuredSection,
 .trendingSection,
 .recentSection,
 .specialtySection,
 .leaderboardSection {
   padding: 1.5rem 0;
-}
-
-.featuredCard {
-  max-width: 600px;
-  margin: 0 auto;
 }
 
 .caseList {
@@ -243,7 +237,6 @@
     font-size: 0.75rem;
   }
 
-  .featuredSection,
   .trendingSection,
   .recentSection,
   .specialtySection,
