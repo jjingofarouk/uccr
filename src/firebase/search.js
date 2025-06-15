@@ -1,52 +1,40 @@
-import { collection, getDocs } from 'firebase/firestore';
+// searchCasesAndUsers.js
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from './config';
 
 export const searchCasesAndUsers = async (searchTerm) => {
   try {
     const term = searchTerm.toLowerCase().trim();
+    if (term.length < 2) return { cases: [], users: [] };
+
     const results = { cases: [], users: [] };
 
-    const casesRef = collection(db, 'cases');
-    const casesSnapshot = await getDocs(casesRef);
-    const casePromises = casesSnapshot.docs.map(async (doc) => {
-      const data = doc.data();
-      const matches =
-        (data.title?.toLowerCase().includes(term) ||
-         data.specialty?.toLowerCase().includes(term) ||
-         data.presentingComplaint?.toLowerCase().includes(term) ||
-         data.highLevelSummary?.toLowerCase().includes(term));
-      if (matches) {
-        return {
-          id: doc.id,
-          title: data.title || 'Untitled Case',
-          specialty: data.specialty || 'No specialty',
-          userId: data.userId,
-          createdAt: data.createdAt?.toDate?.() || new Date(),
-        };
-      }
-      return null;
-    });
-    results.cases = (await Promise.all(casePromises)).filter((c) => c !== null);
+    // Search cases
+    const casesQuery = query(
+      collection(db, 'cases'),
+      where('searchKeywords', 'array-contains', term)
+    );
+    const casesSnapshot = await getDocs(casesQuery);
+    results.cases = casesSnapshot.docs.map(doc => ({
+      id: doc.id,
+      title: doc.data().title || 'Untitled Case',
+      specialty: doc.data().specialty || 'No specialty',
+      userId: doc.data().userId,
+      createdAt: doc.data().createdAt?.toDate?.() || new Date(),
+    }));
 
-    const usersRef = collection(db, 'profiles');
-    const usersSnapshot = await getDocs(usersRef);
-    const userPromises = usersSnapshot.docs.map(async (doc) => {
-      const data = doc.data();
-      const matches =
-        (data.displayName?.toLowerCase().includes(term) ||
-         data.specialty?.toLowerCase().includes(term) ||
-         data.email?.toLowerCase().includes(term));
-      if (matches) {
-        return {
-          uid: doc.id,
-          displayName: data.displayName || 'Anonymous',
-          specialty: data.specialty || 'No specialty',
-          photoURL: data.photoURL || '/images/doctor-avatar.jpeg',
-        };
-      }
-      return null;
-    });
-    results.users = (await Promise.all(userPromises)).filter((u) => u !== null);
+    // Search users
+    const usersQuery = query(
+      collection(db, 'profiles'),
+      where('searchKeywords', 'array-contains', term)
+    );
+    const usersSnapshot = await getDocs(usersQuery);
+    results.users = usersSnapshot.docs.map(doc => ({
+      uid: doc.id,
+      displayName: doc.data().displayName || 'Anonymous',
+      specialty: doc.data().specialty || 'No specialty',
+      photoURL: doc.data().photoURL || '/images/doctor-avatar.jpeg',
+    }));
 
     console.log('Search term:', term, 'Results:', results);
     return results;
