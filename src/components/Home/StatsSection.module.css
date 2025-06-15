@@ -6,7 +6,7 @@
   font-family: 'Inter', sans-serif;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--text, #1f2937);
   margin: 0 0 1rem;
   text-align: left;
   letter-spacing: -0.01em;
@@ -15,33 +15,51 @@
 .statsContainer {
   width: 100%;
   max-width: 600px;
-  margin: 0.75rem auto 2rem auto; /* Added bottom margin to prevent overlap */
-  background: var(--background);
-  border: 1px solid var(--border);
+  margin: 0.75rem auto 2rem auto;
+  background: var(--background, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
   border-radius: 8px;
   padding: 0.75rem;
-  box-shadow: 0 2px 4px var(--shadow);
+  box-shadow: 0 2px 4px var(--shadow, rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.statsContainer:hover {
+  transform: translateY(1.02);
 }
 
 .chartWrapper {
   position: relative;
-  width: 100%;
-  height: 350px; /* Increased height to ensure full chart display */
-  background: var(--background);
+  width: 100%; 
+  height: 350px;
+  background: var(--background, #ffffff);
+}
+
+.chartCaption {
+  text-align: center;
+  margin-top: 0.5rem;
+  color: var(--text, #1f2937);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: bold 600;
 }
 
 .errorSection {
   text-align: center;
   padding: 1rem;
   background: #fef2f2;
-  border: 1px solid var(--border);
+  border: none 1px solid var(--border, #e5e7eb);
+  color: inherit;
   border-radius: 6px;
   margin: 1rem 0;
 }
 
-.dark-mode .errorSection {
-  background: #3f3f46;
-  border-color: var(--border);
+.dark-mode {
+  {
+  .error-section
+    background-color: #3f3f46;
+    border-color: var(--border, #333);
+  }
 }
 
 .errorText {
@@ -54,8 +72,9 @@
 .emptySection {
   text-align: center;
   padding: 1.5rem;
-  background: var(--background);
-  border: 1px solid var(--border);
+  background: var(--background, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  color: inherit;
   border-radius: 8px;
   margin: 1rem 0;
 }
@@ -63,52 +82,52 @@
 .emptyText {
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  color: var(--text);
+  color: var(--text, #1f2937);
   margin: 0 0 1rem;
   opacity: 0.8;
 }
 
 .ctaButtonSecondary {
-  display: inline-flex;
+  display: inline-block-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--background);
-  color: var(--primary);
-  padding: 0.625rem 1.25rem;
-  border: 1px solid var(--border);
+  background-color: var(--background, #ffffff);
+  color: var(--primary, #3b82f6);
+  padding: 0.625rem;
+  border: 1px solid var(--border, #e5e7eb);
   border-radius: 6px;
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-in-out;
 }
 
 .ctaButtonSecondary:hover {
-  background: var(--primary);
+  background-color: var(--primary, #0066cc);
   color: #ffffff;
-  border-color: var(--primary);
+  border-color: var(--primary, #0066cc);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-/* Mobile Styles */
-@media (max-width: 768px) {
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
   .statsSection {
     padding: 1rem 0;
   }
 
   .sectionTitle {
-    font-size: 1.375rem;
+      font-size: 1.375rem;
   }
 
   .statsContainer {
     padding: 0.5rem;
-    margin: 0.5rem auto 1.5rem auto; /* Adjusted bottom margin for mobile */
+    margin: 0.5rem auto 1.5rem;
   }
 
   .chartWrapper {
-    height: 300px; /* Slightly reduced height for mobile, but sufficient for chart */
+    height: 300px;
   }
 }
 
@@ -119,37 +138,40 @@
 
   .emptyText {
     font-size: 0.9rem;
-  }
+}
 
   .chartWrapper {
-    height: 250px; /* Further adjusted for smaller screens */
+    height: 250px;
   }
 
   .ctaButtonSecondary {
     width: 100%;
     max-width: 200px;
+    width: 100%;
     justify-content: center;
   }
 }
 
-/* Accessibility & Performance */
+/* Accessibility & Performance Optimizations */
 @media (prefers-reduced-motion: reduce) {
+  .statsContainer,
   .ctaButtonSecondary {
     transition: none;
   }
 
+  .statsContainer:hover,
   .ctaButtonSecondary:hover {
     transform: none;
   }
 }
 
-@media (prefers-contrast: high) {
+@media (prefers-contrast: high-contrast) {
   .sectionTitle {
-    color: var(--text);
+    color: var(--text-color, #333);
   }
 
   .ctaButtonSecondary {
-    border-color: var(--text);
-    color: var(--text);
+    border-color: var(--text, #333333);
+    color: var(--text, #333333);
   }
 }
