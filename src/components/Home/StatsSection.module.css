@@ -77,6 +77,32 @@
   opacity: 0.8;
 }
 
+.dark-mode .errorText {
+  color: #f87171; /* Lighter red for dark mode */
+}
+
+.dark-mode .emptyText {
+  color: var(--text, #f9fafb);
+}
+
+.dark-mode .footerText {
+  color: var(--text, #f9fafb);
+}
+
+.dark-mode .footerSubtext {
+  color: var(--muted-foreground, #9ca3af);
+}
+
+.dark-mode .ctaButton {
+  background: var(--background, #1f2937);
+  border-color: var(--border, #374151);
+}
+
+.dark-mode .ctaButton:hover {
+  background: var(--primary, #3b82f6);
+  border-color: var(--primary, #3b82f6);
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
   .statsSection {
@@ -119,9 +145,21 @@
     color: var(--text, #000000);
   }
 
+  .dark-mode .errorText,
+  .dark-mode .emptyText,
+  .dark-mode .footerText,
+  .dark-mode .footerSubtext {
+    color: var(--text, #ffffff);
+  }
+
   .ctaButton {
     border-color: var(--text, #000000);
     color: var(--text, #000000);
+  }
+
+  .dark-mode .ctaButton {
+    border-color: var(--text, #ffffff);
+    color: var(--text, #ffffff);
   }
 
   .ctaButton:hover {
