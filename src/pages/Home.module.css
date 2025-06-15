@@ -60,10 +60,6 @@
   min-height: calc(100vh - 60px);
 }
 
-.specialtySection {
-  padding: 1.5rem 0;
-}
-
 .loadMoreContainer {
   display: flex;
   justify-content: center;
@@ -84,10 +80,6 @@
 
   .statItem {
     font-size: 0.75rem;
-  }
-
-  .specialtySection {
-    padding: 1rem 0;
   }
 }
 
