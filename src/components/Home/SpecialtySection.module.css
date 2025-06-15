@@ -1,0 +1,114 @@
+.specialtySection {
+  padding: 1.5rem 0;
+}
+
+.sectionTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 1rem;
+  text-align: left;
+  letter-spacing: -0.01em;
+}
+
+.caseList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.emptySection {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.emptyText {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: var(--text);
+  margin: 0 0 1rem;
+  opacity: 0.8;
+}
+
+.ctaButtonSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--background);
+  color: var(--primary);
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.ctaButtonSecondary:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .specialtySection {
+    padding: 1rem 0;
+  }
+
+  .sectionTitle {
+    font-size: 1.375rem;
+  }
+
+  .caseList {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionTitle {
+    font-size: 1.25rem;
+  }
+
+  .emptyText {
+    font-size: 0.9rem;
+  }
+
+  .ctaButtonSecondary {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+  }
+}
+
+/* Accessibility & Performance */
+@media (prefers-reduced-motion: reduce) {
+  .ctaButtonSecondary {
+    transition: none;
+  }
+
+  .ctaButtonSecondary:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .sectionTitle {
+    color: var(--text);
+  }
+
+  .ctaButtonSecondary {
+    border-color: var(--text);
+    color: var(--text);
+  }
+}
