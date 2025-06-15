@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import CaseCard from '../Case/CaseCard';
 import { trackClick, trackEngagement } from '../../utils/analytics';
-import styles from '../../pages/Home.module.css';
+import styles from './FeaturedSection.module.css';
 
 const FeaturedSection = ({ caseOfTheDay }) => (
   <section className={styles.featuredSection} aria-labelledby="featured-title">
