@@ -1,4 +1,3 @@
-// Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -92,15 +91,21 @@ export default function Navbar() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       const clickedElement = event.target;
-      const isOutsideSidebar = sidebarRef.current && !sidebarRef.current.contains(clickedElement);
-      const isOutsideNotifications = notificationsRef.current && !notificationsRef.current.contains(clickedElement);
-      const isOutsideUserAvatar = userAvatarRef.current && !userAvatarRef.current.contains(clickedElement);
-      
-      if (isOutsideSidebar && isOutsideNotifications && isOutsideUserAvatar) {
+
+      // Close sidebar if click is outside sidebarRef
+      if (isSidebarOpen && sidebarRef.current && !sidebarRef.current.contains(clickedElement)) {
         setIsSidebarOpen(false);
-        setIsNotificationsOpen(false);
-        setIsSearchModalOpen(false);
         setLogoutError('');
+      }
+
+      // Close notifications if click is outside notificationsRef
+      if (isNotificationsOpen && notificationsRef.current && !notificationsRef.current.contains(clickedElement)) {
+        setIsNotificationsOpen(false);
+      }
+
+      // Close search modal if click is outside searchModalRef
+      if (isSearchModalOpen && searchModalRef.current && !searchModalRef.current.contains(clickedElement)) {
+        setIsSearchModalOpen(false);
       }
     };
 
@@ -122,7 +127,7 @@ export default function Navbar() {
       document.removeEventListener('touchstart', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, []);
+  }, [isSidebarOpen, isNotificationsOpen, isSearchModalOpen]);
 
   return (
     <header className={styles.header}>
