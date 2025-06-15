@@ -1,3 +1,6 @@
+/* navbar.module.css */
+
+/* Existing styles remain unchanged */
 .header {
   background: var(--background);
   border-bottom: 1px solid var(--border);
@@ -8,7 +11,7 @@
   right: 0;
   z-index: 1000;
   box-shadow: 0 2px 6px var(--shadow);
-  margin: 0; /* Ensure no margin */
+  margin: 0;
 }
 
 .headerContent {
@@ -374,6 +377,44 @@
   color: #b91c1c;
 }
 
+/* Added styles for previously unstyled parts */
+.searchLoading {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.noResults ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.noResults li {
+  margin-bottom: 0.5rem;
+}
+
+.noResults a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.noResults a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* Media Queries */
 @media (max-width: 768px) {
   .headerContent {
     padding: 0 0.5rem;
@@ -404,6 +445,10 @@
   .sidebarAvatar {
     width: 32px;
     height: 32px;
+  }
+
+  .noResults ul {
+    padding-left: 0.5rem;
   }
 }
 
@@ -451,13 +496,22 @@
   .menuButton {
     padding: 0.4rem;
   }
+
+  .noResults {
+    font-size: 0.85rem;
+  }
+
+  .noResults a {
+    font-size: 0.85rem;
+  }
 }
 
 @media (prefers-contrast: high) {
   .logo,
   .navLink,
   .notificationItem,
-  .searchResult {
+  .searchResult,
+  .noResults a {
     color: var(--text);
   }
 
@@ -475,6 +529,11 @@
     background: var(--text);
     color: var(--background);
   }
+
+  .noResults a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -488,7 +547,10 @@
   .searchResult,
   .sidebar,
   .notificationDropdown,
-  .searchModal {
+  .searchModal,
+  .noResults a,
+  .searchLoading {
     transition: none;
+    animation: none;
   }
 }
