@@ -85,7 +85,7 @@ const StatsSection = () => {
           <Skeleton height={30} width={200} />
           <div className={styles.statsContainer}>
             <div className={styles.chartWrapper}>
-              <Skeleton height={300} />
+              <Skeleton height={350} /> {/* Updated height to match chartWrapper */}
             </div>
           </div>
         </section>
@@ -107,14 +107,17 @@ const StatsSection = () => {
       {stats.length > 0 ? (
         <div className={styles.statsContainer}>
           <div className={styles.chartWrapper}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+            <ResponsiveContainer width="100%" height={350}> {/* Increased height */}
+              <BarChart
+                data={stats}
+                margin={{ top: 20, right: 30, left: 20, bottom: 100 }} // Increased bottom margin for labels
+              >
                 <XAxis
                   dataKey="specialty"
                   angle={-45}
                   textAnchor="end"
                   interval={0}
-                  height={80}
+                  height={100} // Increased height for XAxis to accommodate labels
                   tick={{
                     fill: 'var(--text, #1f2937)',
                     fontFamily: 'Inter, sans-serif',
@@ -126,6 +129,7 @@ const StatsSection = () => {
                   label={{
                     value: 'Specialty',
                     position: 'bottom',
+                    offset: 40, // Adjusted offset for better label placement
                     fill: 'var(--text, #1f2937)',
                     fontFamily: 'Inter, sans-serif',
                     fontSize: 12,
@@ -140,6 +144,7 @@ const StatsSection = () => {
                     value: 'Number of Cases',
                     angle: -90,
                     position: 'insideLeft',
+                    offset: -10, // Adjusted for better visibility
                     fill: 'var(--text, #1f2937)',
                     fontFamily: 'Inter, sans-serif',
                     fontSize: 12,
