@@ -7,13 +7,13 @@ const SupportUs = () => {
   const reasons = [
     {
       icon: <Coffee size={40} />,
-      title: 'Buy Us a Coffee',
-      description: 'Help us keep the platform running by supporting us with a coffee.',
+      title: 'Support Our Mission',
+      description: 'Your contribution fuels our mission to connect healthcare professionals.',
     },
     {
       icon: <Heart size={40} />,
-      title: 'Support Our Mission',
-      description: 'Your contribution fuels our mission to connect healthcare professionals.',
+      title: 'Improve Healthcare Access',
+      description: 'Your support helps us enhance healthcare access and education across Africa.',
     },
     {
       icon: <Smile size={40} />,
@@ -34,12 +34,12 @@ const SupportUs = () => {
         <Button
           variant="contained"
           color="primary"
-          href="https://www.buymeacoffee.com/yourpage" // Replace with your actual link
+          href="https://chipper.cash/@jf12" // Replace with your actual Chipper Cash tag link
           target="_blank"
           rel="noopener noreferrer"
-          style={{ backgroundColor: '#FFDD00', color: '#000', fontWeight: 'bold' }}
+          style={{ backgroundColor: '#00B386', color: '#fff', fontWeight: 'bold' }}
         >
-          Buy Me a Coffee
+          Support via Chipper Cash
         </Button>
       </div>
       <div>
