@@ -1,34 +1,61 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import { getCaseStatistics } from '../../firebase/firestore';
-import { trackEngagement, trackEvent } from '../../utils/analytics';
-import Link from 'next/link';
-import styles from './StatsSection.module.css';
+"use client";
 
-// Register Chart.js components
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+import { useState, useEffect } from "react";
+import { TrendingUp } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/Card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/Chart";
+import { getCaseStatistics } from "../../firebase/firestore";
+import { trackEngagement, trackEvent } from "../../utils/analytics";
+import Link from "next/link";
+import styles from "./StatsSection.module.css";
 
 const StatsSection = () => {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        trackEngagement('load_start', 'stats');
+        trackEngagement("load_start", "stats");
         const data = await getCaseStatistics();
-        setStats(data.slice(0, 5));
-        trackEngagement('load_success', 'stats', `${data.length}_specialties`);
-        data.slice(0, 5).forEach((stat, index) => {
-          trackEvent('specialty_title', 'stats', `${stat.specialty}_rank_${index + 1}`, stat.count);
+        const top5 = data.slice(0, 5).map((item, index) => ({
+          ...item,
+          fill: [
+            "rgba(59, 130, 246, 0.6)", // Blue
+            "rgba(239, 68, 68, 0.6)", // Red
+            "rgba(34, 197, 94, 0.6)", // Green
+            "rgba(249, 115, 22, 0.6)", // Orange
+            "rgba(168, 85, 247, 0.6)", // Purple
+          ][index % 5],
+        }));
+        setStats(top5);
+        trackEngagement("load_success", "stats", `${data.length}_specialties`);
+        top5.forEach((stat, index) => {
+          trackEvent(
+            "specialty_title",
+            "stats",
+            `${stat.specialty}_rank_${index + 1}`,
+            stat.count
+          );
         });
       } catch (err) {
-        setError('Unable to load case statistics');
-        trackEngagement('load_error', 'stats', err.message);
+        setError("Unable to load case statistics");
+        trackEngagement("load_error", "stats", err.message);
       } finally {
         setLoading(false);
       }
@@ -36,147 +63,139 @@ const StatsSection = () => {
     fetchStats();
   }, []);
 
-  const barColors = [
-    'rgba(59, 130, 246, 0.6)', // Blue
-    'rgba(239, 68, 68, 0.6)', // Red
-    'rgba(34, 197, 94, 0.6)', // Green
-    'rgba(249, 115, 22, 0.6)', // Orange
-    'rgba(168, 85, 247, 0.6)', // Purple
-  ];
+  const handleBarClick = (data) => {
+    if (data?.activePayload?.[0]?.payload) {
+      const payload = data.activePayload[0].payload;
+      trackEngagement(
+        "click",
+        "stats",
+        `${payload.specialty}_${payload.count}_specialty`
+      );
+    }
+  };
 
-  // Memoize chart data to optimize performance
-  const chartData = useMemo(() => ({
-    labels: stats.map(s => s.specialty.length > 15 ? `${s.specialty.substring(0, 12)}...` : s.specialty),
-    datasets: [{
-      label: 'Number of Cases',
-      data: stats.map(s => s.count),
-      backgroundColor: stats.map((_, i) => {
-        const ctx = document.createElement('canvas').getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 350);
-        gradient.addColorStop(0, barColors[i % barColors.length].replace('0.6', '0.8'));
-        gradient.addColorStop(1, barColors[i % barColors.length].replace('0.6', '0.2'));
-        return gradient;
-      }),
-      borderColor: barColors.map(c => c.replace('0.6', '1')),
-      borderWidth: 1,
-      hoverBackgroundColor: barColors.map(c => c.replace('0.6', '0.8')),
-    }],
-  }), [stats]);
-
-  const chartOptions = {
-    animation: {
-      duration: 1500,
-      easing: 'easeOutBounce',
-      onComplete: () => trackEngagement('animation_complete', 'stats'),
-    },
-    plugins: {
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleFont: { family: 'Inter, sans-serif', size: 12 },
-        bodyFont: { family: 'Inter, sans-serif', size: 12 },
-        callbacks: {
-          label: (context) => {
-            trackEngagement('tooltip_view', 'stats', `${context.label}_${context.raw}_specialty`);
-            return `${context.label}: ${context.raw} cases`;
-          },
-        },
-      },
-      legend: { display: false },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Specialty',
-          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
-          color: 'var(--text, #1f2937)',
-        },
-        ticks: {
-          font: { family: 'Inter, sans-serif', size: 12 },
-          color: 'var(--text, #1f2937)',
-          maxRotation: 45,
-          minRotation: 45,
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Number of Cases',
-          font: { family: 'Inter, sans-serif', size: 12, weight: '600' },
-          color: 'var(--text, #1f2937)',
-        },
-        ticks: {
-          font: { family: 'Inter, sans-serif', size: 12 },
-          color: 'var(--text, #1f2937)',
-          stepSize: 1,
-        },
-      },
-    },
-    onClick: (event, elements) => {
-      if (elements.length) {
-        const index = elements[0].index;
-        const data = stats[index];
-        trackEngagement('click', 'stats', `${data.specialty}_${data.count}_specialty`);
-      }
-    },
-    onHover: (event, elements) => {
-      if (elements.length) {
-        const index = elements[0].index;
-        const data = stats[index];
-        trackEngagement('hover', 'stats', data.specialty);
-      }
-    },
-    maintainAspectRatio: false,
+  const handleMouseEnter = (data) => {
+    if (data?.activePayload?.[0]?.payload) {
+      const payload = data.activePayload[0].payload;
+      trackEngagement("hover", "stats", payload.specialty);
+    }
   };
 
   if (loading) {
     return (
       <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
-        <section className={styles.statsSection}>
-          <Skeleton height={30} width={200} />
-          <div className={styles.statsContainer}>
-            <div className={styles.chartWrapper}>
-              <Skeleton height={350} />
-            </div>
-          </div>
-        </section>
+        <Card>
+          <CardHeader>
+            <Skeleton height={24} width={150} />
+            <Skeleton height={16} width={100} />
+          </CardHeader>
+          <CardContent>
+            <Skeleton height={350} />
+          </CardContent>
+        </Card>
       </SkeletonTheme>
     );
   }
 
   if (error) {
     return (
-      <section className={styles.errorSection} role="alert">
-        <p className={styles.errorText}>{error}</p>
-      </section>
+      <Card className={styles.errorCard}>
+        <CardContent className={styles.errorContent}>
+          <p className={styles.errorText}>{error}</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <section className={styles.statsSection} aria-labelledby="stats-title">
-      <h2 id="stats-title" className={styles.sectionTitle}>
-        Case Statistics
-      </h2>
+    <section aria-labelledby="stats-title" className={styles.statsSection}>
       {stats.length > 0 ? (
-        <div className={styles.statsContainer}>
-          <div className={styles.chartWrapper}>
-            <Bar data={chartData} options={chartOptions} />
-            <div className={styles.chartCaption}>
-              Top Specialties by Case Count
+        <Card>
+          <CardHeader>
+            <CardTitle id="stats-title">Case Statistics</CardTitle>
+            <CardDescription>Top 5 Specialties by Case Count</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer>
+              <BarChart
+                accessibilityLayer
+                data={stats}
+                margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                onClick={handleBarClick}
+                onMouseMove={handleMouseEnter}
+              >
+                <CartesianGrid vertical={false} stroke="var(--border, #e5e7eb)" />
+                <XAxis
+                  dataKey="specialty"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tick={{
+                    fill: "var(--text, #1f2937)",
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: 12,
+                  }}
+                  tickFormatter={(value) =>
+                    value.length > 15 ? `${value.slice(0, 12)}...` : value
+                  }
+                  angle={-45}
+                  textAnchor="end"
+                  height={100}
+                />
+                <YAxis
+                  dataKey="count"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  allowDecimals={false}
+                  tick={{
+                    fill: "var(--text, #1f2937)",
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: 12,
+                  }}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, name, props) =>
+                        `${props.payload.specialty}: ${value} cases`
+                      }
+                    />
+                  }
+                />
+                <Bar dataKey="count" radius={8}>
+                  {stats.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+          <CardFooter>
+            <div className={styles.footerText}>
+              Top specialties by case volume <TrendingUp className={styles.footerIcon} />
             </div>
-          </div>
-        </div>
+            <div className={styles.footerSubtext}>
+              Showing the top 5 specialties with the most cases
+            </div>
+          </CardFooter>
+        </Card>
       ) : (
-        <div className={styles.emptySection} aria-live="polite">
-          <p className={styles.emptyText}>No case statistics available</p>
-          <Link
-            href="/cases/new"
-            className={styles.ctaButtonSecondary}
-            onClick={() => trackEngagement('click', 'stats_empty', 'contribute_case')}
-          >
-            Contribute a Case
-          </Link>
-        </div>
+        <Card>
+          <CardContent className={styles.emptyContent}>
+            <p className={styles.emptyText}>No case statistics available</p>
+            <Link
+              href="/cases/new"
+              className={styles.ctaButton}
+              onClick={() =>
+                trackEngagement("click", "stats_empty", "contribute_case")
+              }
+            >
+              Contribute a case
+            </Link>
+          </CardContent>
+        </Card>
       )}
     </section>
   );
