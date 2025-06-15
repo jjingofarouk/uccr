@@ -36,9 +36,27 @@
   gap: 0.5rem;
 }
 
+.dark-mode .card {
+  background: var(--background, #1f2937);
+  border-color: var(--border, #374151);
+}
+
+.dark-mode .cardTitle {
+  color: var(--text, #f9fafb);
+}
+
+.dark-mode .cardDescription {
+  color: var(--muted-foreground, #9ca3af);
+}
+
 @media (prefers-contrast: high) {
   .cardTitle,
   .cardDescription {
     color: var(--text, #000000);
+  }
+
+  .dark-mode .cardTitle,
+  .dark-mode .cardDescription {
+    color: var(--text, #ffffff);
   }
 }
