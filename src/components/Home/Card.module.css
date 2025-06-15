@@ -4,6 +4,9 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px var(--shadow, rgba(0, 0, 0, 0.1));
   padding: 0;
+  overflow: hidden; /* Prevent scrollbars from leaking */
+  max-width: 600px; /* Match original design */
+  margin: 0 auto;
 }
 
 .cardHeader {
