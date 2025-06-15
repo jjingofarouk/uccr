@@ -6,132 +6,128 @@ import {
   Card,
   CardContent,
   Divider,
+  Button,
 } from '@mui/material';
+import { Heart, Smile, DollarSign } from 'lucide-react';
 import styles from '../how-it-works/works.module.css';
-import { Heart, Smile, Wallet } from 'lucide-react';
 
 const SupportUs = () => {
   const reasons = [
     {
-      icon: <Wallet size={40} />,
-      title: 'Donate with Mobile Money',
-      description: 'Send support directly through MTN Mobile Money in Uganda.',
+      icon: <Heart size={40} style={{ color: '#FF4081' }} />,
+      title: 'Fuel Our Mission',
+      description: 'Your contribution helps us maintain free tools like UCCR, empowering healthcare professionals across Africa.',
     },
     {
-      icon: <Heart size={40} />,
-      title: 'Support Our Mission',
-      description: 'Your contribution fuels our mission to connect healthcare professionals.',
-    },
-    {
-      icon: <Smile size={40} />,
-      title: 'Keep Us Motivated',
-      description: 'Every gesture of support inspires us to build more tools for impact.',
+      icon: <Smile size={40} style={{ color: '#FFD54F' }} />,
+      title: 'Inspire Innovation',
+      description: 'Every gesture of support motivates us to create more impactful solutions for healthcare professionals.',
     },
   ];
 
   return (
-    <Container maxWidth="md" className={styles.worksContainer}>
-      <Typography variant="h3" className={styles.title}>
+    <Container maxWidth="md" sx={{ padding: '2rem 1rem' }}>
+      {/* Header Section */}
+      <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem' }}>
         Support Us
       </Typography>
-
-      <Typography variant="body1" className={styles.description}>
-        Your support helps us maintain and improve this platform for healthcare professionals worldwide.
+      <Typography variant="body1" sx={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.2rem' }}>
+        Together, we can transform healthcare access and education across Africa. Your support makes a difference!
       </Typography>
 
-      {/* Support Reasons */}
-      <Box mt={4}>
+      {/* Reasons Section */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2rem' }}>
         {reasons.map((reason, index) => (
-          <Card key={index} className={styles.carouselCard}>
-            <Box className={styles.iconWrapper}>{reason.icon}</Box>
-            <CardContent>
-              <Typography variant="h5" className={styles.cardTitle}>
-                {reason.title}
-              </Typography>
-              <Typography variant="body2" className={styles.cardDescription}>
-                {reason.description}
-              </Typography>
-            </CardContent>
+          <Card key={index} sx={{ padding: '1rem', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <Box>{reason.icon}</Box>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                  {reason.title}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', marginTop: '0.5rem' }}>
+                  {reason.description}
+                </Typography>
+              </Box>
+            </Box>
           </Card>
         ))}
       </Box>
 
-      <Divider sx={{ my: 4 }} />
+      <Divider sx={{ marginY: '2rem' }} />
 
-      {/* Mobile Money Donation */}
-      <Box textAlign="center" mb={3}>
-        <Typography variant="h6" gutterBottom>
-          Support via Mobile Money (Uganda)
+      {/* Donation Methods */}
+      <Box textAlign="center" sx={{ marginBottom: '2rem' }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+          Donate via Binance (Crypto)
         </Typography>
-        <Typography variant="body2" color="textSecondary">
-          MTN MoMo Pay or direct Mobile Money to:
-        </Typography>
-        <Box
-          sx={{
-            mt: 1,
-            p: 2,
-            backgroundColor: '#f5f5f5',
-            borderRadius: 2,
-            display: 'inline-block',
-            fontWeight: 'bold',
-            fontSize: '1.1rem',
-            fontFamily: 'monospace',
-          }}
-        >
-          +256 777 421601
-        </Box>
-        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-          Name: Farouk Jjingo
-        </Typography>
-      </Box>
-
-      {/* Binance Wallet Section */}
-      <Divider sx={{ my: 4 }} />
-
-      <Box textAlign="center">
-        <Typography variant="h6" gutterBottom>
-          Donate Crypto (Binance)
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: '0.5rem' }}>
           Binance Smart Chain (BEP20)
         </Typography>
         <Box
           sx={{
-            mt: 1,
-            p: 2,
+            padding: '1rem',
             backgroundColor: '#f5f5f5',
-            borderRadius: 2,
-            wordBreak: 'break-word',
+            borderRadius: '8px',
             fontFamily: 'monospace',
             fontSize: '0.95rem',
+            wordBreak: 'break-word',
+            display: 'inline-block',
           }}
         >
           0xf29645d0e916cb04efb8996000f08e6c057e594a
         </Box>
       </Box>
 
-      {/* Chipper Cash */}
-      <Divider sx={{ my: 4 }} />
+      <Divider sx={{ marginY: '2rem' }} />
+
+      {/* Chipper Cash Section */}
       <Box textAlign="center">
-        <Typography variant="h6" gutterBottom>
-          Or Send via Chipper Cash
+        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+          Support Us Instantly via Chipper Cash
         </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Chipper Tag:
+        <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: '0.5rem' }}>
+          Chipper Cash Tag:
         </Typography>
         <Box
           sx={{
-            mt: 1,
-            p: 1,
-            backgroundColor: '#f5f5f5',
-            borderRadius: 2,
+            padding: '1rem',
+            backgroundColor: '#e0f7fa',
+            borderRadius: '8px',
             fontFamily: 'monospace',
-            display: 'inline-block',
             fontWeight: 'bold',
+            display: 'inline-block',
+            fontSize: '1.1rem',
           }}
         >
           @jf12
         </Box>
+      </Box>
+
+      {/* Call-to-Action */}
+      <Box textAlign="center" sx={{ marginTop: '3rem' }}>
+        <Typography variant="h5" sx={{ fontWeight: 'bold', marginBottom: '1rem' }}>
+          Thank You for Your Support!
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          href="https://chipper.cash/@jf12"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{
+            backgroundColor: '#00B386',
+            color: '#fff',
+            padding: '0.8rem 2rem',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            '&:hover': {
+              backgroundColor: '#007A5E',
+            },
+          }}
+        >
+          Donate Now
+        </Button>
       </Box>
     </Container>
   );
