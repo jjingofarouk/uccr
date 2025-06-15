@@ -6,7 +6,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getTopContributors } from '../../firebase/firestore';
 import { trackClick, trackEngagement } from '../../utils/analytics';
-import styles from '../../pages/Home.module.css';
+import styles from './LeaderBoardSection.module.css';
 
 const LeaderboardSection = () => {
   const [contributors, setContributors] = useState([]);
@@ -66,60 +66,4 @@ const LeaderboardSection = () => {
               key={contributor.uid}
               href={`/profile/view/${contributor.uid}`}
               className={styles.contributor}
-              onClick={() => trackClick('contributor_profile', 'leaderboard', `${contributor.displayName}_position_${index + 1}`)}
-            >
-              <Image
-                src={contributor.photoURL}
-                alt={`${contributor.displayName}'s avatar`}
-                width={40}
-                height={40}
-                className={styles.contributorAvatar}
-              />
-              <div>
-                <span>{contributor.displayName}</span>
-                <small>
-                  {contributor.caseCount} case{contributor.caseCount !== 1 ? 's' : ''} uploaded
-                </small>
-                {contributor.awards?.length > 0 && (
-                  <small className={styles.awards}>
-                    {contributor.awards.map((award, awardIndex) => (
-                      <span
-                        key={awardIndex}
-                        className={
-                          award === 'Gold'
-                            ? styles.goldAward
-                            : award === 'Silver'
-                            ? styles.silverAward
-                            : styles.bronzeAward
-                        }
-                        onClick={(e) => {
-                          e.preventDefault();
-                          trackEngagement('award_click', 'leaderboard', `${award}_${contributor.displayName}`);
-                        }}
-                      >
-                        {award} <Star size={12} />
-                      </span>
-                    ))}
-                  </small>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <div className={styles.emptySection} aria-live="polite">
-          <p className={styles.emptyText}>No contributors found</p>
-          <Link
-            href="/cases/new"
-            className={styles.ctaButtonSecondary}
-            onClick={() => trackClick('contribute_case_button', 'leaderboard_empty')}
-          >
-            Contribute a Case
-          </Link>
-        </div>
-      )}
-    </section>
-  );
-};
-
-export default LeaderboardSection;
+              onClick={() => trackClick('contributor_profile', 'leader
