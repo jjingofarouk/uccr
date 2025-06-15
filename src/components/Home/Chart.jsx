@@ -23,7 +23,7 @@ export const ChartTooltipContent = ({ active, payload, formatter }) => {
     return (
       <div className={styles.tooltip}>
         <p className={styles.tooltipText}>
-          {formatter ? formatter(data.count, 'count', data) : `${data.count} cases`}
+          {formatter ? formatter(data.count, 'count', data) : `${data.specialty}: ${data.count} cases`}
         </p>
       </div>
     );
