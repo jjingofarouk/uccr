@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { trackClick } from '../../utils/analytics';
-import styles from '../../pages/Home.module.css';
+import styles from './HeroSection.module.css';
 
 const HeroSection = () => (
   <section className={styles.hero} aria-labelledby="hero-title">
