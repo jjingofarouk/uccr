@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Cell } from "recharts";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import {
@@ -12,12 +12,12 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "./Card";
+} from "@/components/ui/Card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "./Chart";
+} from "@/components/ui/Chart";
 import { getCaseStatistics } from "../../firebase/firestore";
 import { trackEngagement, trackEvent } from "../../utils/analytics";
 import Link from "next/link";
@@ -90,7 +90,7 @@ const StatsSection = () => {
             <Skeleton height={16} width={100} />
           </CardHeader>
           <CardContent>
-            <Skeleton height={350} />
+            <Skeleton height={400} />
           </CardContent>
         </Card>
       </SkeletonTheme>
@@ -120,34 +120,32 @@ const StatsSection = () => {
               <BarChart
                 accessibilityLayer
                 data={stats}
-                margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                layout="vertical"
+                width={600}
+                height={400}
+                margin={{ top: 20, right: 30, left: 150, bottom: 20 }}
                 onClick={handleBarClick}
                 onMouseMove={handleMouseEnter}
               >
-                <CartesianGrid vertical={false} stroke="var(--border, #e5e7eb)" />
                 <XAxis
-                  dataKey="specialty"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tick={{
-                    fill: "var(--text, #1f2937)",
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: 12,
-                  }}
-                  tickFormatter={(value) =>
-                    value.length > 15 ? `${value.slice(0, 12)}...` : value
-                  }
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                />
-                <YAxis
+                  type="number"
                   dataKey="count"
                   tickLine={false}
                   tickMargin={10}
                   axisLine={false}
                   allowDecimals={false}
+                  tick={{
+                    fill: "var(--text, #1f2937)",
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: 12,
+                  }}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="specialty"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
                   tick={{
                     fill: "var(--text, #1f2937)",
                     fontFamily: "Inter, sans-serif",
@@ -164,7 +162,7 @@ const StatsSection = () => {
                     />
                   }
                 />
-                <Bar dataKey="count" radius={8}>
+                <Bar dataKey="count" radius={12}>
                   {stats.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
