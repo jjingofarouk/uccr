@@ -1,6 +1,4 @@
 /* navbar.module.css */
-
-/* Existing styles remain unchanged */
 .header {
   background: var(--background);
   border-bottom: 1px solid var(--border);
@@ -254,6 +252,28 @@
   text-align: center;
 }
 
+.noResults ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.noResults li {
+  margin-bottom: 0.5rem;
+}
+
+.noResults a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.noResults a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
 .menuButtonWrapper {
   display: flex;
   align-items: center;
@@ -377,7 +397,6 @@
   color: #b91c1c;
 }
 
-/* Added styles for previously unstyled parts */
 .searchLoading {
   padding: 1rem;
   color: var(--text-secondary);
@@ -392,29 +411,6 @@
   100% { opacity: 1; }
 }
 
-.noResults ul {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0 0;
-}
-
-.noResults li {
-  margin-bottom: 0.5rem;
-}
-
-.noResults a {
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 0.875rem;
-  transition: color 0.3s ease;
-}
-
-.noResults a:hover {
-  color: var(--primary-hover);
-  text-decoration: underline;
-}
-
-/* Media Queries */
 @media (max-width: 768px) {
   .headerContent {
     padding: 0 0.5rem;
