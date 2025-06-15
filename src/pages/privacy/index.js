@@ -264,9 +264,9 @@ const Privacy = () => {
           <br />
           Email: privacy@uccr.com
           <br />
-          Address: UCCR Privacy Office, 123 HealthTech Lane, Suite 100, Medical City, MC 12345
+          Address: Martyrs Road, Boma A, Mbarara, Uganda
           <br />
-          We aim to respond within 30 days. If unsatisfied, you may lodge a complaint with your local data protection authority.
+          We aim to respond within 7 days. If unsatisfied, you may lodge a complaint with your local data protection authority.
         </Typography>
       </Box>
     </Container>
