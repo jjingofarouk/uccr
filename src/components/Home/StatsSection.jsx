@@ -12,12 +12,12 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "./Card";
+} from "@/components/ui/Card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "./Chart";
+} from "@/components/ui/Chart";
 import { getCaseStatistics } from "../../firebase/firestore";
 import { trackEngagement, trackEvent } from "../../utils/analytics";
 import Link from "next/link";
@@ -116,59 +116,61 @@ const StatsSection = () => {
             <CardDescription>Top 5 Specialties by Case Count</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer>
-              <BarChart
-                accessibilityLayer
-                data={stats}
-                layout="vertical"
-                width={600}
-                height={400}
-                margin={{ top: 20, right: 30, left: 150, bottom: 20 }}
-                onClick={handleBarClick}
-                onMouseMove={handleMouseEnter}
-              >
-                <XAxis
-                  type="number"
-                  dataKey="count"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  allowDecimals={false}
-                  tick={{
-                    fill: "var(--text, #1f2937)",
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: 12,
-                  }}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="specialty"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tick={{
-                    fill: "var(--text, #1f2937)",
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: 12,
-                  }}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, name, props) =>
-                        `${props.payload.specialty}: ${value} cases`
-                      }
-                    />
-                  }
-                />
-                <Bar dataKey="count" radius={12}>
-                  {stats.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ChartContainer>
+            <div className={styles.scrollContainer}>
+              <ChartContainer>
+                <BarChart
+                  accessibilityLayer
+                  data={stats}
+                  layout="vertical"
+                  width={800} // Increased for full labels
+                  height={400}
+                  margin={{ top: 20, right: 30, left: 200, bottom: 20 }} // Increased left margin
+                  onClick={handleBarClick}
+                  onMouseMove={handleMouseEnter}
+                >
+                  <XAxis
+                    type="number"
+                    dataKey="count"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    allowDecimals={false}
+                    tick={{
+                      fill: "var(--text, #1f2937)",
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 12,
+                    }}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="specialty"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tick={{
+                      fill: "var(--text, #1f2937)",
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 12,
+                    }}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value, name, props) =>
+                          `${props.payload.specialty}: ${value} cases`
+                        }
+                      />
+                    }
+                  />
+                  <Bar dataKey="count" radius={12}>
+                    {stats.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </div>
           </CardContent>
           <CardFooter>
             <div className={styles.footerText}>
