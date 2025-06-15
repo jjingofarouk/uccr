@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import CaseCard from '../Case/CaseCard';
 import { trackClick, trackEngagement } from '../../utils/analytics';
-import styles from '../../pages/Home.module.css';
+import styles from './RecentSection.module.css';
 
 const RecentSection = ({ recentCases }) => (
   <section className={styles.recentSection} aria-labelledby="recent-title">
