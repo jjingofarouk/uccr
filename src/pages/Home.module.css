@@ -60,16 +60,8 @@
   min-height: calc(100vh - 60px);
 }
 
-.trendingSection,
-.recentSection,
 .specialtySection {
   padding: 1.5rem 0;
-}
-
-.caseList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
 }
 
 .loadMoreContainer {
@@ -94,15 +86,8 @@
     font-size: 0.75rem;
   }
 
-  .trendingSection,
-  .recentSection,
   .specialtySection {
     padding: 1rem 0;
-  }
-
-  .caseList {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
   }
 }
 
