@@ -162,7 +162,7 @@ const StatsSection = () => {
                     />
                   }
                 />
-                <Bar dataKey="count" radius={12}>
+                <Bar dataKey="count" radius={12} barSize={40}>
                   {stats.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
