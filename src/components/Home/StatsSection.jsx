@@ -36,10 +36,6 @@ const StatsSection = () => {
         
         const top5 = data.slice(0, 5).map((item, index) => ({
           ...item,
-          // Truncate long specialty names for mobile
-          displayName: isMobile && item.specialty?.length > 12 
-            ? `${item.specialty.substring(0, 10)}...` 
-            : item.specialty,
           fill: [
             "rgba(59, 130, 246, 0.8)", // Blue
             "rgba(239, 68, 68, 0.8)", // Red
@@ -147,27 +143,27 @@ const StatsSection = () => {
                   data={stats}
                   margin={{
                     top: 20,
-                    right: isMobile ? 10 : 30,
-                    left: isMobile ? 10 : 20,
-                    bottom: isMobile ? 80 : 100
+                    right: isMobile ? 5 : 30,
+                    left: isMobile ? 5 : 20,
+                    bottom: isMobile ? 100 : 120
                   }}
                   barCategoryGap={isMobile ? "10%" : "20%"}
                   onClick={handleBarClick}
                   onMouseMove={handleMouseEnter}
                 >
                   <XAxis
-                    dataKey={isMobile ? "displayName" : "specialty"}
+                    dataKey="specialty"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={{ stroke: "var(--border, #e5e7eb)" }}
                     tick={{
                       fill: "var(--text, #1f2937)",
                       fontFamily: "Inter, sans-serif",
-                      fontSize: isMobile ? 10 : 12,
+                      fontSize: isMobile ? 9 : 11,
                     }}
-                    angle={isMobile ? -45 : -30}
+                    angle={isMobile ? -45 : -35}
                     textAnchor="end"
-                    height={isMobile ? 60 : 80}
+                    height={isMobile ? 80 : 100}
                     interval={0}
                   />
                   <YAxis
