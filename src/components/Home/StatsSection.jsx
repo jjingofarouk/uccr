@@ -120,9 +120,9 @@ const StatsSection = () => {
               <BarChart
                 accessibilityLayer
                 data={stats}
-                width={600} // Matches Card max-width
                 height={400}
-                margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 120 }}
+                barCategoryGap={10}
                 onClick={handleBarClick}
                 onMouseMove={handleMouseEnter}
               >
@@ -130,7 +130,7 @@ const StatsSection = () => {
                   dataKey="specialty"
                   tickLine={false}
                   tickMargin={10}
-                  axisLine={false}
+                  axisLine={{ stroke: "var(--border, #e5e7eb)" }}
                   tick={{
                     fill: "var(--text, #1f2937)",
                     fontFamily: "Inter, sans-serif",
@@ -144,7 +144,7 @@ const StatsSection = () => {
                   dataKey="count"
                   tickLine={false}
                   tickMargin={10}
-                  axisLine={false}
+                  axisLine={{ stroke: "var(--border, #e5e7eb)" }}
                   allowDecimals={false}
                   tick={{
                     fill: "var(--text, #1f2937)",
@@ -162,7 +162,7 @@ const StatsSection = () => {
                     />
                   }
                 />
-                <Bar dataKey="count" radius={12} barSize={40}>
+                <Bar dataKey="count" radius={12} barSize={30}>
                   {stats.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
