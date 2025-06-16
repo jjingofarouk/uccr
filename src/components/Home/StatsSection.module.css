@@ -1,5 +1,5 @@
 .statsSection {
-  padding: 1rem 0;
+  padding: 1.5rem 0;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
@@ -45,7 +45,7 @@
 
 .chartContainer {
   width: 100%;
-  height: 420px;
+  height: 400px;
   overflow: hidden;
   position: relative;
 }
@@ -68,7 +68,7 @@
 }
 
 .footer {
-  padding: 0 1.5rem 1.5rem;
+  padding: 0.5rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -232,7 +232,7 @@
   }
 
   .chartContainer {
-    height: 360px;
+    height: 340px;
   }
 
   .title {
@@ -244,7 +244,7 @@
   }
 
   .footer {
-    padding: 0 1rem 1rem;
+    padding: 0.25rem 1rem 1rem;
   }
 
   .footerText {
