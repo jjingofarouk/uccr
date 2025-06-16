@@ -6,7 +6,7 @@ const HeroSection = () => (
   <section className={styles.hero} aria-labelledby="hero-title">
     <h1 id="hero-title" className={styles.heroTitle}>Uganda Clinical Case Reports</h1>
     <p className={styles.heroSubtitle}>
-      Explore and contribute to a growing repository of medical case studies from Uganda.
+      Explore and contribute to a growing archive of medical case studies from Uganda.
     </p>
     <div className={styles.heroButtons}>
       <Link
