@@ -145,7 +145,7 @@ const StatsSection = () => {
                     top: 20,
                     right: isMobile ? 5 : 30,
                     left: isMobile ? 5 : 20,
-                    bottom: isMobile ? 100 : 120
+                    bottom: isMobile ? 80 : 90
                   }}
                   barCategoryGap={isMobile ? "10%" : "20%"}
                   onClick={handleBarClick}
