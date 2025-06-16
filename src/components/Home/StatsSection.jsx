@@ -2,22 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, XAxis, YAxis, Cell } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Cell, Tooltip } from "recharts";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "./Card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "./Chart";
 import { getCaseStatistics } from "../../firebase/firestore";
 import { trackEngagement, trackEvent } from "../../utils/analytics";
 import Link from "next/link";
@@ -33,6 +20,7 @@ const StatsSection = () => {
       try {
         trackEngagement("load_start", "stats");
         const data = await getCaseStatistics();
+        console.log("Fetched stats:", data); // Debug data
         const top5 = data.slice(0, 5).map((item, index) => ({
           ...item,
           fill: [
@@ -81,42 +69,58 @@ const StatsSection = () => {
     }
   };
 
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload?.length) {
+      const { payload: data } = payload[0];
+      return (
+        <div className={styles.tooltip}>
+          <p className={styles.tooltipText}>
+            {`${data.specialty}: ${data.count} cases`}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (loading) {
     return (
       <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
-        <Card>
-          <CardHeader>
+        <div className={styles.container}>
+          <div className={styles.header}>
             <Skeleton height={24} width={150} />
             <Skeleton height={16} width={100} />
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className={styles.content}>
             <Skeleton height={400} />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </SkeletonTheme>
     );
   }
 
   if (error) {
     return (
-      <Card className={styles.errorCard}>
-        <CardContent className={styles.errorContent}>
+      <div className={`${styles.container} ${styles.errorContainer}`}>
+        <div className={styles.errorContent}>
           <p className={styles.errorText}>{error}</p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
     <section aria-labelledby="stats-title" className={styles.statsSection}>
       {stats.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle id="stats-title">Case Statistics</CardTitle>
-            <CardDescription>Top 5 Specialties by Case Count</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer>
+        <div className={styles.container}>
+          <div className={styles.header}>
+            <h2 id="stats-title" className={styles.title}>
+              Case Statistics
+            </h2>
+            <p className={styles.description}>Top 5 Specialties by Case Count</p>
+          </div>
+          <div className={styles.content}>
+            <div className={styles.chartContainer}>
               <BarChart
                 accessibilityLayer
                 data={stats}
@@ -152,36 +156,27 @@ const StatsSection = () => {
                     fontSize: 12,
                   }}
                 />
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, name, props) =>
-                        `${props.payload.specialty}: ${value} cases`
-                      }
-                    />
-                  }
-                />
+                <Tooltip content={<CustomTooltip />} cursor={false} />
                 <Bar dataKey="count" radius={12} barSize={30}>
                   {stats.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Bar>
               </BarChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter>
+            </div>
+          </div>
+          <div className={styles.footer}>
             <div className={styles.footerText}>
               Top specialties by case volume <TrendingUp className={styles.footerIcon} />
             </div>
             <div className={styles.footerSubtext}>
               Showing the top 5 specialties with the most cases
             </div>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       ) : (
-        <Card>
-          <CardContent className={styles.emptyContent}>
+        <div className={styles.container}>
+          <div className={styles.content}>
             <p className={styles.emptyText}>No case statistics available</p>
             <Link
               href="/cases/new"
@@ -192,8 +187,8 @@ const StatsSection = () => {
             >
               Contribute a case
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </section>
   );
