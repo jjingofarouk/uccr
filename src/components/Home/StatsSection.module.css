@@ -77,12 +77,6 @@
   opacity: 0.8;
 }
 
-.scrollContainer {
-  overflow-x: auto;
-  width: 100%;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
-
 .dark-mode .errorText {
   color: #f87171;
 }
