@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, XAxis, YAxis, Cell, Tooltip } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { getCaseStatistics } from "../../firebase/firestore";
@@ -14,26 +14,45 @@ const StatsSection = () => {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         trackEngagement("load_start", "stats");
         const data = await getCaseStatistics();
-        console.log("Fetched stats:", data); // Debug data
+        console.log("Fetched stats:", data);
+        
         const top5 = data.slice(0, 5).map((item, index) => ({
           ...item,
+          // Truncate long specialty names for mobile
+          displayName: isMobile && item.specialty?.length > 12 
+            ? `${item.specialty.substring(0, 10)}...` 
+            : item.specialty,
           fill: [
-            "rgba(59, 130, 246, 0.6)", // Blue
-            "rgba(239, 68, 68, 0.6)", // Red
-            "rgba(34, 197, 94, 0.6)", // Green
-            "rgba(249, 115, 22, 0.6)", // Orange
-            "rgba(168, 85, 247, 0.6)", // Purple
+            "rgba(59, 130, 246, 0.8)", // Blue
+            "rgba(239, 68, 68, 0.8)", // Red
+            "rgba(34, 197, 94, 0.8)", // Green
+            "rgba(249, 115, 22, 0.8)", // Orange
+            "rgba(168, 85, 247, 0.8)", // Purple
           ][index % 5],
         }));
+        
         setStats(top5);
-        console.log("Processed top5 stats:", top5); // Debug processed data
+        console.log("Processed top5 stats:", top5);
         trackEngagement("load_success", "stats", `${data.length}_specialties`);
+        
         top5.forEach((stat, index) => {
           trackEvent(
             "specialty_title",
@@ -44,16 +63,16 @@ const StatsSection = () => {
         });
       } catch (err) {
         setError("Unable to load case statistics");
-        console.error("Stats fetch error:", err); // Debug error
+        console.error("Stats fetch error:", err);
         trackEngagement("load_error", "stats", err.message);
       } finally {
         setLoading(false);
       }
     };
     fetchStats();
-  }, []);
+  }, [isMobile]);
 
-  const handleBarClick = (data) => {
+  const handleBarClick = useCallback((data) => {
     if (data?.activePayload?.[0]?.payload) {
       const payload = data.activePayload[0].payload;
       trackEngagement(
@@ -62,14 +81,14 @@ const StatsSection = () => {
         `${payload.specialty}_${payload.count}_specialty`
       );
     }
-  };
+  }, []);
 
-  const handleMouseEnter = (data) => {
+  const handleMouseEnter = useCallback((data) => {
     if (data?.activePayload?.[0]?.payload) {
       const payload = data.activePayload[0].payload;
       trackEngagement("hover", "stats", payload.specialty);
     }
-  };
+  }, []);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload?.length) {
@@ -94,7 +113,7 @@ const StatsSection = () => {
             <Skeleton height={16} width={100} />
           </div>
           <div className={styles.content}>
-            <Skeleton height={400} />
+            <Skeleton height={isMobile ? 300 : 400} />
           </div>
         </div>
       </SkeletonTheme>
@@ -123,49 +142,59 @@ const StatsSection = () => {
           </div>
           <div className={styles.content}>
             <div className={styles.chartContainer}>
-              <BarChart
-                accessibilityLayer
-                data={stats}
-                width={500} // Explicit width for debugging
-                height={400}
-                margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
-                barCategoryGap={10}
-                onClick={handleBarClick}
-                onMouseMove={handleMouseEnter}
-              >
-                <XAxis
-                  dataKey="specialty"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={{ stroke: "var(--border, #e5e7eb)" }}
-                  tick={{
-                    fill: "var(--text, #1f2937)",
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: 12,
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={stats}
+                  margin={{
+                    top: 20,
+                    right: isMobile ? 10 : 30,
+                    left: isMobile ? 10 : 20,
+                    bottom: isMobile ? 80 : 100
                   }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis
-                  dataKey="count"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={{ stroke: "var(--border, #e5e7eb)" }}
-                  allowDecimals={false}
-                  tick={{
-                    fill: "var(--text, #1f2937)",
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: 12,
-                  }}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={false} />
-                <Bar dataKey="count" radius={12} barSize={30}>
-                  {stats.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
+                  barCategoryGap={isMobile ? "10%" : "20%"}
+                  onClick={handleBarClick}
+                  onMouseMove={handleMouseEnter}
+                >
+                  <XAxis
+                    dataKey={isMobile ? "displayName" : "specialty"}
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={{ stroke: "var(--border, #e5e7eb)" }}
+                    tick={{
+                      fill: "var(--text, #1f2937)",
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: isMobile ? 10 : 12,
+                    }}
+                    angle={isMobile ? -45 : -30}
+                    textAnchor="end"
+                    height={isMobile ? 60 : 80}
+                    interval={0}
+                  />
+                  <YAxis
+                    dataKey="count"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={{ stroke: "var(--border, #e5e7eb)" }}
+                    allowDecimals={false}
+                    tick={{
+                      fill: "var(--text, #1f2937)",
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: isMobile ? 10 : 12,
+                    }}
+                    width={isMobile ? 30 : 40}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={false} />
+                  <Bar 
+                    dataKey="count" 
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={isMobile ? 40 : 60}
+                  >
+                    {stats.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
           <div className={styles.footer}>
