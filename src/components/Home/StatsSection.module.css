@@ -1,5 +1,5 @@
 .statsSection {
-  padding: 1.5rem 0;
+  padding: 1rem 0;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
@@ -375,11 +375,9 @@
   }
 }
 
-/* Ensure no horizontal overflow */
-* {
-  box-sizing: border-box;
-}
-
+/* Ensure no horizontal overflow within stats section */
+.statsSection,
 .statsSection * {
+  box-sizing: border-box;
   max-width: 100%;
 }
