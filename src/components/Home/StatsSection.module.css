@@ -68,7 +68,7 @@
 }
 
 .footer {
-  padding: 0.5rem 1.5rem 1.5rem;
+  padding: 0 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -232,7 +232,7 @@
   }
 
   .chartContainer {
-    height: 340px;
+    height: 360px;
   }
 
   .title {
@@ -244,7 +244,7 @@
   }
 
   .footer {
-    padding: 0.25rem 1rem 1rem;
+    padding: 0 1rem 1rem;
   }
 
   .footerText {
