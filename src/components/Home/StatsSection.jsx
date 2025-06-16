@@ -32,6 +32,7 @@ const StatsSection = () => {
           ][index % 5],
         }));
         setStats(top5);
+        console.log("Processed top5 stats:", top5); // Debug processed data
         trackEngagement("load_success", "stats", `${data.length}_specialties`);
         top5.forEach((stat, index) => {
           trackEvent(
@@ -43,6 +44,7 @@ const StatsSection = () => {
         });
       } catch (err) {
         setError("Unable to load case statistics");
+        console.error("Stats fetch error:", err); // Debug error
         trackEngagement("load_error", "stats", err.message);
       } finally {
         setLoading(false);
@@ -124,8 +126,9 @@ const StatsSection = () => {
               <BarChart
                 accessibilityLayer
                 data={stats}
+                width={500} // Explicit width for debugging
                 height={400}
-                margin={{ top: 20, right: 30, left: 20, bottom: 120 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
                 barCategoryGap={10}
                 onClick={handleBarClick}
                 onMouseMove={handleMouseEnter}
@@ -142,7 +145,7 @@ const StatsSection = () => {
                   }}
                   angle={-45}
                   textAnchor="end"
-                  height={100}
+                  height={80}
                 />
                 <YAxis
                   dataKey="count"
