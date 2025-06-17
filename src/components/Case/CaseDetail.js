@@ -1,290 +1,365 @@
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useAuth } from '../../hooks/useAuth';
-import { addReaction } from '../../firebase/firestore';
-import { Award } from 'lucide-react';
-import CommentSection from './CommentSection';
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import sanitizeHtml from 'sanitize-html';
-import styles from '../../styles/caseDetail.module.css';
+.caseDetail {
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+}
 
-// Google Analytics tracking functions
-const trackEvent = (action, category, label, value) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value,
-    });
+.header {
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.dark-mode .meta {
+  color: #9ca3af;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.dark-mode .avatar {
+  border-color: var(--border);
+}
+
+.authorName {
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.authorName:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.date {
+  font-size: 0.9rem;
+}
+
+.voteSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.voteButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.voteButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.voteButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dark-mode .voteButton {
+  border-color: var(--border);
+}
+
+.dark-mode .voteButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.voteCount {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.error {
+  color: #ef4444;
+  font-size: 0.9rem;
+}
+
+.content {
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.section {
+  margin-bottom: 1.25rem;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.015em;
+}
+
+.richText {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.richText p {
+  margin: 0 0 1em;
+}
+
+.richText ul,
+.richText ol {
+  margin: 0 0 1em;
+  padding-left: 1.5rem;
+}
+
+.richText li {
+  margin-bottom: 0.5em;
+}
+
+.richText strong {
+  font-weight: 700;
+}
+
+.richText em {
+  font-style: italic;
+}
+
+.richText a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.richText a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.richText h1,
+.richText h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0.5em 0;
+}
+
+.dark-mode .richText {
+  color: var(--text);
+}
+
+.dark-mode .richText a {
+  color: var(--primary);
+}
+
+.dark-mode .richText a:hover {
+  color: var(--primary-hover);
+}
+
+.media {
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.media h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.75rem;
+}
+
+.mediaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.mediaImage {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: var(--background);
+}
+
+.dark-mode .mediaImage {
+  border-color: var(--border);
+  background: #1f2937;
+}
+
+.editButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  margin-left: auto;
+}
+
+.editButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.dark-mode .editButton {
+  border-color: var(--border);
+}
+
+.dark-mode .editButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Responsive adjustments - further minimized */
+@media (max-width: 768px) {
+  .caseDetail {
+    margin: 0;
+    padding: 0.75rem 0;
   }
-};
 
-const trackPageView = (caseId, title) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', 'G-GLWW8HX76X', {
-      page_title: `Case: ${title}`,
-      page_location: window.location.href,
-      custom_map: {
-        case_id: caseId,
-      },
-    });
-    
-    // Track case view event
-    trackEvent('view_case', 'Case', caseId, 1);
-  }
-};
-
-// Utility function to sanitize and render HTML content
-const renderRichText = (html) => {
-  if (!html || typeof html !== 'string') return <p>Not specified</p>;
-  const sanitizedHtml = sanitizeHtml(html, {
-    allowedTags: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a', 'h1', 'h2'],
-    allowedAttributes: {
-      a: ['href', 'target'],
-    },
-  });
-  return <div className={styles.richText} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
-};
-
-export default function CaseDetail({ caseData, isLoading }) {
-  const { user } = useAuth();
-  const router = useRouter();
-  const [error, setError] = useState('');
-
-  // Track page view when component mounts
-  useEffect(() => {
-    if (caseData && caseData.id) {
-      trackPageView(caseData.id, caseData.title || 'Untitled Case');
-    }
-  }, [caseData]);
-
-  const handleVote = async (type) => {
-    if (!user) {
-      setError('You must be logged in to vote.');
-      return;
-    }
-    try {
-      await addReaction(caseData.id, user.uid, type);
-      setError('');
-      
-      // Track vote event
-      trackEvent('vote', 'Case Interaction', `${type}_${caseData.id}`, 1);
-    } catch (err) {
-      setError('Failed to record vote. Please try again.');
-      
-      // Track error event
-      trackEvent('vote_error', 'Case Interaction', `${type}_${caseData.id}`, 1);
-    }
-  };
-
-  const handleEditClick = () => {
-    router.push(`/cases/edit/${caseData.id}`);
-    
-    // Track edit event
-    trackEvent('edit_case', 'Case Management', caseData.id, 1);
-  };
-
-  const handleAuthorClick = (userId) => {
-    // Track author profile view
-    trackEvent('view_author', 'Profile', userId, 1);
-  };
-
-  const handleMediaView = (mediaIndex) => {
-    // Track media view
-    trackEvent('view_media', 'Case Media', `${caseData.id}_media_${mediaIndex}`, 1);
-  };
-
-  if (isLoading) {
-    return (
-      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
-        <article className={styles.caseDetail}>
-          <header className={styles.header}>
-            <Skeleton height={40} width="80%" />
-            <div className={styles.meta}>
-              <div className={styles.author}>
-                <Skeleton circle width={40} height={40} />
-                <Skeleton width={100} />
-              </div>
-              <Skeleton width={150} />
-            </div>
-          </header>
-
-          <div className={styles.voteSection}>
-            <Skeleton height={40} width={100} />
-          </div>
-
-          <section className={styles.content}>
-            {[...Array(11)].map((_, index) => (
-              <div key={index} className={styles.section}>
-                <Skeleton height={24} width="50%" />
-                <Skeleton count={3} />
-              </div>
-            ))}
-          </section>
-
-          <section className={styles.media}>
-            <Skeleton height={24} width="50%" />
-            <div className={styles.mediaGrid}>
-              {[...Array(3)].map((_, index) => (
-                <Skeleton key={index} width={600} height={400} />
-              ))}
-            </div>
-          </section>
-
-          <Skeleton height={100} count={3} />
-        </article>
-      </SkeletonTheme>
-    );
+  .header {
+    padding: 0.25rem;
   }
 
-  if (!caseData || !caseData.id) {
-    return <div className={styles.error}>Error: Invalid case data</div>;
+  .title {
+    font-size: 2rem;
   }
 
-  return (
-    <article className={styles.caseDetail}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>{renderRichText(caseData.title)}</h1>
-        {user && user.uid === caseData.userId && (
-          <button
-            onClick={handleEditClick}
-            className={styles.editButton}
-            aria-label="Edit case"
-          >
-            Edit Case
-          </button>
-        )}
-        <div className={styles.meta}>
-          <div className={styles.author}>
-            <Link href={`/profile/view/${caseData.userId}`} onClick={() => handleAuthorClick(caseData.userId)}>
-              <Image
-                src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
-                alt={caseData.userName || 'Contributor'}
-                width={40}
-                height={40}
-                className={styles.avatar}
-                onError={(e) => console.error('Author image error:', caseData.photoURL)}
-              />
-            </Link>
-            <Link href={`/profile/view/${caseData.userId}`} onClick={() => handleAuthorClick(caseData.userId)}>
-              <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
-            </Link>
-          </div>
-          <time className={styles.date}>
-            {caseData.createdAt
-              ? new Date(caseData.createdAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })
-              : 'Unknown date'}
-          </time>
-        </div>
-      </header>
+  .section h2 {
+    font-size: 1.25rem;
+  }
 
-      <div className={styles.voteSection}>
-        <button
-          onClick={() => handleVote('award')}
-          className={styles.voteButton}
-          disabled={!user}
-          aria-label="Award case"
-        >
-          <Award size={20} />
-          <span className={styles.voteCount}>{caseData.awards || 0}</span>
-        </button>
-        {error && <p className={styles.error}>{error}</p>}
-      </div>
+  .richText {
+    font-size: 0.95rem;
+  }
 
-      <section className={styles.content}>
-        <div className={styles.section}>
-          <h2>Chief Concern</h2>
-          {renderRichText(caseData.presentingComplaint)}
-        </div>
-        <div className={styles.section}>
-          <h2>Specialties</h2>
-          <p>{Array.isArray(caseData.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : 'Not specified'}</p>
-        </div>
-        <div className={styles.section}>
-          <h2>History</h2>
-          {renderRichText(caseData.history)}
-        </div>
-        <div className={styles.section}>
-          <h2>Investigations</h2>
-          {renderRichText(caseData.investigations)}
-        </div>
-        <div className={styles.section}>
-          <h2>Management</h2>
-          {renderRichText(caseData.management)}
-        </div>
-        <div className={styles.section}>
-          <h2>Provisional Diagnosis</h2>
-          {renderRichText(caseData.provisionalDiagnosis)}
-        </div>
-        <div className={styles.section}>
-          <h2>Hospital</h2>
-          {renderRichText(caseData.hospital)}
-        </div>
-        <div className={styles.section}>
-          <h2>Referral Center</h2>
-          {renderRichText(caseData.referralCenter)}
-        </div>
-        <div className={styles.section}>
-          <h2>Discussion</h2>
-          {renderRichText(caseData.discussion)}
-        </div>
-        <div className={styles.section}>
-          <h2>High-Level Summary</h2>
-          {renderRichText(caseData.highLevelSummary)}
-        </div>
-        <div className={styles.section}>
-          <h2>References</h2>
-          {renderRichText(caseData.references)}
-        </div>
-      </section>
+  .richText h1,
+  .richText h2 {
+    font-size: 1.1rem;
+  }
 
-      {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? (
-        <section className={styles.media}>
-          <h2>Media</h2>
-          <div className={styles.mediaGrid}>
-            {caseData.mediaUrls.map((url, index) => (
-              url ? (
-                <Image
-                  key={url}
-                  src={url}
-                  alt={`Case media ${index + 1}`}
-                  width={600}
-                  height={400}
-                  className={styles.mediaImage}
-                  objectFit="contain"
-                  onClick={() => handleMediaView(index)}
-                  style={{ cursor: 'pointer' }}
-                  onError={(e) => console.error('Media image error:', url)}
-                />
-              ) : (
-                <div key={index} className={styles.mediaImage}>
-                  <Image
-                    src="/images/default-placeholder.jpg"
-                    alt="No media available"
-                    width={600}
-                    height={400}
-                    objectFit="contain"
-                  />
-                </div>
-              )
-            ))}
-          </div>
-        </section>
-      ) : (
-        <section className={styles.media}>
-          <h2>Media</h2>
-          <p>No media available.</p>
-        </section>
-      )}
+  .mediaGrid {
+    grid-template-columns: 1fr;
+  }
 
-      <CommentSection caseId={caseData.id} />
-    </article>
-  );
+  .voteSection {
+    padding: 0 0.25rem;
+  }
+
+  .content {
+    padding: 0 0.25rem;
+  }
+
+  .media {
+    padding: 0 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .caseDetail {
+    margin: 0;
+    padding: 0.5rem 0;
+  }
+
+  .header {
+    padding: 0.1rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .author {
+    gap: 0.5rem;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .section h2 {
+    font-size: 1.1rem;
+  }
+
+  .richText {
+    font-size: 0.9rem;
+  }
+
+  .richText h1,
+  .richText h2 {
+    font-size: 1rem;
+  }
+
+  .voteButton {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .media h2 {
+    font-size: 1.25rem;
+  }
+
+  .voteSection {
+    padding: 0 0.1rem;
+  }
+
+  .content {
+    padding: 0 0.1rem;
+  }
+
+  .media {
+    padding: 0 0.1rem;
+  }
 }
