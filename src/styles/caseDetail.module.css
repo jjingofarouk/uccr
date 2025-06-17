@@ -1,637 +1,365 @@
-/* styles/caseForm.module.css */
-.caseFormWrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.caseDetail {
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   box-sizing: border-box;
-  overflow-y: auto;
-  background: var(--background);
 }
 
-.caseForm {
-  width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 2.5rem 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-grow: 1;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px var(--shadow);
+.header {
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.loadingSection {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--background);
-}
-
-.caseForm h2 {
-  font-family: 'Inter', sans-serif;
+.title {
   font-size: 2.5rem;
   font-weight: 800;
   color: var(--text);
-  margin: 0 0 2rem;
-  text-align: center;
-  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
 }
 
-.progressBar {
-  width: 100%;
-  max-width: 800px;
-  height: 10px;
-  background: var(--border);
-  border-radius: 5px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-}
-
-.progress {
-  height: 100%;
-  background: var(--primary);
-  transition: width 0.4s ease;
-}
-
-.stepIndicator {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.caseForm form {
-  width: 100%;
-  max-width: 800px;
+.meta {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  position: relative;
-  flex-grow: 1;
-}
-
-.carousel {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.carouselInner {
-  display: flex;
-  width: calc(100% * var(--total-steps));
-  height: 100%;
-  transition: transform 0.4s ease;
-}
-
-.carouselItem {
-  flex: 0 0 calc(100% / var(--total-steps));
-  width: calc(100% / var(--total-steps));
-  padding: 0 1.5rem;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: #6b7280;
 }
 
-.carouselItem.active {
-  opacity: 1;
+.dark-mode .meta {
+  color: #9ca3af;
 }
 
-.stepContent {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  max-height: calc(100vh - 300px);
-  overflow-y: auto;
-  padding: 1rem;
-  background: var(--background);
-  border-radius: 10px;
-}
-
-.caseForm input,
-.selectInput {
-  width: 100%;
-  padding: 0.85rem 1.25rem;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--text);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 3px 6px var(--shadow);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.caseForm input:focus,
-.selectInput:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-hover);
-}
-
-.selectInput:not([multiple]) {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231f2937' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1.25rem center;
-  background-size: 1.5rem;
-}
-
-.selectInput[multiple] {
-  height: 220px;
-  overflow-y: auto;
-  padding: 0.75rem;
-}
-
-.selectInput[multiple] option {
-  padding: 6px;
-  border-radius: 6px;
-}
-
-.selectInput[multiple] option:checked {
-  background: var(--primary);
-  color: #ffffff;
-}
-
-.quillEditor {
-  width: 100%;
-  margin-top: 0.75rem;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.quillEditor .ql-container {
-  min-height: 220px;
-  max-height: 320px;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  color: var(--text);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 3px 6px var(--shadow);
-  overflow-y: auto;
-  flex-grow: 1;
-  line-height: 1.5;
-}
-
-.quillEditor .ql-line-height-1 { line-height: 1 !important; }
-.quillEditor .ql-line-height-1-15 { line-height: 1.15 !important; }
-.quillEditor .ql-line-height-1-5 { line-height: 1.5 !important; }
-.quillEditor .ql-line-height-1-75 { line-height: 1.75 !important; }
-.quillEditor .ql-line-height-2 { line-height: 2 !important; }
-
-.quillEditor .ql-toolbar.ql-snow .ql-picker.ql-line-height .ql-picker-label::before {
-  content: 'Line Height';
-}
-
-.quillEditor .ql-toolbar.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="1"]::before { content: '1'; }
-.quillEditor .ql-toolbar.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="1.15"]::before { content: '1.15'; }
-.quillEditor .ql-toolbar.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="1.5"]::before { content: '1.5'; }
-.quillEditor .ql-toolbar.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="1.75"]::before { content: '1.75'; }
-.quillEditor .ql-toolbar.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="2"]::before { content: '2'; }
-
-.quillEditor .ql-editor {
-  min-height: 180px;
-  max-height: 280px;
-  padding: 1rem 1.25rem;
-  overflow-y: auto;
-  white-space: pre-wrap;
-}
-
-.quillEditor .ql-toolbar {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-bottom: none;
-  border-radius: 10px 10px 0 0;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.quillEditor .ql-container:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-hover);
-}
-
-.navButton {
+.author {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.85rem 1.75rem;
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.navButton:hover {
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.dark-mode .avatar {
+  border-color: var(--border);
+}
+
+.authorName {
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.authorName:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.date {
+  font-size: 0.9rem;
+}
+
+.voteSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.voteButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.voteButton:hover {
   background: var(--primary);
   border-color: var(--primary);
   color: #ffffff;
   transform: translateY(-2px);
 }
 
-.navButton:disabled {
-  opacity: 0.5;
+.voteButton:disabled {
   cursor: not-allowed;
-  transform: none;
+  opacity: 0.6;
 }
 
-.navButton svg {
-  width: 22px;
-  height: 22px;
+.dark-mode .voteButton {
+  border-color: var(--border);
 }
 
-.submitButton {
-  padding: 0.85rem 1.75rem;
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #ffffff;
+.dark-mode .voteButton:hover {
   background: var(--primary);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  border-color: var(--primary);
 }
 
-.submitButton:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
+.voteCount {
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-.submitButton:active {
-  transform: scale(0.98);
+.error {
+  color: #ef4444;
+  font-size: 0.9rem;
 }
 
-.navigation {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1.5rem;
-  padding: 0.75rem 0;
-  position: sticky;
-  bottom: 0;
-  background: var(--background);
-  z-index: 10;
-  border-top: 1px solid var(--border);
+.content {
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
 }
 
-.mediaSection {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.section {
+  margin-bottom: 1.25rem;
 }
 
-.mediaPreview {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.mediaPreviewLabel {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
+.section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.015em;
+}
+
+.richText {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.richText p {
+  margin: 0 0 1em;
+}
+
+.richText ul,
+.richText ol {
+  margin: 0 0 1em;
+  padding-left: 1.5rem;
+}
+
+.richText li {
+  margin-bottom: 0.5em;
+}
+
+.richText strong {
+  font-weight: 700;
+}
+
+.richText em {
+  font-style: italic;
+}
+
+.richText a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.richText a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.richText h1,
+.richText h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0.5em 0;
+}
+
+.dark-mode .richText {
+  color: var(--text);
+}
+
+.dark-mode .richText a {
+  color: var(--primary);
+}
+
+.dark-mode .richText a:hover {
+  color: var(--primary-hover);
+}
+
+.media {
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.media h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.75rem;
 }
 
 .mediaGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
 .mediaImage {
-  width: 140px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border);
-  box-shadow: 0 3px 6px var(--shadow);
-  transition: transform 0.3s ease;
-}
-
-.mediaImage:hover {
-  transform: scale(1.05);
-}
-
-.uploadButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.85rem 1.75rem;
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: var(--primary);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.uploadButton:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-}
-
-.uploadButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.uploadIcon {
-  width: 18px;
-  height: 18px;
-}
-
-.error {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #dc2626;
-  text-align: center;
-  margin-top: 0.75rem;
-}
-
-.mediaItem {
-  position: relative;
-  display: inline-block;
-}
-
-.deleteButton {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #dc2626;
-  color: #ffffff;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 6px var(--shadow);
-  transition: all 0.3s ease;
-}
-
-.deleteButton:hover {
-  background: #b91c1c;
-  transform: scale(1.1);
-}
-
-.deleteIcon {
-  width: 16px;
-  height: 16px;
-}
-
-.fieldLabel {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 0.75rem;
-}
-
-.dark-mode .caseForm,
-.dark-mode .stepContent,
-.dark-mode .quillEditor .ql-container,
-.dark-mode .quillEditor .ql-toolbar,
-.dark-mode .caseForm input,
-.dark-mode .selectInput,
-.dark-mode .navButton {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
   background: var(--background);
-  border-color: var(--border);
-  color: var(--text);
-}
-
-.dark-mode .caseForm h2,
-.dark-mode .mediaPreviewLabel,
-.dark-mode .stepIndicator,
-.dark-mode .fieldLabel {
-  color: var(--text);
-}
-
-.dark-mode .selectInput:not([multiple]) {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f1f5f9' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
 }
 
 .dark-mode .mediaImage {
   border-color: var(--border);
+  background: #1f2937;
 }
 
-.dark-mode .navButton:hover,
-.dark-mode .submitButton:hover,
-.dark-mode .uploadButton:hover {
-  background: var(--primary-hover);
+.editButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  margin-left: auto;
 }
 
-.dark-mode .deleteButton {
-  background: #dc2626;
+.editButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
-.dark-mode .deleteButton:hover {
-  background: #b91c1c;
+.dark-mode .editButton {
+  border-color: var(--border);
 }
 
+.dark-mode .editButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Responsive adjustments - further minimized */
 @media (max-width: 768px) {
-  .caseForm {
-    padding: 2rem 1.5rem;
-    max-width: 100%;
+  .caseDetail {
+    margin: 0;
+    padding: 0.75rem 0;
   }
 
-  .caseForm h2 {
+  .header {
+    padding: 0.25rem;
+  }
+
+  .title {
     font-size: 2rem;
   }
 
-  .caseForm form,
-  .progressBar {
-    max-width: 100%;
+  .section h2 {
+    font-size: 1.25rem;
   }
 
-  .carouselItem,
-  .stepContent {
-    padding: 0 1rem;
-  }
-
-  .caseForm input,
-  .selectInput:not([multiple]) {
-    padding: 0.75rem 1rem;
+  .richText {
     font-size: 0.95rem;
   }
 
-  .selectInput[multiple] {
-    height: 180px;
-    font-size: 0.95rem;
-  }
-
-  .quillEditor .ql-container {
-    min-height: 180px;
-    max-height: 240px;
-  }
-
-  .quillEditor .ql-editor {
-    min-height: 140px;
-    max-height: 200px;
-  }
-
-  .navButton,
-  .submitButton,
-  .uploadButton {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-  }
-
-  .mediaImage {
-    width: 120px;
-    height: 120px;
+  .richText h1,
+  .richText h2 {
+    font-size: 1.1rem;
   }
 
   .mediaGrid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: 1fr;
   }
 
-  .mediaPreviewLabel,
-  .fieldLabel,
-  .stepIndicator {
-    font-size: 1rem;
+  .voteSection {
+    padding: 0 0.25rem;
+  }
+
+  .content {
+    padding: 0 0.25rem;
+  }
+
+  .media {
+    padding: 0 0.25rem;
   }
 }
 
 @media (max-width: 480px) {
-  .caseForm {
-    padding: 1.5rem 1rem;
+  .caseDetail {
+    margin: 0;
+    padding: 0.5rem 0;
   }
 
-  .caseForm h2 {
+  .header {
+    padding: 0.1rem;
+  }
+
+  .title {
     font-size: 1.75rem;
   }
 
-  .caseForm input,
-  .selectInput:not([multiple]) {
-    padding: 0.65rem 0.85rem;
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .author {
+    gap: 0.5rem;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .section h2 {
+    font-size: 1.1rem;
+  }
+
+  .richText {
     font-size: 0.9rem;
   }
 
-  .selectInput[multiple] {
-    height: 140px;
+  .richText h1,
+  .richText h2 {
+    font-size: 1rem;
+  }
+
+  .voteButton {
+    padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
   }
 
-  .quillEditor .ql-container {
-    min-height: 140px;
-    max-height: 180px;
+  .media h2 {
+    font-size: 1.25rem;
   }
 
-  .quillEditor .ql-editor {
-    min-height: 100px;
-    max-height: 140px;
+  .voteSection {
+    padding: 0 0.1rem;
   }
 
-  .navButton,
-  .submitButton,
-  .uploadButton {
-    padding: 0.65rem 1.25rem;
-    font-size: 0.95rem;
+  .content {
+    padding: 0 0.1rem;
   }
 
-  .mediaImage {
-    width: 100px;
-    height: 100px;
-  }
-
-  .mediaGrid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  }
-
-  .mediaPreviewLabel,
-  .fieldLabel,
-  .stepIndicator {
-    font-size: 0.95rem;
-  }
-
-  .navigation {
-    gap: 0.75rem;
-  }
-
-  .deleteButton {
-    width: 24px;
-    height: 24px;
-  }
-
-  .deleteIcon {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-@media (prefers-contrast: high) {
-  .caseForm input,
-  .selectInput,
-  .quillEditor .ql-container,
-  .quillEditor .ql-toolbar {
-    border: 2px solid var(--text);
-  }
-
-  .navButton,
-  .submitButton,
-  .uploadButton {
-    background: var(--text);
-    color: var(--background);
-  }
-
-  .navButton:hover,
-  .submitButton:hover,
-  .uploadButton:hover {
-    background: var(--primary-hover);
-  }
-
-  .deleteButton {
-    background: var(--text);
-    color: var(--background);
-  }
-
-  .deleteButton:hover {
-    background: #b91c1c;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .carouselInner,
-  .navButton,
-  .submitButton,
-  .uploadButton,
-  .deleteButton,
-  .mediaImage,
-  .caseForm input:focus,
-  .selectInput:focus,
-  .quillEditor .ql-container:focus-within,
-  .progress {
-    transition: none;
+  .media {
+    padding: 0 0.1rem;
   }
 }
