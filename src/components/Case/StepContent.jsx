@@ -13,6 +13,9 @@ const quillModules = {
     ['link'],
     ['clean'],
   ],
+  clipboard: {
+    matchVisual: false,
+  },
 };
 
 export default function StepContent({
@@ -58,6 +61,15 @@ export default function StepContent({
                   placeholder={step.placeholder}
                   modules={quillModules}
                   className={styles.quillEditor}
+                  formats={[
+                    'header',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'list',
+                    'bullet',
+                    'link',
+                  ]}
                 />
               )}
               {step.type === 'select' && (
