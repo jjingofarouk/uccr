@@ -38,6 +38,7 @@ export default function StepContent({
   handleDeleteMedia,
   widgetRef,
   isUploading,
+  isEditMode = false,
 }) {
   const step = steps[currentStep];
 
@@ -104,7 +105,15 @@ export default function StepContent({
                 <div className={styles.mediaSection}>
                   <button
                     type="button"
-                    onClick={() => widgetRef.current?.open()}
+                    onClick={() => {
+                      widgetRef.current?.open();
+                      if (window.gtag && !isEditMode) {
+                        window.gtag('event', 'media_upload_button_clicked', {
+                          event_category: 'CaseForm',
+                          event_label: 'Upload Media Button Clicked',
+                        });
+                      }
+                    }}
                     disabled={!widgetRef.current || isUploading}
                     className={styles.uploadButton}
                   >
