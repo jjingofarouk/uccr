@@ -1,3 +1,4 @@
+// StepContent.jsx
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import styles from '../../styles/caseForm.module.css';
@@ -11,6 +12,7 @@ const quillModules = {
     ['bold', 'italic', 'underline'],
     [{ list: 'ordered' }, { list: 'bullet' }],
     ['link'],
+    [{ 'line-height': ['1', '1.15', '1.5', '1.75', '2'] }],
     ['clean'],
   ],
   clipboard: {
@@ -49,7 +51,7 @@ export default function StepContent({
         style={{
           display: 'flex',
           width: `${steps.length * 100}%`,
-          transition: 'transform 0.3s ease-in-out',
+          transition: 'transform 0.4s ease-in-out',
           transform: `translateX(-${currentStep * (100 / steps.length)}%)`,
         }}
       >
@@ -60,7 +62,7 @@ export default function StepContent({
             style={{
               width: `${100 / steps.length}%`,
               flexShrink: 0,
-              padding: '0 20px',
+              padding: '0 1.5rem',
               boxSizing: 'border-box',
             }}
           >
@@ -82,6 +84,7 @@ export default function StepContent({
                     'list',
                     'bullet',
                     'link',
+                    'line-height',
                   ]}
                 />
               )}
@@ -117,19 +120,35 @@ export default function StepContent({
                     disabled={!widgetRef.current || isUploading}
                     className={styles.uploadButton}
                   >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={styles.uploadIcon}
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
                     {isUploading ? 'Uploading...' : 'Upload Media'}
                   </button>
                   {formData.mediaUrls.length > 0 && (
                     <div className={styles.mediaPreview}>
-                      <p>Uploaded media:</p>
+                      <p className={styles.mediaPreviewLabel}>Uploaded media:</p>
                       <div className={styles.mediaGrid}>
                         {formData.mediaUrls.map((url, index) => (
                           <div key={index} className={styles.mediaItem}>
                             <Image
                               src={url}
                               alt={`Uploaded media ${index + 1}`}
-                              width={120}
-                              height={120}
+                              width={140}
+                              height={140}
                               className={styles.mediaImage}
                             />
                             <button
@@ -137,20 +156,21 @@ export default function StepContent({
                               onClick={() => handleDeleteMedia(index)}
                               disabled={isUploading}
                               className={styles.deleteButton}
+                              aria-label="Delete media"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
+                                width="16"
+                                height="16"
                                 viewBox="0 0 24 24"
+                                fill="none"
                                 stroke="currentColor"
                                 strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                                 className={styles.deleteIcon}
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
+                                <path d="M6 18L18 6M6 6l12 12" />
                               </svg>
                             </button>
                           </div>
