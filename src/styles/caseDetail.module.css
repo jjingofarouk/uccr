@@ -1,37 +1,48 @@
+/* General container for case details */
 .caseDetail {
   max-width: 100%;
   margin: 0;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   box-sizing: border-box;
+  font-size: 16px; /* Standard font size for medical journal */
 }
 
+/* Header section with modern inline layout */
 .header {
-  margin-bottom: 1.5rem;
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0.75rem 0;
+  border-bottom: 2px solid var(--primary-light);
+  background: var(--surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   font-weight: 800;
   color: var(--text);
-  margin: 0 0 1rem;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
 .meta {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
-  font-size: 0.95rem;
-  color: #6b7280;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  opacity: 0.85;
+  font-weight: 500;
 }
 
 .dark-mode .meta {
-  color: #9ca3af;
+  color: var(--text);
+  opacity: 0.9;
 }
 
 .author {
@@ -43,17 +54,20 @@
 .avatar {
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border);
+  border: 2px solid var(--primary-light);
+  width: 36px;
+  height: 36px;
 }
 
 .dark-mode .avatar {
-  border-color: var(--border);
+  border-color: var(--primary-light);
 }
 
 .authorName {
   font-weight: 600;
   color: var(--primary);
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .authorName:hover {
@@ -63,28 +77,39 @@
 
 .date {
   font-size: 0.9rem;
+  font-weight: 400;
 }
 
+.awards {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+/* Vote section */
 .voteSection {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 0 0.5rem;
+  margin-bottom: 2rem;
+  padding: 0 0.75rem;
 }
 
 .voteButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--primary-light);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
   cursor: pointer;
   font-size: 0.95rem;
   color: var(--text);
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .voteButton:hover {
@@ -92,6 +117,7 @@
   border-color: var(--primary);
   color: #ffffff;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .voteButton:disabled {
@@ -100,7 +126,7 @@
 }
 
 .dark-mode .voteButton {
-  border-color: var(--border);
+  border-color: var(--primary-light);
 }
 
 .dark-mode .voteButton:hover {
@@ -110,49 +136,114 @@
 
 .voteCount {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
+/* Error message */
 .error {
   color: #ef4444;
   font-size: 0.9rem;
+  margin: 0.5rem 0;
 }
 
+/* Content sections with modern separators */
 .content {
-  margin-bottom: 1.5rem;
-  padding: 0 0.5rem;
+  margin-bottom: 2rem;
+  padding: 0 0.75rem;
 }
 
 .section {
-  margin-bottom: 1.25rem;
+  margin-bottom: 2rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: var(--primary);
+  border-radius: 2px;
 }
 
 .section h2 {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text);
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.75rem;
   letter-spacing: -0.015em;
 }
 
+/* Accordion for specialties */
+.specialtyAccordion {
+  margin-bottom: 1rem;
+}
+
+.specialtyButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.specialtyButton:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.specialtyContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: var(--surface);
+  border-radius: 0 0 10px 10px;
+  padding: 0 1.25rem;
+}
+
+.specialtyContent.open {
+  max-height: 200px; /* Adjust based on content */
+  padding: 1rem 1.25rem;
+}
+
+.specialtyContent p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Rich text styling */
 .richText {
   font-size: 1rem;
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .richText p {
-  margin: 0 0 1em;
+  margin: 0 0 0.75rem;
 }
 
 .richText ul,
 .richText ol {
-  margin: 0 0 1em;
+  margin: 0 0 0.75rem;
   padding-left: 1.5rem;
 }
 
 .richText li {
-  margin-bottom: 0.5em;
+  margin-bottom: 0.25rem;
 }
 
 .richText strong {
@@ -178,7 +269,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);
-  margin: 0.5em 0;
+  margin: 0.5rem 0;
 }
 
 .dark-mode .richText {
@@ -193,9 +284,45 @@
   color: var(--primary-hover);
 }
 
-.media {
+/* References section with reduced line spacing */
+.references {
   margin-bottom: 1.5rem;
-  padding: 0 0.5rem;
+}
+
+.references h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.75rem;
+}
+
+.references ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.references li {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.references li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+/* Media section */
+.media {
+  margin-bottom: 2rem;
+  padding: 0 0.75rem;
 }
 
 .media h2 {
@@ -207,8 +334,8 @@
 
 .mediaGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
 }
 
 .mediaImage {
@@ -217,27 +344,33 @@
   width: 100%;
   height: auto;
   object-fit: contain;
-  background: var(--background);
+  background: var(--surface);
+  transition: transform 0.3s ease;
+}
+
+.mediaImage:hover {
+  transform: scale(1.02);
 }
 
 .dark-mode .mediaImage {
   border-color: var(--border);
-  background: #1f2937;
+  background: var(--surface);
 }
 
+/* Edit button */
 .editButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--primary-light);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
   cursor: pointer;
   font-size: 0.95rem;
+  font-weight: 600;
   color: var(--text);
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-  margin-left: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .editButton:hover {
@@ -245,10 +378,11 @@
   border-color: var(--primary);
   color: #ffffff;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .dark-mode .editButton {
-  border-color: var(--border);
+  border-color: var(--primary-light);
 }
 
 .dark-mode .editButton:hover {
@@ -256,19 +390,25 @@
   border-color: var(--primary);
 }
 
-/* Responsive adjustments - further minimized */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .caseDetail {
-    margin: 0;
-    padding: 0.75rem 0;
+    padding: 1rem 0;
   }
 
   .header {
-    padding: 0.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 0;
   }
 
   .title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .meta {
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 
   .section h2 {
@@ -289,35 +429,35 @@
   }
 
   .voteSection {
-    padding: 0 0.25rem;
+    padding: 0 0.5rem;
   }
 
   .content {
-    padding: 0 0.25rem;
+    padding: 0 0.5rem;
   }
 
   .media {
-    padding: 0 0.25rem;
+    padding: 0 0.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .caseDetail {
-    margin: 0;
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
   }
 
   .header {
-    padding: 0.1rem;
+    padding: 0.25rem 0;
   }
 
   .title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .meta {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .author {
@@ -343,7 +483,7 @@
   }
 
   .voteButton {
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
 
@@ -351,15 +491,47 @@
     font-size: 1.25rem;
   }
 
-  .voteSection {
-    padding: 0 0.1rem;
+  .references li {
+    font-size: 0.85rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .voteButton,
+  .editButton,
+  .specialtyButton,
+  .mediaImage {
+    transition: none;
   }
 
-  .content {
-    padding: 0 0.1rem;
+  .voteButton:hover,
+  .editButton:hover,
+  .specialtyButton:hover,
+  .mediaImage:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .title,
+  .section h2,
+  .richText,
+  .references li {
+    color: var(--text);
   }
 
-  .media {
-    padding: 0 0.1rem;
+  .voteButton,
+  .editButton,
+  .specialtyButton {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  .voteButton:hover,
+  .editButton:hover,
+  .specialtyButton:hover {
+    background: var(--text);
+    color: var(--background);
   }
 }
