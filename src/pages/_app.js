@@ -4,7 +4,6 @@ import { ThemeProvider } from '../context/ThemeContext';
 import { CaseProvider } from '../context/CaseContext'; // Import CaseProvider
 import Navbar from '../components/Navbar';
 import Marquee from '../components/Marquee';
-import Footer from '../components/Footer';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import Head from 'next/head'; // Import Head for adding meta tags
