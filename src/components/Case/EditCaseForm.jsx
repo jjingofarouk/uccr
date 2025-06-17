@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import styles from '../../styles/caseForm.module.css';
 import FormHeader from './FormHeader';
 import ProgressBar from './ProgressBar';
-import StepContent from './EditStepContent';
+import StepContent from './StepContent';
 import Navigation from './EditNavigation';
 import ErrorMessage from './ErrorMessage';
 import Loading from '../Loading';
