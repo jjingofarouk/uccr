@@ -27,7 +27,6 @@ export default function MyApp({ Component, pageProps }) {
             <main>
               <Component {...pageProps} />
             </main>
-            <Footer /> {/* Add Footer component */}
           </CaseProvider>
         </ThemeProvider>
       </AuthProvider>
