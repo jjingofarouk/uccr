@@ -135,7 +135,7 @@ export default function EditCaseForm({ caseId }) {
       { value: 'Virology', label: 'Virology' },
     ]},
     { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
-    { name: 'highLevelSummary', label: 'High-Level Summary', type: 'richtext', placeholder: 'Summarize the case' },
+    { name: 'highLevelSummary', label: 'Case Summary', type: 'richtext', placeholder: 'Summarize the case' },
     { name: 'references', label: 'References', type: 'richtext', placeholder: 'List references' },
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
