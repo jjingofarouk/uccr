@@ -16,6 +16,18 @@ const quillModules = {
   clipboard: {
     matchVisual: false,
   },
+  keyboard: {
+    bindings: {
+      space: {
+        key: ' ',
+        handler: function (range, context) {
+          this.quill.insertText(range.index, ' ');
+          this.quill.setSelection(range.index + 1);
+          return false;
+        },
+      },
+    },
+  },
 };
 
 export default function StepContent({
@@ -92,15 +104,7 @@ export default function StepContent({
                 <div className={styles.mediaSection}>
                   <button
                     type="button"
-                    onClick={() => {
-                      widgetRef.current?.open();
-                      if (window.gtag) {
-                        window.gtag('event', 'media_upload_button_clicked', {
-                          event_category: 'CaseForm',
-                          event_label: 'Upload Media Button Clicked',
-                        });
-                      }
-                    }}
+                    onClick={() => widgetRef.current?.open()}
                     disabled={!widgetRef.current || isUploading}
                     className={styles.uploadButton}
                   >
