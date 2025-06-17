@@ -14,7 +14,6 @@ export default function MyApp({ Component, pageProps }) {
       <Head>
         <link rel="manifest" href="/manifest.json" /> {/* Link to PWA manifest */}
         <link rel="apple-touch-icon" href="/logo.jpg" /> {/* Apple Touch Icon */}
-        <meta name="theme-color" content="#2563eb" /> {/* Theme Color */}
       </Head>
       <AuthProvider>
         <ThemeProvider>
