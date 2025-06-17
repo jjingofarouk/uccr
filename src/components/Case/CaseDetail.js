@@ -32,7 +32,6 @@ const trackPageView = (caseId, title) => {
       },
     });
     
-    // Track case view event
     trackEvent('view_case', 'Case', caseId, 1);
   }
 };
@@ -54,7 +53,6 @@ export default function CaseDetail({ caseData, isLoading }) {
   const router = useRouter();
   const [error, setError] = useState('');
 
-  // Track page view when component mounts
   useEffect(() => {
     if (caseData && caseData.id) {
       trackPageView(caseData.id, caseData.title || 'Untitled Case');
@@ -69,31 +67,23 @@ export default function CaseDetail({ caseData, isLoading }) {
     try {
       await addReaction(caseData.id, user.uid, type);
       setError('');
-      
-      // Track vote event
       trackEvent('vote', 'Case Interaction', `${type}_${caseData.id}`, 1);
     } catch (err) {
       setError('Failed to record vote. Please try again.');
-      
-      // Track error event
       trackEvent('vote_error', 'Case Interaction', `${type}_${caseData.id}`, 1);
     }
   };
 
   const handleEditClick = () => {
     router.push(`/cases/edit/${caseData.id}`);
-    
-    // Track edit event
     trackEvent('edit_case', 'Case Management', caseData.id, 1);
   };
 
   const handleAuthorClick = (userId) => {
-    // Track author profile view
     trackEvent('view_author', 'Profile', userId, 1);
   };
 
   const handleMediaView = (mediaIndex) => {
-    // Track media view
     trackEvent('view_media', 'Case Media', `${caseData.id}_media_${mediaIndex}`, 1);
   };
 
@@ -200,7 +190,11 @@ export default function CaseDetail({ caseData, isLoading }) {
 
       <section className={styles.content}>
         <div className={styles.section}>
-          <h2>Chief Concern</h2>
+          <h2>Case Summary</h2>
+          {renderRichText(caseData.highLevelSummary)}
+        </div>
+        <div className={styles.section}>
+          <h2>Presenting Complaint</h2>
           {renderRichText(caseData.presentingComplaint)}
         </div>
         <div className={styles.section}>
@@ -234,10 +228,6 @@ export default function CaseDetail({ caseData, isLoading }) {
         <div className={styles.section}>
           <h2>Discussion</h2>
           {renderRichText(caseData.discussion)}
-        </div>
-        <div className={styles.section}>
-          <h2>High-Level Summary</h2>
-          {renderRichText(caseData.highLevelSummary)}
         </div>
         <div className={styles.section}>
           <h2>References</h2>
