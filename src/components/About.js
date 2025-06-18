@@ -116,7 +116,7 @@ const About = () => (
               lineHeight: 1.7,
             }}
           >
-            Farouk Jjingo is a visionary medical doctor full-stack developer with a deep understanding of both healthcare and technology. Farouk has combined his clinical expertise and programming skills to develop UCCR (and dozens of other applications) as a tool to enhance medical collaboration and education. He is a dedicated leader solving real-world healthcare challenges, which drives the success of this platform.
+            Farouk Jjingo is a visionary medical doctor and full-stack developer with a deep understanding of both healthcare and technology. He has combined his clinical expertise and programming skills to develop UCCR (and dozens of other applications) as a tool to enhance medical collaboration and education. He is a dedicated leader solving real-world healthcare challenges, which drives the success of this platform.
           </Typography>
         </Box>
 
