@@ -9,7 +9,7 @@ import {
   Button,
 } from '@mui/material';
 import { Heart, Smile, DollarSign, Building, GraduationCap, Users } from 'lucide-react';
-import Donate from '../components/Donate';
+import Donate from '../../components/Donate';
 import styles from '../styles/support.module.css';
 
 const SupportUs = () => {
