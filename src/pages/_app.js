@@ -33,7 +33,6 @@ export default function MyApp({ Component, pageProps }) {
             <main>
               <Component {...pageProps} />
             </main>
-            <Footer />
           </CaseProvider>
         </ThemeProvider>
       </AuthProvider>
