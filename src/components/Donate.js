@@ -24,7 +24,7 @@ const Donate = () => {
     visible: { opacity: 1, y: 0 },
   };
 
-  const goal = 100000;
+  const goal = 50000; // Sensible goal for a case reporting app
   const [donationAmount, setDonationAmount] = useState(50);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -41,12 +41,58 @@ const Donate = () => {
       try {
         setIsLoading(true);
         setError(null);
-        // Mock API response for demo
+        // Mock API response for demo with global donors
         const mockData = {
-          totalRaised: 25000,
+          totalRaised: 18500,
           recentDonations: [
-            { id: '1', name: 'John Doe', amount: 100, donationType: 'Supporter', createdAt: new Date().toISOString(), message: 'Great cause!' },
-            { id: '2', name: 'Anonymous', amount: 500, donationType: 'Innovator', createdAt: new Date().toISOString() },
+            {
+              id: '1',
+              name: 'Joseph Kiggundu',
+              amount: 75,
+              donationType: 'Advocate',
+              createdAt: new Date().toISOString(),
+              message: 'Kale nange nzikiriza mu kukulaakulanya eby’obulamu! (I believe in advancing healthcare!)',
+            },
+            {
+              id: '2',
+              name: 'Alejandra Morales',
+              amount: 400,
+              donationType: 'Champion',
+              createdAt: new Date().toISOString(),
+              message: '¡Apoyo esta gran causa para la salud global! (I support this great cause for global health!)',
+            },
+            {
+              id: '3',
+              name: 'Esther Nakayima',
+              amount: 150,
+              donationType: 'Advocate',
+              createdAt: new Date().toISOString(),
+              message: 'For better patient outcomes in Uganda!',
+            },
+            {
+              id: '4',
+              name: 'Hiroshi Tanaka',
+              amount: 1000,
+              donationType: 'Leader',
+              createdAt: new Date().toISOString(),
+              message: '医療の未来のために (For the future of healthcare)',
+            },
+            {
+              id: '5',
+              name: 'Fatima Al-Sayed',
+              amount: 300,
+              donationType: 'Champion',
+              createdAt: new Date().toISOString(),
+              message: 'لتعزيز الرعاية الصحية في المجتمعات (To enhance healthcare in communities)',
+            },
+            {
+              id: '6',
+              name: 'Anika Sharma',
+              amount: 50,
+              donationType: 'Advocate',
+              createdAt: new Date().toISOString(),
+              message: 'Proud to support medical innovation!',
+            },
           ],
         };
         setTotalRaised(mockData.totalRaised);
@@ -62,28 +108,28 @@ const Donate = () => {
 
   const donationTiers = [
     {
-      name: 'Supporter',
-      range: '$25 - $499',
-      description: 'Support clinical case reporting tools for healthcare professionals.',
-      benefits: ['Website recognition', 'Newsletter updates'],
+      name: 'Advocate',
+      range: '$25 - $249',
+      description: 'Support essential case reporting tools for healthcare workers.',
+      benefits: ['Website recognition', 'Monthly newsletter'],
     },
     {
-      name: 'Innovator',
-      range: '$500 - $2,499',
-      description: 'Fund advanced features for our medical reporting platform.',
-      benefits: ['All Supporter benefits', 'Annual impact report', 'Virtual event access'],
+      name: 'Champion',
+      range: '$250 - $999',
+      description: 'Enhance platform features for real-time case tracking.',
+      benefits: ['All Advocate benefits', 'Impact report', 'Webinar access'],
     },
     {
-      name: 'Pioneer',
-      range: '$2,500 - $9,999',
-      description: 'Expand our platform to new medical institutions.',
-      benefits: ['All Innovator benefits', 'Named recognition', 'Exclusive updates'],
+      name: 'Leader',
+      range: '$1,000 - $4,999',
+      description: 'Expand access to hospitals and clinics in underserved areas.',
+      benefits: ['All Champion benefits', 'Named recognition', 'Exclusive updates'],
     },
     {
-      name: 'Visionary',
-      range: '$10,000+',
-      description: 'Establish a fully integrated case reporting system.',
-      benefits: ['All Pioneer benefits', 'Naming opportunity', 'Annual demo', 'Advisory role'],
+      name: 'Transformer',
+      range: '$5,000+',
+      description: 'Drive a fully integrated case reporting ecosystem.',
+      benefits: ['All Leader benefits', 'Naming opportunity', 'Virtual demo', 'Advisory role'],
     },
   ];
 
@@ -116,7 +162,7 @@ const Donate = () => {
             <Card sx={{ flex: 1, padding: '1.5rem', minWidth: '300px' }}>
               <CardContent>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', marginBottom: '1rem' }}>
-                  Donate
+                  Support Case Reporting
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
                 <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -171,7 +217,7 @@ const Donate = () => {
               {isLoading ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <Box sx={{ height: '1rem', background: '#e0e0e0', borderRadius: '4px' }} />
-                  <Box sx={{ height: '5rem', background: '#e0e0e0', borderRadius: '4px' }} />
+                  <Box sx{{ height: '5rem', background: '#e0e0e0', borderRadius: '4px' }} />
                 </Box>
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
