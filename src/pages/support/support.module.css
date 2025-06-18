@@ -1,3 +1,4 @@
+// styles/support.module.css
 /* Support Page Styling */
 
 /* General Container */
@@ -5,8 +6,8 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  background: var(--background, #ffffff);
-  color: var(--text, #333333);
+  background: #ffffff;
+  color: #333333;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -17,8 +18,8 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 1.5rem;
-  color: var(--primary, #1976d2);
-  background: linear-gradient(135deg, var(--primary, #1976d2), var(--accent, #42a5f5));
+  color: #1976d2;
+  background: linear-gradient(135deg, #1976d2, #42a5f5);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -33,27 +34,28 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  color: var(--text, #333333);
+  color: #333333;
   opacity: 0.9;
 }
 
 /* Card Styles */
-.card {
+.carouselCard {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   padding: 1.5rem;
   border-radius: 16px;
-  background: var(--surface, #f9f9f9);
-  border: 1px solid var(--border, #e0e0e0);
-  box-shadow: 0 4px 12px var(--shadow, rgba(0, 0, 0, 0.1));
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
 }
 
-.card:hover {
+.carouselCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 18px var(--shadow-hover, rgba(0, 0, 0, 0.15));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 /* Card Icon */
@@ -65,7 +67,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--secondary, #e3f2fd);
+  background: #e3f2fd;
 }
 
 /* Card Title */
@@ -74,14 +76,14 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--primary-dark, #1565c0);
+  color: #1565c0;
 }
 
 /* Card Description */
 .cardDescription {
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  color: var(--text, #333333);
+  color: #333333;
   line-height: 1.5;
 }
 
@@ -92,15 +94,15 @@
   font-size: 1rem;
   font-weight: bold;
   border-radius: 8px;
-  background: var(--button-bg, #1976d2);
-  color: var(--button-text, #ffffff);
+  background: #1976d2;
+  color: #ffffff;
   text-align: center;
   text-decoration: none;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .donateButton:hover {
-  background: var(--button-bg-hover, #1565c0);
+  background: #1565c0;
   transform: scale(1.05);
 }
 
@@ -118,7 +120,7 @@
     font-size: 1rem;
   }
 
-  .card {
+  .carouselCard {
     padding: 1rem;
   }
 
@@ -149,7 +151,7 @@
     font-size: 0.95rem;
   }
 
-  .card {
+  .carouselCard {
     padding: 0.8rem;
   }
 
@@ -169,11 +171,11 @@
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .card {
+  .carouselCard {
     transition: none;
   }
 
-  .card:hover {
+  .carouselCard:hover {
     transform: none;
   }
 
@@ -184,11 +186,11 @@
 
 @media (prefers-contrast: high) {
   .title {
-    -webkit-text-fill-color: var(--text, #000000);
+    -webkit-text-fill-color: #000000;
     background: none;
   }
 
-  .card {
-    border-color: var(--text, #000000);
+  .carouselCard {
+    border-color: #000000;
   }
 }
