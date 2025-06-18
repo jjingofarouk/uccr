@@ -150,17 +150,19 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               <Grid size={20} className={styles.navIcon} />
               Other Apps
             </Link>
-            <Link 
-              href="/support" 
-              onClick={() => {
-                handleNavigationClick('support');
-                toggleSidebar();
-              }} 
-              className={styles.navLink}
-            >
-              <Heart size={20} className={styles.navIcon} />
-              Support This Project
-            </Link>
+{/*
+  <Link 
+    href="/support" 
+    onClick={() => {
+      handleNavigationClick('support');
+      toggleSidebar();
+    }} 
+    className={styles.navLink}
+  >
+    <Heart size={20} className={styles.navIcon} />
+    Support This Project
+  </Link>
+*/}
             {user ? (
               <button
                 onClick={handleLogout}
