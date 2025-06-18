@@ -1,8 +1,7 @@
-// src/components/Chat/Inbox.jsx
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { getMessages, getUsers, sendMessage, getThreadMessages, getProfile } from '../../firebase/firestore';
+import { getMessages, sendMessage, getThreadMessages, getProfile, searchCasesAndUsers } from '../../firebase/firestore';
 import Navbar from '../../components/Navbar';
 import { Search, Send, AlertCircle } from 'lucide-react';
 import styles from './inbox.module.css';
@@ -12,9 +11,8 @@ export default function Inbox() {
   const router = useRouter();
   const { recipient: recipientId } = router.query;
   const [threads, setThreads] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const [selectedThread, setSelectedThread] = useState(null);
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState('');
@@ -41,36 +39,24 @@ export default function Inbox() {
   }, [user]);
 
   useEffect(() => {
-    if (!user) return;
-
-    const fetchUsers = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    const searchUsers = async () => {
       try {
-        const allUsers = await getUsers();
-        const filtered = allUsers.filter(u => u.uid !== user.uid);
-        console.log('Filtered users:', filtered);
-        setUsers(filtered);
-        setFilteredUsers(filtered);
+        const results = await searchCasesAndUsers(searchQuery, 'users');
+        const filtered = results.filter(u => u.uid !== user.uid);
+        console.log('Search query:', searchQuery, 'Filtered users:', filtered);
+        setSearchResults(filtered);
       } catch (err) {
-        setError('Failed to load users.');
-        console.error('Fetch users error:', err);
+        setError('Failed to search users.');
+        console.error('Search users error:', err);
       }
     };
-    fetchUsers();
-  }, [user]);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredUsers(users);
-    } else {
-      const lowerQuery = searchQuery.toLowerCase();
-      const filtered = users.filter(u => 
-        u.displayName?.toLowerCase().includes(lowerQuery) || 
-        u.email?.toLowerCase().includes(lowerQuery)
-      );
-      console.log('Search query:', searchQuery, 'Filtered users:', filtered);
-      setFilteredUsers(filtered);
-    }
-  }, [searchQuery, users]);
+    const debounce = setTimeout(searchUsers, 300);
+    return () => clearTimeout(debounce);
+  }, [searchQuery, user]);
 
   useEffect(() => {
     if (!selectedThread) {
@@ -90,36 +76,29 @@ export default function Inbox() {
   }, [selectedThread]);
 
   useEffect(() => {
-    if (!user || !recipientId || !users.length) return;
+    if (!user || !recipientId) return;
 
     const selectRecipient = async () => {
-      const recipient = users.find(u => u.uid === recipientId);
-      if (!recipient) {
-        try {
-          const profile = await getProfile(recipientId);
-          if (profile.displayName) {
-            const recipientData = {
-              uid: recipientId,
-              displayName: profile.displayName,
-              email: profile.email || '',
-              photoURL: profile.photoURL,
-            };
-            setUsers(prev => [...prev, recipientData]);
-            setFilteredUsers(prev => [...prev, recipientData]);
-            handleSelectUser(recipientData);
-          } else {
-            setError('User not found.');
-          }
-        } catch (err) {
-          setError('Failed to load recipient profile.');
-          console.error('Fetch profile error:', err);
+      try {
+        const profile = await getProfile(recipientId);
+        if (profile.displayName) {
+          const recipientData = {
+            uid: recipientId,
+            displayName: profile.displayName,
+            email: profile.email || '',
+            photoURL: profile.photoURL,
+          };
+          handleSelectUser(recipientData);
+        } else {
+          setError('User not found.');
         }
-        return;
+      } catch (err) {
+        setError('Failed to load recipient profile.');
+        console.error('Fetch profile error:', err);
       }
-      handleSelectUser(recipient);
     };
     selectRecipient();
-  }, [recipientId, user, users]);
+  }, [recipientId, user]);
 
   const handleSelectUser = async (recipient) => {
     const threadId = [user.uid, recipient.uid].sort().join('_');
@@ -135,6 +114,7 @@ export default function Inbox() {
       setMessages([]);
     }
     setSearchQuery('');
+    setSearchResults([]);
     setError('');
     setSuccess('');
     router.replace('/inbox', undefined, { shallow: true });
@@ -182,14 +162,14 @@ export default function Inbox() {
               <Search className={styles.searchIcon} size={20} />
               <input
                 type="text"
-                placeholder="Search users..."
+                placeholder="Search users to chat..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.searchInput}
               />
             </div>
             <div className={styles.users}>
-              {filteredUsers.map(u => (
+              {searchResults.map(u => (
                 <div
                   key={u.uid}
                   onClick={() => handleSelectUser(u)}
@@ -199,7 +179,7 @@ export default function Inbox() {
                   <span className={styles.userEmail}>{u.email}</span>
                 </div>
               ))}
-              {filteredUsers.length === 0 && searchQuery && (
+              {searchResults.length === 0 && searchQuery && (
                 <p className={styles.noResults}>No users found</p>
               )}
             </div>
@@ -245,7 +225,7 @@ export default function Inbox() {
                 )}
               </>
             ) : (
-              <p className={styles.noChat}>Select a user to start chatting</p>
+              <p className={styles.noChat}>Search for a user to start chatting</p>
             )}
           </div>
         </div>
