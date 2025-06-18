@@ -1,6 +1,7 @@
 import { collection, addDoc, getDocs, doc, getDoc, updateDoc, serverTimestamp, query, where } from 'firebase/firestore';
 import { db, auth } from './config';
 import { fetchUserPhotoURL } from './utils';
+import { notifyUsersOfCaseChange } from './notifications';
 
 export const addCase = async (caseData) => {
   try {
@@ -33,6 +34,7 @@ export const addCase = async (caseData) => {
     console.log('Validated case data:', validatedCaseData);
     const docRef = await addDoc(collection(db, 'cases'), validatedCaseData);
     console.log('Case added with ID:', docRef.id, 'userId:', caseData.userId);
+    await notifyUsersOfCaseChange(docRef.id, validatedCaseData.title, 'Added', caseData.userId);
     return docRef.id;
   } catch (error) {
     console.error('Add case error:', { code: error.code, message: error.message, stack: error.stack });
@@ -157,6 +159,7 @@ export const updateCase = async (caseId, caseData) => {
     const caseRef = doc(db, 'cases', caseId);
     await updateDoc(caseRef, validatedCaseData);
     console.log('Case updated with ID:', caseId, 'userId:', caseData.userId);
+    await notifyUsersOfCaseChange(caseId, validatedCaseData.title, 'Updated', caseData.userId);
     return caseId;
   } catch (error) {
     console.error('Update case error:', { code: error.code, message: error.message, stack: error.stack });
