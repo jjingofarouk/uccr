@@ -13,7 +13,7 @@
 }
 
 .dark-mode {
-  --background: #121212; /* Deep black for true dark mode */
+  --background: #000000; /* Pure black for the darkest dark mode */
   --text: #e0e0e0; /* Light gray for readable text */
   --primary: #4db6ac; /* Brighter teal for visibility in dark mode */
   --primary-hover: #80cbc4; /* Lighter teal for hover states */
