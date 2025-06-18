@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import { Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
-import styles from '../styles/support.module.css';
 
 const Donate = () => {
   const fadeIn = {
@@ -24,7 +23,7 @@ const Donate = () => {
     visible: { opacity: 1, y: 0 },
   };
 
-  const goal = 50000; // Sensible goal for a case reporting app
+  const goal = 50000;
   const [donationAmount, setDonationAmount] = useState(50);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -41,9 +40,8 @@ const Donate = () => {
       try {
         setIsLoading(true);
         setError(null);
-        // Mock API response for demo with global donors
         const mockData = {
-          totalRaised: 18500,
+          totalRaised: 22000,
           recentDonations: [
             {
               id: '1',
@@ -93,6 +91,22 @@ const Donate = () => {
               createdAt: new Date().toISOString(),
               message: 'Proud to support medical innovation!',
             },
+            {
+              id: '7',
+              name: 'Liam O’Connor',
+              amount: 200,
+              donationType: 'Champion',
+              createdAt: new Date().toISOString(),
+              message: 'Supporting global health initiatives!',
+            },
+            {
+              id: '8',
+              name: 'Sofia Mendes',
+              amount: 500,
+              donationType: 'Champion',
+              createdAt: new Date().toISOString(),
+              message: 'Para uma saúde melhor em todo o mundo! (For better health worldwide!)',
+            },
           ],
         };
         setTotalRaised(mockData.totalRaised);
@@ -141,7 +155,7 @@ const Donate = () => {
       maximumFractionDigits: 0,
     }).format(amount);
 
-  const progressPercentage = (totalRaised / goal) * 100;
+  const progressPercentage = Math.min((totalRaised / goal) * 100, 100);
 
   return (
     <motion.div
@@ -165,7 +179,7 @@ const Donate = () => {
                   Support Case Reporting
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
-                <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <Typography variant="body1">Donation Amount (USD)</Typography>
                   <Slider
                     value={donationAmount}
@@ -205,10 +219,11 @@ const Donate = () => {
                   />
                   <Button
                     variant="contained"
-                    className={styles.donateButton}
+                    sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     href={`/donate?amount=${donationAmount}`}
                   >
-                    Donate {formatCurrency(donationAmount)} <Heart size={20} style={{ marginLeft: '0.5rem' }} />
+                    Donate {formatCurrency(donationAmount)}
+                    <Heart size={20} />
                   </Button>
                 </Box>
               </CardContent>
@@ -217,7 +232,7 @@ const Donate = () => {
               {isLoading ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <Box sx={{ height: '1rem', background: '#e0e0e0', borderRadius: '4px' }} />
-                  <Box sx{{ height: '5rem', background: '#e0e0e0', borderRadius: '4px' }} />
+                  <Box sx={{ height: '5rem', background: '#e0e0e0', borderRadius: '4px' }} />
                 </Box>
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -288,11 +303,11 @@ const Donate = () => {
                 </CardContent>
                 <Button
                   variant="contained"
-                  className={styles.donateButton}
+                  sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}
                   href={`/donate/${tier.name.toLowerCase()}`}
-                  sx={{ marginTop: '1rem' }}
                 >
-                  Donate as {tier.name} <Heart size={20} style={{ marginLeft: '0.5rem' }} />
+                  Donate as {tier.name}
+                  <Heart size={20} />
                 </Button>
               </Card>
             ))}
