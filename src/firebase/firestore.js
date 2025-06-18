@@ -7,9 +7,10 @@ import { sendMessage, getMessages, getThreadMessages } from './messages';
 import { addReaction } from './reactions';
 import { getUserStats, subscribeUserStats, getCaseStatistics } from './stats';
 import { getTopContributors } from './contributors';
-import { getTrendingCases } from './trending'; // New import
+import { getTrendingCases } from './trending';
 import { searchCasesAndUsers } from './search';
 import { getAllSpecialties } from './specialties';
+import { notifyUsersOfCaseChange } from './notifications';
 
 export {
   db,
@@ -33,7 +34,8 @@ export {
   subscribeUserStats,
   getCaseStatistics,
   getTopContributors,
-  getTrendingCases, // New export
+  getTrendingCases,
   searchCasesAndUsers,
   getAllSpecialties,
+  notifyUsersOfCaseChange,
 };
