@@ -1,48 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import styles from '../styles/navbar.module.css';
-import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db, auth } from '../firebase/config';
 
 export default function NotificationsDropdown({ isOpen, toggleNotifications, unreadThreads, handleNavigationClick }) {
-  const [notifications, setNotifications] = React.useState([]);
-
-  const fetchNotifications = async () => {
-    try {
-      const q = query(
-        collection(db, 'notifications'),
-        where('userId', '==', auth.currentUser?.uid),
-        where('read', '==', false)
-      );
-      const querySnapshot = await getDocs(q);
-      const fetchedNotifications = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.() || new Date(),
-      }));
-      setNotifications(fetchedNotifications);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      setNotifications([]);
-    }
-  };
-
-  const markNotificationAsRead = async (notificationId) => {
-    try {
-      const notificationRef = doc(db, 'notifications', notificationId);
-      await updateDoc(notificationRef, { read: true });
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-    }
-  };
-
-  React.useEffect(() => {
-    if (isOpen && auth.currentUser) {
-      fetchNotifications();
-    }
-  }, [isOpen]);
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -53,40 +13,23 @@ export default function NotificationsDropdown({ isOpen, toggleNotifications, unr
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
         >
-          {notifications.length === 0 && unreadThreads.length === 0 ? (
-            <p className={styles.noNotifications}>No new notifications</p>
+          {unreadThreads.length === 0 ? (
+            <p className={styles.noNotifications}>No new messages</p>
           ) : (
-            <>
-              {notifications.map((notification) => (
-                <Link
-                  key={notification.id}
-                  href={`/cases/${notification.caseId}`}
-                  className={styles.notificationItem}
-                  onClick={() => {
-                    handleNavigationClick('notification_case');
-                    markNotificationAsRead(notification.id);
-                    toggleNotifications();
-                  }}
-                >
-                  <span>{notification.title}</span>
-                  <small>{notification.message}</small>
-                </Link>
-              ))}
-              {unreadThreads.map((thread) => (
-                <Link
-                  key={thread.id}
-                  href={`/messages/${thread.id}`}
-                  className={styles.notificationItem}
-                  onClick={() => {
-                    handleNavigationClick('notification_message');
-                    toggleNotifications();
-                  }}
-                >
-                  <span>New message from {thread.otherUserName}</span>
-                  <small>{thread.lastMessage}</small>
-                </Link>
-              ))}
-            </>
+            unreadThreads.map((thread) => (
+              <Link
+                key={thread.id}
+                href={`/messages/${thread.id}`}
+                className={styles.notificationItem}
+                onClick={() => {
+                  handleNavigationClick('notification_message');
+                  toggleNotifications();
+                }}
+              >
+                <span>New message from {thread.otherUserName}</span>
+                <small>{thread.lastMessage}</small>
+              </Link>
+            ))
           )}
         </motion.div>
       )}
