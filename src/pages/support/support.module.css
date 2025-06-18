@@ -5,8 +5,8 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  background: var(--background);
-  color: var(--text);
+  background: var(--background, #ffffff);
+  color: var(--text, #333333);
   transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -17,8 +17,8 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 1.5rem;
-  color: var(--primary);
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: var(--primary, #1976d2);
+  background: linear-gradient(135deg, var(--primary, #1976d2), var(--accent, #42a5f5));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -33,7 +33,7 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  color: var(--text);
+  color: var(--text, #333333);
   opacity: 0.9;
 }
 
@@ -45,15 +45,15 @@
   text-align: center;
   padding: 1.5rem;
   border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 12px var(--shadow);
+  background: var(--surface, #f9f9f9);
+  border: 1px solid var(--border, #e0e0e0);
+  box-shadow: 0 4px 12px var(--shadow, rgba(0, 0, 0, 0.1));
   transition: all 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 18px var(--shadow-hover);
+  box-shadow: 0 6px 18px var(--shadow-hover, rgba(0, 0, 0, 0.15));
 }
 
 /* Card Icon */
@@ -65,7 +65,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--secondary);
+  background: var(--secondary, #e3f2fd);
 }
 
 /* Card Title */
@@ -74,14 +74,14 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--primary-dark);
+  color: var(--primary-dark, #1565c0);
 }
 
 /* Card Description */
 .cardDescription {
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  color: var(--text);
+  color: var(--text, #333333);
   line-height: 1.5;
 }
 
@@ -92,15 +92,15 @@
   font-size: 1rem;
   font-weight: bold;
   border-radius: 8px;
-  background: var(--button-bg);
-  color: var(--button-text);
+  background: var(--button-bg, #1976d2);
+  color: var(--button-text, #ffffff);
   text-align: center;
   text-decoration: none;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .donateButton:hover {
-  background: var(--button-bg-hover);
+  background: var(--button-bg-hover, #1565c0);
   transform: scale(1.05);
 }
 
@@ -184,11 +184,11 @@
 
 @media (prefers-contrast: high) {
   .title {
-    -webkit-text-fill-color: var(--text);
+    -webkit-text-fill-color: var(--text, #000000);
     background: none;
   }
 
   .card {
-    border-color: var(--text);
+    border-color: var(--text, #000000);
   }
 }
