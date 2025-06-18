@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { getMessages } from '../firebase/firestore';
+import { getMessages, notifyUsersOfCaseChange } from '../firebase/firestore';
 import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -12,6 +12,8 @@ import styles from '../styles/navbar.module.css';
 import SearchModal from './SearchModal';
 import NotificationsDropdown from './NotificationsDropdown';
 import Sidebar from './Sidebar';
+import { onSnapshot, collection, query, where } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
@@ -21,6 +23,7 @@ export default function Navbar() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [unreadThreads, setUnreadThreads] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [logoutError, setLogoutError] = useState('');
   const sidebarRef = useRef(null);
   const notificationsRef = useRef(null);
@@ -89,45 +92,51 @@ export default function Navbar() {
   }, [user]);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      const clickedElement = event.target;
+    if (!user) {
+      setUnreadNotifications([]);
+      return;
+    }
 
-      // Close sidebar if click is outside sidebarRef
-      if (isSidebarOpen && sidebarRef.current && !sidebarRef.current.contains(clickedElement)) {
-        setIsSidebarOpen(false);
-        setLogoutError('');
-      }
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', user.uid),
+      where('read', '==', false)
+    );
 
-      // Close notifications if click is outside notificationsRef
-      if (isNotificationsOpen && notificationsRef.current && !notificationsRef.current.contains(clickedElement)) {
-        setIsNotificationsOpen(false);
-      }
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const notifications = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate?.() || new Date(),
+      }));
+      setUnreadNotifications(notifications);
+    }, (error) => {
+      console.error('Error fetching notifications:', error);
+    });
 
-      // Close search modal if click is outside searchModalRef
-      if (isSearchModalOpen && searchModalRef.current && !searchModalRef.current.contains(clickedElement)) {
-        setIsSearchModalOpen(false);
-      }
-    };
+    return () => unsubscribe();
+  }, [user]);
 
-    const handleEscapeKey = (event) => {
-      if (event.key === 'Escape') {
-        setIsSidebarOpen(false);
-        setIsNotificationsOpen(false);
-        setIsSearchModalOpen(false);
-        setLogoutError('');
-      }
-    };
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'cases'), (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const caseData = change.doc.data();
+        const caseId = change.doc.id;
+        const caseTitle = caseData.title || 'Untitled Case';
+        const action = change.type === 'added' ? 'Added' : change.type === 'modified' ? 'Updated' : null;
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
+        if (action && user) {
+          notifyUsersOfCaseChange(caseId, caseTitle, action).catch((error) => {
+            console.error(`Error notifying users of case ${action.toLowerCase()}:`, error);
+          });
+        }
+      });
+    }, (error) => {
+      console.error('Error listening to cases:', error);
+    });
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [isSidebarOpen, isNotificationsOpen, isSearchModalOpen]);
+    return () => unsubscribe();
+  }, [user]);
 
   return (
     <header className={styles.header}>
@@ -179,8 +188,8 @@ export default function Navbar() {
                 aria-label="View notifications"
               >
                 <Bell size={20} />
-                {unreadThreads.length > 0 && (
-                  <span className={styles.notificationBadge}>{unreadThreads.length}</span>
+                {(unreadThreads.length + unreadNotifications.length) > 0 && (
+                  <span className={styles.notificationBadge}>{unreadThreads.length + unreadNotifications.length}</span>
                 )}
               </button>
               <NotificationsDropdown
