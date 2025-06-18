@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import styles from '../styles/navbar.module.css';
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db, auth } from './config';
+import { db, auth } from '../firebase/config';
 
 export default function NotificationsDropdown({ isOpen, toggleNotifications, unreadThreads, handleNavigationClick }) {
   const [notifications, setNotifications] = React.useState([]);
