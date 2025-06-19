@@ -1,7 +1,7 @@
 import RoadSafetyCharts from '../../components/Charts';
 
-const AboutPage = () => {
-  return <About />;
+const ChartPage = () => {
+  return <RoadSafetyCharts />;
 };
 
-export default AboutPage;
+export default ChartPage;
