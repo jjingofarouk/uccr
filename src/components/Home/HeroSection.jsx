@@ -5,6 +5,7 @@ import { trackClick } from '../../utils/analytics';
 import styles from './HeroSection.module.css';
 
 const HeroSection = () => {
+  // Archive words
   const archiveWords = [
     'medical case studies',
     'clinical reports',
@@ -16,6 +17,7 @@ const HeroSection = () => {
     'treatment protocols'
   ];
 
+  // Research words
   const researchWords = [
     'medical research',
     'clinical data',
@@ -27,6 +29,7 @@ const HeroSection = () => {
     'research publications'
   ];
 
+  // Professionals
   const professionals = [
     'doctors',
     'nurses',
@@ -35,25 +38,52 @@ const HeroSection = () => {
     'surgeons',
     'specialists',
     'pediatricians',
-    'cardiologists'
+    'cardiologists',
+    'neurologists',
+    'oncologists',
+    'radiologists',
+    'pathologists',
+    'anesthesiologists',
+    'gynecologists',
+    'psychiatrists',
+    'dermatologists',
+    'orthopedic surgeons',
+    'emergency physicians',
+    'family medicine doctors',
+    'public health experts',
+    'clinical pharmacists',
+    'medical educators'
   ];
 
+  // Locations
   const locations = [
     'Uganda',
     'East Africa',
+    'West Africa',
+    'Central Africa',
+    'Southern Africa',
+    'Sub-Saharan Africa',
     'Kenya',
     'Tanzania',
     'Rwanda',
     'Ghana',
     'Nigeria',
-    'South Africa'
+    'South Africa',
+    'Ethiopia',
+    'Malawi',
+    'Zambia',
+    'developing nations',
+    'emerging markets',
+    'global health communities'
   ];
 
+  // State for each typing element
   const [archiveState, setArchiveState] = useState({ index: 0, text: '', isTyping: true });
   const [researchState, setResearchState] = useState({ index: 0, text: '', isTyping: true });
   const [professionalsState, setProfessionalsState] = useState({ index: 0, text: '', isTyping: true });
   const [locationsState, setLocationsState] = useState({ index: 0, text: '', isTyping: true });
 
+  // Generic typing effect hook
   const useTypingEffect = (words, state, setState, speed = 80, pauseTime = 2000, eraseSpeed = 40) => {
     useEffect(() => {
       const currentWord = words[state.index];
@@ -96,6 +126,7 @@ const HeroSection = () => {
     }, [words, state, setState, speed, pauseTime, eraseSpeed]);
   };
 
+  // Apply typing effects with different speeds and delays
   useTypingEffect(archiveWords, archiveState, setArchiveState, 80, 2500, 40);
   useTypingEffect(researchWords, researchState, setResearchState, 90, 2000, 45);
   useTypingEffect(professionals, professionalsState, setProfessionalsState, 70, 1800, 35);
@@ -126,7 +157,27 @@ const HeroSection = () => {
       'healthcare research Uganda',
       'clinical research Africa',
       'Uganda medical research',
-      'clinical trials Uganda'
+      'clinical trials Uganda',
+      'medical case reports',
+      'healthcare studies Uganda',
+      'medical journals Uganda',
+      'clinical case studies',
+      'Uganda health studies',
+      'medical research Africa',
+      'healthcare professionals Uganda',
+      'clinical reports Uganda',
+      'medical education Uganda',
+      'public health Uganda',
+      'medical case study database',
+      'Uganda healthcare insights',
+      'clinical case archive',
+      'health research Uganda',
+      'medical case reports Africa',
+      'Uganda clinical trials',
+      'healthcare case studies',
+      'medical studies East Africa',
+      'clinical data Uganda',
+      'healthcare innovation Uganda',
     ],
   };
 
@@ -138,11 +189,11 @@ const HeroSection = () => {
         </title>
         <meta
           name="description"
-          content="Explore Uganda Clinical Case Reports, a leading archive of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda."
+          content="Explore Uganda Clinical Case Reports, a leading archive of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda. Contribute to medical education, public health, and clinical studies for healthcare professionals, researchers, and students."
         />
         <meta
           name="keywords"
-          content="Uganda clinical case reports, medical case studies Uganda, healthcare research Uganda, clinical research Africa, Uganda medical research, clinical trials Uganda"
+          content="Uganda clinical case reports, medical case studies Uganda, healthcare research Uganda, clinical research Africa, Uganda medical research, clinical trials Uganda, medical case reports, healthcare studies Uganda, medical journals Uganda, clinical case studies, Uganda health studies, medical research Africa, healthcare professionals Uganda, clinical reports Uganda, medical education Uganda, public health Uganda, medical case study database, Uganda healthcare insights, clinical case archive, health research Uganda, medical case reports Africa, Uganda clinical trials, healthcare case studies, medical studies East Africa, clinical data Uganda, healthcare innovation Uganda, medical research database, clinical insights Uganda, health studies Africa"
         />
         <meta name="author" content="Uganda Clinical Case Reports" />
         <meta name="robots" content="index, follow" />
@@ -152,13 +203,13 @@ const HeroSection = () => {
         />
         <meta
           property="og:description"
-          content="Discover Uganda Clinical Case Reports, a comprehensive collection of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda."
+          content="Discover Uganda Clinical Case Reports, a comprehensive collection of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda for healthcare professionals and researchers."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ugandacasereports.org" />
         <meta
           property="og:image"
-          content="https://ugandacasereports.org/og-image.jpg"
+          content="https://ugandacasereports.org/reports.jpg"
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta
@@ -171,7 +222,7 @@ const HeroSection = () => {
         />
         <meta
           name="twitter:image"
-          content="https://ugandacasereports.org/og-image.jpg"
+          content="https://ugandacasereports.org/reports.jpg"
         />
         <link rel="canonical" href="https://ugandacasereports.org" />
       </Head>
@@ -183,12 +234,16 @@ const HeroSection = () => {
         <video
           className={styles.heroVideo}
           autoPlay
-          loop
           muted
+          loop
           playsInline
-          src="/hospital.mp4"
+          preload="auto"
           aria-hidden="true"
-        />
+        >
+          <source src="/hospital.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
           <h1 id="hero-title" className={styles.heroTitle}>
             Uganda Clinical Case Reports
