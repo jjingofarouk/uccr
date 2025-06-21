@@ -101,7 +101,7 @@ const About = () => {
   const contactLinks = [
     {
       href: 'https://ug.linkedin.com/in/farouk-jjingo-0341b01a5',
-      icon: Linkedin,
+      Icon: Linkedin,
       label: 'LinkedIn',
       value: 'Farouk Jjingo',
       ariaLabel: 'Farouk Jjingo LinkedIn Profile for Medical and Tech Collaboration',
@@ -109,7 +109,7 @@ const About = () => {
     },
     {
       href: 'https://wa.me/256751360385',
-      icon: MessageCircle,
+      Icon: MessageCircle,
       label: 'WhatsApp',
       value: '+256751360385',
       ariaLabel: 'Contact Farouk Jjingo via WhatsApp for Medical Research',
@@ -117,7 +117,7 @@ const About = () => {
     },
     {
       href: 'https://jjingofarouk.xyz',
-      icon: Globe,
+      Icon: Globe,
       label: 'Website',
       value: 'jjingofarouk.xyz',
       ariaLabel: 'Farouk Jjingo\'s Website for Healthcare Technology Insights',
@@ -125,7 +125,7 @@ const About = () => {
     },
     {
       href: '/cases',
-      icon: FileText,
+      Icon: FileText,
       label: 'Case Studies',
       value: 'Browse Medical Cases',
       ariaLabel: 'Browse Uganda Medical Case Studies',
@@ -135,22 +135,22 @@ const About = () => {
 
   const platformFeatures = [
     {
-      icon: Stethoscope,
+      Icon: Stethoscope,
       title: 'Clinical Excellence',
       description: 'Advanced diagnostic tools and case management systems'
     },
     {
-      icon: Users,
+      Icon: Users,
       title: 'Collaboration',
       description: 'Connect with healthcare professionals across Uganda'
     },
     {
-      icon: BookOpen,
+      Icon: BookOpen,
       title: 'Education',
       description: 'Comprehensive medical education and training resources'
     },
     {
-      icon: Award,
+      Icon: Award,
       title: 'Research',
       description: 'Cutting-edge medical research and case studies'
     }
@@ -266,7 +266,7 @@ const About = () => {
                     className={styles.featureCard}
                   >
                     <div className={styles.featureIconWrapper}>
-                      <feature.icon className={styles.featureIcon} size={24} />
+                      <feature.Icon className={styles.featureIcon} size={24} />
                     </div>
                     <h3 className={styles.featureTitle}>{feature.title}</h3>
                     <p className={styles.featureDescription}>{feature.description}</p>
@@ -320,7 +320,9 @@ const About = () => {
                             aria-label={link.ariaLabel}
                             title={link.title}
                           >
-                            <span className={styles.contactIcon}>{link.icon}</span>
+                            <span className={styles.contactIcon}>
+                              <link.Icon size={24} />
+                            </span>
                             <div className={styles.contactText}>
                               <span className={styles.contactLabel}>{link.label}</span>
                               <span className={styles.contactValue}>{link.value}</span>
