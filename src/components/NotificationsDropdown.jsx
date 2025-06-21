@@ -1,53 +1,83 @@
-
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { X } from 'lucide-react';
 import styles from '../styles/navbar.module.css';
 
-export default function NotificationsDropdown({ isOpen, toggleNotifications, unreadThreads, unreadNotifications, handleNavigationClick }) {
+export default function NotificationsModal({ isOpen, toggleModal, unreadThreads, unreadNotifications, handleNavigationClick }) {
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className={styles.notificationDropdown}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
+          className={styles.modalOverlay}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={toggleModal}
         >
-          {unreadThreads.length === 0 && unreadNotifications.length === 0 ? (
-            <p className={styles.noNotifications}>No new notifications</p>
-          ) : (
-            <>
-              {unreadNotifications.map((notification) => (
-                <Link
-                  key={notification.id}
-                  href={`/cases/${notification.caseId}`}
-                  className={styles.notificationItem}
-                  onClick={() => {
-                    handleNavigationClick('notification_case');
-                    toggleNotifications();
-                  }}
-                >
-                  <span>{notification.title}</span>
-                  <small>{notification.message}</small>
-                </Link>
-              ))}
-              {unreadThreads.map((thread) => (
-                <Link
-                  key={thread.id}
-                  href={`/messages/${thread.id}`}
-                  className={styles.notificationItem}
-                  onClick={() => {
-                    handleNavigationClick('notification_message');
-                    toggleNotifications();
-                  }}
-                >
-                  <span>New message from {thread.otherUserName}</span>
-                  <small>{thread.lastMessage}</small>
-                </Link>
-              ))}
-            </>
-          )}
+          <motion.div
+            className={styles.notificationsModal}
+            initial={{ y: '-100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '-100%', opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Notifications</h2>
+              <button
+                onClick={toggleModal}
+                className={styles.closeButton}
+                aria-label="Close notifications"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className={styles.modalContent}>
+              {unreadThreads.length === 0 && unreadNotifications.length === 0 ? (
+                <p className={styles.noNotifications}>No new notifications</p>
+              ) : (
+                <ul className={styles.notificationList}>
+                  {unreadNotifications.map((notification) => (
+                    <li key={notification.id} className={styles.notificationItem}>
+                      <Link
+                        href={`/cases/${notification.caseId}`}
+                        className={styles.notificationLink}
+                        onClick={() => {
+                          handleNavigationClick('notification_case');
+                          toggleModal();
+                        }}
+                      >
+                        <span className={styles.notificationTitle}>{notification.title}</span>
+                        <p className={styles.notificationMessage}>{notification.message}</p>
+                        <small className={styles.notificationTime}>
+                          {new Date(notification.createdAt).toLocaleTimeString()}
+                        </small>
+                      </Link>
+                    </li>
+                  ))}
+                  {unreadThreads.map((thread) => (
+                    <li key={thread.id} className={styles.notificationItem}>
+                      <Link
+                        href={`/messages/${thread.id}`}
+                        className={styles.notificationLink}
+                        onClick={() => {
+                          handleNavigationClick('notification_message');
+                          toggleModal();
+                        }}
+                      >
+                        <span className={styles.notificationTitle}>New message from {thread.otherUserName}</span>
+                        <p className={styles.notificationMessage}>{thread.lastMessage}</p>
+                        <small className={styles.notificationTime}>
+                          {new Date(thread.createdAt).toLocaleTimeString()}
+                        </small>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
