@@ -44,16 +44,13 @@ html, body {
 
 main {
   flex: 1 0 auto;
-  margin-top: 76px;
+  margin-top: 100px; /* Adjusted to account for navbar (60px) + marquee (40px) */
 }
-
-
 
 .marquee-container {
   margin: 0;
   padding: 0;
   width: 100%;
-  margin-top: 60px;
   position: relative;
   z-index: 999;
 }
@@ -62,7 +59,7 @@ main {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1rem;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 100px); /* Adjusted for navbar + marquee */
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
