@@ -1,4 +1,3 @@
-// NotificationsModal.jsx
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { X } from 'lucide-react';
@@ -15,6 +14,14 @@ export default function NotificationsModal({ isOpen, toggleModal, unreadThreads,
       await Promise.all(notificationPromises);
     } catch (error) {
       console.error('Error clearing notifications:', error);
+    }
+  };
+
+  const markNotificationAsRead = async (notificationId) => {
+    try {
+      await updateDoc(doc(db, 'notifications', notificationId), { read: true });
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
     }
   };
 
@@ -67,6 +74,7 @@ export default function NotificationsModal({ isOpen, toggleModal, unreadThreads,
                     className={styles.searchResult}
                     onClick={() => {
                       handleNavigationClick('notification_case');
+                      markNotificationAsRead(notification.id);
                       toggleModal();
                     }}
                   >
