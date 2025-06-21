@@ -14,33 +14,42 @@ const HeroSection = () => {
   ];
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
-  const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [isTyping, setIsTyping] = useState(true);
 
   useEffect(() => {
-    if (currentWordIndex >= words.length) {
-      setIsTypingComplete(true);
-      return;
-    }
-
     const currentWord = words[currentWordIndex];
-    let charIndex = currentText.length;
-
-    const typeNextChar = () => {
-      if (charIndex < currentWord.length) {
-        setCurrentText(currentWord.substring(0, charIndex + 1));
-        charIndex++;
-        setTimeout(typeNextChar, 100);
+    
+    if (isTyping) {
+      // Typing forward
+      if (currentText.length < currentWord.length) {
+        const timer = setTimeout(() => {
+          setCurrentText(currentWord.substring(0, currentText.length + 1));
+        }, 100);
+        return () => clearTimeout(timer);
       } else {
-        setTimeout(() => {
-          setCurrentWordIndex(prev => prev + 1);
-          setCurrentText('');
-        }, 1000);
+        // Finished typing, wait then start erasing
+        const timer = setTimeout(() => {
+          setIsTyping(false);
+        }, 2000);
+        return () => clearTimeout(timer);
       }
-    };
-
-    const timer = setTimeout(typeNextChar, 100);
-    return () => clearTimeout(timer);
-  }, [currentText, currentWordIndex, words]);
+    } else {
+      // Erasing backward
+      if (currentText.length > 0) {
+        const timer = setTimeout(() => {
+          setCurrentText(currentText.substring(0, currentText.length - 1));
+        }, 50);
+        return () => clearTimeout(timer);
+      } else {
+        // Finished erasing, move to next word
+        const timer = setTimeout(() => {
+          setCurrentWordIndex((prev) => (prev + 1) % words.length);
+          setIsTyping(true);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentText, currentWordIndex, isTyping, words]);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -141,49 +150,45 @@ const HeroSection = () => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <section className={styles.hero} aria-labelledby="hero-title">
-        <h1 id="hero-title" className={styles.heroTitle}>
-          Uganda Clinical Case Reports
-        </h1>
-        <p className={styles.heroSubtitle}>
-          Discover and contribute to a leading archive of{' '}
-          <strong>
-            <span className={styles.typedText}>
-              {isTypingComplete ? words[words.length - 1] : currentText}
-            </span>
-            {!isTypingComplete && <span className={styles.cursor}>|</span>}
-          </strong>{' '}
-          from Uganda. Access valuable <strong>medical research</strong>,{' '}
-          <strong>healthcare insights</strong>, and <strong>clinical data</strong> for{' '}
-          <strong>healthcare professionals</strong>, <strong>medical researchers</strong>,
-          and <strong>students</strong> in <strong>Uganda</strong> and{' '}
-          <strong>East Africa</strong>.
-        </p>
-        <div className={styles.heroButtons}>
-          <Link
-            href="/cases"
-            className={styles.ctaButtonPrimary}
-            onClick={() => trackClick('browse_cases_button', 'hero')}
-            title="Browse Uganda Medical Case Studies and Clinical Reports"
-            aria-label="Browse Uganda Medical Case Studies and Clinical Reports"
-          >
-            Browse Medical Case Studies
-          </Link>
-          <Link
-            href="/cases/new"
-            className={styles.ctaButtonSecondary}
-            onClick={() => trackClick('share_case_button', 'hero')}
-            title="Contribute a Clinical Case Report or Medical Study"
-            aria-label="Contribute a Clinical Case Report or Medical Study"
-          >
-            Share a Clinical Case
-          </Link>
+        <div className={styles.heroContent}>
+          <h1 id="hero-title" className={styles.heroTitle}>
+            Uganda Clinical Case Reports
+          </h1>
+          <p className={styles.heroSubtitle}>
+            Discover and contribute to a leading archive of{' '}
+            <strong>
+              <span className={styles.typedText}>
+                {currentText}
+                <span className={styles.cursor}>|</span>
+              </span>
+            </strong>{' '}
+            from Uganda. Access valuable <strong>medical research</strong>,{' '}
+            <strong>healthcare insights</strong>, and <strong>clinical data</strong> for{' '}
+            <strong>healthcare professionals</strong>, <strong>medical researchers</strong>,
+            and <strong>students</strong> in <strong>Uganda</strong> and{' '}
+            <strong>East Africa</strong>.
+          </p>
+          <div className={styles.heroButtons}>
+            <Link
+              href="/cases"
+              className={styles.ctaButtonPrimary}
+              onClick={() => trackClick('browse_cases_button', 'hero')}
+              title="Browse Uganda Medical Case Studies and Clinical Reports"
+              aria-label="Browse Uganda Medical Case Studies and Clinical Reports"
+            >
+              Browse Medical Case Studies
+            </Link>
+            <Link
+              href="/cases/new"
+              className={styles.ctaButtonSecondary}
+              onClick={() => trackClick('share_case_button', 'hero')}
+              title="Contribute a Clinical Case Report or Medical Study"
+              aria-label="Contribute a Clinical Case Report or Medical Study"
+            >
+              Share a Clinical Case
+            </Link>
+          </div>
         </div>
-        <img
-          src="/reports.jpg"
-          alt="Uganda Clinical Case Reports - Medical Case Studies and Healthcare Research"
-          className={styles.heroImage}
-          loading="lazy"
-        />
       </section>
     </>
   );
