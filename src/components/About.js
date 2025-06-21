@@ -2,6 +2,22 @@ import Head from 'next.js/head';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Container, Box, Typography } from '@mui/material';
+import { 
+  Target, 
+  Eye, 
+  Stethoscope, 
+  Linkedin, 
+  MessageCircle, 
+  Globe, 
+  FileText,
+  Phone,
+  Mail,
+  MapPin,
+  Users,
+  Heart,
+  BookOpen,
+  Award
+} from 'lucide-react';
 import styles from './About.module.css';
 
 const About = () => {
@@ -85,7 +101,7 @@ const About = () => {
   const contactLinks = [
     {
       href: 'https://ug.linkedin.com/in/farouk-jjingo-0341b01a5',
-      icon: '💼',
+      icon: Linkedin,
       label: 'LinkedIn',
       value: 'Farouk Jjingo',
       ariaLabel: 'Farouk Jjingo LinkedIn Profile for Medical and Tech Collaboration',
@@ -93,7 +109,7 @@ const About = () => {
     },
     {
       href: 'https://wa.me/256751360385',
-      icon: '📱',
+      icon: MessageCircle,
       label: 'WhatsApp',
       value: '+256751360385',
       ariaLabel: 'Contact Farouk Jjingo via WhatsApp for Medical Research',
@@ -101,7 +117,7 @@ const About = () => {
     },
     {
       href: 'https://jjingofarouk.xyz',
-      icon: '🌐',
+      icon: Globe,
       label: 'Website',
       value: 'jjingofarouk.xyz',
       ariaLabel: 'Farouk Jjingo\'s Website for Healthcare Technology Insights',
@@ -109,11 +125,34 @@ const About = () => {
     },
     {
       href: '/cases',
-      icon: '📋',
+      icon: FileText,
       label: 'Case Studies',
       value: 'Browse Medical Cases',
       ariaLabel: 'Browse Uganda Medical Case Studies',
       title: 'Explore Medical Case Studies on UCCR'
+    }
+  ];
+
+  const platformFeatures = [
+    {
+      icon: Stethoscope,
+      title: 'Clinical Excellence',
+      description: 'Advanced diagnostic tools and case management systems'
+    },
+    {
+      icon: Users,
+      title: 'Collaboration',
+      description: 'Connect with healthcare professionals across Uganda'
+    },
+    {
+      icon: BookOpen,
+      title: 'Education',
+      description: 'Comprehensive medical education and training resources'
+    },
+    {
+      icon: Award,
+      title: 'Research',
+      description: 'Cutting-edge medical research and case studies'
     }
   ];
 
@@ -191,6 +230,9 @@ const About = () => {
                 transition={{ duration: 0.3 }}
                 className={styles.missionCard}
               >
+                <div className={styles.cardIconWrapper}>
+                  <Target className={styles.cardIcon} size={32} />
+                </div>
                 <h2 className={styles.cardTitle}>Our Mission</h2>
                 <p className={styles.cardContent}>
                   To provide a secure, accessible <strong>clinical research platform</strong> for <strong>healthcare professionals</strong> to share <strong>clinical knowledge</strong>, collaborate on <strong>medical case studies</strong>, and advance <strong>medical education</strong> and <strong>healthcare innovation</strong> in Uganda.
@@ -202,12 +244,36 @@ const About = () => {
                 transition={{ duration: 0.3 }}
                 className={styles.visionCard}
               >
+                <div className={styles.cardIconWrapper}>
+                  <Eye className={styles.cardIcon} size={32} />
+                </div>
                 <h2 className={styles.cardTitle}>Our Vision</h2>
                 <p className={styles.cardContent}>
                   To bridge the gap in <strong>medical knowledge sharing</strong> by creating a digital <strong>healthcare collaboration platform</strong> where <strong>clinical expertise</strong> and <strong>medical case reports</strong> are accessible to all <strong>healthcare professionals</strong> in <strong>Uganda</strong> and <strong>East Africa</strong>.
                 </p>
               </motion.div>
             </div>
+
+            {/* Platform Features Section */}
+            <section className={styles.featuresSection}>
+              <h2 className={styles.sectionTitle}>Platform Features</h2>
+              <div className={styles.featuresGrid}>
+                {platformFeatures.map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                    className={styles.featureCard}
+                  >
+                    <div className={styles.featureIconWrapper}>
+                      <feature.icon className={styles.featureIcon} size={24} />
+                    </div>
+                    <h3 className={styles.featureTitle}>{feature.title}</h3>
+                    <p className={styles.featureDescription}>{feature.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
 
             <section className={styles.founderSection}>
               <h2 className={styles.founderTitle}>
