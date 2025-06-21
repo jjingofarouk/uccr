@@ -114,10 +114,10 @@ const HeroSection = () => {
           content="Discover Uganda Clinical Case Reports, a comprehensive collection of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda for healthcare professionals and researchers."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourwebsite.com" />
+        <meta property="og:url" content="https://ugandacasereports.org" />
         <meta
           property="og:image"
-          content="https://yourwebsite.com/images/uganda-clinical-case-reports.jpg"
+          content="https://ugandacasereports.org/reports.jpg"
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta
@@ -130,9 +130,9 @@ const HeroSection = () => {
         />
         <meta
           name="twitter:image"
-          content="https://yourwebsite.com/images/uganda-clinical-case-reports.jpg"
+          content="https://ugandacasereports.org/reports.jpg"
         />
-        <link rel="canonical" href="https://yourwebsite.com" />
+        <link rel="canonical" href="https://ugandacasereports.org" />
       </Head>
       <script
         type="application/ld+json"
