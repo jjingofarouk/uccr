@@ -68,7 +68,7 @@ main {
 
 .hero {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 1rem;
   position: relative;
   background: var(--surface);
   border-radius: 16px;
