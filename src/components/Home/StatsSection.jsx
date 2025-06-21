@@ -1,4 +1,3 @@
-// src/components/Home/StatsSection.jsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -36,11 +35,11 @@ const StatsSection = () => {
         const top5 = data.slice(0, 5).map((item, index) => ({
           ...item,
           fill: [
-            "#4db6ac",
-            "#29b6f6",
-            "#00695c",
-            "#0288d1",
-            "#66bb6a",
+            "#FF6B6B", // Coral Red
+            "#4ECDC4", // Cyan
+            "#45B7D1", // Sky Blue
+            "#96CEB4", // Mint Green
+            "#FFEEAD", // Light Yellow
           ][index % 5],
         }));
         
