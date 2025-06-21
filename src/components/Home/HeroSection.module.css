@@ -2,9 +2,8 @@
 .hero {
   position: relative;
   width: 100vw;
-  min-height: 100vh;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
+  min-height: calc(100vh - 100px); /* Adjusted for navbar (60px) + marquee (40px) */
+  margin: 0 calc(-50vw + 50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,8 +46,9 @@
   position: relative;
   z-index: 3;
   max-width: 900px;
-  padding: 2rem 1rem;
+  padding: 0 1rem; /* Removed top/bottom padding */
   color: #ffffff;
+  margin-top: 0; /* Ensure no top margin */
 }
 
 /* Typography - Clean and Modern */
@@ -76,7 +76,7 @@
 
 /* Enhanced Typing Text Styles with Better Contrast */
 .typedTextArchive {
-  color: #60a5fa; /* Light blue for medical theme */
+  color: #60a5fa;
   display: inline-block;
   min-height: 1.4em;
   min-width: 2ch;
@@ -84,7 +84,7 @@
 }
 
 .typedTextResearch {
-  color: #34d399; /* Emerald green for research */
+  color: #34d399;
   display: inline-block;
   min-height: 1.4em;
   min-width: 2ch;
@@ -92,7 +92,7 @@
 }
 
 .typedTextProfessionals {
-  color: #fbbf24; /* Amber for professionals */
+  color: #fbbf24;
   display: inline-block;
   min-height: 1.4em;
   min-width: 2ch;
@@ -100,7 +100,7 @@
 }
 
 .typedTextLocations {
-  color: #f472b6; /* Pink for locations */
+  color: #f472b6;
   display: inline-block;
   min-height: 1.4em;
   min-width: 2ch;
@@ -270,7 +270,7 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .heroContent {
-    padding: 1.5rem 1rem;
+    padding: 0 1rem;
   }
 
   .heroTitle {
@@ -284,11 +284,11 @@
 
 @media (max-width: 768px) {
   .hero {
-    min-height: 70vh;
+    min-height: calc(70vh - 92px); /* Adjusted for navbar (56px) + marquee (36px) */
   }
 
   .heroContent {
-    padding: 1.5rem 0.75rem;
+    padding: 0 0.75rem;
   }
 
   .heroTitle {
@@ -315,11 +315,11 @@
 
 @media (max-width: 480px) {
   .hero {
-    min-height: 60vh;
+    min-height: calc(60vh - 80px); /* Adjusted for navbar (48px) + marquee (32px) */
   }
 
   .heroContent {
-    padding: 1rem 0.5rem;
+    padding: 0 0.5rem;
   }
 
   .heroTitle {
