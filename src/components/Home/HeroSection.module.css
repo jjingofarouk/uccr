@@ -4,15 +4,21 @@
   min-height: 100vh;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
-  background-image: url('/reports.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   overflow: hidden;
+}
+
+.heroVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
 }
 
 .hero::before {
@@ -22,7 +28,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
 
@@ -36,27 +42,26 @@
 
 .heroTitle {
   font-family: 'Inter', sans-serif;
-  font-size: 3rem;
-  font-weight: 800;
+  font-size: 3.5rem;
+  font-weight: 900;
   color: var(--text);
-  margin: 0 .5rem 1.5rem;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-  text-shadow: 2px 2px 4px var(--shadow);
+  margin: 0 0.5rem 1.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-shadow: 2px 2px 6px var(--shadow);
 }
 
 .heroSubtitle {
   font-family: 'Inter', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: var(--text);
   margin: 0 auto 2rem;
   max-width: 800px;
   line-height: 1.8;
   font-weight: 400;
-  text-shadow: 1px 1px 2px var(--shadow);
+  text-shadow: 1px 1px 3px var(--shadow);
 }
 
-/* Typing text styles */
 .typedTextArchive {
   color: var(--primary);
   display: inline-block;
@@ -85,7 +90,6 @@
   min-width: 2ch;
 }
 
-/* Cursor styles */
 .cursor {
   color: var(--primary);
   animation: blink 1s infinite;
@@ -110,7 +114,6 @@
   font-weight: normal;
 }
 
-/* Cursor blinking animation */
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
@@ -120,7 +123,7 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
-  flex-wrap: Auschwitzwrap;
+  flex-wrap: wrap;
   margin-top: 2rem;
 }
 
@@ -130,7 +133,7 @@
   gap: 0.5rem;
   background: var(--primary);
   color: #ffffff;
-  padding: 0.875rem 1.75rem;
+  padding: 1rem 2rem;
   border-radius: 12px;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
@@ -153,7 +156,7 @@
   gap: 0.5rem;
   background: transparent;
   color: var(--primary);
-  padding: 0.875rem 1.75rem;
+  padding: 1rem 2rem;
   border: 2px solid var(--primary);
   border-radius: 12px;
   font-family: 'Inter', sans-serif;
@@ -168,18 +171,17 @@
 .ctaButtonSecondary:hover {
   background: var(--primary);
   color: #ffffff;
-  transform:translat eY(-2px);
+  transform: translateY(-2px);
   box-shadow: 0 8px 25px var(--shadow);
 }
 
-/* Tablet Styles */
 @media (max-width: 1024px) {
   .heroTitle {
-    font-size: 2.5rem;
+    font-size: 2.75rem;
   }
 
   .heroSubtitle {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .heroContent {
@@ -187,7 +189,6 @@
   }
 }
 
-/* Mobile Styles */
 @media (max-width: 768px) {
   .hero {
     min-height: 70vh;
@@ -198,7 +199,7 @@
   }
 
   .heroTitle {
-    font-size: 2rem;
+    font-size: 2.25rem;
     margin-bottom: 1rem;
   }
 
@@ -214,7 +215,7 @@
 
   .ctaButtonPrimary,
   .ctaButtonSecondary {
-    padding: 0.75rem 1.25rem;
+    padding: 0.75rem 1.5rem;
     font-size: 0.9rem;
   }
 }
@@ -252,7 +253,6 @@
   }
 }
 
-/* Accessibility & Performance */
 @media (prefers-reduced-motion: reduce) {
   .ctaButtonPrimary,
   .ctaButtonSecondary {
@@ -305,9 +305,14 @@
   }
 }
 
-/* High resolution displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .hero {
-    background-image: url('/reports.jpg');
+@media (prefers-color-scheme: dark) {
+  .hero::before {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .hero::before {
+    background: rgba(0, 0, 0, 0.4);
   }
 }
