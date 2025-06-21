@@ -1,4 +1,4 @@
-// StatsSection.jsx
+// src/components/Home/StatsSection.jsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -36,22 +36,22 @@ const StatsSection = () => {
         const top5 = data.slice(0, 5).map((item, index) => ({
           ...item,
           fill: [
-            "#4db6ac", // Teal
-            "#29b6f6", // Light Blue
-            "#00695c", // Dark Teal
-            "#0288d1", // Blue
-            "#66bb6a", // Light Green
+            "#4db6ac",
+            "#29b6f6",
+            "#00695c",
+            "#0288d1",
+            "#66bb6a",
           ][index % 5],
         }));
         
         setStats(top5);
-        trackEngagement("load_success", "stats", `${data.length}_specialties");
+        trackEngagement("load_success", "stats", `${data.length}_specialties`);
         
         top5.forEach((stat, index) => {
           trackEvent(
             "specialty_title",
             "stats",
-            `${stat.specialty}_rank_${index + 1}`,
+            stat.specialty + "_rank_" + (index + 1),
             stat.count
           );
         });
@@ -71,7 +71,7 @@ const StatsSection = () => {
       trackEngagement(
         "click",
         "stats",
-        `${payload.specialty}_${payload.count}_specialty`
+        payload.specialty + "_" + payload.count + "_specialty"
       );
     }
   }, []);
