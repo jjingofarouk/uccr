@@ -2,7 +2,7 @@
 .hero {
   position: relative;
   width: 100vw;
-  min-height: calc(100vh - 100px); /* Adjusted for navbar (60px) + marquee (40px) */
+top: 100px;
   margin: 0 calc(-50vw + 50%);
   display: flex;
   align-items: center;
