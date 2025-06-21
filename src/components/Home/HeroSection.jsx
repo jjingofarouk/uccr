@@ -175,7 +175,7 @@ const HeroSection = () => {
           </Link>
         </div>
         <img
-          src="/images/uganda-clinical-case-reports.jpg"
+          src="/reports.jpg"
           alt="Uganda Clinical Case Reports - Medical Case Studies and Healthcare Research"
           className={styles.heroImage}
           loading="lazy"
