@@ -1,10 +1,45 @@
+// components/HeroSection.jsx
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { trackClick } from '../../utils/analytics';
 import styles from './HeroSection.module.css';
 
 const HeroSection = () => {
-  // Structured data with extensive keywords
+  const words = [
+    'medical case studies',
+    'clinical reports',
+    'healthcare research',
+    'clinical trials'
+  ];
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [currentText, setCurrentText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [typingSpeed, setTypingSpeed] = useState(100);
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const currentWord = words[currentWordIndex];
+      setCurrentText(prev => 
+        isDeleting 
+          ? currentWord.substring(0, prev.length - 1)
+          : currentWord.substring(0, prev.length + 1)
+      );
+
+      setTypingSpeed(isDeleting ? 50 : 100);
+
+      if (!isDeleting && currentText === currentWord) {
+        setTimeout(() => setIsDeleting(true), 1000);
+      } else if (isDeleting && currentText === '') {
+        setIsDeleting(false);
+        setCurrentWordIndex((prev) => (prev + 1) % words.length);
+      }
+    };
+
+    const timer = setTimeout(handleTyping, typingSpeed);
+    return () => clearTimeout(timer);
+  }, [currentText, isDeleting, currentWordIndex, typingSpeed, words]);
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'MedicalStudy',
@@ -109,9 +144,11 @@ const HeroSection = () => {
         </h1>
         <p className={styles.heroSubtitle}>
           Discover and contribute to a leading archive of{' '}
-          <strong>medical case studies</strong>, <strong>clinical reports</strong>,{' '}
-          <strong>healthcare research</strong>, and <strong>clinical trials</strong> from
-          Uganda. Access valuable <strong>medical research</strong>,{' '}
+          <strong>
+            <span className={styles.typedText}>{currentText}</span>
+            <span className={styles.cursor}>|</span>
+          </strong>{' '}
+          from Uganda. Access valuable <strong>medical research</strong>,{' '}
           <strong>healthcare insights</strong>, and <strong>clinical data</strong> for{' '}
           <strong>healthcare professionals</strong>, <strong>medical researchers</strong>,
           and <strong>students</strong> in <strong>Uganda</strong> and{' '}
@@ -137,7 +174,6 @@ const HeroSection = () => {
             Share a Clinical Case
           </Link>
         </div>
-        {/* Optional hero image for visual appeal and SEO */}
         <img
           src="/images/uganda-clinical-case-reports.jpg"
           alt="Uganda Clinical Case Reports - Medical Case Studies and Healthcare Research"
