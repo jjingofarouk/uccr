@@ -1,10 +1,23 @@
-
+// NotificationsModal.jsx
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { X } from 'lucide-react';
+import { updateDoc, doc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import styles from '../styles/navbar.module.css';
 
 export default function NotificationsModal({ isOpen, toggleModal, unreadThreads, unreadNotifications, handleNavigationClick }) {
+  const clearNotifications = async () => {
+    try {
+      const notificationPromises = unreadNotifications.map(notification =>
+        updateDoc(doc(db, 'notifications', notification.id), { read: true })
+      );
+      await Promise.all(notificationPromises);
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -31,7 +44,18 @@ export default function NotificationsModal({ isOpen, toggleModal, unreadThreads,
             >
               <X size={24} />
             </button>
-            <h3 className={styles.searchSection}>Notifications</h3>
+            <div className={styles.notificationHeader}>
+              <h3 className={styles.searchSection}>Notifications</h3>
+              {(unreadThreads.length > 0 || unreadNotifications.length > 0) && (
+                <button
+                  onClick={clearNotifications}
+                  className={styles.clearNotificationsButton}
+                  aria-label="Clear all notifications"
+                >
+                  Clear All
+                </button>
+              )}
+            </div>
             {unreadThreads.length === 0 && unreadNotifications.length === 0 ? (
               <p className={styles.noNotifications}>No new notifications</p>
             ) : (
@@ -47,7 +71,7 @@ export default function NotificationsModal({ isOpen, toggleModal, unreadThreads,
                     }}
                   >
                     <span>{notification.title}</span>
-                    <small>{notification.message}</small>
+                    <small>{notification.message.replace(/<p>|<\/p>/g, '')}</small>
                   </Link>
                 ))}
                 {unreadThreads.map((thread) => (
