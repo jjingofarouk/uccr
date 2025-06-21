@@ -1,4 +1,4 @@
-That navbar shoukf work with this styles without them being changed. /* navbar.module.css */
+
 .header {
   background: var(--background);
   border-bottom: 1px solid var(--border);
