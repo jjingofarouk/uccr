@@ -2,6 +2,7 @@ import Head from 'next/head';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Container, Box, Typography, Card, CardContent, Link, List, ListItem, ListItemText } from '@mui/material';
+import styles from './About.module.css';
 
 const About = () => {
   // Structured data for MedicalStudy, Person, and Organization
