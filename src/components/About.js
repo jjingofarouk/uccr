@@ -1,7 +1,7 @@
-import Head from 'next/head';
+import Head from 'next.js/head';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Container, Box, Typography, Card, CardContent, Link, List, ListItem, ListItemText } from '@mui/material';
+import { Container, Box, Typography } from '@mui/material';
 import styles from './About.module.css';
 
 const About = () => {
@@ -82,6 +82,41 @@ const About = () => {
     },
   ];
 
+  const contactLinks = [
+    {
+      href: 'https://ug.linkedin.com/in/farouk-jjingo-0341b01a5',
+      icon: '💼',
+      label: 'LinkedIn',
+      value: 'Farouk Jjingo',
+      ariaLabel: 'Farouk Jjingo LinkedIn Profile for Medical and Tech Collaboration',
+      title: 'Connect with Farouk Jjingo on LinkedIn for Healthcare Collaboration'
+    },
+    {
+      href: 'https://wa.me/256751360385',
+      icon: '📱',
+      label: 'WhatsApp',
+      value: '+256751360385',
+      ariaLabel: 'Contact Farouk Jjingo via WhatsApp for Medical Research',
+      title: 'WhatsApp Farouk Jjingo for Clinical Research Discussions'
+    },
+    {
+      href: 'https://jjingofarouk.xyz',
+      icon: '🌐',
+      label: 'Website',
+      value: 'jjingofarouk.xyz',
+      ariaLabel: 'Farouk Jjingo\'s Website for Healthcare Technology Insights',
+      title: 'Visit Farouk Jjingo\'s Website for Medical and Tech Projects'
+    },
+    {
+      href: '/cases',
+      icon: '📋',
+      label: 'Case Studies',
+      value: 'Browse Medical Cases',
+      ariaLabel: 'Browse Uganda Medical Case Studies',
+      title: 'Explore Medical Case Studies on UCCR'
+    }
+  ];
+
   return (
     <>
       <Head>
@@ -127,245 +162,113 @@ const About = () => {
         />
         <link rel="canonical" href="https://yourwebsite.com/about" />
       </Head>
+      
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
       >
-        <Container
-          maxWidth="lg"
-          sx={{
-            py: 6,
-            position: 'relative',
-            bgcolor: 'var(--background)',
-            color: 'var(--text)',
-            transition: 'background 0.3s ease, color 0.3s ease',
-          }}
-        >
-          <Box
-            sx={{
-              position: 'absolute',
-              inset: 0,
-              background: 'var(--surface)',
-              borderRadius: '16px',
-              zIndex: -1,
-            }}
-          />
+        <div className={styles.aboutContainer}>
+          <div className={styles.backgroundSurface} />
+          
+          <Container maxWidth="lg">
+            <h1 className={styles.aboutTitle}>
+              About Uganda Clinical Case Reports
+            </h1>
 
-          <Typography
-            variant="h2"
-            sx={{
-              mb: 4,
-              fontWeight: 700,
-              color: 'var(--primary)',
-              textAlign: 'center',
-            }}
-          >
-            About Uganda Clinical Case Reports
-          </Typography>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <Typography
-              variant="body1"
-              sx={{
-                maxWidth: '48rem',
-                color: 'var(--text)',
-                lineHeight: 1.8,
-                textAlign: 'center',
-                margin: '0 auto',
-              }}
-            >
+            <p className={styles.introText}>
               Uganda Clinical Case Reports (UCCR) is a leading <strong>medical collaboration platform</strong> designed to empower <strong>healthcare professionals</strong>, <strong>medical students</strong>, and <strong>doctors</strong> in Uganda. Share, discuss, and learn from <strong>medical case studies</strong>, <strong>clinical reports</strong>, and <strong>healthcare research</strong> in a secure, structured environment. UCCR promotes <strong>medical education</strong>, <strong>clinical data sharing</strong>, and <strong>healthcare innovation</strong> across <strong>Uganda</strong> and <strong>East Africa</strong>.
-            </Typography>
+            </p>
 
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                gap: 3,
-              }}
-            >
-              <motion.div whileHover={{ scale: 1.03 }} transition={{ duration: 0.3 }}>
-                <Card
-                  sx={{
-                    bgcolor: 'var(--primary)',
-                    color: 'var(--surface)',
-                    p: 3,
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 14px var(--shadow)',
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
-                      Our Mission
-                    </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
-                      To provide a secure, accessible <strong>clinical research platform</strong> for <strong>healthcare professionals</strong> to share <strong>clinical knowledge</strong>, collaborate on <strong>medical case studies</strong>, and advance <strong>medical education</strong> and <strong>healthcare innovation</strong> in Uganda.
-                    </Typography>
-                  </CardContent>
-                </Card>
+            <div className={styles.cardGrid}>
+              <motion.div 
+                whileHover={{ scale: 1.03 }} 
+                transition={{ duration: 0.3 }}
+                className={styles.missionCard}
+              >
+                <h2 className={styles.cardTitle}>Our Mission</h2>
+                <p className={styles.cardContent}>
+                  To provide a secure, accessible <strong>clinical research platform</strong> for <strong>healthcare professionals</strong> to share <strong>clinical knowledge</strong>, collaborate on <strong>medical case studies</strong>, and advance <strong>medical education</strong> and <strong>healthcare innovation</strong> in Uganda.
+                </p>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.03 }} transition={{ duration: 0.3 }}>
-                <Card
-                  sx={{
-                    bgcolor: 'var(--primary)',
-                    color: 'var(--surface)',
-                    p: 3,
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 14px var(--shadow)',
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
-                      Our Vision
-                    </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
-                      To bridge the gap in <strong>medical knowledge sharing</strong> by creating a digital <strong>healthcare collaboration platform</strong> where <strong>clinical expertise</strong> and <strong>medical case reports</strong> are accessible to all <strong>healthcare professionals</strong> in <strong>Uganda</strong> and <strong>East Africa</strong>.
-                    </Typography>
-                  </CardContent>
-                </Card>
+              <motion.div 
+                whileHover={{ scale: 1.03 }} 
+                transition={{ duration: 0.3 }}
+                className={styles.visionCard}
+              >
+                <h2 className={styles.cardTitle}>Our Vision</h2>
+                <p className={styles.cardContent}>
+                  To bridge the gap in <strong>medical knowledge sharing</strong> by creating a digital <strong>healthcare collaboration platform</strong> where <strong>clinical expertise</strong> and <strong>medical case reports</strong> are accessible to all <strong>healthcare professionals</strong> in <strong>Uganda</strong> and <strong>East Africa</strong>.
+                </p>
               </motion.div>
-            </Box>
+            </div>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: 'var(--primary)' }}>
+            <section className={styles.founderSection}>
+              <h2 className={styles.founderTitle}>
                 Meet the Founder: Farouk Jjingo
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  maxWidth: '48rem',
-                  color: 'var(--text)',
-                  lineHeight: 1.7,
-                }}
-              >
+              </h2>
+              <p className={styles.founderDescription}>
                 Farouk Jjingo is a visionary <strong>medical doctor</strong> and <strong>full-stack developer</strong> with expertise in <strong>clinical diagnostics</strong>, <strong>healthcare technology</strong>, and <strong>medical research</strong>. He founded UCCR to enhance <strong>medical collaboration</strong>, <strong>clinical case sharing</strong>, and <strong>healthcare education</strong> in Uganda. Combining his skills in <strong>healthcare innovation</strong> and software development, Farouk drives solutions for real-world <strong>healthcare challenges</strong> in <strong>East Africa</strong>.
-              </Typography>
-            </Box>
+              </p>
+            </section>
 
-            <Box sx={{ mt: 4 }}>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 700,
-                  color: 'var(--primary)',
-                  mb: 3,
-                }}
-              >
+            <section className={styles.connectSection}>
+              <h2 className={styles.connectTitle}>
                 Connect for Healthcare Collaboration
-              </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: { xs: 'column', md: 'row' },
-                  gap: 4,
-                  alignItems: { xs: 'center', md: 'flex-start' },
-                }}
-              >
+              </h2>
+              
+              <div className={styles.connectContent}>
                 <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
-                  <Box
-                    component="img"
+                  <img
                     src="/farouk.png"
                     alt="Farouk Jjingo, Medical Doctor and Full Stack Developer, Founder of Uganda Clinical Case Reports"
                     loading="lazy"
-                    sx={{
-                      width: { xs: '10rem', md: '14rem' },
-                      height: { xs: '10rem', md: '14rem' },
-                      borderRadius: '50%',
-                      border: '4px solid var(--primary-dark)',
-                      boxShadow: '0 4px 14px var(--shadow)',
-                      objectFit: 'cover',
-                      transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                      '&:hover': { borderColor: 'var(--primary)' },
-                    }}
+                    className={styles.founderImage}
                   />
                 </motion.div>
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Typography variant="body2" sx={{ color: 'var(--text)', lineHeight: 1.7 }}>
+                
+                <div className={styles.connectInfo}>
+                  <p className={styles.connectDescription}>
                     Farouk Jjingo is available for <strong>healthcare collaboration</strong>, <strong>medical research discussions</strong>, and <strong>clinical platform feedback</strong>. Connect with him to explore <strong>medical case studies</strong>, <strong>healthcare technology</strong>, or <strong>clinical research opportunities</strong>:
-                  </Typography>
-                  <List sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <ListItem disablePadding>
-                      <ListItemText>
-                        <Link
-                          href="https://ug.linkedin.com/in/farouk-jjingo-0341b01a5"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          sx={{
-                            color: 'var(--accent)',
-                            textDecoration: 'none',
-                            '&:hover': { color: 'var(--primary-hover)' },
-                          }}
-                          aria-label="Farouk Jjingo LinkedIn Profile for Medical and Tech Collaboration"
-                          title="Connect with Farouk Jjingo on LinkedIn for Healthcare Collaboration"
-                        >
-                          LinkedIn: Farouk Jjingo
-                        </Link>
-                      </ListItemText>
-                    </ListItem>
-                    <ListItem disablePadding>
-                      <ListItemText>
-                        <Link
-                          href="https://wa.me/256751360385"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          sx={{
-                            color: 'var(--accent)',
-                            textDecoration: 'none',
-                            '&:hover': { color: 'var(--primary-hover)' },
-                          }}
-                          aria-label="Contact Farouk Jjingo via WhatsApp for Medical Research"
-                          title="WhatsApp Farouk Jjingo for Clinical Research Discussions"
-                        >
-                          WhatsApp: +256751360385
-                        </Link>
-                      </ListItemText>
-                    </ListItem>
-                    <ListItem disablePadding>
-                      <ListItemText>
-                        <Link
-                          href="https://jjingofarouk.xyz"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          sx={{
-                            color: 'var(--accent)',
-                            textDecoration: 'none',
-                            '&:hover': { color: 'var(--primary-hover)' },
-                          }}
-                          aria-label="Farouk Jjingo's Website for Healthcare Technology Insights"
-                          title="Visit Farouk Jjingo’s Website for Medical and Tech Projects"
-                        >
-                          Website: jjingofarouk.xyz
-                        </Link>
-                      </ListItemText>
-                    </ListItem>
-                    <ListItem disablePadding>
-                      <ListItemText>
-                        <Link
-                          href="/cases"
-                          sx={{
-                            color: 'var(--accent)',
-                            textDecoration: 'none',
-                            '&:hover': { color: 'var(--primary-hover)' },
-                          }}
-                          aria-label="Browse Uganda Medical Case Studies"
-                          title="Explore Medical Case Studies on UCCR"
-                        >
-                          Browse Medical Case Studies
-                        </Link>
-                      </ListItemText>
-                    </ListItem>
-                  </List>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Container>
+                  </p>
+                  
+                  <div className={styles.contactCard}>
+                    <h3 className={styles.contactCardTitle}>
+                      Get in Touch
+                    </h3>
+                    
+                    <ul className={styles.contactList}>
+                      {contactLinks.map((link, index) => (
+                        <li key={index} className={styles.contactItem}>
+                          <a
+                            href={link.href}
+                            target={link.href.startsWith('http') ? '_blank' : undefined}
+                            rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                            className={styles.contactLink}
+                            aria-label={link.ariaLabel}
+                            title={link.title}
+                          >
+                            <span className={styles.contactIcon}>{link.icon}</span>
+                            <div className={styles.contactText}>
+                              <span className={styles.contactLabel}>{link.label}</span>
+                              <span className={styles.contactValue}>{link.value}</span>
+                            </div>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </Container>
+        </div>
       </motion.div>
     </>
   );
