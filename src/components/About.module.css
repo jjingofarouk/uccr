@@ -635,3 +635,373 @@
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
+
+/* Additional CSS classes to add to your About.module.css file */
+
+/* Card Icon Styles */
+.cardIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cardIcon {
+  color: rgba(255, 255, 255, 0.9);
+  transition: transform 0.3s ease;
+}
+
+.missionCard:hover .cardIcon,
+.visionCard:hover .cardIcon {
+  transform: scale(1.1);
+}
+
+/* Features Section */
+.featuresSection {
+  margin: 4rem 0;
+  padding: 3rem 0;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.sectionTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.sectionTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 2px;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 0 2rem;
+}
+
+.featureCard {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.featureCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover::before {
+  transform: scaleX(1);
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px var(--shadow);
+  border-color: var(--primary);
+}
+
+.featureIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  position: relative;
+}
+
+.featureIconWrapper::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.featureCard:hover .featureIconWrapper::before {
+  opacity: 0.6;
+}
+
+.featureIcon {
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover .featureIcon {
+  transform: scale(1.1);
+}
+
+.featureTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+.featureDescription {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+/* Section Headers with Icons */
+.founderHeader,
+.connectHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* Contact Card Icon */
+.contactCardIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.contactCardTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Contact Icon Styles */
+.contactIcon {
+  color: var(--primary);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.contactLink:hover .contactIcon {
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Mobile Responsiveness for New Elements */
+@media (max-width: 768px) {
+  .featuresSection {
+    margin: 2rem 0;
+    padding: 2rem 0;
+  }
+
+  .sectionTitle {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .featureCard {
+    padding: 1.5rem 1rem;
+  }
+
+  .featureIconWrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .featureTitle {
+    font-size: 1.125rem;
+  }
+
+  .featureDescription {
+    font-size: 0.9rem;
+  }
+
+  .founderHeader,
+  .connectHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .sectionIcon {
+    align-self: flex-start;
+  }
+
+  .cardIconWrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .cardIcon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .featuresSection {
+    margin: 1.5rem 0;
+    padding: 1.5rem 0;
+  }
+
+  .sectionTitle {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .featuresGrid {
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .featureCard {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .featureIconWrapper {
+    width: 45px;
+    height: 45px;
+  }
+
+  .featureIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .featureTitle {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .featureDescription {
+    font-size: 0.85rem;
+  }
+
+  .cardIconWrapper {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 0.75rem;
+  }
+
+  .cardIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sectionIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .contactCardIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .contactIcon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Dark Mode Adjustments for New Elements */
+.dark-mode .featuresSection {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.dark-mode .featureCard {
+  background: var(--background);
+  border-color: var(--border);
+}
+
+.dark-mode .featureCard:hover {
+  border-color: var(--primary);
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .featureIconWrapper {
+    background: var(--text);
+  }
+
+  .featureIcon {
+    color: var(--background);
+  }
+
+  .cardIconWrapper {
+    background: var(--text);
+  }
+
+  .cardIcon {
+    color: var(--background);
+  }
+
+  .sectionIcon,
+  .contactCardIcon,
+  .contactIcon {
+    color: var(--text);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .featureCard,
+  .featureIcon,
+  .cardIcon,
+  .contactIcon {
+    transition: none;
+  }
+  
+  .featureCard:hover,
+  .featureCard:hover .featureIcon,
+  .cardIcon,
+  .contactIcon {
+    transform: none;
+  }
+
+  .featureCard::before {
+    transition: none;
+  }
+}
