@@ -37,11 +37,11 @@ const StatsSection = () => {
         const top5 = data.slice(0, 5).map((item, index) => ({
           ...item,
           fill: [
-            "rgba(59, 130, 246, 0.8)", // Blue
-            "rgba(239, 68, 68, 0.8)", // Red
-            "rgba(34, 197, 94, 0.8)", // Green
-            "rgba(249, 115, 22, 0.8)", // Orange
-            "rgba(168, 85, 247, 0.8)", // Purple
+            "#4db6ac", // Teal
+            "#29b6f6", // Light Blue
+            "#00695c", // Dark Teal
+            "#0288d1", // Blue
+            "#66bb6a", // Light Green
           ][index % 5],
         }));
         
@@ -66,7 +66,7 @@ const StatsSection = () => {
       }
     };
     fetchStats();
-  }, [isMobile]);
+  }, []);
 
   const handleBarClick = useCallback((data) => {
     if (data?.activePayload?.[0]?.payload) {
@@ -76,6 +76,7 @@ const StatsSection = () => {
         "stats",
         `${payload.specialty}_${payload.count}_specialty`
       );
+      console.log(`Clicked: ${payload.specialty} - ${payload.count} cases`);
     }
   }, []);
 
@@ -83,6 +84,7 @@ const StatsSection = () => {
     if (data?.activePayload?.[0]?.payload) {
       const payload = data.activePayload[0].payload;
       trackEngagement("hover", "stats", payload.specialty);
+      console.log(`Hovered: ${payload.specialty}`);
     }
   }, []);
 
@@ -92,7 +94,9 @@ const StatsSection = () => {
       return (
         <div className={styles.tooltip}>
           <p className={styles.tooltipText}>
-            {`${data.specialty}: ${data.count} cases`}
+            <strong>{data.specialty}</strong>
+            <br />
+            {data.count} cases
           </p>
         </div>
       );
@@ -100,29 +104,97 @@ const StatsSection = () => {
     return null;
   };
 
+  const CustomBar = (props) => {
+    const { fill, x, y, width, height } = props;
+    
+    return (
+      <g className={styles.customBar}>
+        {/* 3D shadow effect */}
+        <rect
+          x={x + 4}
+          y={y + 4}
+          width={width}
+          height={height}
+          fill="rgba(0, 0, 0, 0.15)"
+          rx={8}
+          ry={8}
+        />
+        {/* Side panel for 3D effect */}
+        <rect
+          x={x + width}
+          y={y + 4}
+          width={4}
+          height={height}
+          fill="rgba(0, 0, 0, 0.2)"
+          rx={2}
+          ry={2}
+        />
+        {/* Main bar */}
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={fill}
+          rx={8}
+          ry={8}
+          style={{
+            filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15))',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}
+        />
+        {/* Top highlight for 3D effect */}
+        <rect
+          x={x + 3}
+          y={y + 3}
+          width={width - 6}
+          height={12}
+          fill="rgba(255, 255, 255, 0.4)"
+          rx={6}
+          ry={6}
+        />
+        {/* Left highlight */}
+        <rect
+          x={x + 3}
+          y={y + 3}
+          width={8}
+          height={height - 6}
+          fill="rgba(255, 255, 255, 0.2)"
+          rx={4}
+          ry={4}
+        />
+      </g>
+    );
+  };
+
   if (loading) {
     return (
-      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
-        <div className={styles.container}>
-          <div className={styles.header}>
-            <Skeleton height={24} width={150} />
-            <Skeleton height={16} width={100} />
+      <section className={styles.statsSection}>
+        <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+          <div className={styles.container}>
+            <div className={styles.header}>
+              <Skeleton height={24} width={150} />
+              <Skeleton height={16} width={100} />
+            </div>
+            <div className={styles.content}>
+              <Skeleton height={isMobile ? 300 : 400} />
+            </div>
           </div>
-          <div className={styles.content}>
-            <Skeleton height={isMobile ? 300 : 400} />
-          </div>
-        </div>
-      </SkeletonTheme>
+        </SkeletonTheme>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className={`${styles.container} ${styles.errorContainer}`}>
-        <div className={styles.errorContent}>
-          <p className={styles.errorText}>{error}</p>
+      <section className={styles.statsSection}>
+        <div className={`${styles.container} ${styles.errorContainer}`}>
+          <div className={styles.errorContent}>
+            <p className={styles.errorText}>{error}</p>
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -143,23 +215,24 @@ const StatsSection = () => {
                   data={stats}
                   margin={{
                     top: 20,
-                    right: isMobile ? 5 : 30,
-                    left: isMobile ? 5 : 20,
+                    right: isMobile ? 10 : 30,
+                    left: isMobile ? 10 : 20,
                     bottom: isMobile ? 80 : 90
                   }}
-                  barCategoryGap={isMobile ? "10%" : "20%"}
+                  barCategoryGap={isMobile ? "15%" : "25%"}
                   onClick={handleBarClick}
                   onMouseMove={handleMouseEnter}
                 >
                   <XAxis
                     dataKey="specialty"
                     tickLine={false}
-                    tickMargin={10}
-                    axisLine={{ stroke: "var(--border, #e5e7eb)" }}
+                    tickMargin={15}
+                    axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
                     tick={{
-                      fill: "var(--text, #1f2937)",
+                      fill: "var(--text)",
                       fontFamily: "Inter, sans-serif",
-                      fontSize: isMobile ? 9 : 11,
+                      fontSize: isMobile ? 10 : 12,
+                      fontWeight: 500,
                     }}
                     angle={isMobile ? -45 : -35}
                     textAnchor="end"
@@ -169,24 +242,30 @@ const StatsSection = () => {
                   <YAxis
                     dataKey="count"
                     tickLine={false}
-                    tickMargin={10}
-                    axisLine={{ stroke: "var(--border, #e5e7eb)" }}
+                    tickMargin={15}
+                    axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
                     allowDecimals={false}
                     tick={{
-                      fill: "var(--text, #1f2937)",
+                      fill: "var(--text)",
                       fontFamily: "Inter, sans-serif",
                       fontSize: isMobile ? 10 : 12,
+                      fontWeight: 500,
                     }}
-                    width={isMobile ? 30 : 40}
+                    width={isMobile ? 35 : 45}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={false} />
                   <Bar 
                     dataKey="count" 
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={isMobile ? 40 : 60}
+                    radius={[8, 8, 0, 0]}
+                    maxBarSize={isMobile ? 45 : 65}
+                    shape={<CustomBar />}
                   >
                     {stats.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.fill}
+                        className={styles.barCell}
+                      />
                     ))}
                   </Bar>
                 </BarChart>
@@ -195,10 +274,11 @@ const StatsSection = () => {
           </div>
           <div className={styles.footer}>
             <div className={styles.footerText}>
-              Top specialties by case volume <TrendingUp className={styles.footerIcon} />
+              Top specialties by case volume 
+              <TrendingUp className={styles.footerIcon} />
             </div>
             <div className={styles.footerSubtext}>
-              Showing the top 5 specialties with the most cases
+              Interactive chart showing the 5 most active medical specialties
             </div>
           </div>
         </div>
