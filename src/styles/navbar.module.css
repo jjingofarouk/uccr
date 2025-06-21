@@ -1,216 +1,1105 @@
-```javascript
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useAuth } from '../hooks/useAuth';
-import { logout } from '../firebase/auth';
-import { getMessages } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { useTheme } from '../context/ThemeContext';
-import styles from '../styles/navbar.module.css';
-import SearchModal from './SearchModal';
-import NotificationsModal from './NotificationsModal';
-import Sidebar from './Sidebar';
-import { subscribeToNotifications } from '../firebase/notifications';
+That navbar shoukf work with this styles without them being changed. /* navbar.module.css */
+.header {
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 6px var(--shadow);
+  margin: 0;
+}
 
-export default function Navbar() {
-  const { user, loading } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-  const router = useRouter();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [unreadThreads, setUnreadThreads] = useState([]);
-  const [unreadNotifications, setUnreadNotifications] = useState([]);
-  const [logoutError, setLogoutError] = useState('');
-  const sidebarRef = useRef(null);
-  const notificationsButtonRef = useRef(null);
-  const userAvatarRef = useRef(null);
+.headerContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-    setIsNotificationsModalOpen(false);
-    setIsSearchModalOpen(false);
-    setLogoutError('');
-  };
+.logo {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+}
 
-  const toggleNotificationsModal = () => {
-    setIsNotificationsModalOpen(!isNotificationsModalOpen);
-    setIsSidebarOpen(false);
-    setIsSearchModalOpen(false);
-    setLogoutError('');
-  };
+.logo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 
-  const toggleSearchModal = () => {
-    setIsSearchModalOpen(!isSearchModalOpen);
-    setIsSidebarOpen(false);
-    setIsNotificationsModalOpen(false);
-    setLogoutError('');
-  };
+.logo:hover {
+  color: var(--primary-hover);
+}
 
-  const handleLogout = async () => {
-    try {
-      const result = await logout();
-      if (result.success) {
-        setIsSidebarOpen(false);
-        router.push('/auth');
-      } else {
-        setLogoutError(result.error);
-      }
-    } catch (error) {
-      setLogoutError('Failed to log out. Please try again.');
-    }
-  };
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-  const handleThemeToggle = () => {
-    toggleTheme();
-  };
+.searchButton,
+.themeToggle,
+.notificationButton,
+.menuButton {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
 
-  const handleNavigationClick = (navType) => {};
+.searchButton:hover,
+.themeToggle:hover,
+.notificationButton:hover,
+.menuButton:hover {
+  background: var(--primary);
+  color: #ffffff;
+  transform: scale(1.05);
+}
 
-  const clearError = () => {
-    setLogoutError('');
-  };
+.notificationWrapper {
+  position: relative;
+}
 
-  useEffect(() => {
-    const fetchUnreadMessages = async () => {
-      if (!user) {
-        setUnreadThreads([]);
-        return;
-      }
-      try {
-        const threads = await getMessages(user.uid);
-        const unread = threads.filter((thread) => thread.lastMessage && !thread.read);
-        setUnreadThreads(unread);
-      } catch (err) {
-        console.error('Fetch unread messages error:', err);
-      }
-    };
-    fetchUnreadMessages();
-  }, [user]);
+.notificationBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
 
-  useEffect(() => {
-    if (!user) {
-      setUnreadNotifications([]);
-      return;
-    }
+.notificationDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px var(--shadow);
+  z-index: 1002;
+  padding: 0.5rem;
+}
 
-    const unsubscribe = subscribeToNotifications(user.uid, (notifications) => {
-      setUnreadNotifications(notifications);
-    });
+.notificationItem {
+  display: block;
+  padding: 0.75rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
 
-    return () => unsubscribe();
-  }, [user]);
+.notificationItem:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
 
-  return (
-    <>
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <Link 
-            href="/" 
-            className={styles.logo}
-            onClick={() => handleNavigationClick('home_logo')}
-          >
-            <Image src="/logo.jpg" alt="UCCR Logo" width={36} height={36} />
-            <span>UCCR</span>
-          </Link>
-          <div className={styles.headerControls}>
-            <button
-              onClick={toggleSearchModal}
-              className={styles.searchButton}
-              aria-label="Open search"
-            >
-              <Search size={20} />
-            </button>
-            <button
-              onClick={handleThemeToggle}
-              className={styles.themeToggle}
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            >
-              {theme === 'light' ? (
-                <motion.div
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Moon size={20} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Sun size={20} />
-                </motion.div>
-              )}
-            </button>
-            {user && (
-              <div ref={notificationsButtonRef} className={styles.notificationWrapper}>
-                <button
-                  onClick={toggleNotificationsModal}
-                  className={styles.notificationButton}
-                  aria-label="View notifications"
-                >
-                  <Bell size={20} />
-                  {(unreadThreads.length + unreadNotifications.length) > 0 && (
-                    <span className={styles.notificationBadge}>{unreadThreads.length + unreadNotifications.length}</span>
-                  )}
-                </button>
-              </div>
-            )}
-            <div ref={userAvatarRef} className={styles.menuButtonWrapper}>
-              {user ? (
-                <Image
-                  src={user.photoURL || '/images/doctor-avatar.jpeg'}
-                  alt="User profile"
-                  width={36}
-                  height={36}
-                  className={styles.userAvatar}
-                  onClick={toggleSidebar}
-                />
-              ) : (
-                <button
-                  onClick={toggleSidebar}
-                  className={styles.menuButton}
-                  aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
-                  disabled={loading}
-                >
-                  <Menu size={24} />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-      <AnimatePresence>
-        {isNotificationsModalOpen && (
-          <NotificationsModal
-            isOpen={isNotificationsModalOpen}
-            toggleModal={toggleNotificationsModal}
-            unreadThreads={unreadThreads}
-            unreadNotifications={unreadNotifications}
-            handleNavigationClick={handleNavigationClick}
-          />
-        )}
-      </AnimatePresence>
-      <SearchModal
-        isOpen={isSearchModalOpen}
-        toggleModal={toggleSearchModal}
-        handleNavigationClick={handleNavigationClick}
-      />
-      <Sidebar
-        isOpen={isSidebarOpen}
-        toggleSidebar={toggleSidebar}
-        user={user}
-        loading={loading}
-        handleNavigationClick={handleNavigationClick}
-        handleLogout={handleLogout}
-        logoutError={logoutError}
-        clearError={clearError}
-      />
-    </>
-  );
+.notificationItem small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.noNotifications {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.searchModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 1001;
+  padding-top: 5rem;
+}
+
+.searchModalContent {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 16px var(--shadow);
+  position: relative;
+  padding: 1.5rem;
+}
+
+.closeSearchButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.closeSearchButton:hover {
+  color: var(--primary);
+}
+
+.searchInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+  margin-bottom: 1rem;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--text-secondary);
+}
+
+.searchIcon {
+  color: var(--text);
+}
+
+.searchResults {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.searchSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.searchSection h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0.5rem 0;
+}
+
+.searchResult {
+  display: block;
+  padding: 0.75rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.searchResult:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.searchResult small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.noResults {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.noResults ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.noResults li {
+  margin-bottom: 0.5rem;
+}
+
+.noResults a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.noResults a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.menuButtonWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.userAvatar:hover {
+  transform: scale(1.05);
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 280px;
+  background: var(--background);
+  box-shadow: -4px 0 12px var(--shadow);
+  padding: 1.5rem;
+  overflow-y: auto;
+  z-index: 2000;
+}
+
+.sidebarHeader {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebarAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userName {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.navLink:hover {
+  background: var(--primary);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.logoutButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.navIcon {
+  flex-shrink: 0;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #fef2f2;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 1rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.dark-mode .error {
+  background: #3f3f46;
+  border-color: var(--border);
+}
+
+.closeError {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc2626;
+  padding: 0.25rem;
+}
+
+.closeError:hover {
+  color: #b91c1c;
+}
+
+.searchLoading {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    padding: 0 0.5rem;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .logo img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar {
+    width: 260px;
+  }
+
+  .notificationDropdown {
+    width: 260px;
+  }
+
+  .searchModalContent {
+    width: 90%;
+  }
+
+  .userAvatar,
+  .sidebarAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .noResults ul {
+    padding-left: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .logo img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .userAvatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .sidebarAvatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar {
+    width: 240px;
+    padding: 1rem;
+  }
+
+  .notificationDropdown {
+    width: 240px;
+  }
+
+  .navLink {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .searchButton,
+  .themeToggle,
+  .notificationButton,
+  .menuButton {
+    padding: 0.4rem;
+  }
+
+  .noResults {
+    font-size: 0.85rem;
+  }
+
+  .noResults a {
+    font-size: 0.85rem;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .logo,
+  .navLink,
+  .notificationItem,
+  .searchResult,
+  .noResults a {
+    color: var(--text);
+  }
+
+  .searchButton,
+  .themeToggle,
+  .notificationButton,
+  .menuButton {
+    color: var(--text);
+  }
+
+  .searchButton:hover,
+  .themeToggle:hover,
+  .notificationButton:hover,
+  .menuButton:hover {
+    background: var(--text);
+    color: var(--background);
+  }
+
+  .noResults a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .searchButton,
+  .themeToggle,
+  .notificationButton,
+  .menuButton,
+  .userAvatar,
+  .navLink,
+  .notificationItem,
+  .searchResult,
+  .sidebar,
+  .notificationDropdown,
+  .searchModal,
+  .noResults a,
+  .searchLoading {
+    transition: none;
+    animation: none;
+  }
+}
+
+The hamburger menu no longer opens! You must have removed stuff /* navbar.module.css */
+.header {
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 6px var(--shadow);
+  margin: 0;
+}
+
+.headerContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.logo {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.logo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.logo:hover {
+  color: var(--primary-hover);
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.searchButton,
+.themeToggle,
+.notificationButton,
+.menuButton {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.searchButton:hover,
+.themeToggle:hover,
+.notificationButton:hover,
+.menuButton:hover {
+  background: var(--primary);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.notificationWrapper {
+  position: relative;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.notificationDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px var(--shadow);
+  z-index: 1002;
+  padding: 0.5rem;
+}
+
+.notificationItem {
+  display: block;
+  padding: 0.75rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.notificationItem:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.notificationItem small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.noNotifications {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.searchModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 1001;
+  padding-top: 5rem;
+}
+
+.searchModalContent {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 16px var(--shadow);
+  position: relative;
+  padding: 1.5rem;
+}
+
+.closeSearchButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.closeSearchButton:hover {
+  color: var(--primary);
+}
+
+.searchInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+  margin-bottom: 1rem;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--text-secondary);
+}
+
+.searchIcon {
+  color: var(--text);
+}
+
+.searchResults {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.searchSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.searchSection h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0.5rem 0;
+}
+
+.searchResult {
+  display: block;
+  padding: 0.75rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.searchResult:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.searchResult small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.noResults {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.noResults ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.noResults li {
+  margin-bottom: 0.5rem;
+}
+
+.noResults a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.noResults a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.menuButtonWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.userAvatar:hover {
+  transform: scale(1.05);
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 280px;
+  background: var(--background);
+  box-shadow: -4px 0 12px var(--shadow);
+  padding: 1.5rem;
+  overflow-y: auto;
+  z-index: 2000;
+}
+
+.sidebarHeader {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebarAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userName {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.navLink:hover {
+  background: var(--primary);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.logoutButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.navIcon {
+  flex-shrink: 0;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #fef2f2;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 1rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.dark-mode .error {
+  background: #3f3f46;
+  border-color: var(--border);
+}
+
+.closeError {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc2626;
+  padding: 0.25rem;
+}
+
+.closeError:hover {
+  color: #b91c1c;
+}
+
+.searchLoading {
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    padding: 0 0.5rem;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .logo img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar {
+    width: 260px;
+  }
+
+  .notificationDropdown {
+    width: 260px;
+  }
+
+  .searchModalContent {
+    width: 90%;
+  }
+
+  .userAvatar,
+  .sidebarAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .noResults ul {
+    padding-left: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .logo img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .userAvatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .sidebarAvatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar {
+    width: 240px;
+    padding: 1rem;
+  }
+
+  .notificationDropdown {
+    width: 240px;
+  }
+
+  .navLink {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .searchButton,
+  .themeToggle,
+  .notificationButton,
+  .menuButton {
+    padding: 0.4rem;
+  }
+
+  .noResults {
+    font-size: 0.85rem;
+  }
+
+  .noResults a {
+    font-size: 0.85rem;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .logo,
+  .navLink,
+  .notificationItem,
+  .searchResult,
+  .noResults a {
+    color: var(--text);
+  }
+
+  .searchButton,
+  .themeToggle,
+  .notificationButton,
+  .menuButton {
+    color: var(--text);
+  }
+
+  .searchButton:hover,
+  .themeToggle:hover,
+  .notificationButton:hover,
+  .menuButton:hover {
+    background: var(--text);
+    color: var(--background);
+  }
+
+  .noResults a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .searchButton,
+  .themeToggle,
+  .notificationButton,
+  .menuButton,
+  .userAvatar,
+  .navLink,
+  .notificationItem,
+  .searchResult,
+  .sidebar,
+  .notificationDropdown,
+  .searchModal,
+  .noResults a,
+  .searchLoading {
+    transition: none;
+    animation: none;
+  }
 }
