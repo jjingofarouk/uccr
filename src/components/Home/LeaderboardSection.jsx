@@ -17,7 +17,7 @@ const LeaderboardSection = () => {
     const fetchContributors = async () => {
       try {
         trackEngagement('load_start', 'leaderboard');
-        const data = await getTopContributors(3);
+        const data = await getTopContributors(5); // Changed to 5 contributors
         setContributors(data);
         trackEngagement('load_success', 'leaderboard', `${data.length}_contributors`);
       } catch (err) {
@@ -31,17 +31,37 @@ const LeaderboardSection = () => {
     fetchContributors();
   }, []);
 
+  const getRankDisplay = (index) => {
+    switch (index) {
+      case 0: return '1';
+      case 1: return '2';
+      case 2: return '3';
+      case 3: return '4';
+      case 4: return '5';
+      default: return index + 1;
+    }
+  };
+
+  const getRankSuffix = (index) => {
+    switch (index) {
+      case 0: return 'st';
+      case 1: return 'nd';
+      case 2: return 'rd';
+      default: return 'th';
+    }
+  };
+
   if (loading) return (
-    <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+    <SkeletonTheme baseColor="var(--border)" highlightColor="var(--secondary)">
       <section className={styles.leaderboardSection}>
-        <Skeleton height={30} width={200} />
+        <Skeleton height={40} width={250} style={{ marginBottom: '2.5rem' }} />
         <div className={styles.leaderboard}>
-          {[...Array(3)].map((_, index) => (
+          {[...Array(5)].map((_, index) => (
             <div key={index} className={styles.contributor}>
-              <Skeleton circle width={40} height={40} />
-              <div>
-                <Skeleton width={100} height={20} />
-                <Skeleton width={80} height={15} />
+              <Skeleton circle width={60} height={60} />
+              <div className={styles.contributorInfo}>
+                <Skeleton width={120} height={20} style={{ marginBottom: '0.5rem' }} />
+                <Skeleton width={100} height={15} />
               </div>
             </div>
           ))}
@@ -58,7 +78,10 @@ const LeaderboardSection = () => {
 
   return (
     <section className={styles.leaderboardSection} aria-labelledby="leaderboard-title">
-      <h2 id="leaderboard-title" className={styles.sectionTitle}>Top Contributors</h2>
+      <h2 id="leaderboard-title" className={styles.sectionTitle}>
+        Top Contributors
+      </h2>
+      
       {contributors.length > 0 ? (
         <div className={styles.leaderboard}>
           {contributors.map((contributor, index) => (
@@ -67,54 +90,70 @@ const LeaderboardSection = () => {
               href={`/profile/view/${contributor.uid}`}
               className={styles.contributor}
               onClick={() => trackClick('contributor_profile', 'leaderboard', `${contributor.displayName}_position_${index + 1}`)}
+              title={`View ${contributor.displayName}'s profile - ${getRankDisplay(index)}${getRankSuffix(index)} place`}
             >
+              <div className={styles.rankBadge}>
+                {getRankDisplay(index)}
+              </div>
+              
               <Image
                 src={contributor.photoURL}
                 alt={`${contributor.displayName}'s avatar`}
-                width={40}
-                height={40}
+                width={60}
+                height={60}
                 className={styles.contributorAvatar}
+                priority={index < 3}
               />
-              <div>
-                <span>{contributor.displayName}</span>
-                <small>
-                  {contributor.caseCount} case{contributor.caseCount !== 1 ? 's' : ''} uploaded
-                </small>
-                {contributor.awards?.length > 0 && (
-                  <small className={styles.awards}>
-                    {contributor.awards.map((award, awardIndex) => (
-                      <span
-                        key={awardIndex}
-                        className={
-                          award === 'Gold'
-                            ? styles.goldAward
-                            : award === 'Silver'
-                            ? styles.silverAward
-                            : styles.bronzeAward
-                        }
-                        onClick={(e) => {
-                          e.preventDefault();
-                          trackEngagement('award_click', 'leaderboard', `${award}_${contributor.displayName}`);
-                        }}
-                      >
-                        {award} <Star size={12} />
-                      </span>
-                    ))}
-                  </small>
-                )}
+              
+              <div className={styles.contributorInfo}>
+                <h3 className={styles.contributorName}>
+                  {contributor.displayName}
+                </h3>
+                
+                <div className={styles.contributorStats}>
+                  <div>
+                    {contributor.caseCount} case{contributor.caseCount !== 1 ? 's' : ''} uploaded
+                  </div>
+                  
+                  {contributor.awards?.length > 0 && (
+                    <div className={styles.awards}>
+                      {contributor.awards.map((award, awardIndex) => (
+                        <span
+                          key={awardIndex}
+                          className={
+                            award === 'Gold'
+                              ? styles.goldAward
+                              : award === 'Silver'
+                              ? styles.silverAward
+                              : styles.bronzeAward
+                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            trackEngagement('award_click', 'leaderboard', `${award}_${contributor.displayName}`);
+                          }}
+                          title={`${award} award recipient`}
+                        >
+                          {award} <Star size={10} />
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </Link>
           ))}
         </div>
       ) : (
         <div className={styles.emptySection} aria-live="polite">
-          <p className={styles.emptyText}>No contributors found</p>
+          <p className={styles.emptyText}>
+            No contributors found yet
+          </p>
           <Link
             href="/cases/new"
             className={styles.ctaButtonSecondary}
             onClick={() => trackClick('contribute_case_button', 'leaderboard_empty')}
           >
-            Contribute a Case
+            Be the First Contributor
           </Link>
         </div>
       )}
