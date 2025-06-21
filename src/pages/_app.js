@@ -1,5 +1,3 @@
-// _app.js
-
 import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
@@ -12,12 +10,11 @@ import Footer from '../components/Footer';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 
-import Head from 'next/head'; // ✅ Needed to inject the PWA-related meta tags
+import Head from 'next/head';
 
 export default function MyApp({ Component, pageProps }) {
   return (
     <>
-      {/* ✅ Add only PWA-related meta links */}
       <Head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/logo.jpg" />
@@ -27,9 +24,7 @@ export default function MyApp({ Component, pageProps }) {
         <ThemeProvider>
           <CaseProvider>
             <Navbar />
-            <div className="marquee-container">
-              <Marquee />
-            </div>
+            <Marquee />
             <main>
               <Component {...pageProps} />
             </main>
