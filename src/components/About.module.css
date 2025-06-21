@@ -1,0 +1,490 @@
+/* About Page Styles */
+.aboutContainer {
+  position: relative;
+  background: var(--background);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+  min-height: calc(100vh - 76px);
+  padding: 3rem 0;
+}
+
+.backgroundSurface {
+  position: absolute;
+  inset: 0;
+  background: var(--surface);
+  border-radius: 16px;
+  z-index: -1;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.aboutTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: -0.025em;
+  position: relative;
+}
+
+.aboutTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 2px;
+}
+
+.introText {
+  max-width: 48rem;
+  color: var(--text);
+  line-height: 1.8;
+  text-align: center;
+  margin: 0 auto 2rem;
+  font-size: 1.125rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.introText strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.missionCard,
+.visionCard {
+  background: var(--primary);
+  color: var(--surface);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px var(--shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.missionCard::before,
+.visionCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(20px, -20px);
+}
+
+.missionCard:hover,
+.visionCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px var(--shadow);
+}
+
+.cardTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: inherit;
+}
+
+.cardContent {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  color: inherit;
+}
+
+.cardContent strong {
+  font-weight: 600;
+  opacity: 1;
+}
+
+.founderSection {
+  margin: 3rem 0;
+  padding: 0;
+}
+
+.founderTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.founderTitle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+.founderDescription {
+  max-width: 48rem;
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.founderDescription strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.connectSection {
+  margin-top: 3rem;
+  padding: 2rem 0;
+  background: var(--background);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.connectTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 2rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.connectTitle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+.connectContent {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.founderImage {
+  width: 14rem;
+  height: 14rem;
+  border-radius: 50%;
+  border: 4px solid var(--primary-dark);
+  box-shadow: 0 4px 14px var(--shadow);
+  object-fit: cover;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.founderImage:hover {
+  border-color: var(--primary);
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px var(--shadow);
+}
+
+.connectInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.connectDescription {
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.connectDescription strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contactItem {
+  padding: 0;
+}
+
+.contactLink {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.contactLink::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+  z-index: -1;
+}
+
+.contactLink:hover::before {
+  width: 100%;
+}
+
+.contactLink:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(2, 136, 209, 0.2);
+}
+
+.contactLink:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .aboutContainer {
+    padding: 2rem 0;
+  }
+
+  .aboutTitle {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .introText {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .missionCard,
+  .visionCard {
+    padding: 1.5rem;
+  }
+
+  .cardTitle {
+    font-size: 1.25rem;
+  }
+
+  .cardContent {
+    font-size: 0.9rem;
+  }
+
+  .founderSection {
+    margin: 2rem 0;
+  }
+
+  .founderTitle,
+  .connectTitle {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .founderDescription,
+  .connectDescription {
+    font-size: 0.95rem;
+  }
+
+  .connectContent {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .founderImage {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  .connectInfo {
+    text-align: center;
+  }
+
+  .contactList {
+    align-items: center;
+  }
+
+  .contactLink {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .aboutContainer {
+    padding: 1.5rem 0;
+  }
+
+  .aboutTitle {
+    font-size: 1.75rem;
+  }
+
+  .introText {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .missionCard,
+  .visionCard {
+    padding: 1.25rem;
+  }
+
+  .cardTitle {
+    font-size: 1.125rem;
+  }
+
+  .cardContent {
+    font-size: 0.875rem;
+  }
+
+  .founderTitle,
+  .connectTitle {
+    font-size: 1.5rem;
+    padding-left: 0.75rem;
+  }
+
+  .founderTitle::before,
+  .connectTitle::before {
+    width: 3px;
+  }
+
+  .founderDescription,
+  .connectDescription {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .founderImage {
+    width: 8rem;
+    height: 8rem;
+    border-width: 3px;
+  }
+
+  .contactLink {
+    font-size: 0.9rem;
+    padding: 0.375rem 0.625rem;
+  }
+}
+
+/* Dark Mode Specific Adjustments */
+.dark-mode .backgroundSurface {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.dark-mode .connectSection {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.dark-mode .contactLink {
+  background: var(--background);
+  border-color: var(--border);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .missionCard,
+  .visionCard,
+  .founderImage,
+  .contactLink {
+    transition: none;
+  }
+  
+  .missionCard:hover,
+  .visionCard:hover,
+  .founderImage:hover,
+  .contactLink:hover {
+    transform: none;
+  }
+
+  .contactLink::before {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .aboutTitle,
+  .founderTitle,
+  .connectTitle {
+    color: var(--text);
+  }
+
+  .missionCard,
+  .visionCard {
+    background: var(--text);
+    color: var(--background);
+    border: 2px solid var(--text);
+  }
+
+  .contactLink {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  .contactLink:hover {
+    background: var(--text);
+    color: var(--background);
+  }
+}
+
+/* Focus Styles for Better Accessibility */
+.missionCard:focus-within,
+.visionCard:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.founderImage:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
