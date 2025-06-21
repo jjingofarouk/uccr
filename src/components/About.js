@@ -1,4 +1,4 @@
-import Head from 'next.js/head';
+import Head from 'next/head';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Container, Box, Typography } from '@mui/material';
