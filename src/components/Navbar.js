@@ -3,41 +3,40 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
-import { getMessages, notifyUsersOfCaseChange } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { getMessages } from '../firebase/firestore';
+import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
 import styles from '../styles/navbar.module.css';
 import SearchModal from './SearchModal';
-import NotificationsDropdown from './NotificationsDropdown';
+import NotificationsModal from './NotificationsDropdown';
 import Sidebar from './Sidebar';
-import { onSnapshot, collection, query, where } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { subscribeToNotifications } from '../firebase/notifications';
 
 export default function Navbar() {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [unreadThreads, setUnreadThreads] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [logoutError, setLogoutError] = useState('');
   const sidebarRef = useRef(null);
-  const notificationsRef = useRef(null);
+  const notificationsButtonRef = useRef(null);
   const userAvatarRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-    setIsNotificationsOpen(false);
+    setIsNotificationsModalOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
   };
 
-  const toggleNotifications = () => {
-    setIsNotificationsOpen(!isNotificationsOpen);
+  const toggleNotificationsModal = () => {
+    setIsNotificationsModalOpen(!isNotificationsModalOpen);
     setIsSidebarOpen(false);
     setIsSearchModalOpen(false);
     setLogoutError('');
@@ -46,7 +45,7 @@ export default function Navbar() {
   const toggleSearchModal = () => {
     setIsSearchModalOpen(!isSearchModalOpen);
     setIsSidebarOpen(false);
-    setIsNotificationsOpen(false);
+    setIsNotificationsModalOpen(false);
     setLogoutError('');
   };
 
@@ -97,132 +96,105 @@ export default function Navbar() {
       return;
     }
 
-    const q = query(
-      collection(db, 'notifications'),
-      where('userId', '==', user.uid),
-      where('read', '==', false)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const notifications = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.() || new Date(),
-      }));
+    const unsubscribe = subscribeToNotifications(user.uid, (notifications) => {
       setUnreadNotifications(notifications);
-    }, (error) => {
-      console.error('Error fetching notifications:', error);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'cases'), (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const caseData = change.doc.data();
-        const caseId = change.doc.id;
-        const caseTitle = caseData.title || 'Untitled Case';
-        const action = change.type === 'added' ? 'Added' : change.type === 'modified' ? 'Updated' : null;
-
-        if (action && user) {
-          notifyUsersOfCaseChange(caseId, caseTitle, action).catch((error) => {
-            console.error(`Error notifying users of case ${action.toLowerCase()}:`, error);
-          });
-        }
-      });
-    }, (error) => {
-      console.error('Error listening to cases:', error);
     });
 
     return () => unsubscribe();
   }, [user]);
 
   return (
-    <header className={styles.header}>
-      <div className={styles.headerContent}>
-        <Link 
-          href="/" 
-          className={styles.logo}
-          onClick={() => handleNavigationClick('home_logo')}
-        >
-          <Image src="/logo.jpg" alt="UCCR Logo" width={40} height={40} />
-          <span>UCCR</span>
-        </Link>
-        <div className={styles.headerControls}>
-          <button
-            onClick={toggleSearchModal}
-            className={styles.searchButton}
-            aria-label="Open search"
+    <>
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <Link 
+            href="/" 
+            className={styles.logo}
+            onClick={() => handleNavigationClick('home_logo')}
           >
-            <Search size={20} />
-          </button>
-          <button
-            onClick={handleThemeToggle}
-            className={styles.themeToggle}
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            {theme === 'light' ? (
-              <motion.div
-                initial={{ rotate: 0 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Moon size={20} />
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ rotate: 0 }}
-                animate={{ rotate: -360 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Sun size={20} />
-              </motion.div>
+            <Image src="/logo.jpg" alt="UCCR Logo" width={40} height={40} />
+            <span>UCCR</span>
+          </Link>
+          <div className={styles.headerControls}>
+            <button
+              onClick={toggleSearchModal}
+              className={styles.searchButton}
+              aria-label="Open search"
+            >
+              <Search size={20} />
+            </button>
+            <button
+              onClick={handleThemeToggle}
+              className={styles.themeToggle}
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? (
+                <motion.div
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Moon size={20} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Sun size={20} />
+                </motion.div>
+              )}
+            </button>
+            {user && (
+              <div ref={notificationsButtonRef} className={styles.notificationWrapper}>
+                <button
+                  onClick={toggleNotificationsModal}
+                  className={styles.notificationButton}
+                  aria-label="View notifications"
+                >
+                  <Bell size={20} />
+                  {(unreadThreads.length + unreadNotifications.length) > 0 && (
+                    <span className={styles.notificationBadge}>{unreadThreads.length + unreadNotifications.length}</span>
+                  )}
+                </button>
+              </div>
             )}
-          </button>
-          {user && (
-            <div ref={notificationsRef} className={styles.notificationWrapper}>
-              <button
-                onClick={toggleNotifications}
-                className={styles.notificationButton}
-                aria-label="View notifications"
-              >
-                <Bell size={20} />
-                {(unreadThreads.length + unreadNotifications.length) > 0 && (
-                  <span className={styles.notificationBadge}>{unreadThreads.length + unreadNotifications.length}</span>
-                )}
-              </button>
-              <NotificationsDropdown
-                isOpen={isNotificationsOpen}
-                toggleNotifications={toggleNotifications}
-                unreadThreads={unreadThreads}
-                handleNavigationClick={handleNavigationClick}
-              />
+            <div ref={userAvatarRef} className={styles.menuButtonWrapper}>
+              {user ? (
+                <Image
+                  src={user.photoURL || '/images/doctor-avatar.jpeg'}
+                  alt="User profile"
+                  width={36}
+                  height={36}
+                  className={styles.userAvatar}
+                  onClick={toggleSidebar}
+                />
+              ) : (
+                <button
+                  onClick={toggleSidebar}
+                  className={styles.menuButton}
+                  aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
+                  disabled={loading}
+                >
+                  <Menu size={24} />
+                </button>
+              )}
             </div>
-          )}
-          <div ref={userAvatarRef} className={styles.menuButtonWrapper}>
-            {user ? (
-              <Image
-                src={user.photoURL || '/images/doctor-avatar.jpeg'}
-                alt="User profile"
-                width={36}
-                height={36}
-                className={styles.userAvatar}
-                onClick={toggleSidebar}
-              />
-            ) : (
-              <button
-                onClick={toggleSidebar}
-                className={styles.menuButton}
-                aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
-                disabled={loading}
-              >
-                <Menu size={24} />
-              </button>
-            )}
           </div>
         </div>
-      </div>
+      </header>
+      <AnimatePresence>
+        {isNotificationsModalOpen && (
+          <NotificationsModal
+            isOpen={isNotificationsModalOpen}
+            toggleModal={toggleNotificationsModal}
+            unreadThreads={unreadThreads}
+            unreadNotifications={unreadNotifications}
+            handleNavigationClick={handleNavigationClick}
+          />
+        )}
+      </AnimatePresence>
       <SearchModal
         isOpen={isSearchModalOpen}
         toggleModal={toggleSearchModal}
@@ -238,6 +210,6 @@ export default function Navbar() {
         logoutError={logoutError}
         clearError={clearError}
       />
-    </header>
+    </>
   );
 }
