@@ -1,16 +1,17 @@
+
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../firebase/auth';
 import { getMessages } from '../firebase/firestore';
-import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search, X } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Menu, Moon, Sun, Bell, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
 import styles from '../styles/navbar.module.css';
 import SearchModal from './SearchModal';
-import NotificationsModal from './NotificationsDropdown';
+import NotificationsModal from './NotificationsModal';
 import Sidebar from './Sidebar';
 import { subscribeToNotifications } from '../firebase/notifications';
 
@@ -112,7 +113,7 @@ export default function Navbar() {
             className={styles.logo}
             onClick={() => handleNavigationClick('home_logo')}
           >
-            <Image src="/logo.jpg" alt="UCCR Logo" width={40} height={40} />
+            <Image src="/logo.jpg" alt="UCCR Logo" width={36} height={36} />
             <span>UCCR</span>
           </Link>
           <div className={styles.headerControls}>
