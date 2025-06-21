@@ -1,3 +1,4 @@
+// StatsSection.jsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -16,7 +17,6 @@ const StatsSection = () => {
   const [error, setError] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile viewport
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -32,7 +32,6 @@ const StatsSection = () => {
       try {
         trackEngagement("load_start", "stats");
         const data = await getCaseStatistics();
-        console.log("Fetched stats:", data);
         
         const top5 = data.slice(0, 5).map((item, index) => ({
           ...item,
@@ -46,8 +45,7 @@ const StatsSection = () => {
         }));
         
         setStats(top5);
-        console.log("Processed top5 stats:", top5);
-        trackEngagement("load_success", "stats", `${data.length}_specialties`);
+        trackEngagement("load_success", "stats", `${data.length}_specialties");
         
         top5.forEach((stat, index) => {
           trackEvent(
@@ -59,7 +57,6 @@ const StatsSection = () => {
         });
       } catch (err) {
         setError("Unable to load case statistics");
-        console.error("Stats fetch error:", err);
         trackEngagement("load_error", "stats", err.message);
       } finally {
         setLoading(false);
@@ -76,7 +73,6 @@ const StatsSection = () => {
         "stats",
         `${payload.specialty}_${payload.count}_specialty`
       );
-      console.log(`Clicked: ${payload.specialty} - ${payload.count} cases`);
     }
   }, []);
 
@@ -84,7 +80,6 @@ const StatsSection = () => {
     if (data?.activePayload?.[0]?.payload) {
       const payload = data.activePayload[0].payload;
       trackEngagement("hover", "stats", payload.specialty);
-      console.log(`Hovered: ${payload.specialty}`);
     }
   }, []);
 
@@ -102,70 +97,6 @@ const StatsSection = () => {
       );
     }
     return null;
-  };
-
-  const CustomBar = (props) => {
-    const { fill, x, y, width, height } = props;
-    
-    return (
-      <g className={styles.customBar}>
-        {/* 3D shadow effect */}
-        <rect
-          x={x + 4}
-          y={y + 4}
-          width={width}
-          height={height}
-          fill="rgba(0, 0, 0, 0.15)"
-          rx={8}
-          ry={8}
-        />
-        {/* Side panel for 3D effect */}
-        <rect
-          x={x + width}
-          y={y + 4}
-          width={4}
-          height={height}
-          fill="rgba(0, 0, 0, 0.2)"
-          rx={2}
-          ry={2}
-        />
-        {/* Main bar */}
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill={fill}
-          rx={8}
-          ry={8}
-          style={{
-            filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15))',
-            transition: 'all 0.3s ease',
-            cursor: 'pointer'
-          }}
-        />
-        {/* Top highlight for 3D effect */}
-        <rect
-          x={x + 3}
-          y={y + 3}
-          width={width - 6}
-          height={12}
-          fill="rgba(255, 255, 255, 0.4)"
-          rx={6}
-          ry={6}
-        />
-        {/* Left highlight */}
-        <rect
-          x={x + 3}
-          y={y + 3}
-          width={8}
-          height={height - 6}
-          fill="rgba(255, 255, 255, 0.2)"
-          rx={4}
-          ry={4}
-        />
-      </g>
-    );
   };
 
   if (loading) {
@@ -258,7 +189,6 @@ const StatsSection = () => {
                     dataKey="count" 
                     radius={[8, 8, 0, 0]}
                     maxBarSize={isMobile ? 45 : 65}
-                    shape={<CustomBar />}
                   >
                     {stats.map((entry, index) => (
                       <Cell 
