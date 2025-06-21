@@ -189,7 +189,7 @@ const HeroSection = () => {
         </title>
         <meta
           name="description"
-          content="Explore Uganda Clinical Case Reports, a leading archive of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda. Contribute to medical education, public health, and clinical studies for healthcare professionals, researchers, and students."
+          content="Explore Uganda Clinical Case Reports, a growing archive of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda. Contribute to medical education, public health, and clinical studies for healthcare professionals, researchers, and students."
         />
         <meta
           name="keywords"
