@@ -1,4 +1,3 @@
-// components/HeroSection.jsx
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -239,22 +238,38 @@ const HeroSection = () => {
           <p className={styles.heroSubtitle}>
             Discover and contribute to a leading archive of{' '}
             <strong>
-              <span className={styles.typedText}>
-                {currentText}
+              <span className={styles.typedTextArchive}>
+                {archiveState.text}
                 <span className={styles.cursor}>|</span>
               </span>
             </strong>{' '}
-            from Uganda. Access valuable <strong>medical research</strong>,{' '}
-            <strong>healthcare insights</strong>, and <strong>clinical data</strong> for{' '}
-            <strong>healthcare professionals</strong>, <strong>medical researchers</strong>,
-            and <strong>students</strong> in <strong>Uganda</strong> and{' '}
-            <strong>East Africa</strong>.
+            from Uganda. Access valuable{' '}
+            <strong>
+              <span className={styles.typedTextResearch}>
+                {researchState.text}
+                <span className={styles.cursorResearch}>|</span>
+              </span>
+            </strong>{' '}
+            for{' '}
+            <strong>
+              <span className={styles.typedTextProfessionals}>
+                {professionalsState.text}
+                <span className={styles.cursorProfessionals}>|</span>
+              </span>
+            </strong>{' '}
+            in{' '}
+            <strong>
+              <span className={styles.typedTextLocations}>
+                {locationsState.text}
+                <span className={styles.cursorLocations}>|</span>
+              </span>
+            </strong>.
           </p>
           <div className={styles.heroButtons}>
             <Link
               href="/cases"
               className={styles.ctaButtonPrimary}
-              onClick={() => trackClick('browse_cases_button', 'hero')}
+              DNNN onClick={() => trackClick('browse_cases_button', 'hero')}
               title="Browse Uganda Medical Case Studies and Clinical Reports"
               aria-label="Browse Uganda Medical Case Studies and Clinical Reports"
             >
