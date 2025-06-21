@@ -2,7 +2,6 @@
 .hero {
   position: relative;
   width: 100vw;
-top: 1px;
   margin: 0 calc(-50vw + 50%);
   display: flex;
   align-items: center;
