@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { useTheme } from '../context/ThemeContext';
 import styles from '../styles/navbar.module.css';
 import SearchModal from './SearchModal';
-import NotificationsModal from './NotificationsModal';
+import NotificationsModal from './NotificationsDropdown';
 import Sidebar from './Sidebar';
 import { subscribeToNotifications } from '../firebase/notifications';
 
