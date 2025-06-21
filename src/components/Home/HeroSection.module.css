@@ -1,3 +1,4 @@
+/* styles/HeroSection.module.css */
 .hero {
   text-align: center;
   padding: 2rem 1rem;
@@ -37,6 +38,21 @@
   opacity: 0.8;
   line-height: 1.6;
   font-weight: 400;
+}
+
+.typedText {
+  color: var(--primary);
+  border-right: 2px solid var(--primary);
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.cursor {
+  animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
 }
 
 .heroButtons {
@@ -152,8 +168,10 @@
 @media (prefers-reduced-motion: reduce) {
   .hero::before,
   .ctaButtonPrimary,
-  .ctaButtonSecondary {
+  .ctaButtonSecondary,
+  .cursor {
     transition: none;
+    animation: none;
   }
   
   .ctaButtonPrimary:hover,
@@ -180,5 +198,10 @@
   .ctaButtonSecondary {
     border-color: var(--text);
     color: var(--text);
+  }
+
+  .typedText {
+    color: var(--text);
+    border-right-color: var(--text);
   }
 }
