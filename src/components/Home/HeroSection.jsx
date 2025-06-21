@@ -6,50 +6,132 @@ import { trackClick } from '../../utils/analytics';
 import styles from './HeroSection.module.css';
 
 const HeroSection = () => {
-  const words = [
+  // Archive words
+  const archiveWords = [
     'medical case studies',
     'clinical reports',
     'healthcare research',
-    'clinical trials'
+    'clinical trials',
+    'diagnostic cases',
+    'surgical procedures',
+    'patient outcomes',
+    'treatment protocols'
   ];
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [currentText, setCurrentText] = useState('');
-  const [isTyping, setIsTyping] = useState(true);
 
-  useEffect(() => {
-    const currentWord = words[currentWordIndex];
-    
-    if (isTyping) {
-      // Typing forward
-      if (currentText.length < currentWord.length) {
-        const timer = setTimeout(() => {
-          setCurrentText(currentWord.substring(0, currentText.length + 1));
-        }, 100);
-        return () => clearTimeout(timer);
+  // Research words
+  const researchWords = [
+    'medical research',
+    'clinical data',
+    'healthcare insights',
+    'evidence-based studies',
+    'peer-reviewed cases',
+    'diagnostic findings',
+    'treatment outcomes',
+    'research publications'
+  ];
+
+  // Professionals
+  const professionals = [
+    'doctors',
+    'nurses',
+    'medical students',
+    'researchers',
+    'surgeons',
+    'specialists',
+    'pediatricians',
+    'cardiologists',
+    'neurologists',
+    'oncologists',
+    'radiologists',
+    'pathologists',
+    'anesthesiologists',
+    'gynecologists',
+    'psychiatrists',
+    'dermatologists',
+    'orthopedic surgeons',
+    'emergency physicians',
+    'family medicine doctors',
+    'public health experts',
+    'clinical pharmacists',
+    'medical educators'
+  ];
+
+  // Locations
+  const locations = [
+    'Uganda',
+    'East Africa',
+    'West Africa',
+    'Central Africa',
+    'Southern Africa',
+    'Sub-Saharan Africa',
+    'Kenya',
+    'Tanzania',
+    'Rwanda',
+    'Ghana',
+    'Nigeria',
+    'South Africa',
+    'Ethiopia',
+    'Malawi',
+    'Zambia',
+    'developing nations',
+    'emerging markets',
+    'global health communities'
+  ];
+
+  // State for each typing element
+  const [archiveState, setArchiveState] = useState({ index: 0, text: '', isTyping: true });
+  const [researchState, setResearchState] = useState({ index: 0, text: '', isTyping: true });
+  const [professionalsState, setProfessionalsState] = useState({ index: 0, text: '', isTyping: true });
+  const [locationsState, setLocationsState] = useState({ index: 0, text: '', isTyping: true });
+
+  // Generic typing effect hook
+  const useTypingEffect = (words, state, setState, speed = 80, pauseTime = 2000, eraseSpeed = 40) => {
+    useEffect(() => {
+      const currentWord = words[state.index];
+      
+      if (state.isTyping) {
+        if (state.text.length < currentWord.length) {
+          const timer = setTimeout(() => {
+            setState(prev => ({
+              ...prev,
+              text: currentWord.substring(0, prev.text.length + 1)
+            }));
+          }, speed);
+          return () => clearTimeout(timer);
+        } else {
+          const timer = setTimeout(() => {
+            setState(prev => ({ ...prev, isTyping: false }));
+          }, pauseTime);
+          return () => clearTimeout(timer);
+        }
       } else {
-        // Finished typing, wait then start erasing
-        const timer = setTimeout(() => {
-          setIsTyping(false);
-        }, 2000);
-        return () => clearTimeout(timer);
+        if (state.text.length > 0) {
+          const timer = setTimeout(() => {
+            setState(prev => ({
+              ...prev,
+              text: prev.text.substring(0, prev.text.length - 1)
+            }));
+          }, eraseSpeed);
+          return () => clearTimeout(timer);
+        } else {
+          const timer = setTimeout(() => {
+            setState(prev => ({
+              index: (prev.index + 1) % words.length,
+              text: '',
+              isTyping: true
+            }));
+          }, 300);
+          return () => clearTimeout(timer);
+        }
       }
-    } else {
-      // Erasing backward
-      if (currentText.length > 0) {
-        const timer = setTimeout(() => {
-          setCurrentText(currentText.substring(0, currentText.length - 1));
-        }, 50);
-        return () => clearTimeout(timer);
-      } else {
-        // Finished erasing, move to next word
-        const timer = setTimeout(() => {
-          setCurrentWordIndex((prev) => (prev + 1) % words.length);
-          setIsTyping(true);
-        }, 500);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [currentText, currentWordIndex, isTyping, words]);
+    }, [words, state, setState, speed, pauseTime, eraseSpeed]);
+  };
+
+  // Apply typing effects with different speeds and delays
+  useTypingEffect(archiveWords, archiveState, setArchiveState, 80, 2500, 40);
+  useTypingEffect(researchWords, researchState, setResearchState, 90, 2000, 45);
+  useTypingEffect(professionals, professionalsState, setProfessionalsState, 70, 1800, 35);
+  useTypingEffect(locations, locationsState, setLocationsState, 85, 2200, 50);
 
   const structuredData = {
     '@context': 'https://schema.org',
