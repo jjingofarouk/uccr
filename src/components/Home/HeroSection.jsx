@@ -14,31 +14,33 @@ const HeroSection = () => {
   ];
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [typingSpeed, setTypingSpeed] = useState(100);
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
 
   useEffect(() => {
-    const handleTyping = () => {
-      const currentWord = words[currentWordIndex];
-      setCurrentText(prev => 
-        isDeleting 
-          ? currentWord.substring(0, prev.length - 1)
-          : currentWord.substring(0, prev.length + 1)
-      );
+    if (currentWordIndex >= words.length) {
+      setIsTypingComplete(true);
+      return;
+    }
 
-      setTypingSpeed(isDeleting ? 50 : 100);
+    const currentWord = words[currentWordIndex];
+    let charIndex = currentText.length;
 
-      if (!isDeleting && currentText === currentWord) {
-        setTimeout(() => setIsDeleting(true), 1000);
-      } else if (isDeleting && currentText === '') {
-        setIsDeleting(false);
-        setCurrentWordIndex((prev) => (prev + 1) % words.length);
+    const typeNextChar = () => {
+      if (charIndex < currentWord.length) {
+        setCurrentText(currentWord.substring(0, charIndex + 1));
+        charIndex++;
+        setTimeout(typeNextChar, 100);
+      } else {
+        setTimeout(() => {
+          setCurrentWordIndex(prev => prev + 1);
+          setCurrentText('');
+        }, 1000);
       }
     };
 
-    const timer = setTimeout(handleTyping, typingSpeed);
+    const timer = setTimeout(typeNextChar, 100);
     return () => clearTimeout(timer);
-  }, [currentText, isDeleting, currentWordIndex, typingSpeed, words]);
+  }, [currentText, currentWordIndex, words]);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -145,8 +147,10 @@ const HeroSection = () => {
         <p className={styles.heroSubtitle}>
           Discover and contribute to a leading archive of{' '}
           <strong>
-            <span className={styles.typedText}>{currentText}</span>
-            <span className={styles.cursor}>|</span>
+            <span className={styles.typedText}>
+              {isTypingComplete ? words[words.length - 1] : currentText}
+            </span>
+            {!isTypingComplete && <span className={styles.cursor}>|</span>}
           </strong>{' '}
           from Uganda. Access valuable <strong>medical research</strong>,{' '}
           <strong>healthcare insights</strong>, and <strong>clinical data</strong> for{' '}
