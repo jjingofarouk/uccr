@@ -249,7 +249,7 @@ const HeroSection = () => {
             Uganda Clinical Case Reports
           </h1>
           <p className={styles.heroSubtitle}>
-            Discover and contribute to a leading archive of{' '}
+            Discover and contribute to a growing archive of{' '}
             <strong>
               <span className={styles.typedTextArchive}>
                 {archiveState.text}
