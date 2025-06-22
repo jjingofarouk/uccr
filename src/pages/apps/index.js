@@ -64,7 +64,7 @@ const OtherApps = () => {
   return (
     <Container maxWidth="md" className={styles.otherAppsContainer}>
       <Typography variant="h3" className={styles.title}>
-        Other Apps by Farouk Jjingo
+        Other Projects by Farouk Jjingo
       </Typography>
       <Typography variant="body1" className={styles.subtitle}>
  Explore innovative apps developed by Farouk Jjingo that solve real-world problems in healthcare, education, and beyond. Some of these apps are still under active development, with new features and improvements being added regularly.
