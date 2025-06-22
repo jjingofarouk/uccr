@@ -8,7 +8,7 @@ const OtherApps = () => {
     {
       title: 'Zunobotics',
       description: 'Democratizing robotics and automation innovation in Africa through open-source technology.',
-      link: 'https://zunobotics.com',
+      link: 'https://www.zunobotics.com',
       image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/zunobotics/home.jpg',
     },
     {
