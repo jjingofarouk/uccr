@@ -6,65 +6,59 @@ import styles from './otherApps.module.css';
 const OtherApps = () => {
   const apps = [
     {
-      title: 'CareWave',
-      description: 'An enterprise-grade hospital management system for streamlining clinical, administrative, and operational workflows.',
-      link: 'https://carewave-doctor.vercel.app',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/carewave/landing.png',
+      title: 'Zunobotics',
+      description: 'Democratizing robotics and automation innovation in Africa through open-source technology.',
+      link: 'https://zunobotics.com',
+      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/zunobotics/home.png',
     },
-    {
-      title: 'Ssuubi Chatbot',
-      description: 'A mental health chatbot providing compassionate, AI-driven support for anxiety, depression, and crisis situations.',
-      link: 'https://ssuubi-mental-health-bot.onrender.com',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/ssuubi/home.png',
-    },
-    {
-      title: 'MediQ',
-      description: 'A tool to check potential drug interactions with a user-friendly interface and detailed results.',
-      link: 'https://mediq.vercel.app/',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/mediq/home.png',
-    },
-    {
-      title: 'Clinical Calculators',
-      description: 'A mobile app with over 90 specialized calculators for healthcare professionals across multiple specialties.',
-      link: 'https://clinical-calculators.vercel.app/',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/clinical-calculators/home.png',
-    },
-    {
-      title: 'Dwaliro',
-      description: 'A web app for exploring clinical trials from ClinicalTrials.gov with advanced filters and detailed study insights.',
-      link: 'https://dwaliro.vercel.app',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/dwaliro/home.png',
-    },
-    {
-      title: 'FreeResume',
-      description: 'A PWA for Ugandan job seekers to create professional, ATS-friendly resumes with real-time previews.',
-      link: 'http://free-resume-indol.vercel.app',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/free-resume/home.png',
-    },
-    {
-      title: 'GigMap',
-      description: 'A PWA connecting freelancers globally with an interactive map and dynamic profiles for talent discovery.',
-      link: 'https://gigmap.vercel.app',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/gigmap/home.png',
-    },
-    {
-      title: 'LitShelf',
-      description: 'A personalized book recommendation app with a hybrid algorithm and interactive preference form.',
-      link: 'https://litshelf.vercel.app',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/litshelf/home.png',
-    },
-    {
-      title: 'Dr. Osler',
-      description: 'A PWA offering clinical mentorship through a virtual Ugandan clinician, powered by the Gemini API.',
-      link: 'https://oslermentor.onrender.com/',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/osler/home.png',
-    },
-    {
-      title: 'BloodMatch',
-      description: 'A PWA connecting blood donors and recipients in Uganda with geolocation-based matching and notifications.',
-      link: 'https://bloodmatchug.vercel.app/',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/BloodMatch/home.png',
-    },
+    // {
+    //   title: 'CareWave',
+    //   description: 'An enterprise-grade hospital management system for streamlining clinical, administrative, and operational workflows.',
+    //   link: 'https://carewave-doctor.vercel.app',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/carewave/landing.png',
+    // },
+    // {
+    //   title: 'Ssuubi Chatbot',
+    //   description: 'A mental health chatbot providing compassionate, AI-driven support for anxiety, depression, and crisis situations.',
+    //   link: 'https://ssuubi-mental-health-bot.onrender.com',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/ssuubi/home.png',
+    // },
+    // {
+    //   title: 'Clinical Calculators',
+    //   description: 'A mobile app with over 90 specialized calculators for healthcare professionals across multiple specialties.',
+    //   link: 'https://clinical-calculators.vercel.app/',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/clinical-calculators/home.png',
+    // },
+    // {
+    //   title: 'FreeResume',
+    //   description: 'A PWA for Ugandan job seekers to create professional, ATS-friendly resumes with real-time previews.',
+    //   link: 'http://free-resume-indol.vercel.app',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/free-resume/home.png',
+    // },
+    // {
+    //   title: 'GigMap',
+    //   description: 'A PWA connecting freelancers globally with an interactive map and dynamic profiles for talent discovery.',
+    //   link: 'https://gigmap.vercel.app',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/gigmap/home.png',
+    // },
+    // {
+    //   title: 'LitShelf',
+    //   description: 'A personalized book recommendation app with a hybrid algorithm and interactive preference form.',
+    //   link: 'https://litshelf.vercel.app',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/litshelf/home.png',
+    // },
+    // {
+    //   title: 'Dr. Osler',
+    //   description: 'A PWA offering clinical mentorship through a virtual Ugandan clinician, powered by the Gemini API.',
+    //   link: 'https://oslermentor.onrender.com/',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/osler/home.png',
+    // },
+    // {
+    //   title: 'BloodMatch',
+    //   description: 'A PWA connecting blood donors and recipients in Uganda with geolocation-based matching and notifications.',
+    //   link: 'https://bloodmatchug.vercel.app/',
+    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/BloodMatch/home.png',
+    // },
   ];
 
   return (
