@@ -9,7 +9,25 @@ const OtherApps = () => {
       title: 'Zunobotics',
       description: 'Democratizing robotics and automation innovation in Africa through open-source technology.',
       link: 'https://zunobotics.com',
-      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/zunobotics/home.png',
+      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/zunobotics/home.jpg',
+    },
+    {
+      title: 'MediQ',
+      description: 'A tool to check potential drug interactions with a user-friendly interface and concise results.',
+      link: 'https://mediq.vercel.app/',
+      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/mediq/home.png',
+    },
+    {
+      title: 'Dwaliro',
+      description: 'A web app for exploring clinical trials from ClinicalTrials.gov with advanced filters and detailed study.',
+      link: 'https://dwaliro.vercel.app',
+      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/dwaliro/home.png',
+    },
+    {
+      title: 'FreeResume',
+      description: 'A PWA for Ugandan job seekers to create professional, ATS-friendly resumes with real-time previews.',
+      link: 'http://free-resume-indol.vercel.app',
+      image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/free-resume/home.png',
     },
     // {
     //   title: 'CareWave',
@@ -28,12 +46,6 @@ const OtherApps = () => {
     //   description: 'A mobile app with over 90 specialized calculators for healthcare professionals across multiple specialties.',
     //   link: 'https://clinical-calculators.vercel.app/',
     //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/clinical-calculators/home.png',
-    // },
-    // {
-    //   title: 'FreeResume',
-    //   description: 'A PWA for Ugandan job seekers to create professional, ATS-friendly resumes with real-time previews.',
-    //   link: 'http://free-resume-indol.vercel.app',
-    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/free-resume/home.png',
     // },
     // {
     //   title: 'GigMap',
@@ -67,7 +79,7 @@ const OtherApps = () => {
         Other Projects by Farouk Jjingo
       </Typography>
       <Typography variant="body1" className={styles.subtitle}>
- Explore innovative apps developed by Farouk Jjingo that solve real-world problems in healthcare, education, and beyond. Some of these apps are still under active development, with new features and improvements being added regularly.
+Join the Journey — Contribute or Collaborate!
       </Typography>
       <Box className={styles.appsGrid}>
         {apps.map((app, index) => (
