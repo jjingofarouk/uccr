@@ -1,4 +1,3 @@
-// components/Sidebar.jsx
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -139,7 +138,7 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               <Shield size={20} className={styles.navIcon} />
               Privacy
             </Link> */}
-            {/* <Link 
+            <Link 
               href="/apps" 
               onClick={() => {
                 handleNavigationClick('apps');
@@ -149,7 +148,7 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
             >
               <Grid size={20} className={styles.navIcon} />
               Other Apps
-            </Link> */}
+            </Link>
 {/*
   <Link 
     href="/support" 
