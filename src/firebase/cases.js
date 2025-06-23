@@ -10,6 +10,12 @@ export const addCase = async (caseData) => {
     if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
       throw new Error('Authenticated user does not match caseData.userId');
     }
+    const searchKeywords = [
+      ...(caseData.title?.toLowerCase().split(/\s+/) || []),
+      ...(Array.isArray(caseData.specialty) ? caseData.specialty.map(s => s.toLowerCase()) : [caseData.specialty?.toLowerCase()]),
+      ...(caseData.presentingComplaint?.toLowerCase().split(/\s+/) || []),
+    ].filter(Boolean);
+
     const validatedCaseData = {
       userId: caseData.userId,
       userName: caseData.userName || 'Anonymous',
@@ -30,6 +36,7 @@ export const addCase = async (caseData) => {
       awards: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
+      searchKeywords: [...new Set(searchKeywords)],
     };
     console.log('Validated case data:', validatedCaseData);
     const docRef = await addDoc(collection(db, 'cases'), validatedCaseData);
@@ -135,6 +142,12 @@ export const updateCase = async (caseId, caseData) => {
     if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
       throw new Error('Authenticated user does not match caseData.userId');
     }
+    const searchKeywords = [
+      ...(caseData.title?.toLowerCase().split(/\s+/) || []),
+      ...(Array.isArray(caseData.specialty) ? caseData.specialty.map(s => s.toLowerCase()) : [caseData.specialty?.toLowerCase()]),
+      ...(caseData.presentingComplaint?.toLowerCase().split(/\s+/) || []),
+    ].filter(Boolean);
+
     const validatedCaseData = {
       userId: caseData.userId,
       userName: caseData.userName || 'Anonymous',
@@ -154,6 +167,7 @@ export const updateCase = async (caseId, caseData) => {
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
       awards: Number(caseData.awards) || 0,
       updatedAt: serverTimestamp(),
+      searchKeywords: [...new Set(searchKeywords)],
     };
     console.log('Validated case data for update:', validatedCaseData);
     const caseRef = doc(db, 'cases', caseId);
