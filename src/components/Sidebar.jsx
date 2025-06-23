@@ -92,19 +92,17 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
                 Profile
               </Link>
             )}
-            {user && (
-              /* <Link 
-                href="/inbox" 
-                onClick={() => {
-                  handleNavigationClick('inbox');
-                  toggleSidebar();
-                }} 
-                className={styles.navLink}
-              >
-                <Inbox size={20} className={styles.navIcon} />
-                Inbox
-              </Link> */
-            )}
+            {/* <Link 
+              href="/inbox" 
+              onClick={() => {
+                handleNavigationClick('inbox');
+                toggleSidebar();
+              }} 
+              className={styles.navLink}
+            >
+              <Inbox size={20} className={styles.navIcon} />
+              Inbox
+            </Link> */}
             <Link 
               href="/about" 
               onClick={() => {
