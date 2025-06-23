@@ -93,7 +93,7 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               </Link>
             )}
             {user && (
-              <Link 
+              /* <Link 
                 href="/inbox" 
                 onClick={() => {
                   handleNavigationClick('inbox');
@@ -103,7 +103,7 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               >
                 <Inbox size={20} className={styles.navIcon} />
                 Inbox
-              </Link>
+              </Link> */
             )}
             <Link 
               href="/about" 
