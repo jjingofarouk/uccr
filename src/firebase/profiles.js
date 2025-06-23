@@ -59,7 +59,6 @@ export const getProfile = async (uid) => {
 
 export const updateProfile = async (uid, profileData) => {
   try {
-    const profileRef = doc(db, 'profiles', uid);
     const validatedProfileData = {
       role: profileData.role || '',
       displayName: profileData.displayName || 'User',
@@ -82,6 +81,7 @@ export const updateProfile = async (uid, profileData) => {
       courseOfStudy: profileData.courseOfStudy || '',
       updatedAt: serverTimestamp(),
     };
+    const profileRef = doc(db, 'profiles', uid);
     await setDoc(profileRef, validatedProfileData, { merge: true });
     console.log('Profile updated for uid:', uid, 'photoURL:', validatedProfileData.photoURL);
   } catch (error) {
@@ -92,7 +92,11 @@ export const updateProfile = async (uid, profileData) => {
 
 export const updateUserProfile = async (userId, profileData) => {
   try {
-    await setDoc(doc(db, 'profiles', userId), profileData, { merge: true });
+    const validatedProfileData = {
+      ...profileData,
+      updatedAt: serverTimestamp(),
+    };
+    await setDoc(doc(db, 'profiles', userId), validatedProfileData, { merge: true });
     console.log('User profile updated for:', userId);
   } catch (error) {
     console.error('Update user profile error:', error);
