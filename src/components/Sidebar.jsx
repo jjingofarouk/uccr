@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react'; // Added useEffect and useRef
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -6,10 +6,30 @@ import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Sh
 import styles from '../styles/navbar.module.css';
 
 export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNavigationClick, handleLogout, logoutError, clearError }) {
+  const sidebarRef = useRef(null); // Create a ref for the sidebar
+
+  // Handle clicks outside the sidebar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isOpen && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        toggleSidebar(); // Close sidebar if click is outside
+      }
+    };
+
+    // Add event listener for clicks
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, toggleSidebar]); // Dependencies: isOpen and toggleSidebar
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.aside
+          ref={sidebarRef} // Attach ref to sidebar
           className={styles.sidebar}
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
