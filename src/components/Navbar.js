@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -25,7 +24,6 @@ export default function Navbar() {
   const [unreadThreads, setUnreadThreads] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [logoutError, setLogoutError] = useState('');
-  const sidebarRef = useRef(null);
   const notificationsButtonRef = useRef(null);
   const userAvatarRef = useRef(null);
 
@@ -126,25 +124,23 @@ export default function Navbar() {
             </button>
             <button
               onClick={handleThemeToggle}
-              className={styles.themeToggle}
+              className={styles.themeToggleButton}
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
               {theme === 'light' ? (
                 <motion.div
                   initial={{ rotate: 0 }}
-                  animate={{ rotate: 360 }}
+                  animate={{ rotate: 360deg }}
                   transition={{ duration: 0.5 }}
                 >
                   <Moon size={20} />
                 </motion.div>
               ) : (
-                <motion.div
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 0.5 }}
+                <motion.div 
+                  initial={{ rotate: '0deg' }}
+                  animate={{ rotate: '-360deg' }}
                 >
-                  <Sun size={20} />
-                </motion.div>
+                <Sun size="20"/>
               )}
             </button>
             {user && (
