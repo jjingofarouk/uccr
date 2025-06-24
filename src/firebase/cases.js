@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, doc, getDoc, updateDoc, serverTimestamp, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, serverTimestamp, query, where } from 'firebase/firestore';
 import { db, auth } from './config';
 import { fetchUserPhotoURL } from './utils';
 import { notifyUsersOfCaseChange } from './notifications';
@@ -140,10 +140,6 @@ export const getCaseById = async (id) => {
 export const updateCase = async (caseId, caseData) => {
   try {
     console.log('updateCase called with caseId:', caseId, 'caseData:', caseData);
-    if (!caseData.userId) throw new Error('Missing userId in caseData');
-    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
-      throw new Error('Authenticated user does not match caseData.userId');
-    }
     const searchKeywords = [
       ...(caseData.title?.toLowerCase().split(/\s+/) || []),
       ...(Array.isArray(caseData.specialty) ? caseData.specialty.map(s => s.toLowerCase()) : []),
@@ -181,6 +177,19 @@ export const updateCase = async (caseId, caseData) => {
     return caseId;
   } catch (error) {
     console.error('Update case error:', error);
+    throw error;
+  }
+};
+
+export const deleteCase = async (caseId) => {
+  try {
+    console.log('deleteCase called with caseId:', caseId);
+    const caseRef = doc(db, 'cases', caseId);
+    await deleteDoc(caseRef);
+    console.log('Case deleted with ID:', caseId);
+    await notifyUsersOfCaseChange(caseId, '', 'Deleted', '');
+  } catch (error) {
+    console.error('Delete case error:', error);
     throw error;
   }
 };
