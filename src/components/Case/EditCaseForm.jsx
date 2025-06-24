@@ -137,23 +137,25 @@ export default function EditCaseForm({ caseId }) {
     { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
     { name: 'highLevelSummary', label: 'Case Summary', type: 'richtext', placeholder: 'Summarize the case' },
     { name: 'references', label: 'References', type: 'richtext', placeholder: 'List references' },
-    { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
+    { name: 'mediaUrls', label: 'Upload Media', type: 'media', placeholder: 'Upload media' },
   ];
 
   useEffect(() => {
-    const fetchCase = async () => {
-      if (caseId && user) {
+    const fetchCaseData = async () => {
+      if (caseId && user && user.uid) {
         try {
           const caseData = await getCaseById(caseId);
           if (!caseData) {
+            throw new Error('Case not found');
             setError('Case not found.');
             setIsLoading(false);
-            return;
+            return false;
           }
           if (caseData.userId !== user.uid) {
+            throw new Error('Permission denied');
             setError('You do not have permission to edit this case.');
             setIsLoading(false);
-            return;
+            return false;
           }
           setFormData({
             title: caseData.title || '',
@@ -173,16 +175,17 @@ export default function EditCaseForm({ caseId }) {
           });
           setIsLoading(false);
         } catch (err) {
-          setError('Failed to load case: ' + err.message);
+          setError(`Failed to load case data: ${err.message}`);
           setIsLoading(false);
         }
-      }
+      };
+      await fetchCaseData();
     };
     fetchCase();
   }, [caseId, user]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && user) {
+    if (typeof window !== 'undefined' && user && user.uid) {
       const script = document.createElement('script');
       script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
       script.async = true;
@@ -193,13 +196,15 @@ export default function EditCaseForm({ caseId }) {
         if (cloudinaryRef.current) {
           widgetRef.current = cloudinaryRef.current.createUploadWidget(
             {
-              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-              uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '',
+              uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '',
               folder: `cases/${user.uid}`,
               sources: ['local', 'camera'],
               multiple: true,
               resourceType: 'image',
-              public_id: `case_${uuidv4()}`,
+              clientAllowedFormats: ['jpg', 'png', 'jpeg'],
+              maxFileSize: 10000000,
+              public_id: `upload_${uuidv4()}`,
             },
             (error, result) => {
               if (result && result.event === 'upload-added') {
@@ -212,7 +217,7 @@ export default function EditCaseForm({ caseId }) {
                 }));
                 setIsUploading(false);
               } else if (error) {
-                setError('Image upload failed. Please try again.');
+                setError(error.message || 'Image upload failed. Please try again.');
                 setIsUploading(false);
               }
             }
@@ -254,11 +259,11 @@ export default function EditCaseForm({ caseId }) {
     e.preventDefault();
     if (!validateStep()) {
       setError('Please fill out the current step before proceeding.');
-      return;
+      return false;
     }
     if (isUploading) {
-      setError('Please wait for media upload to complete.');
-      return;
+      setError('Please wait for the upload to complete.');
+      return false;
     }
     if (currentStep < steps.length - 1) {
       setError('');
@@ -278,23 +283,23 @@ export default function EditCaseForm({ caseId }) {
     e.preventDefault();
     if (!user || !user.uid) {
       setError('You must be logged in to edit a case.');
-      return;
+      return false;
     }
     if (currentStep !== steps.length - 1) {
       setError('Please complete all steps before submitting.');
-      return;
+      return false;
     }
     if (isUploading) {
-      setError('Please wait for media upload to complete before submitting.');
-      return;
+      setError('Please wait for the upload to complete before submitting.');
+      return false;
     }
     const requiredFields = steps
-      .filter((step) => step.type !== 'media' && step.name !== 'specialty')
+      .filter((step) => step.name !== 'media' && step.name !== 'specialty')
       .map((step) => step.name);
     const isValid = requiredFields.every((field) => formData[field].trim() !== '');
     if (!isValid) {
       setError('Please fill out all required fields.');
-      return;
+      return false;
     }
     setError('');
     setIsLoading(true);
@@ -302,14 +307,14 @@ export default function EditCaseForm({ caseId }) {
       const caseData = {
         ...formData,
         userId: user.uid,
-        userName: user.displayName || 'Anonymous',
+        userName: user.displayName || '',
         thumbnailUrl: formData.mediaUrls[0] || '',
       };
       await updateCase(caseId, caseData);
       setLoadStart(Date.now());
       setForceLoading(true);
     } catch (err) {
-      setError('Failed to update case: ' + err.message);
+      setError(`Failed to update case: ${err.message}`);
       setIsLoading(false);
     }
   };
@@ -317,21 +322,21 @@ export default function EditCaseForm({ caseId }) {
   useEffect(() => {
     if (forceLoading && loadStart) {
       const elapsed = Date.now() - loadStart;
-      const remaining = SUBMISSION_LOADING_DURATION - elapsed;
+      const remaining = SUBMISSION_TIME_OUT_DURATION - elapsed;
       if (remaining <= 0) {
         setForceLoading(false);
         setIsLoading(false);
-        router.push(`/cases/${caseId}`);
+        router.push('/');
       } else {
         const timer = setTimeout(() => {
           setForceLoading(false);
           setIsLoading(false);
-          router.push(`/cases/${caseId}`);
+          router.push('/');
         }, remaining);
         return () => clearTimeout(timer);
       }
     }
-  }, [forceLoading, loadStart, router, caseId]);
+  }, [forceLoading, loadStart, router]);
 
   if (authLoading || isLoading) return <Loading />;
   if (authError) return <div>Error: {authError}</div>;
