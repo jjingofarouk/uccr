@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { addCase } from '../../firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 import SkeletonTheme from 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../../styles/caseForm.module.css';
 import FormHeader from './FormHeader';
@@ -51,7 +52,7 @@ export default function CaseForm() {
     { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
     { name: 'hospital', label: 'Hospital', type: 'richtext', placeholder: 'Enter hospital name' },
     { name: 'referralCenter', label: 'Referral Center', type: 'richtext', placeholder: 'Enter referral center' },
-{ name: 'specialty', label: 'Specialty', type: 'select', options: [
+    { name: 'specialty', label: 'Specialty', type: 'select', options: [
       { value: 'Adolescent Medicine', label: 'Adolescent Medicine' },
       { value: 'Allergy and Immunology', label: 'Allergy and Immunology' },
       { value: 'Anesthesiology', label: 'Anesthesiology' },
@@ -168,6 +169,8 @@ export default function CaseForm() {
               sources: ['local', 'camera'],
               multiple: true,
               resourceType: 'image',
+              clientAllowedFormats: ['jpg', 'png', 'jpeg'],
+              maxFileSize: 10000000,
               public_id: `case_${uuidv4()}`,
             },
             (error, result) => {
@@ -374,17 +377,18 @@ export default function CaseForm() {
         createdAt: new Date().toISOString(),
         thumbnailUrl: formData.mediaUrls[0] || '',
       };
-      await addCase(caseData);
+      const caseId = await addCase(caseData);
       setLoadStart(Date.now());
       setForceLoading(true);
       if (window.gtag) {
         window.gtag('event', 'submission_success', {
           event_category: 'CaseForm',
           event_label: 'Case Submission Successful',
+          value: caseId,
         });
       }
     } catch (err) {
-      setError('Failed to submit case: ' + err.message);
+      setError('Failed to submit case. Please try again.');
       setIsLoading(false);
       if (window.gtag) {
         window.gtag('event', 'submission_failed', {
@@ -403,12 +407,12 @@ export default function CaseForm() {
       if (remaining <= 0) {
         setForceLoading(false);
         setIsLoading(false);
-        router.push('/cases');
+        router.push('/');
       } else {
         const timer = setTimeout(() => {
           setForceLoading(false);
           setIsLoading(false);
-          router.push('/cases');
+          router.push('/');
         }, remaining);
         return () => clearTimeout(timer);
       }
