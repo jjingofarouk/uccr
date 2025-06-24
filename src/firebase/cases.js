@@ -69,7 +69,6 @@ export const getCases = async (uid = null) => {
         specialty: Array.isArray(data.specialty) ? data.specialty : [],
         presentingComplaint: data.presentingComplaint || '',
         history: data.history || '',
- converts to HTML entities
         physicalExam: data.physicalExam || '',
         investigations: data.investigations || '',
         provisionalDiagnosis: data.provisionalDiagnosis || '',
@@ -101,7 +100,7 @@ export const getCaseById = async (id) => {
     const docRef = doc(db, 'cases', id);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
-  console.warn('Case not found:', id);
+      console.warn('Case not found:', id);
       return null;
     }
     const data = docSnap.data();
@@ -142,8 +141,7 @@ export const updateCase = async (caseId, caseData) => {
   try {
     console.log('updateCase called with caseId:', caseId, 'caseData:', caseData);
     if (!caseData.userId) throw new Error('Missing userId in caseData');
-    if (!aut
-h.currentUser || auth.currentUser.uid !== caseData.userId) {
+    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
       throw new Error('Authenticated user does not match caseData.userId');
     }
     const searchKeywords = [
