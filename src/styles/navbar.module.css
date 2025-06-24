@@ -9,7 +9,7 @@
   z-index: 1000;
   box-shadow: 0 2px 6px var(--shadow);
   margin: 0;
-  height: 60px; /* Fixed navbar height */
+  height: 60px;
 }
 
 .headerContent {
@@ -52,7 +52,7 @@
 }
 
 .searchButton,
-.themeToggle,
+.themeToggleButton,
 .notificationButton,
 .menuButton {
   background: none;
@@ -65,7 +65,7 @@
 }
 
 .searchButton:hover,
-.themeToggle:hover,
+.themeToggleButton:hover,
 .notificationButton:hover,
 .menuButton:hover {
   background: var(--primary);
@@ -385,6 +385,22 @@
   border: none;
   cursor: pointer;
   text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.logoutButton:hover {
+  background: var(--primary);
+  color: #ffffff;
+  transform: translateX(4px);
 }
 
 .navIcon {
@@ -438,7 +454,7 @@
 @media (max-width: 768px) {
   .header {
     padding: 0.5rem 0.75rem;
-    height: 56px; /* Fixed height for mobile */
+    height: 56px;
   }
 
   .headerContent {
@@ -485,7 +501,7 @@
 @media (max-width: 480px) {
   .header {
     padding: 0.5rem 0.75rem;
-    height: 48px; /* Fixed height for small screens */
+    height: 48px;
   }
 
   .logo {
@@ -516,13 +532,14 @@
     width: 240px;
   }
 
-  .navLink {
+  .navLink,
+  .logoutButton {
     font-size: 0.9rem;
     padding: 0.6rem 0.75rem;
   }
 
   .searchButton,
-  .themeToggle,
+  .themeToggleButton,
   .notificationButton,
   .menuButton {
     padding: 0.4rem;
@@ -548,22 +565,24 @@
   .notificationItem,
   .searchResult,
   .noResults a,
-  .clearNotificationsButton {
+  .clearNotificationsButton,
+  .logoutButton {
     color: var(--text);
   }
 
   .searchButton,
-  .themeToggle,
+  .themeToggleButton,
   .notificationButton,
   .menuButton {
     color: var(--text);
   }
 
   .searchButton:hover,
-  .themeToggle:hover,
+  .themeToggleButton:hover,
   .notificationButton:hover,
   .menuButton:hover,
-  .clearNotificationsButton:hover {
+  .clearNotificationsButton:hover,
+  .logoutButton:hover {
     background: var(--text);
     color: var(--background);
   }
@@ -576,7 +595,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .searchButton,
-  .themeToggle,
+  .themeToggleButton,
   .notificationButton,
   .menuButton,
   .userAvatar,
@@ -588,7 +607,8 @@
   .searchModal,
   .noResults a,
   .searchLoading,
-  .clearNotificationsButton {
+  .clearNotificationsButton,
+  .logoutButton {
     transition: none;
     animation: none;
   }
