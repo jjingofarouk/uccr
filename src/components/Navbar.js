@@ -106,8 +106,8 @@ export default function Navbar() {
     <>
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className={styles.logo}
             onClick={() => handleNavigationClick('home_logo')}
           >
@@ -130,17 +130,19 @@ export default function Navbar() {
               {theme === 'light' ? (
                 <motion.div
                   initial={{ rotate: 0 }}
-                  animate={{ rotate: 360deg }}
+                  animate={{ rotate: 360 }}
                   transition={{ duration: 0.5 }}
                 >
                   <Moon size={20} />
                 </motion.div>
               ) : (
-                <motion.div 
-                  initial={{ rotate: '0deg' }}
-                  animate={{ rotate: '-360deg' }}
+                <motion.div
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 0.5 }}
                 >
-                <Sun size="20"/>
+                  <Sun size={20} />
+                </motion.div>
               )}
             </button>
             {user && (
@@ -152,7 +154,9 @@ export default function Navbar() {
                 >
                   <Bell size={20} />
                   {(unreadThreads.length + unreadNotifications.length) > 0 && (
-                    <span className={styles.notificationBadge}>{unreadThreads.length + unreadNotifications.length}</span>
+                    <span className={styles.notificationBadge}>
+                      {unreadThreads.length + unreadNotifications.length}
+                    </span>
                   )}
                 </button>
               </div>
