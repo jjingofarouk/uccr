@@ -1,5 +1,6 @@
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './config';
+import { fetchUserPhotoURL } from './utils';
 
 // Cache for random cases
 let cache = null;
@@ -26,11 +27,36 @@ export const getTrendingCases = async (limitCount = 3) => {
     const casesRef = collection(db, 'cases');
     const snapshot = await getDocs(casesRef);
     
-    // Convert snapshot to array and shuffle
-    const allCases = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    // Convert snapshot to array with photoURL and date conversion
+    const allCasesPromises = snapshot.docs.map(async (doc) => {
+      const data = doc.data();
+      const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/doctor-avatar.jpeg';
+      return {
+        id: doc.id,
+        userId: data.userId,
+        userName: data.userName || 'Anonymous',
+        title: data.title || '',
+        specialty: Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []),
+        presentingComplaint: data.presentingComplaint || '',
+        history: data.history || '',
+        physicalExam: data.physicalExam || '',
+        investigations: data.investigations || '',
+        provisionalDiagnosis: data.provisionalDiagnosis || '',
+        management: data.management || '',
+        discussion: data.discussion || '',
+        highLevelSummary: data.highLevelSummary || '',
+        references: data.references || '',
+        hospital: data.hospital || '',
+        referralCenter: data.referralCenter || '',
+        mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
+        awards: Number(data.awards) || 0,
+        createdAt: data.createdAt?.toDate?.() || new Date(),
+        updatedAt: data.updatedAt?.toDate?.() || new Date(),
+        photoURL,
+      };
+    });
+    
+    const allCases = await Promise.all(allCasesPromises);
     
     // Shuffle array using Fisher-Yates algorithm
     for (let i = allCases.length - 1; i > 0; i--) {
