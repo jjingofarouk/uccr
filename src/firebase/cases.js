@@ -30,13 +30,15 @@ export const addCase = async (caseData) => {
       discussion: String(caseData.discussion || ''),
       highLevelSummary: String(caseData.highLevelSummary || ''),
       references: String(caseData.references || ''),
-      hospital: String(caseData.hospital || ''),
-      referralCenter: String(caseData.referralCenter || ''),
+      hospital: String(caseData.hospital || '' ),
+      referralCenter: String(caseData.referralCenter || '',
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-      awards: 0,
+      awards: Number(caseData.awards || || 0),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       searchKeywords: [...new Set(searchKeywords)],
+      thumbnailUrl: String(caseData.thumbnailUrl || ''),
+      photoURL: String(caseData.photoURL || ''),
     };
     console.log('Validated case data:', validatedCaseData);
     const docRef = await addDoc(collection(db, 'cases'), validatedCaseData);
@@ -44,29 +46,27 @@ export const addCase = async (caseData) => {
     await notifyUsersOfCaseChange(docRef.id, validatedCaseData.title, 'Added', caseData.userId);
     return docRef.id;
   } catch (error) {
-    console.error('Add case error:', { code: error.code, message: error.message, stack: error.stack });
-    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to create case' : `Failed to create case: ${error.message}`);
+    console.error('Add case error:', error);
+    throw error;
   }
 };
 
 export const getCases = async (uid = null) => {
   try {
-    let q;
+    let q = query(collection(db, 'cases'));
     if (uid) {
       q = query(collection(db, 'cases'), where('userId', '==', uid));
-    } else {
-      q = query(collection(db, 'cases'));
     }
     const querySnapshot = await getDocs(q);
-    const casesPromises = querySnapshot.docs.map(async (doc) => {
+    const casesPromises = querySnapshot.docs.map(async (doc => {
       const data = doc.data();
-      const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/doctor-avatar.jpeg';
+      const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/photo-placeholder.jpg';
       return {
         id: doc.id,
-        userId: data.userId,
+        userId: data.userId || '',
         userName: data.userName || 'Anonymous',
         title: data.title || '',
-        specialty: data.specialty || '',
+        specialty: Array.isArray(data.specialty) ? data.specialty : [],
         presentingComplaint: data.presentingComplaint || '',
         history: data.history || '',
         physicalExam: data.physicalExam || '',
@@ -82,15 +82,16 @@ export const getCases = async (uid = null) => {
         awards: Number(data.awards) || 0,
         createdAt: data.createdAt?.toDate?.() || new Date(),
         updatedAt: data.updatedAt?.toDate?.() || new Date(),
-        photoURL,
+        photoURL: photoURL,
+        thumbnailUrl: data.thumbnailUrl || '',
       };
     });
     const cases = await Promise.all(casesPromises);
-    console.log('Fetched cases:', cases.length, 'for uid:', uid || 'all');
+    console.log('Retrieved cases:', cases.length, 'for user:', uid || 'all');
     return cases;
   } catch (error) {
-    console.error('Get cases error:', error.code, error.message);
-    return [];
+    console.error('Error fetching cases:', error);
+    throw error;
   }
 };
 
@@ -103,13 +104,13 @@ export const getCaseById = async (id) => {
       return null;
     }
     const data = docSnap.data();
-    const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/doctor-avatar.jpeg';
+    const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/photo-placeholder.jpg';
     const caseData = {
       id: docSnap.id,
-      userId: data.userId,
+      userId: data.userId || '',
       userName: data.userName || 'Anonymous',
       title: data.title || '',
-      specialty: Array.isArray(data.specialty) ? data.specialty : (data.specialty ? [data.specialty] : []),
+      specialty: Array.isArray(data.specialty) ? data.specialty : [],
       presentingComplaint: data.presentingComplaint || '',
       history: data.history || '',
       physicalExam: data.physicalExam || '',
@@ -125,13 +126,14 @@ export const getCaseById = async (id) => {
       awards: Number(data.awards) || 0,
       createdAt: data.createdAt?.toDate?.() || new Date(),
       updatedAt: data.updatedAt?.toDate?.() || new Date(),
-      photoURL,
+      photoURL: photoURL,
+      thumbnailUrl: data.thumbnailUrl || '',
     };
-    console.log('Fetched case:', caseData.id, 'uid:', caseData.userId);
+    console.log('Retrieved case:', caseData.id);
     return caseData;
   } catch (error) {
-    console.error('Get case by ID error:', error.code, error.message);
-    return null;
+    console.error('Error fetching case by ID:', error);
+    throw error;
   }
 };
 
@@ -144,7 +146,7 @@ export const updateCase = async (caseId, caseData) => {
     }
     const searchKeywords = [
       ...(caseData.title?.toLowerCase().split(/\s+/) || []),
-      ...(Array.isArray(caseData.specialty) ? caseData.specialty.map(s => s.toLowerCase()) : [caseData.specialty?.toLowerCase()]),
+      ...(Array.isArray(caseData.specialty) ? caseData.specialty.map(s => s.toLowerCase()) : []),
       ...(caseData.presentingComplaint?.toLowerCase().split(/\s+/) || []),
     ].filter(Boolean);
 
@@ -165,18 +167,20 @@ export const updateCase = async (caseId, caseData) => {
       hospital: String(caseData.hospital || ''),
       referralCenter: String(caseData.referralCenter || ''),
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-      awards: Number(caseData.awards) || 0,
+      awards: Number(caseData.awards || 0),
       updatedAt: serverTimestamp(),
       searchKeywords: [...new Set(searchKeywords)],
+      thumbnailUrl: String(caseData.thumbnailUrl || ''),
+      photoURL: String(caseData.photoURL || ''),
     };
     console.log('Validated case data for update:', validatedCaseData);
     const caseRef = doc(db, 'cases', caseId);
     await updateDoc(caseRef, validatedCaseData);
-    console.log('Case updated with ID:', caseId, 'userId:', caseData.userId);
+    console.log('Case updated with ID:', caseId);
     await notifyUsersOfCaseChange(caseId, validatedCaseData.title, 'Updated', caseData.userId);
     return caseId;
   } catch (error) {
-    console.error('Update case error:', { code: error.code, message: error.message, stack: error.stack });
-    throw new Error(error.code === 'permission-denied' ? 'Missing permissions to update case' : `Failed to update case: ${error.message}`);
+    console.error('Update case error:', error);
+    throw error;
   }
 };
