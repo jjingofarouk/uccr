@@ -18,7 +18,9 @@ const renderRichTextSummary = (html) => {
 // Utility function to format posted date
 const formatPostedDate = (createdAt) => {
   if (!createdAt) return 'Unknown date';
-  const date = new Date(createdAt);
+  // Handle Firestore Timestamp objects
+  const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+  if (isNaN(date.getTime())) return 'Unknown date';
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -109,7 +111,7 @@ export default function CaseCard({ caseData, isLoading }) {
         <p className={styles.postedDate}>{formatPostedDate(caseData.createdAt)}</p>
         <div className={styles.contributor}>
           <Image
-            src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
+            src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
             alt={`Avatar for ${caseData.userName || 'Contributor'}`}
             width={24}
             height={24}
