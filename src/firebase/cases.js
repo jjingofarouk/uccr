@@ -30,10 +30,10 @@ export const addCase = async (caseData) => {
       discussion: String(caseData.discussion || ''),
       highLevelSummary: String(caseData.highLevelSummary || ''),
       references: String(caseData.references || ''),
-      hospital: String(caseData.hospital || '' ),
-      referralCenter: String(caseData.referralCenter || '',
+      hospital: String(caseData.hospital || ''),
+      referralCenter: String(caseData.referralCenter || ''),
       mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-      awards: Number(caseData.awards || || 0),
+      awards: Number(caseData.awards || 0),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       searchKeywords: [...new Set(searchKeywords)],
@@ -58,7 +58,7 @@ export const getCases = async (uid = null) => {
       q = query(collection(db, 'cases'), where('userId', '==', uid));
     }
     const querySnapshot = await getDocs(q);
-    const casesPromises = querySnapshot.docs.map(async (doc => {
+    const casesPromises = querySnapshot.docs.map(async (doc) => {
       const data = doc.data();
       const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/photo-placeholder.jpg';
       return {
@@ -69,6 +69,7 @@ export const getCases = async (uid = null) => {
         specialty: Array.isArray(data.specialty) ? data.specialty : [],
         presentingComplaint: data.presentingComplaint || '',
         history: data.history || '',
+ converts to HTML entities
         physicalExam: data.physicalExam || '',
         investigations: data.investigations || '',
         provisionalDiagnosis: data.provisionalDiagnosis || '',
@@ -100,7 +101,7 @@ export const getCaseById = async (id) => {
     const docRef = doc(db, 'cases', id);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
-      console.warn('Case not found:', id);
+  console.warn('Case not found:', id);
       return null;
     }
     const data = docSnap.data();
@@ -141,7 +142,8 @@ export const updateCase = async (caseId, caseData) => {
   try {
     console.log('updateCase called with caseId:', caseId, 'caseData:', caseData);
     if (!caseData.userId) throw new Error('Missing userId in caseData');
-    if (!auth.currentUser || auth.currentUser.uid !== caseData.userId) {
+    if (!aut
+h.currentUser || auth.currentUser.uid !== caseData.userId) {
       throw new Error('Authenticated user does not match caseData.userId');
     }
     const searchKeywords = [
