@@ -1,3 +1,4 @@
+// src/components/EditCaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -146,16 +147,14 @@ export default function EditCaseForm({ caseId }) {
         try {
           const caseData = await getCaseById(caseId);
           if (!caseData) {
-            throw new Error('Case not found');
             setError('Case not found.');
             setIsLoading(false);
-            return false;
+            return;
           }
           if (caseData.userId !== user.uid) {
-            throw new Error('Permission denied');
             setError('You do not have permission to edit this case.');
             setIsLoading(false);
-            return false;
+            return;
           }
           setFormData({
             title: caseData.title || '',
@@ -178,10 +177,9 @@ export default function EditCaseForm({ caseId }) {
           setError(`Failed to load case data: ${err.message}`);
           setIsLoading(false);
         }
-      };
-      await fetchCaseData();
+      }
     };
-    fetchCase();
+    fetchCaseData();
   }, [caseId, user]);
 
   useEffect(() => {
@@ -205,10 +203,17 @@ export default function EditCaseForm({ caseId }) {
               clientAllowedFormats: ['jpg', 'png', 'jpeg'],
               maxFileSize: 10000000,
               public_id: `upload_${uuidv4()}`,
+              buttonClass: 'cloudinary-button',
             },
             (error, result) => {
               if (result && result.event === 'upload-added') {
                 setIsUploading(true);
+                if (window.gtag) {
+                  window.gtag('event', 'media_upload_started', {
+                    event_category: 'EditCaseForm',
+                    event_label: 'Media Upload Initiated',
+                  });
+                }
               }
               if (!error && result && result.event === 'success') {
                 setFormData((prev) => ({
@@ -216,9 +221,23 @@ export default function EditCaseForm({ caseId }) {
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
                 setIsUploading(false);
+                if (window.gtag) {
+                  window.gtag('event', 'media_upload_success', {
+                    event_category: 'EditCaseForm',
+                    event_label: 'Media Upload Completed',
+                    value: result.info.secure_url,
+                  });
+                }
               } else if (error) {
                 setError(error.message || 'Image upload failed. Please try again.');
                 setIsUploading(false);
+                if (window.gtag) {
+                  window.gtag('event', 'media_upload_failed', {
+                    event_category: 'EditCaseForm',
+                    event_label: 'Media Upload Error',
+                    value: error.message,
+                  });
+                }
               }
             }
           );
@@ -237,16 +256,37 @@ export default function EditCaseForm({ caseId }) {
     if (name === 'specialty') {
       const selectedOptions = Array.from(value.target.selectedOptions).map((option) => option.value);
       setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
+      if (window.gtag) {
+        window.gtag('event', 'specialty_selected', {
+          event_category: 'EditCaseForm',
+          event_label: 'Specialty Selection',
+          value: selectedOptions.join(', '),
+        });
+      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
+      if (window.gtag) {
+        window.gtag('event', 'form_field_updated', {
+          event_category: 'EditCaseForm',
+          event_label: `Field Updated: ${name}`,
+        });
+      }
     }
   };
 
   const handleDeleteMedia = (index) => {
+    const deletedUrl = formData.mediaUrls[index];
     setFormData((prev) => ({
       ...prev,
       mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
     }));
+    if (window.gtag) {
+      window.gtag('event', 'media_deleted', {
+        event_category: 'EditCaseForm',
+        event_label: 'Media Deleted',
+        value: deletedUrl,
+      });
+    }
   };
 
   const validateStep = () => {
@@ -259,15 +299,22 @@ export default function EditCaseForm({ caseId }) {
     e.preventDefault();
     if (!validateStep()) {
       setError('Please fill out the current step before proceeding.');
-      return false;
+      return;
     }
     if (isUploading) {
       setError('Please wait for the upload to complete.');
-      return false;
+      return;
     }
     if (currentStep < steps.length - 1) {
       setError('');
       setCurrentStep(currentStep + 1);
+      if (window.gtag) {
+        window.gtag('event', 'form_step_next', {
+          event_category: 'EditCaseForm',
+          event_label: `Step ${currentStep + 1}: ${steps[currentStep].label}`,
+          value: currentStep + 2,
+        });
+      }
     }
   };
 
@@ -276,6 +323,13 @@ export default function EditCaseForm({ caseId }) {
     if (currentStep > 0) {
       setError('');
       setCurrentStep(currentStep - 1);
+      if (window.gtag) {
+        window.gtag('event', 'form_step_previous', {
+          event_category: 'EditCaseForm',
+          event_label: `Step ${currentStep - 1}: ${steps[currentStep - 1].label}`,
+          value: currentStep,
+        });
+      }
     }
   };
 
@@ -283,55 +337,100 @@ export default function EditCaseForm({ caseId }) {
     e.preventDefault();
     if (!user || !user.uid) {
       setError('You must be logged in to edit a case.');
-      return false;
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'EditCaseForm',
+          event_label: 'Submission Failed: Not Logged In',
+        });
+      }
+      return;
     }
     if (currentStep !== steps.length - 1) {
       setError('Please complete all steps before submitting.');
-      return false;
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'EditCaseForm',
+          event_label: 'Submission Failed: Incomplete Steps',
+        });
+      }
+      return;
     }
     if (isUploading) {
       setError('Please wait for the upload to complete before submitting.');
-      return false;
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'EditCaseForm',
+          event_label: 'Submission Failed: Media Uploading',
+        });
+      }
+      return;
     }
     const requiredFields = steps
-      .filter((step) => step.name !== 'media' && step.name !== 'specialty')
+      .filter((step) => step.type !== 'media' && step.name !== 'specialty')
       .map((step) => step.name);
     const isValid = requiredFields.every((field) => formData[field].trim() !== '');
     if (!isValid) {
       setError('Please fill out all required fields.');
-      return false;
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'EditCaseForm',
+          event_label: 'Submission Failed: Missing Required Fields',
+        });
+      }
+      return;
     }
     setError('');
     setIsLoading(true);
+    if (window.gtag) {
+      window.gtag('event', 'submission_started', {
+        event_category: 'EditCaseForm',
+        event_label: 'Case Update Started',
+      });
+    }
     try {
       const caseData = {
         ...formData,
         userId: user.uid,
-        userName: user.displayName || '',
+        userName: user.displayName || 'Anonymous',
+        photoURL: user.photoURL || '',
         thumbnailUrl: formData.mediaUrls[0] || '',
       };
       await updateCase(caseId, caseData);
       setLoadStart(Date.now());
       setForceLoading(true);
+      if (window.gtag) {
+        window.gtag('event', 'submission_success', {
+          event_category: 'EditCaseForm',
+          event_label: 'Case Update Successful',
+          value: caseId,
+        });
+      }
     } catch (err) {
-      setError(`Failed to update case: ${err.message}`);
+      setError('Failed to update case: ' + (err.message.includes('permission-denied') ? 'Insufficient permissions.' : err.message));
       setIsLoading(false);
+      if (window.gtag) {
+        window.gtag('event', 'submission_failed', {
+          event_category: 'EditCaseForm',
+          event_label: 'Submission Failed: Error',
+          value: err.message,
+        });
+      }
     }
   };
 
   useEffect(() => {
     if (forceLoading && loadStart) {
       const elapsed = Date.now() - loadStart;
-      const remaining = SUBMISSION_TIME_OUT_DURATION - elapsed;
+      const remaining = SUBMISSION_LOADING_DURATION - elapsed;
       if (remaining <= 0) {
         setForceLoading(false);
         setIsLoading(false);
-        router.push('/');
+        router.push('/cases');
       } else {
         const timer = setTimeout(() => {
           setForceLoading(false);
           setIsLoading(false);
-          router.push('/');
+          router.push('/cases');
         }, remaining);
         return () => clearTimeout(timer);
       }
@@ -339,7 +438,7 @@ export default function EditCaseForm({ caseId }) {
   }, [forceLoading, loadStart, router]);
 
   if (authLoading || isLoading) return <Loading />;
-  if (authError) return <div>Error: {authError}</div>;
+  if (authError) return;
   if (!user) return <div>Please log in to edit a case.</div>;
 
   return (
@@ -349,7 +448,7 @@ export default function EditCaseForm({ caseId }) {
         <ProgressBar currentStep={currentStep} stepsLength={steps.length} />
         <form onSubmit={handleSubmit}>
           <StepContent
-            steps={steps}
+            steps={steps
             currentStep={currentStep}
             formData={formData}
             handleChange={handleChange}
