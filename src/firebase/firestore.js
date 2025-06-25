@@ -1,4 +1,4 @@
-"use client";
+
 import { db, auth } from './config';
 import { fetchUserPhotoURL } from './utils';
 import { addCase, getCases, getCaseById, updateCase, deleteCase } from './cases';
