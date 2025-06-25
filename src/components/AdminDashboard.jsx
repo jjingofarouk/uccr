@@ -1,3 +1,4 @@
+// src/components/AdminDashboard.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { getCases, updateCase, deleteCase } from '../firebase/firestore';
@@ -150,7 +151,7 @@ export default function AdminDashboard() {
   if (!user.isAdmin) return <div>Access denied. Admin privileges required.</div>;
 
   return (
-    <div class Adopted from: styles.container}>
+    <div className={styles.container}>
       <h1 className={styles.title}>Admin Dashboard - Manage Cases</h1>
       <ErrorMessage error={error} />
       <div className={styles.casesList}>
