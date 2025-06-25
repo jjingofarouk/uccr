@@ -1,6 +1,5 @@
 // src/components/AdminDashboard.jsx
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { getCases, updateCase, deleteCase } from '../firebase/firestore';
 import styles from '../styles/adminDashboard.module.css';
 import { Pencil, Trash2, Save, X } from 'lucide-react';
@@ -17,12 +16,16 @@ function ErrorMessage({ error }) {
 }
 
 export default function AdminDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
   const [cases, setCases] = useState([]);
   const [editingCaseId, setEditingCaseId] = useState(null);
   const [formData, setFormData] = useState({});
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+
+  const ADMIN_PASSWORD = 'SecureAdmin2025';
 
   const specialties = [
     'Adolescent Medicine', 'Allergy and Immunology', 'Anesthesiology', 'Aviation Medicine', 'Bacteriology',
@@ -43,9 +46,19 @@ export default function AdminDashboard() {
     'Telemedicine', 'Tropical Medicine', 'Urology', 'Vascular Surgery', 'Virology'
   ];
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setAuthError('');
+    } else {
+      setAuthError('Incorrect password. Please try again.');
+    }
+  };
+
   useEffect(() => {
     const fetchCases = async () => {
-      if (!user) return;
+      if (!isAuthenticated) return;
       try {
         setIsLoading(true);
         const allCases = await getCases();
@@ -57,7 +70,7 @@ export default function AdminDashboard() {
       }
     };
     fetchCases();
-  }, [user]);
+  }, [isAuthenticated]);
 
   const handleEdit = (caseItem) => {
     setEditingCaseId(caseItem.id);
@@ -126,7 +139,28 @@ export default function AdminDashboard() {
     setError('');
   };
 
-  if (authLoading || isLoading) {
+  if (!isAuthenticated) {
+    return (
+      <div className={styles.container}>
+        <h1 className={styles.title}>Admin Login</h1>
+        <ErrorMessage error={authError} />
+        <form onSubmit={handleLogin} className={styles.loginForm}>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter admin password"
+            className={styles.input}
+          />
+          <button type="submit" className={styles.saveButton}>
+            Login
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  if (isLoading) {
     return (
       <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f5f5f5">
         <div className={styles.container}>
@@ -146,9 +180,6 @@ export default function AdminDashboard() {
       </SkeletonTheme>
     );
   }
-
-  if (!user) return <div>Please log in to access the admin dashboard.</div>;
-  if (!user.isAdmin) return <div>Access denied. Admin privileges required.</div>;
 
   return (
     <div className={styles.container}>
