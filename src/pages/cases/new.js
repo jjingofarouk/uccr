@@ -1,8 +1,8 @@
-// pages/cases/new.jsx
-import CaseForm from '../../components/CaseForm';
+// src/pages/cases/new.jsx
+import CaseForm from '../../components/Case/CaseForm';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 import styles from '../../styles/caseForm.module.css';
-import { GoogleAnalytics } from '@next/third-parties';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 
 export default function NewCase() {
