@@ -5,6 +5,7 @@ import styles from '../styles/adminDashboard.module.css';
 import { Pencil, Trash2, Save, X } from 'lucide-react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import CaseCard from './Case/CaseCard';
 
 function ErrorMessage({ error }) {
   if (!error) return null;
@@ -93,6 +94,7 @@ export default function AdminDashboard() {
       userName: caseItem.userName || 'Anonymous',
       photoURL: caseItem.photoURL || '',
       thumbnailUrl: caseItem.thumbnailUrl || '',
+      createdAt: caseItem.createdAt || null
     });
   };
 
@@ -164,16 +166,11 @@ export default function AdminDashboard() {
     return (
       <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f5f5f5">
         <div className={styles.container}>
-          <Skeleton height={40} width={300} style={{ marginBottom: '20px' }} />
+          <h1 className={styles.title}>Admin Dashboard - Manage Cases</h1>
           <ErrorMessage error={error} />
           <div className={styles.casesList}>
             {[...Array(3)].map((_, index) => (
-              <div key={index} className={styles.caseItem}>
-                <Skeleton height={30} width="80%" style={{ marginBottom: '10px' }} />
-                <Skeleton count={5} height={20} />
-                <Skeleton height={100} style={{ marginTop: '10px' }} />
-                <Skeleton height={40} width={100} style={{ marginTop: '10px' }} />
-              </div>
+              <CaseCard key={index} isLoading={true} />
             ))}
           </div>
         </div>
@@ -297,26 +294,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
             ) : (
-              <div className={styles.caseDetails}>
-                <h2 className={styles.caseTitle}>{caseItem.title}</h2>
-                <p><strong>User:</strong> {caseItem.userName}</p>
-                <p><strong>Specialty:</strong> {caseItem.specialty.join(', ')}</p>
-                <p><strong>Presenting Complaint:</strong> {caseItem.presentingComplaint}</p>
-                <p><strong>History:</strong> {caseItem.history}</p>
-                <p><strong>Physical Exam:</strong> {caseItem.physicalExam}</p>
-                <p><strong>Investigations:</strong> {caseItem.investigations}</p>
-                <p><strong>Management:</strong> {caseItem.management}</p>
-                <p><strong>Provisional Diagnosis:</strong> {caseItem.provisionalDiagnosis}</p>
-                <p><strong>Hospital:</strong> {caseItem.hospital}</p>
-                <p><strong>Referral Center:</strong> {caseItem.referralCenter}</p>
-                <p><strong>Discussion:</strong> {caseItem.discussion}</p>
-                <p><strong>Summary:</strong> {caseItem.highLevelSummary}</p>
-                <p><strong>References:</strong> {caseItem.references}</p>
-                <div className={styles.mediaPreview}>
-                  {caseItem.mediaUrls.map((url, index) => (
-                    <img key={index} src={url} alt={`Media ${index + 1}`} className={styles.mediaImage} />
-                  ))}
-                </div>
+              <div>
+                <CaseCard caseData={caseItem} isLoading={false} />
                 <div className={styles.buttonGroup}>
                   <button
                     onClick={() => handleEdit(caseItem)}
