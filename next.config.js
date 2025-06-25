@@ -2,11 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['res.cloudinary.com'], // Allow Cloudinary images
+    domains: ['res.cloudinary.com'],
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
+        ...config.resolve.fallback,
+        net: false,
+        tls: false,
+        child_process: false,
         fs: false,
         crypto: false,
         events: false,
@@ -16,6 +20,9 @@ const nextConfig = {
     }
     return config;
   },
+  experimental: {
+    serverComponentsExternalPackages: ['react-quill', 'cloudinary', 'dompurify', 'jsdom'],
+  },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
