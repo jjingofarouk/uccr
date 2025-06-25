@@ -1,6 +1,6 @@
 import { db, auth } from './config';
 import { fetchUserPhotoURL } from './utils';
-import { addCase, getCases, getCaseById, updateCase } from './cases';
+import { addCase, getCases, getCaseById, updateCase, deleteCase } from './cases';
 import { addComment, getComments } from './comments';
 import { getProfile, updateProfile, updateUserProfile, getUsers } from './profiles';
 import { sendMessage, getMessages, getThreadMessages } from './messages';
@@ -20,6 +20,7 @@ export {
   getCases,
   getCaseById,
   updateCase,
+  deleteCase,
   addComment,
   getComments,
   getProfile,
