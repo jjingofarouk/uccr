@@ -138,6 +138,12 @@
   margin-bottom: 1.5rem;
 }
 
+.stepContentWrapper {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
 .uploadButton,
 .navButton,
 .deleteMediaButton {
@@ -357,19 +363,21 @@
   background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 1000;
-  padding: 1.5rem;
+  padding: 2rem;
+  overflow-y: auto;
 }
 
 .editModalContent {
   background: var(--background, #ffffff);
   border-radius: 12px;
   padding: 2rem;
-  max-width: 800px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 900px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
   position: relative;
   box-shadow: 0 6px 16px var(--shadow, rgba(0, 0, 0, 0.2));
 }
@@ -391,13 +399,15 @@
 }
 
 .caseFormWrapper {
-  width: 100%;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .caseForm {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  height: 100%;
 }
 
 .navigation {
@@ -440,8 +450,14 @@
     align-items: stretch;
   }
 
+  .editModal {
+    padding: 1rem;
+  }
+
   .editModalContent {
     padding: 1.5rem;
+    height: 500px;
+    max-width: 600px;
   }
 
   .formHeader {
@@ -471,6 +487,8 @@
 
   .editModalContent {
     padding: 1rem;
+    height: 450px;
+    max-width: 100%;
   }
 
   .mediaItem {
