@@ -258,7 +258,7 @@ export default function AdminDashboard() {
         { value: 'Genitourinary Medicine', label: 'Genitourinary Medicine' },
         { value: 'Geriatrics', label: 'Geriatrics' },
         { value: 'Health Economics', label: 'Health Economics' },
-        { value: 'Health Informatics', label: 'Health Informatics insanity:1
+        { value: 'Health Informatics', label: 'Health Informatics' },
         { value: 'Health Policy and Management', label: 'Health Policy and Management' },
         { value: 'Hematology', label: 'Hematology' },
         { value: 'Histopathology', label: 'Histopathology' },
