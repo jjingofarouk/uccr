@@ -6,10 +6,13 @@ import { Pencil, Trash2, Download, X, Upload } from 'lucide-react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CaseCard from './Case/CaseCard';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import dynamic from 'next/dynamic';
 import DOMPurify from 'dompurify';
 import { v4 as uuidv4 } from 'uuid';
+
+// Dynamically import ReactQuill with SSR disabled
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
 function ErrorMessage({ error }) {
   if (!error) return null;
@@ -604,7 +607,7 @@ export default function AdminDashboard() {
 
   const handleExportCSV = () => {
     const headers = [
-      'Title', 'Specialties', 'Author', 'Hospital', 'Referral Center', 'Awards', 'Created At',
+      'Title', 'Specialties', 'Author', 'Hospital', 'Awards', 'Created At',
       'Presenting Complaint', 'Provisional Diagnosis'
     ];
     const rows = filteredCases.map((caseData) => [
@@ -612,7 +615,6 @@ export default function AdminDashboard() {
       `"${Array.isArray(caseData.specialty) ? caseData.specialty.join(', ') : caseData.specialty || ''}"`,
       caseData.userName || 'Anonymous',
       caseData.hospital || '',
-      caseData.referralCenter || '',
       caseData.awards || 0,
       new Date(caseData.createdAt).toISOString(),
       `"${caseData.presentingComplaint || ''}"`,
