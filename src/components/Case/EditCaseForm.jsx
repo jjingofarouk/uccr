@@ -1,4 +1,4 @@
-// src/components/EditCaseForm.jsx
+// src/components/Case/EditCaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -438,7 +438,7 @@ export default function EditCaseForm({ caseId }) {
   }, [forceLoading, loadStart, router]);
 
   if (authLoading || isLoading) return <Loading />;
-  if (authError) return;
+  if (authError) return <div>Error: {authError}</div>;
   if (!user) return <div>Please log in to edit a case.</div>;
 
   return (
@@ -448,7 +448,7 @@ export default function EditCaseForm({ caseId }) {
         <ProgressBar currentStep={currentStep} stepsLength={steps.length} />
         <form onSubmit={handleSubmit}>
           <StepContent
-            steps={steps
+            steps={steps}
             currentStep={currentStep}
             formData={formData}
             handleChange={handleChange}
