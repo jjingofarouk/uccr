@@ -1,12 +1,13 @@
 // src/components/AdminDashboard.jsx
 import { useState, useEffect, useMemo } from 'react';
-import { getCases, updateCase, deleteCase } from '../firebase/firestore';
+import { getCases, deleteCase } from '../firebase/firestore';
 import { searchCasesAndUsers } from '../firebase/search';
 import styles from '../styles/adminDashboard.module.css';
-import { Pencil, Trash2, Save, X, Download } from 'lucide-react';
+import { Pencil, Trash2, Download } from 'lucide-react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CaseCard from './Case/CaseCard';
+import EditCaseForm from './Case/EditCaseForm';
 
 function ErrorMessage({ error }) {
   if (!error) return null;
@@ -23,7 +24,6 @@ export default function AdminDashboard() {
   const [authError, setAuthError] = useState('');
   const [cases, setCases] = useState([]);
   const [editingCaseId, setEditingCaseId] = useState(null);
-  const [formData, setFormData] = useState({});
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -71,53 +71,22 @@ export default function AdminDashboard() {
     fetchCases();
   }, [isAuthenticated]);
 
-  const handleEdit = (caseItem) => {
-    setEditingCaseId(caseItem.id);
-    setFormData({
-      title: caseItem.title || '',
-      presentingComplaint: caseItem.presentingComplaint || '',
-      history: caseItem.history || '',
-      physicalExam: caseItem.physicalExam || '',
-      investigations: caseItem.investigations || '',
-      management: caseItem.management || '',
-      provisionalDiagnosis: caseItem.provisionalDiagnosis || '',
-      hospital: caseItem.hospital || '',
-      referralCenter: caseItem.referralCenter || '',
-      specialty: Array.isArray(caseItem.specialty) ? caseItem.specialty : [],
-      discussion: caseItem.discussion || '',
-      highLevelSummary: caseItem.highLevelSummary || '',
-      references: caseItem.references || '',
-      mediaUrls: Array.isArray(caseItem.mediaUrls) ? caseItem.mediaUrls : [],
-      userId: caseItem.userId,
-      userName: caseItem.userName || 'Anonymous',
-      photoURL: caseItem.photoURL || '',
-      thumbnailUrl: caseItem.thumbnailUrl || '',
-      createdAt: caseItem.createdAt || null
-    });
+  const handleEdit = (caseId) => {
+    setEditingCaseId(caseId);
   };
 
-  const handleChange = (e, field) => {
-    if (field === 'specialty') {
-      const selectedOptions = Array.from(e.target.selectedOptions).map(opt => opt.value);
-      setFormData(prev => ({ ...prev, specialty: selectedOptions }));
-    } else {
-      setFormData(prev => ({ ...prev, [field]: e.target.value }));
-    }
-  };
-
-  const handleSave = async (caseId) => {
-    try {
-      setIsLoading(true);
-      await updateCase(caseId, formData);
-      const updatedCases = cases.map(c => c.id === caseId ? { ...c, ...formData } : c);
-      setCases(updatedCases);
-      setEditingCaseId(null);
-      setError('');
-      setIsLoading(false);
-    } catch (err) {
-      setError('Failed to update case: ' + err.message);
-      setIsLoading(false);
-    }
+  const handleCloseEdit = () => {
+    setEditingCaseId(null);
+    // Refresh cases to reflect any updates
+    const refreshCases = async () => {
+      try {
+        const allCases = await getCases();
+        setCases(allCases);
+      } catch (err) {
+        setError('Failed to refresh cases: ' + err.message);
+      }
+    };
+    refreshCases();
   };
 
   const handleDelete = async (caseId) => {
@@ -132,11 +101,6 @@ export default function AdminDashboard() {
       setError('Failed to delete case: ' + err.message);
       setIsLoading(false);
     }
-  };
-
-  const handleCancel = () => {
-    setEditingCaseId(null);
-    setError('');
   };
 
   const handleFilterChange = (e) => {
@@ -159,6 +123,9 @@ export default function AdminDashboard() {
     e.preventDefault();
     if (!searchTerm) {
       setFilters((prev) => ({ ...prev, author: '' }));
+      // Reset to all cases
+      const allCases = await getCases();
+      setCases(allCases);
       return;
     }
     try {
@@ -241,7 +208,7 @@ export default function AdminDashboard() {
         return (b.awards || 0) - (a.awards || 0);
       }
       if (sortBy === 'awards-asc') {
-        return (a.awards || 0) - (b.awards || 0);
+        return (a.awards || 0) - (a.awards || 0);
       }
       if (sortBy === 'title-asc') {
         return a.title.localeCompare(b.title);
@@ -421,132 +388,21 @@ export default function AdminDashboard() {
         {sortedCases.length === 0 && <p className={styles.noCases}>No cases found.</p>}
         {paginatedCases.map(caseItem => (
           <div key={caseItem.id} className={styles.caseItem}>
-            {editingCaseId === caseItem.id ? (
-              <div className={styles.editForm}>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => handleChange(e, 'title')}
-                  placeholder="Case Title"
-                  className={styles.input}
-                />
-                <textarea
-                  value={formData.presentingComplaint}
-                  onChange={(e) => handleChange(e, 'presentingComplaint')}
-                  placeholder="Presenting Complaint"
-                  className={styles.textarea}
-                />
-                <textarea
-                  value={formData.history}
-                  onChange={(e) => handleChange(e, 'history')}
-                  placeholder="History"
-                  className={styles.textarea}
-                />
-                <textarea
-                  value={formData.physicalExam}
-                  onChange={(e) => handleChange(e, 'physicalExam')}
-                  placeholder="Physical Examination"
-                  className={styles.textarea}
-                />
-                <textarea
-                  value={formData.investigations}
-                  onChange={(e) => handleChange(e, 'investigations')}
-                  placeholder="Investigations"
-                  className={styles.textarea}
-                />
-                <textarea
-                  value={formData.management}
-                  onChange={(e) => handleChange(e, 'management')}
-                  placeholder="Management"
-                  className={styles.textarea}
-                />
-                <textarea
-                  value={formData.provisionalDiagnosis}
-                  onChange={(e) => handleChange(e, 'provisionalDiagnosis')}
-                  placeholder="Provisional Diagnosis"
-                  className={styles.textarea}
-                />
-                <input
-                  type="text"
-                  value={formData.hospital}
-                  onChange={(e) => handleChange(e, 'hospital')}
-                  placeholder="Hospital"
-                  className={styles.input}
-                />
-                <input
-                  type="text"
-                  value={formData.referralCenter}
-                  onChange={(e) => handleChange(e, 'referralCenter')}
-                  placeholder="Referral Center"
-                  className={styles.input}
-                />
-                <select
-                  multiple
-                  value={formData.specialty}
-                  onChange={(e) => handleChange(e, 'specialty')}
-                  className={styles.select}
-                >
-                  {specialties.map(spec => (
-                    <option key={spec} value={spec}>{spec}</option>
-                  ))}
-                </select>
-                <textarea
-                  value={formData.discussion}
-                  onChange={(e) => handleChange(e, 'discussion')}
-                  placeholder="Discussion"
-                  className={styles.textarea}
-                />
-                <textarea
-                  value={formData.highLevelSummary}
-                  onChange={(e) => handleChange(e, 'highLevelSummary')}
-                  placeholder="Case Summary"
-                  className={styles.textarea}
-                />
-                <textarea
-                  value={formData.references}
-                  onChange={(e) => handleChange(e, 'references')}
-                  placeholder="References"
-                  className={styles.textarea}
-                />
-                <div className={styles.mediaPreview}>
-                  {formData.mediaUrls.map((url, index) => (
-                    <img key={index} src={url} alt={`Media ${index + 1}`} className={styles.mediaImage} />
-                  ))}
-                </div>
-                <div className={styles.buttonGroup}>
-                  <button
-                    onClick={() => handleSave(caseItem.id)}
-                    className={styles.saveButton}
-                  >
-                    <Save size={20} /> Save
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className={styles.cancelButton}
-                  >
-                    <X size={20} /> Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <CaseCard caseData={caseItem} isLoading={false} />
-                <div className={styles.buttonGroup}>
-                  <button
-                    onClick={() => handleEdit(caseItem)}
-                    className={styles.editButton}
-                  >
-                    <Pencil size={20} /> Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(caseItem.id)}
-                    className={styles.deleteButton}
-                  >
-                    <Trash2 size={20} /> Delete
-                  </button>
-                </div>
-              </div>
-            )}
+            <CaseCard caseData={caseItem} isLoading={false} />
+            <div className={styles.buttonGroup}>
+              <button
+                onClick={() => handleEdit(caseItem.id)}
+                className={styles.editButton}
+              >
+                <Pencil size={20} /> Edit
+              </button>
+              <button
+                onClick={() => handleDelete(caseItem.id)}
+                className={styles.deleteButton}
+              >
+                <Trash2 size={20} /> Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -579,6 +435,20 @@ export default function AdminDashboard() {
           >
             Next
           </button>
+        </div>
+      )}
+      {editingCaseId && (
+        <div className={styles.editModal}>
+          <div className={styles.editModalContent}>
+            <button
+              onClick={handleCloseEdit}
+              className={styles.closeButton}
+              aria-label="Close edit form"
+            >
+              <X size={24} />
+            </button>
+            <EditCaseForm caseId={editingCaseId} />
+          </div>
         </div>
       )}
     </div>
