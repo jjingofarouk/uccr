@@ -7,10 +7,9 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CaseCard from './Case/CaseCard';
 import dynamic from 'next/dynamic';
-import DOMPurify from 'dompurify';
+import { sanitize } from '../utils/sanitize';
 import { v4 as uuidv4 } from 'uuid';
 
-// Dynamically import ReactQuill with SSR disabled
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
 
@@ -52,7 +51,7 @@ function StepContent({
         <label className={styles.label}>{step.label}</label>
         <ReactQuill
           value={formData[step.name]}
-          onChange={(value) => handleChange(DOMPurify.sanitize(value), step.name)}
+          onChange={(value) => handleChange(sanitize(value), step.name)}
           modules={{
             toolbar: [
               [{ header: [1, 2, 3, false] }],
@@ -607,7 +606,7 @@ export default function AdminDashboard() {
 
   const handleExportCSV = () => {
     const headers = [
-      'Title', 'Specialties', 'Author', 'Hospital', 'Awards', 'Created At',
+      'Title', 'Specialties', 'Author', 'Hospital', 'Referral Center', 'Awards', 'Created At',
       'Presenting Complaint', 'Provisional Diagnosis'
     ];
     const rows = filteredCases.map((caseData) => [
@@ -615,6 +614,7 @@ export default function AdminDashboard() {
       `"${Array.isArray(caseData.specialty) ? caseData.specialty.join(', ') : caseData.specialty || ''}"`,
       caseData.userName || 'Anonymous',
       caseData.hospital || '',
+      caseData.referralCenter || '',
       caseData.awards || 0,
       new Date(caseData.createdAt).toISOString(),
       `"${caseData.presentingComplaint || ''}"`,
@@ -919,15 +919,17 @@ export default function AdminDashboard() {
                 <FormHeader title="Edit Case" />
                 <ProgressBar currentStep={currentStep} stepsLength={steps.length} />
                 <form onSubmit={handleSubmit}>
-                  <StepContent
-                    steps={steps}
-                    currentStep={currentStep}
-                    formData={formData}
-                    handleChange={handleChange}
-                    handleDeleteMedia={handleDeleteMedia}
-                    widgetRef={widgetRef}
-                    isUploading={isUploading}
-                  />
+                  <div className={styles.stepContentWrapper}>
+                    <StepContent
+                      steps={steps}
+                      currentStep={currentStep}
+                      formData={formData}
+                      handleChange={handleChange}
+                      handleDeleteMedia={handleDeleteMedia}
+                      widgetRef={widgetRef}
+                      isUploading={isUploading}
+                    />
+                  </div>
                   <Navigation
                     currentStep={currentStep}
                     stepsLength={steps.length}
