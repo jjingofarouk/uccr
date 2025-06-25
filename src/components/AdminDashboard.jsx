@@ -1,5 +1,3 @@
-// src/components/AdminDashboard.jsx
-
 "use client";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { getCases, updateCase, deleteCase } from '../firebase/firestore';
@@ -207,8 +205,6 @@ export default function AdminDashboard() {
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const casesPerPage = 10;
-  const SUBMISSION_LOADING_DURATION = 1000;
-
   const ADMIN_PASSWORD = 'SecureAdmin2025';
 
   const specialties = [...new Set(cases.flatMap((caseData) => caseData.specialty).filter(Boolean))];
@@ -262,7 +258,7 @@ export default function AdminDashboard() {
         { value: 'Genitourinary Medicine', label: 'Genitourinary Medicine' },
         { value: 'Geriatrics', label: 'Geriatrics' },
         { value: 'Health Economics', label: 'Health Economics' },
-        { value: 'Health Informatics', label: 'Health Informatics' },
+        { value: 'Health Informatics', label: 'Health Informatics insanity:1
         { value: 'Health Policy and Management', label: 'Health Policy and Management' },
         { value: 'Hematology', label: 'Hematology' },
         { value: 'Histopathology', label: 'Histopathology' },
@@ -319,6 +315,17 @@ export default function AdminDashboard() {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media', placeholder: 'Upload media' },
   ];
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setAuthError('');
+    } else {
+      setAuthError('Incorrect password');
+      setPassword('');
+    }
+  };
+
   useEffect(() => {
     const fetchCases = async () => {
       if (!isAuthenticated) return;
@@ -336,52 +343,51 @@ export default function AdminDashboard() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const script = document.createElement('script');
-      script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
-      script.async = true;
-      document.body.appendChild(script);
+    if (typeof window === 'undefined') return; // Prevent server-side execution
+    const script = document.createElement('script');
+    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
+    script.async = true;
+    document.body.appendChild(script);
 
-      script.onload = () => {
-        cloudinaryRef.current = window.cloudinary;
-        if (cloudinaryRef.current) {
-          widgetRef.current = cloudinaryRef.current.createUploadWidget(
-            {
-              cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '',
-              uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '',
-              folder: `cases/admin`,
-              sources: ['local', 'camera'],
-              multiple: true,
-              resourceType: 'image',
-              clientAllowedFormats: ['jpg', 'png', 'jpeg'],
-              maxFileSize: 10000000,
-              public_id: `upload_${uuidv4()}`,
-            },
-            (error, result) => {
-              if (result && result.event === 'upload-added') {
-                setIsUploading(true);
-              }
-              if (!error && result && result.event === 'success') {
-                setFormData((prev) => ({
-                  ...prev,
-                  mediaUrls: [...prev.mediaUrls, result.info.secure_url],
-                }));
-                setIsUploading(false);
-              } else if (error) {
-                setError(error.message || 'Image upload failed. Please try again.');
-                setIsUploading(false);
-              }
+    script.onload = () => {
+      cloudinaryRef.current = window.cloudinary;
+      if (cloudinaryRef.current) {
+        widgetRef.current = cloudinaryRef.current.createUploadWidget(
+          {
+            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '',
+            uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '',
+            folder: `cases/admin`,
+            sources: ['local', 'camera'],
+            multiple: true,
+            resourceType: 'image',
+            clientAllowedFormats: ['jpg', 'png', 'jpeg'],
+            maxFileSize: 10000000,
+            public_id: `upload_${uuidv4()}`,
+          },
+          (error, result) => {
+            if (result && result.event === 'upload-added') {
+              setIsUploading(true);
             }
-          );
-        }
-      };
+            if (!error && result && result.event === 'success') {
+              setFormData((prev) => ({
+                ...prev,
+                mediaUrls: [...prev.mediaUrls, result.info.secure_url],
+              }));
+              setIsUploading(false);
+            } else if (error) {
+              setError(error.message || 'Image upload failed. Please try again.');
+              setIsUploading(false);
+            }
+          }
+        );
+      }
+    };
 
-      return () => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-      };
-    }
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
   }, []);
 
   const handleEdit = (caseItem) => {
