@@ -1,4 +1,6 @@
 // src/components/AdminDashboard.jsx
+
+"use client";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { getCases, updateCase, deleteCase } from '../firebase/firestore';
 import { searchCasesAndUsers } from '../firebase/search';
