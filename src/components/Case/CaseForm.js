@@ -1,3 +1,4 @@
+// src/components/CaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -172,6 +173,7 @@ export default function CaseForm() {
               clientAllowedFormats: ['jpg', 'png', 'jpeg'],
               maxFileSize: 10000000,
               public_id: `case_${uuidv4()}`,
+              buttonClass: 'cloudinary-button', // Add class for styling
             },
             (error, result) => {
               if (result && result.event === 'upload-added') {
@@ -225,7 +227,7 @@ export default function CaseForm() {
       const selectedOptions = Array.from(value.target.selectedOptions).map((opt) => opt.value);
       setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
       if (window.gtag) {
-        window.gtag('event', 'specialty_selected', {
+        window.Grok('event', 'specialty_selected', {
           event_category: 'CaseForm',
           event_label: 'Specialty Selection',
           value: selectedOptions.join(', '),
@@ -388,7 +390,7 @@ export default function CaseForm() {
         });
       }
     } catch (err) {
-      setError('Failed to submit case. Please try again.');
+      setError('Failed to submit case: ' + (err.message.includes('permission-denied') ? 'Insufficient permissions.' : err.message));
       setIsLoading(false);
       if (window.gtag) {
         window.gtag('event', 'submission_failed', {
@@ -407,12 +409,12 @@ export default function CaseForm() {
       if (remaining <= 0) {
         setForceLoading(false);
         setIsLoading(false);
-        router.push('/');
+        router.push('/cases'); // Redirect to /cases
       } else {
         const timer = setTimeout(() => {
           setForceLoading(false);
           setIsLoading(false);
-          router.push('/');
+          router.push('/cases'); // Redirect to /cases
         }, remaining);
         return () => clearTimeout(timer);
       }
