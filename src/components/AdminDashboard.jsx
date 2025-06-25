@@ -3,8 +3,17 @@ import { useAuth } from '../hooks/useAuth';
 import { getCases, updateCase, deleteCase } from '../firebase/firestore';
 import styles from '../styles/adminDashboard.module.css';
 import { Pencil, Trash2, Save, X } from 'lucide-react';
-import Loading from './Loading';
-import ErrorMessage from './ErrorMessage';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
+function ErrorMessage({ error }) {
+  if (!error) return null;
+  return (
+    <div className={styles.errorMessage}>
+      <p style={{ color: 'red', margin: '10px 0', fontWeight: 'bold' }}>{error}</p>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -116,12 +125,32 @@ export default function AdminDashboard() {
     setError('');
   };
 
-  if (authLoading || isLoading) return <Loading />;
+  if (authLoading || isLoading) {
+    return (
+      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f5f5f5">
+        <div className={styles.container}>
+          <Skeleton height={40} width={300} style={{ marginBottom: '20px' }} />
+          <ErrorMessage error={error} />
+          <div className={styles.casesList}>
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className={styles.caseItem}>
+                <Skeleton height={30} width="80%" style={{ marginBottom: '10px' }} />
+                <Skeleton count={5} height={20} />
+                <Skeleton height={100} style={{ marginTop: '10px' }} />
+                <Skeleton height={40} width={100} style={{ marginTop: '10px' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
+
   if (!user) return <div>Please log in to access the admin dashboard.</div>;
   if (!user.isAdmin) return <div>Access denied. Admin privileges required.</div>;
 
   return (
-    <div className={styles.container}>
+    <div class Adopted from: styles.container}>
       <h1 className={styles.title}>Admin Dashboard - Manage Cases</h1>
       <ErrorMessage error={error} />
       <div className={styles.casesList}>
