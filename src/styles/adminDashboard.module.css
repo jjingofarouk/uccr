@@ -42,7 +42,7 @@
   box-shadow: 0 2px 6px var(--shadow);
 }
 
-.input, .filterInput, .filterSelect, .sortSelect {
+.input, .filterInput, .filterSelect, .sortSelect, .select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border);
@@ -53,8 +53,142 @@
   font-size: 0.875rem;
 }
 
+.select {
+  min-height: 100px;
+}
+
 .filterSelect, .sortSelect {
   min-height: 40px;
+}
+
+.quillEditor {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 150px;
+}
+
+.quillEditor :global(.ql-toolbar) {
+  border-bottom: 1px solid var(--border);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background: var(--surface);
+}
+
+.quillEditor :global(.ql-container) {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+}
+
+.label {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.formHeader {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.progress {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.stepContent {
+  margin-bottom: 1.5rem;
+}
+
+.uploadButton, .navButton, .deleteMediaButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.uploadButton {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.uploadButton:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+.uploadButton:disabled {
+  background: var(--border);
+  cursor: not-allowed;
+}
+
+.navButton {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.navButton:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+.navButton:disabled {
+  background: var(--border);
+  cursor: not-allowed;
+}
+
+.deleteMediaButton {
+  background: #dc2626;
+  color: #ffffff;
+  padding: 0.25rem;
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+.deleteMediaButton:hover {
+  background: #b91c1c;
+}
+
+.mediaPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.mediaItem {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.mediaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .buttonGroup {
@@ -225,6 +359,22 @@
   color: var(--primary);
 }
 
+.caseFormWrapper {
+  width: 100%;
+}
+
+.caseForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -242,7 +392,7 @@
     padding: 0.75rem;
   }
 
-  .input, .filterInput, .filterSelect, .sortSelect {
+  .input, .filterInput, .filterSelect, .sortSelect, .select {
     font-size: 0.85rem;
   }
 
@@ -258,6 +408,10 @@
   .editModalContent {
     padding: 1.5rem;
   }
+
+  .formHeader {
+    font-size: 1.3rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -269,43 +423,51 @@
     font-size: 1.25rem;
   }
 
-  .editButton, .deleteButton, .saveButton, .exportButton, .pageButton {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+  .editButton, .deleteButton, .saveButton, .exportButton, .pageButton, .navButton, .uploadButton {
+    font-size: .0.8rem;
+    padding: .0.4rem;
   }
 
   .editModalContent {
     padding: 1rem;
   }
+
+  .mediaImage {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 @media (prefers-contrast: high) {
-  .caseItem, .input, .filterInput, .filterSelect, .sortSelect, .editModalContent {
+  .caseItem, .input, .filterInput, .filterSelect, .sortSelect, .select, .editModalContent, .quillEditor {
     border-color: var(--text);
   }
 
-  .editButton, .saveButton, .exportButton {
+  .editButton, .saveButton, .exportButton, .navButton, .uploadButton {
     background: var(--text);
-    color: var(--background);
+    color: .var(--background);
   }
 
   .deleteButton {
-    background: var(--text);
-    color: var(--background);
+    background: .var(--text);
+    color: .var(--background);
   }
 
   .pageButton {
-    background: var(--text);
+    background: .var(--text);
     color: var(--background);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .editButton, .deleteButton, .saveButton, .exportButton, .pageButton {
+  .editButton, .deleteButton, .saveButton, .exportButton, .pageButton, .navButton, .uploadButton {
     transition: none;
   }
 
-  .editButton:hover, .deleteButton:hover, .saveButton:hover, .exportButton:hover, .pageButton:hover {
+  .editButton:hover, .deleteButton:hover, .saveButton:hover, .exportButton:hover, .pageButton:hover, .navButton:hover, .uploadButton:hover {
     transform: none;
   }
-}
+
+  .progress {
+    transition: none;
+  }
