@@ -1,3 +1,4 @@
+// pages/cases/edit/[id].jsx
 import { useRouter } from 'next/router';
 import EditCaseForm from '../../../components/Case/EditCaseForm';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
@@ -10,14 +11,7 @@ export default function EditCasePage() {
   const { id } = router.query;
 
   if (!id) {
-    return (
-      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
-        <section className={styles.loadingSection}>
-          <Skeleton height={40} width={300} />
-          <Skeleton height={20} count={5} style={{ marginTop: '10px' }} />
-        </section>
-      </SkeletonTheme>
-    );
+    return null;
   }
 
   return (
