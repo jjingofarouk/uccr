@@ -173,7 +173,7 @@ export default function CaseForm() {
               clientAllowedFormats: ['jpg', 'png', 'jpeg'],
               maxFileSize: 10000000,
               public_id: `case_${uuidv4()}`,
-              buttonClass: 'cloudinary-button', // Add class for styling
+              buttonClass: 'cloudinary-button',
             },
             (error, result) => {
               if (result && result.event === 'upload-added') {
@@ -227,7 +227,7 @@ export default function CaseForm() {
       const selectedOptions = Array.from(value.target.selectedOptions).map((opt) => opt.value);
       setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
       if (window.gtag) {
-        window.Grok('event', 'specialty_selected', {
+        window.gtag('event', 'specialty_selected', {
           event_category: 'CaseForm',
           event_label: 'Specialty Selection',
           value: selectedOptions.join(', '),
@@ -409,12 +409,12 @@ export default function CaseForm() {
       if (remaining <= 0) {
         setForceLoading(false);
         setIsLoading(false);
-        router.push('/cases'); // Redirect to /cases
+        router.push('/cases');
       } else {
         const timer = setTimeout(() => {
           setForceLoading(false);
           setIsLoading(false);
-          router.push('/cases'); // Redirect to /cases
+          router.push('/cases');
         }, remaining);
         return () => clearTimeout(timer);
       }
