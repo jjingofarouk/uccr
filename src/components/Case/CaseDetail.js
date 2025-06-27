@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -19,6 +19,32 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+// Error Boundary Component
+class ErrorBoundary extends Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('ErrorBoundary caught:', error, errorInfo);
+    // Optionally log to an error reporting service
+    trackEvent('client_error', 'ErrorBoundary', error.message, 1);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className={styles.error}>
+          <Typography>Something went wrong. Please try refreshing the page.</Typography>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // Google Analytics tracking functions
 const trackEvent = (action, category, label, value) => {
   if (typeof window !== 'undefined' && window.gtag) {
@@ -27,6 +53,8 @@ const trackEvent = (action, category, label, value) => {
       event_label: label,
       value: value,
     });
+  } else {
+    console.warn('gtag not available for tracking:', { action, category, label, value });
   }
 };
 
@@ -43,13 +71,23 @@ const trackPageView = (caseId, title) => {
 
 // Utility function to sanitize and render HTML content
 const renderRichText = (html) => {
-  if (!html || typeof html !== 'string') return <Typography>Not specified</Typography>;
-  const sanitizedHtml = sanitizeHtml(html, {
-    allowedTags: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a', 'h1', 'h2'],
-    allowedAttributes: { a: ['href', 'target'] },
-  });
-  return <div className={styles.richText} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
+  if (!html || typeof html !== 'string') {
+    return <Typography>Not specified</Typography>;
+  }
+  try {
+    const sanitizedHtml = sanitizeHtml(html, {
+      allowedTags: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a', 'h1', 'h2'],
+      allowedAttributes: { a: ['href', 'target'] },
+    });
+    return <div className={styles.richText} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
+  } catch (err) {
+    console.error('Error sanitizing HTML:', err);
+    return <Typography>Error rendering content</Typography>;
+  }
 };
+
+// Utility to safely access data
+const getSafeValue = (value, fallback = 'Not specified') => value || fallback;
 
 export default function CaseDetail({ caseData, isLoading }) {
   const { user } = useAuth();
@@ -60,26 +98,33 @@ export default function CaseDetail({ caseData, isLoading }) {
 
   // Sections for TOC and collapsible content
   const sections = [
-    { id: 'chiefConcern', label: 'Chief Concern', content: caseData?.presentingComplaint },
-    { id: 'specialties', label: 'Specialties', content: Array.isArray(caseData?.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : null },
-    { id: 'history', label: 'History', content: caseData?.history },
-    { id: 'investigations', label: 'Investigations', content: caseData?.investigations },
-    { id: 'management', label: 'Management', content: caseData?.management },
-    { id: 'provisionalDiagnosis', label: 'Provisional Diagnosis', content: caseData?.provisionalDiagnosis },
-    { id: 'hospital', label: 'Hospital', content: caseData?.hospital },
-    { id: 'referralCenter', label: 'Referral Center', content: caseData?.referralCenter },
-    { id: 'discussion', label: 'Discussion', content: caseData?.discussion },
-    { id: 'highLevelSummary', label: 'High-Level Summary', content: caseData?.highLevelSummary },
-    { id: 'references', label: 'References', content: caseData?.references },
+    { id: 'chiefConcern', label: 'Chief Concern', content: getSafeValue(caseData?.presentingComplaint) },
+    { id: 'specialties', label: 'Specialties', content: getSafeValue(Array.isArray(caseData?.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : null) },
+    { id: 'history', label: 'History', content: getSafeValue(caseData?.history) },
+    { id: 'investigations', label: 'Investigations', content: getSafeValue(caseData?.investigations) },
+    { id: 'management', label: 'Management', content: getSafeValue(caseData?.management) },
+    { id: 'provisionalDiagnosis', label: 'Provisional Diagnosis', content: getSafeValue(caseData?.provisionalDiagnosis) },
+    { id: 'hospital', label: 'Hospital', content: getSafeValue(caseData?.hospital) },
+    { id: 'referralCenter', label: 'Referral Center', content: getSafeValue(caseData?.referralCenter) },
+    { id: 'discussion', label: 'Discussion', content: getSafeValue(caseData?.discussion) },
+    { id: 'highLevelSummary', label: 'High-Level Summary', content: getSafeValue(caseData?.highLevelSummary) },
+    { id: 'references', label: 'References', content: getSafeValue(caseData?.references) },
   ];
 
   // Track page view and initialize expanded state
   useEffect(() => {
-    if (caseData && caseData.id) {
+    if (!caseData || !caseData.id || !caseData.title) {
+      console.warn('Invalid caseData in useEffect:', caseData);
+      return;
+    }
+    try {
       trackPageView(caseData.id, caseData.title || 'Untitled Case');
-      // Expand first section by default on desktop, none on mobile
+      // Expand first section on desktop, none on mobile
       const initialExpanded = window.innerWidth > 768 ? { chiefConcern: true } : {};
       setExpanded(initialExpanded);
+    } catch (err) {
+      console.error('Error in page view tracking:', err);
+      setError('Failed to load case details.');
     }
   }, [caseData]);
 
@@ -96,11 +141,15 @@ export default function CaseDetail({ caseData, isLoading }) {
 
   // Handle accordion toggle
   const handleAccordionChange = (sectionId) => (event, isExpanded) => {
-    setExpanded((prev) => ({ ...prev, [sectionId]: isExpanded }));
-    if (isExpanded) {
-      trackEvent('expand_section', 'Case Section', `${caseData.id}_${sectionId}`, 1);
-      // Smooth scroll to section
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    try {
+      setExpanded((prev) => ({ ...prev, [sectionId]: isExpanded }));
+      if (isExpanded) {
+        trackEvent('expand_section', 'Case Section', `${caseData?.id || 'unknown'}_${sectionId}`, 1);
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (err) {
+      console.error('Error in handleAccordionChange:', err);
+      setError('Failed to toggle section.');
     }
   };
 
@@ -115,14 +164,20 @@ export default function CaseDetail({ caseData, isLoading }) {
       setError('');
       trackEvent('vote', 'Case Interaction', `${type}_${caseData.id}`, 1);
     } catch (err) {
+      console.error('Error in handleVote:', err);
       setError('Failed to record vote. Please try again.');
       trackEvent('vote_error', 'Case Interaction', `${type}_${caseData.id}`, 1);
     }
   };
 
   const handleEditClick = () => {
-    router.push(`/cases/edit/${caseData.id}`);
-    trackEvent('edit_case', 'Case Management', caseData.id, 1);
+    try {
+      router.push(`/cases/edit/${caseData.id}`);
+      trackEvent('edit_case', 'Case Management', caseData.id, 1);
+    } catch (err) {
+      console.error('Error in handleEditClick:', err);
+      setError('Failed to navigate to edit page.');
+    }
   };
 
   const handleAuthorClick = (userId) => {
@@ -130,14 +185,19 @@ export default function CaseDetail({ caseData, isLoading }) {
   };
 
   const handleMediaView = (mediaIndex) => {
-    trackEvent('view_media', 'Case Media', `${caseData.id}_media_${mediaIndex}`, 1);
+    trackEvent('view_media', 'Case Media', `${caseData?.id || 'unknown'}_media_${mediaIndex}`, 1);
   };
 
   // Handle TOC click
   const handleTocClick = (sectionId) => {
-    trackEvent('toc_click', 'Navigation', sectionId, 1);
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
-    setExpanded( sectionId );
+    try {
+      trackEvent('toc_click', 'Navigation', sectionId, 1);
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      setExpanded((prev) => ({ ...prev, [sectionId]: true }));
+    } catch (err) {
+      console.error('Error in handleTocClick:', err);
+      setError('Failed to navigate to section.');
+    }
   };
 
   if (isLoading) {
@@ -150,156 +210,167 @@ export default function CaseDetail({ caseData, isLoading }) {
   }
 
   if (!caseData || !caseData.id) {
-    return <div className={styles.error}>Error: Invalid case data</div>;
+    console.warn('Invalid caseData:', caseData);
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <Typography>Error: Invalid case data</Typography>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className={styles.container}>
-      {/* Progress Bar */}
-      <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
+    <ErrorBoundary>
+      <div className={styles.container}>
+        {/* Progress Bar */}
+        <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
 
-      {/* Table of Contents */}
-      <Box className={styles.toc}>
-        <Typography variant="h6" className={styles.tocTitle}>
-          Table of Contents
-        </Typography>
-        <ul className={styles.tocList}>
-          {sections.map((section) => (
-            <li key={section.id}>
-              <a
-                href={`#${section.id}`}
-                onClick={() => handleTocClick(section.id)}
-                className={styles.tocLink}
-              >
-                {section.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </Box>
-
-      <article className={styles.caseDetail}>
-        <header className={styles.header}>
-          <Typography variant="h1" className={styles.title}>
-            {renderRichText(caseData.title)}
+        {/* Table of Contents */}
+        <Box className={styles.toc}>
+          <Typography variant="h6" className={styles.tocTitle}>
+            Table of Contents
           </Typography>
-          {user && user.uid === caseData.userId && (
-            <button
-              onClick={handleEditClick}
-              className={styles.editButton}
-              aria-label="Edit case"
-            >
-              Edit Case
-            </button>
-          )}
-          <div className={styles.meta}>
-            <div className={styles.author}>
-              <Link href={`/profile/view/${caseData.userId}`} onClick={() => handleAuthorClick(caseData.userId)}>
-                <Image
-                  src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
-                  alt={`Profile picture of ${caseData.userName || 'Contributor'}`}
-                  width={40}
-                  height={40}
-                  className={styles.avatar}
-                  onError={(e) => console.error('Author image error:', caseData.photoURL)}
-                />
-              </Link>
-              <Link href={`/profile/view/${caseData.userId}`} onClick={() => handleAuthorClick(caseData.userId)}>
-                <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
-              </Link>
-            </div>
-            <time className={styles.date}>
-              {caseData.createdAt
-                ? new Date(caseData.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
-                : 'Unknown date'}
-            </time>
-          </div>
-        </header>
-
-        <div className={styles.voteSection}>
-          <button
-            onClick={() => handleVote('award')}
-            className={styles.voteButton}
-            disabled={!user}
-            aria-label="Award case"
-          >
-            <Award size={20} />
-            <span className={styles.voteCount}>{caseData.awards || 0}</span>
-          </button>
-          {error && <Typography className={styles.error}>{error}</Typography>}
-        </div>
-
-        <section className={styles.content}>
-          {sections.map((section) => (
-            <Accordion
-              key={section.id}
-              expanded={expanded[ techniek.id] || false}
-              onChange={handleAccordionChange(section.id)}
-              className={styles.accordion}
-              elevation={0}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={`${section.id}-content`}
-                id={`${section.id}-header`}
-                className={styles.accordionSummary}
-              >
-                <Typography variant="h2" className={styles.sectionTitle}>
+          <ul className={styles.tocList}>
+            {sections.map((section) => (
+              <li key={section.id}>
+                <a
+                  href={`#${section.id}`}
+                  onClick={() => handleTocClick(section.id)}
+                  className={styles.tocLink}
+                >
                   {section.label}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails className={styles.accordionDetails}>
-                {renderRichText(section.content)}
-              </AccordionDetails>
-            </Accordion>
-          ))}
-        </section>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Box>
 
-        <section className={styles.media}>
-          <Typography variant="h2" className={styles.sectionTitle}>
-            Media
-          </Typography>
-          {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? (
-            <div className={styles.mediaGrid}>
-              {caseData.mediaUrls.map((url, index) => (
-                url ? (
+        <article className={styles.caseDetail}>
+          <header className={styles.header}>
+            <Typography variant="h1" className={styles.title}>
+              {renderRichText(getSafeValue(caseData.title))}
+            </Typography>
+            {user && user.uid === caseData.userId && (
+              <button
+                onClick={handleEditClick}
+                className={styles.editButton}
+                aria-label="Edit case"
+              >
+                Edit Case
+              </button>
+            )}
+            <div className={styles.meta}>
+              <div className={styles.author}>
+                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId || 'unknown')}>
                   <Image
-                    key={url}
-                    src={url}
-                    alt={`Case media ${index + 1}: ${caseData.title || 'Medical image'}`}
-                    width={600}
-                    height={400}
-                    className={styles.mediaImage}
-                    objectFit="contain"
-                    loading="lazy"
-                    onClick={() => handleMediaView(index)}
-                    style={{ cursor: 'pointer' }}
-                    onError={(e) => console.error('Media image error:', url)}
+                    src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
+                    alt={`Profile picture of ${caseData.userName || 'Contributor'}`}
+                    width={40}
+                    height={40}
+                    className={styles.avatar}
+                    onError={(e) => console.error('Author image error:', caseData.photoURL)}
                   />
-                ) : (
-                  <div key={index} className={styles.mediaImage}>
+                </Link>
+                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId || 'unknown')}>
+                  <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
+                </Link>
+              </div>
+              <time className={styles.date}>
+                {caseData.createdAt
+                  ? new Date(caseData.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  : 'Unknown date'}
+              </time>
+            </div>
+          </header>
+
+          <div className={styles.voteSection}>
+            <button
+              onClick={() => handleVote('award')}
+              className={styles.voteButton}
+              disabled={!user}
+              aria-label="Award case"
+            >
+              <Award size={20} />
+              <span className={styles.voteCount}>{caseData.awards || 0}</span>
+            </button>
+            {error && <Typography className={styles.error}>{error}</Typography>}
+          </div>
+
+          <section className={styles.content}>
+            {sections.map((section) => (
+              <Accordion
+                key={section.id}
+                expanded={expanded[section.id] || false}
+                onChange={handleAccordionChange(section.id)}
+                className={styles.accordion}
+                elevation={0}
+                id={section.id}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={`${section.id}-content`}
+                  id={`${section.id}-header`}
+                  className={styles.accordionSummary}
+                >
+                  <Typography variant="h2" className={styles.sectionTitle}>
+                    {section.label}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails className={styles.accordionDetails}>
+                  {renderRichText(section.content)}
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </section>
+
+          <section className={styles.media}>
+            <Typography variant="h2" className={styles.sectionTitle}>
+              Media
+            </Typography>
+            {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? (
+              <div className={styles.mediaGrid}>
+                {caseData.mediaUrls.map((url, index) => (
+                  url ? (
                     <Image
-                      src="/images/default-placeholder.jpg"
-                      alt="No media available"
+                      key={url}
+                      src={url}
+                      alt={`Case media ${index + 1}: ${caseData.title || 'Medical image'}`}
                       width={600}
                       height={400}
+                      className={styles.mediaImage}
                       objectFit="contain"
+                      loading="lazy"
+                      onClick={() => handleMediaView(index)}
+                      style={{ cursor: 'pointer' }}
+                      onError={(e) => console.error('Media image error:', url)}
                     />
-                  </div>
-                )
-              ))}
-            </div>
-          ) : (
-            <Typography>No media available.</Typography>
-          )}
-        </section>
+                  ) : (
+                    <div key={index} className={styles.mediaImage}>
+                      <Image
+                        src="/images/default-placeholder.jpg"
+                        alt="No media available"
+                        width={600}
+                        height={400}
+                        objectFit="contain"
+                        loading="lazy"
+                      />
+                    </div>
+                  )
+                ))}
+              </div>
+            ) : (
+              <Typography>No media available.</Typography>
+            )}
+          </section>
 
-        <CommentSection caseId={caseData.id} />
-      </article>
-    </div>
+          <CommentSection caseId={caseData.id} />
+        </article>
+      </div>
+    </ErrorBoundary>
   );
 }
