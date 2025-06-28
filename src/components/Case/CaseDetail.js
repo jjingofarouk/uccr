@@ -102,6 +102,15 @@ export default function CaseDetail({ caseData, isLoading }) {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [allExpanded, setAllExpanded] = useState(false);
 
+  // Debug dark mode
+  useEffect(() => {
+    const isDarkMode = document.documentElement.classList.contains('dark-mode');
+    console.log('Dark mode enabled:', isDarkMode, 'CSS variables:', {
+      surface: getComputedStyle(document.documentElement).getPropertyValue('--surface'),
+      text: getComputedStyle(document.documentElement).getPropertyValue('--text'),
+    });
+  }, []);
+
   // Sections for TOC and collapsible content, with Summary at the top
   const sections = [
     { id: 'summary', label: 'Summary', content: getSafeValue(caseData?.highLevelSummary) },
@@ -125,7 +134,6 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
     try {
       trackPageView(caseData.id, caseData.title || 'Untitled Case');
-      // Expand Summary section by default
       setExpanded({ summary: true });
       setAllExpanded(false);
     } catch (err) {
