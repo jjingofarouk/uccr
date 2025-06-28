@@ -58,7 +58,7 @@ main {
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0;
   min-height: calc(100vh - 100px); /* Adjusted for navbar + marquee */
   display: flex;
   flex-direction: column;
@@ -68,7 +68,7 @@ main {
 
 .hero {
   text-align: center;
-  padding: 1rem;
+  padding: 0;
   position: relative;
   background: var(--surface);
   border-radius: 16px;
