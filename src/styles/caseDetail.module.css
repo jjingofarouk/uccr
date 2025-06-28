@@ -108,11 +108,6 @@
   color: #6b7280;
 }
 
-/* Dark mode for meta */
-.dark-mode .meta {
-  color: #9ca3af;
-}
-
 /* Author container */
 .author {
   display: flex;
@@ -380,6 +375,98 @@
   transform: translateY(-2px);
 }
 
+/* Dark Mode */
+.dark-mode .container {
+  background: var(--background, #111827);
+}
+
+.dark-mode .caseDetail {
+  color: #ffffff;
+}
+
+.dark-mode .toc {
+  background: var(--surface, #1f2937);
+  border-color: var(--border, #374151);
+}
+
+.dark-mode .tocTitle,
+.dark-mode .tocLink {
+  color: #ffffff;
+}
+
+.dark-mode .tocLink:hover {
+  color: var(--primary-hover);
+}
+
+.dark-mode .header {
+  border-color: var(--border, #374151);
+}
+
+.dark-mode .title,
+.dark-mode .meta,
+.dark-mode .authorName,
+.dark-mode .date,
+.dark-mode .voteCount,
+.dark-mode .notSpecified,
+.dark-mode .mediaSectionTitle {
+  color: #ffffff;
+}
+
+.dark-mode .accordion {
+  background: var(--surface, #1f2937);
+  border-color: var(--border, #374151);
+}
+
+.dark-mode .accordionSummary {
+  background: var(--surface, #1f2937);
+}
+
+.dark-mode .sectionTitle {
+  color: #ffffff !important;
+}
+
+.dark-mode .accordionDetails {
+  background: var(--surface, #1f2937);
+  border-top-color: var(--border, #374151);
+  color: #ffffff;
+}
+
+.dark-mode .richText,
+.dark-mode .richText p,
+.dark-mode .richText li {
+  color: #ffffff;
+}
+
+.dark-mode .richText a {
+  color: var(--primary);
+}
+
+.dark-mode .richText a:hover {
+  color: var(--primary-hover);
+}
+
+.dark-mode .mediaImage {
+  border-color: var(--border, #374151);
+  background: var(--background, #111827);
+}
+
+.dark-mode .editButton,
+.dark-mode .voteButton,
+.dark-mode .retryButton,
+.dark-mode .expandCollapseButton {
+  border-color: var(--border, #374151);
+  color: #ffffff;
+}
+
+.dark-mode .editButton:hover,
+.dark-mode .voteButton:hover,
+.dark-mode .retryButton:hover,
+.dark-mode .expandCollapseButton:hover {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .container {
@@ -479,40 +566,6 @@
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
   }
-}
-
-/* Dark Mode */
-.dark-mode .toc,
-.dark-mode .accordion,
-.dark-mode .accordionSummary,
-.dark-mode .accordionDetails {
-  background: var(--surface);
-  border-color: var(--border);
-}
-
-.dark-mode .accordionDetails {
-  border-top-color: var(--border);
-}
-
-.dark-mode .mediaImage {
-  border-color: var(--border);
-  background: #1f2937;
-}
-
-.dark-mode .editButton,
-.dark-mode .voteButton,
-.dark-mode .retryButton,
-.dark-mode .expandCollapseButton {
-  border-color: var(--border);
-}
-
-.dark-mode .editButton:hover,
-.dark-mode .voteButton:hover,
-.dark-mode .retryButton:hover,
-.dark-mode .expandCollapseButton:hover {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: #ffffff !important;
 }
 
 /* Accessibility */
