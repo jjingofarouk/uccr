@@ -13,7 +13,7 @@
 }
 
 .dark-mode {
-  --background: #000000; /* Pure black for the darkest dark mode */
+  --background: #121212; /* Deep black for true dark mode */
   --text: #e0e0e0; /* Light gray for readable text */
   --primary: #4db6ac; /* Brighter teal for visibility in dark mode */
   --primary-hover: #80cbc4; /* Lighter teal for hover states */
@@ -44,13 +44,16 @@ html, body {
 
 main {
   flex: 1 0 auto;
-  margin-top: 100px; /* Adjusted to account for navbar (60px) + marquee (40px) */
+  margin-top: 76px;
 }
+
+
 
 .marquee-container {
   margin: 0;
   padding: 0;
   width: 100%;
+  margin-top: 60px;
   position: relative;
   z-index: 999;
 }
@@ -58,8 +61,8 @@ main {
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0;
-  min-height: calc(100vh - 100px); /* Adjusted for navbar + marquee */
+  padding: 1rem;
+  min-height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -68,7 +71,7 @@ main {
 
 .hero {
   text-align: center;
-  padding: 0;
+  padding: 3rem 1rem;
   position: relative;
   background: var(--surface);
   border-radius: 16px;
