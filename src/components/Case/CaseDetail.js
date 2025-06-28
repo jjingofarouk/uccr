@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
-import { Award } from 'lucide-react';
+import { Award, ChevronDown, ChevronUp } from 'lucide-react';
 import CommentSection from './CommentSection';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -16,6 +16,7 @@ import {
   AccordionDetails,
   Typography,
   Box,
+  Button,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -72,7 +73,7 @@ const trackPageView = (caseId, title) => {
 // Utility function to sanitize and render HTML content
 const renderRichText = (html) => {
   if (!html || typeof html !== 'string') {
-    return <Typography>Not specified</Typography>;
+    return <Typography className={styles.notSpecified}>Not specified</Typography>;
   }
   try {
     const sanitizedHtml = sanitizeHtml(html, {
@@ -82,7 +83,7 @@ const renderRichText = (html) => {
     return <div className={styles.richText} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
   } catch (err) {
     console.error('Error sanitizing HTML:', err);
-    return <Typography>Error rendering content</Typography>;
+    return <Typography className={styles.errorText}>Error rendering content</Typography>;
   }
 };
 
@@ -95,6 +96,7 @@ export default function CaseDetail({ caseData, isLoading }) {
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState({});
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [allExpanded, setAllExpanded] = useState(false);
 
   // Sections for TOC and collapsible content
   const sections = [
@@ -111,7 +113,7 @@ export default function CaseDetail({ caseData, isLoading }) {
     { id: 'references', label: 'References', content: getSafeValue(caseData?.references) },
   ];
 
-  // Track page view and initialize expanded state
+  // Track page view and initialize expanded state (all collapsed by default)
   useEffect(() => {
     if (!caseData || !caseData.id || !caseData.title) {
       console.warn('Invalid caseData in useEffect:', caseData);
@@ -119,9 +121,9 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
     try {
       trackPageView(caseData.id, caseData.title || 'Untitled Case');
-      // Expand first section on desktop, none on mobile
-      const initialExpanded = window.innerWidth > 768 ? { chiefConcern: true } : {};
-      setExpanded(initialExpanded);
+      // All sections collapsed by default
+      setExpanded({});
+      setAllExpanded(false);
     } catch (err) {
       console.error('Error in page view tracking:', err);
       setError('Failed to load case details.');
@@ -139,13 +141,45 @@ export default function CaseDetail({ caseData, isLoading }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle expand/collapse all
+  const handleExpandCollapseAll = () => {
+    try {
+      const newState = !allExpanded;
+      const newExpanded = {};
+      
+      if (newState) {
+        sections.forEach(section => {
+          newExpanded[section.id] = true;
+        });
+        trackEvent('expand_all_sections', 'Case Section', caseData?.id || 'unknown', 1);
+      } else {
+        // Collapse all
+        trackEvent('collapse_all_sections', 'Case Section', caseData?.id || 'unknown', 1);
+      }
+      
+      setExpanded(newExpanded);
+      setAllExpanded(newState);
+    } catch (err) {
+      console.error('Error in handleExpandCollapseAll:', err);
+      setError('Failed to toggle sections.');
+    }
+  };
+
   // Handle accordion toggle
   const handleAccordionChange = (sectionId) => (event, isExpanded) => {
     try {
       setExpanded((prev) => ({ ...prev, [sectionId]: isExpanded }));
+      
+      // Update allExpanded state based on current state
+      const newExpanded = { ...expanded, [sectionId]: isExpanded };
+      const expandedCount = Object.values(newExpanded).filter(Boolean).length;
+      setAllExpanded(expandedCount === sections.length);
+      
       if (isExpanded) {
         trackEvent('expand_section', 'Case Section', `${caseData?.id || 'unknown'}_${sectionId}`, 1);
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
       }
     } catch (err) {
       console.error('Error in handleAccordionChange:', err);
@@ -192,7 +226,7 @@ export default function CaseDetail({ caseData, isLoading }) {
   const handleTocClick = (sectionId) => {
     try {
       trackEvent('toc_click', 'Navigation', sectionId, 1);
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setExpanded((prev) => ({ ...prev, [sectionId]: true }));
     } catch (err) {
       console.error('Error in handleTocClick:', err);
@@ -236,7 +270,10 @@ export default function CaseDetail({ caseData, isLoading }) {
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  onClick={() => handleTocClick(section.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleTocClick(section.id);
+                  }}
                   className={styles.tocLink}
                 >
                   {section.label}
@@ -301,6 +338,19 @@ export default function CaseDetail({ caseData, isLoading }) {
             {error && <Typography className={styles.error}>{error}</Typography>}
           </div>
 
+          {/* Expand/Collapse All Button */}
+          <div className={styles.controlsSection}>
+            <Button
+              onClick={handleExpandCollapseAll}
+              className={styles.expandCollapseButton}
+              startIcon={allExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              variant="outlined"
+              size="small"
+            >
+              {allExpanded ? 'Collapse All' : 'Expand All'}
+            </Button>
+          </div>
+
           <section className={styles.content}>
             {sections.map((section) => (
               <Accordion
@@ -317,7 +367,7 @@ export default function CaseDetail({ caseData, isLoading }) {
                   id={`${section.id}-header`}
                   className={styles.accordionSummary}
                 >
-                  <Typography variant="h2" className={styles.sectionTitle}>
+                  <Typography className={styles.sectionTitle}>
                     {section.label}
                   </Typography>
                 </AccordionSummary>
@@ -329,7 +379,7 @@ export default function CaseDetail({ caseData, isLoading }) {
           </section>
 
           <section className={styles.media}>
-            <Typography variant="h2" className={styles.sectionTitle}>
+            <Typography variant="h2" className={styles.mediaSectionTitle}>
               Media
             </Typography>
             {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? (
