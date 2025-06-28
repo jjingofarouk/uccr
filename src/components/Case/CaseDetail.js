@@ -1,3 +1,5 @@
+"use client"; // Ensure client-side rendering
+
 import { useState, useEffect, Component } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -30,7 +32,6 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
-    // Optionally log to an error reporting service
     trackEvent('client_error', 'ErrorBoundary', error.message, 1);
   }
 
@@ -39,6 +40,9 @@ class ErrorBoundary extends Component {
       return (
         <div className={styles.error}>
           <Typography>Something went wrong. Please try refreshing the page.</Typography>
+          <button onClick={() => window.location.reload()} className={styles.retryButton}>
+            Retry
+          </button>
         </div>
       );
     }
@@ -94,12 +98,13 @@ export default function CaseDetail({ caseData, isLoading }) {
   const { user } = useAuth();
   const router = useRouter();
   const [error, setError] = useState('');
-  const [expanded, setExpanded] = useState({});
+  const [expanded, setExpanded] = useState({ summary: true }); // Expand Summary by default
   const [scrollProgress, setScrollProgress] = useState(0);
   const [allExpanded, setAllExpanded] = useState(false);
 
-  // Sections for TOC and collapsible content
+  // Sections for TOC and collapsible content, with Summary at the top
   const sections = [
+    { id: 'summary', label: 'Summary', content: getSafeValue(caseData?.highLevelSummary) },
     { id: 'chiefConcern', label: 'Chief Concern', content: getSafeValue(caseData?.presentingComplaint) },
     { id: 'specialties', label: 'Specialties', content: getSafeValue(Array.isArray(caseData?.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : null) },
     { id: 'history', label: 'History', content: getSafeValue(caseData?.history) },
@@ -109,11 +114,10 @@ export default function CaseDetail({ caseData, isLoading }) {
     { id: 'hospital', label: 'Hospital', content: getSafeValue(caseData?.hospital) },
     { id: 'referralCenter', label: 'Referral Center', content: getSafeValue(caseData?.referralCenter) },
     { id: 'discussion', label: 'Discussion', content: getSafeValue(caseData?.discussion) },
-    { id: 'highLevelSummary', label: 'High-Level Summary', content: getSafeValue(caseData?.highLevelSummary) },
     { id: 'references', label: 'References', content: getSafeValue(caseData?.references) },
   ];
 
-  // Track page view and initialize expanded state (all collapsed by default)
+  // Track page view and initialize expanded state
   useEffect(() => {
     if (!caseData || !caseData.id || !caseData.title) {
       console.warn('Invalid caseData in useEffect:', caseData);
@@ -121,8 +125,8 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
     try {
       trackPageView(caseData.id, caseData.title || 'Untitled Case');
-      // All sections collapsed by default
-      setExpanded({});
+      // Expand Summary section by default
+      setExpanded({ summary: true });
       setAllExpanded(false);
     } catch (err) {
       console.error('Error in page view tracking:', err);
@@ -133,6 +137,7 @@ export default function CaseDetail({ caseData, isLoading }) {
   // Scroll progress
   useEffect(() => {
     const handleScroll = () => {
+      if (typeof window === 'undefined') return;
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
       setScrollProgress(progress);
@@ -146,17 +151,14 @@ export default function CaseDetail({ caseData, isLoading }) {
     try {
       const newState = !allExpanded;
       const newExpanded = {};
-      
       if (newState) {
-        sections.forEach(section => {
+        sections.forEach((section) => {
           newExpanded[section.id] = true;
         });
         trackEvent('expand_all_sections', 'Case Section', caseData?.id || 'unknown', 1);
       } else {
-        // Collapse all
         trackEvent('collapse_all_sections', 'Case Section', caseData?.id || 'unknown', 1);
       }
-      
       setExpanded(newExpanded);
       setAllExpanded(newState);
     } catch (err) {
@@ -169,12 +171,9 @@ export default function CaseDetail({ caseData, isLoading }) {
   const handleAccordionChange = (sectionId) => (event, isExpanded) => {
     try {
       setExpanded((prev) => ({ ...prev, [sectionId]: isExpanded }));
-      
-      // Update allExpanded state based on current state
       const newExpanded = { ...expanded, [sectionId]: isExpanded };
       const expandedCount = Object.values(newExpanded).filter(Boolean).length;
       setAllExpanded(expandedCount === sections.length);
-      
       if (isExpanded) {
         trackEvent('expand_section', 'Case Section', `${caseData?.id || 'unknown'}_${sectionId}`, 1);
         setTimeout(() => {
@@ -204,6 +203,7 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
   };
 
+  // Handle edit
   const handleEditClick = () => {
     try {
       router.push(`/cases/edit/${caseData.id}`);
@@ -214,10 +214,12 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
   };
 
+  // Handle author click
   const handleAuthorClick = (userId) => {
-    trackEvent('view_author', 'Profile', userId, 1);
+    trackEvent('view_author', 'Profile', userId || 'unknown', 1);
   };
 
+  // Handle media view
   const handleMediaView = (mediaIndex) => {
     trackEvent('view_media', 'Case Media', `${caseData?.id || 'unknown'}_media_${mediaIndex}`, 1);
   };
@@ -237,7 +239,7 @@ export default function CaseDetail({ caseData, isLoading }) {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <Skeleton height={40} width="80%" />
+        <Skeleton height={40} width="80%" data-testid="skeleton" />
         <Skeleton height={24} count={10} />
       </div>
     );
@@ -249,6 +251,9 @@ export default function CaseDetail({ caseData, isLoading }) {
       <div className={styles.container}>
         <div className={styles.error}>
           <Typography>Error: Invalid case data</Typography>
+          <button onClick={() => window.location.reload()} className={styles.retryButton}>
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -299,7 +304,7 @@ export default function CaseDetail({ caseData, isLoading }) {
             )}
             <div className={styles.meta}>
               <div className={styles.author}>
-                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId || 'unknown')}>
+                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId)}>
                   <Image
                     src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
                     alt={`Profile picture of ${caseData.userName || 'Contributor'}`}
@@ -309,7 +314,7 @@ export default function CaseDetail({ caseData, isLoading }) {
                     onError={(e) => console.error('Author image error:', caseData.photoURL)}
                   />
                 </Link>
-                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId || 'unknown')}>
+                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId)}>
                   <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
                 </Link>
               </div>
