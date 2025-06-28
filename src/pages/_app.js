@@ -1,4 +1,4 @@
-
+import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import { CaseProvider } from '../context/CaseContext';
