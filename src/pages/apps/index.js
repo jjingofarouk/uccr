@@ -76,7 +76,7 @@ const OtherApps = () => {
   return (
     <Container maxWidth="md" className={styles.otherAppsContainer}>
       <Typography variant="h3" className={styles.title}>
-        Other Projects by Farouk Jjingo
+        Other Projects
       </Typography>
       <Typography variant="body1" className={styles.subtitle}>
 Join the Journey — Contribute or Collaborate!
