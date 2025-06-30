@@ -41,12 +41,12 @@ const OtherApps = () => {
     //   link: 'https://ssuubi-mental-health-bot.onrender.com',
     //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/ssuubi/home.png',
     // },
-    // {
-    //   title: 'Clinical Calculators',
-    //   description: 'A mobile app with over 90 specialized calculators for healthcare professionals across multiple specialties.',
-    //   link: 'https://clinical-calculators.vercel.app/',
-    //   image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/clinical-calculators/home.png',
-    // },
+    {
+    title: 'Clinical Calculators',
+    description: 'A web application with over 3,000 specialized clinical calculators and medical algorithms for healthcare professionals across 60 specialties.',
+    link: 'https://clinical-calculators.vercel.app/',
+    image: 'https://raw.githubusercontent.com/jjingofarouk/portfol/main/public/assets/projects-screenshots/clinical-calculators/home.png',
+    },
     // {
     //   title: 'GigMap',
     //   description: 'A PWA connecting freelancers globally with an interactive map and dynamic profiles for talent discovery.',
