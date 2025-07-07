@@ -2,34 +2,104 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import styles from '../../styles/caseForm.module.css';
-import 'react-quill/dist/quill.snow.css';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
+import Link from '@tiptap/extension-link';
+import LineHeight from '@tiptap/extension-line-height';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const TiptapEditor = dynamic(() => Promise.resolve(EditorContent), { ssr: false });
 
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, false] }],
-    ['bold', 'italic', 'underline'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    ['link'],
-    [{ 'line-height': ['1', '1.15', '1.5', '1.75', '2'] }],
-    ['clean'],
-  ],
-  clipboard: {
-    matchVisual: false,
-  },
-  keyboard: {
-    bindings: {
-      space: {
-        key: ' ',
-        handler: function (range, context) {
-          this.quill.insertText(range.index, ' ');
-          this.quill.setSelection(range.index + 1);
-          return false;
-        },
-      },
-    },
-  },
+const TiptapToolbar = ({ editor }) => {
+  if (!editor) return null;
+
+  return (
+    <div className={styles.toolbar}>
+      <select
+        onChange={(e) => editor.chain().focus().toggleHeading({ level: Number(e.target.value) }).run()}
+        value={editor.isActive('heading') ? editor.getAttributes('heading').level || '' : ''}
+      >
+        <option value="">Normal</option>
+        <option value="1">H1</option>
+        <option value="2">H2</option>
+      </select>
+      <button
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={editor.isActive('bold') ? styles.active : ''}
+      >
+        Bold
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={editor.isActive('italic') ? styles.active : ''}
+      >
+        Italic
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={editor.isActive('underline') ? styles.active : ''}
+      >
+        Underline
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={editor.isActive('orderedList') ? styles.active : ''}
+      >
+        Ordered List
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={editor.isActive('bulletList') ? styles.active : ''}
+      >
+        Bullet List
+      </button>
+      <button
+        onClick={() =>
+          editor.chain().focus().setLink({ href: prompt('Enter URL') || '' }).run()
+        }
+        className={editor.isActive('link') ? styles.active : ''}
+      >
+        Link
+      </button>
+      <select
+        onChange={(e) => editor.chain().focus().setLineHeight(e.target.value).run()}
+        value={editor.getAttributes('lineHeight')?.lineHeight || '1'}
+      >
+        <option value="1">1</option>
+        <option value="1.15">1.15</option>
+        <option value="1.5">1.5</option>
+        <option value="1.75">1.75</option>
+        <option value="2">2</option>
+      </select>
+      <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
+        Insert Table
+      </button>
+      <button
+        onClick={() => editor.chain().focus().addRowAfter().run()}
+        disabled={!editor.can().addRowAfter()}
+      >
+        Add Row
+      </button>
+      <button
+        onClick={() => editor.chain().focus().addColumnAfter().run()}
+        disabled={!editor.can().addColumnAfter()}
+      >
+        Add Column
+      </button>
+      <button
+        onClick={() => editor.chain().focus().deleteTable().run()}
+        disabled={!editor.can().deleteTable()}
+      >
+        Delete Table
+      </button>
+      <button onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>
+        Clean
+      </button>
+    </div>
+  );
 };
 
 export default function StepContent({
@@ -43,6 +113,27 @@ export default function StepContent({
   isEditMode = false,
 }) {
   const step = steps[currentStep];
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [1, 2] },
+      }),
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Link.configure({
+        openOnClick: false,
+      }),
+      LineHeight.configure({
+        types: ['paragraph', 'heading'],
+        lineHeights: ['1', '1.15', '1.5', '1.75', '2'],
+      }),
+    ],
+    content: formData[step.name],
+    onUpdate: ({ editor }) => handleChange(editor.getHTML(), step.name),
+  });
 
   return (
     <div className={styles.carousel}>
@@ -69,24 +160,10 @@ export default function StepContent({
             <div className={styles.stepContent}>
               <label className={styles.fieldLabel}>{step.label}</label>
               {step.type === 'richtext' && (
-                <ReactQuill
-                  theme="snow"
-                  value={formData[step.name]}
-                  onChange={(value) => handleChange(value, step.name)}
-                  placeholder={step.placeholder}
-                  modules={quillModules}
-                  className={styles.quillEditor}
-                  formats={[
-                    'header',
-                    'bold',
-                    'italic',
-                    'underline',
-                    'list',
-                    'bullet',
-                    'link',
-                    'line-height',
-                  ]}
-                />
+                <div className={styles.quillEditor}>
+                  <TiptapToolbar editor={editor} />
+                  <TiptapEditor editor={editor} placeholder={step.placeholder} />
+                </div>
               )}
               {step.type === 'select' && (
                 <select
