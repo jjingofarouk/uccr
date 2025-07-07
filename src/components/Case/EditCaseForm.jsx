@@ -1,4 +1,3 @@
-// src/components/Case/EditCaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -11,6 +10,7 @@ import StepContent from './StepContent';
 import Navigation from './EditNavigation';
 import ErrorMessage from './ErrorMessage';
 import Loading from '../Loading';
+import { auth } from '../../firebase/config';
 
 export default function EditCaseForm({ caseId }) {
   const { user, loading: authLoading, error: authError } = useAuth();
@@ -174,6 +174,7 @@ export default function EditCaseForm({ caseId }) {
           });
           setIsLoading(false);
         } catch (err) {
+          console.error('Fetch case error:', { message: err.message, code: err.code });
           setError(`Failed to load case data: ${err.message}`);
           setIsLoading(false);
         }
@@ -381,6 +382,7 @@ export default function EditCaseForm({ caseId }) {
     }
     setError('');
     setIsLoading(true);
+    console.log('Updating case with ID:', caseId, 'data:', { userId: user.uid, title: formData.title });
     if (window.gtag) {
       window.gtag('event', 'submission_started', {
         event_category: 'EditCaseForm',
@@ -388,6 +390,9 @@ export default function EditCaseForm({ caseId }) {
       });
     }
     try {
+      // Force refresh authentication token
+      await auth.currentUser.getIdToken(true);
+      console.log('Authentication token refreshed for user:', user.uid);
       const caseData = {
         ...formData,
         userId: user.uid,
@@ -396,6 +401,7 @@ export default function EditCaseForm({ caseId }) {
         thumbnailUrl: formData.mediaUrls[0] || '',
       };
       await updateCase(caseId, caseData);
+      console.log('Case update successful, ID:', caseId);
       setLoadStart(Date.now());
       setForceLoading(true);
       if (window.gtag) {
@@ -406,14 +412,51 @@ export default function EditCaseForm({ caseId }) {
         });
       }
     } catch (err) {
-      setError('Failed to update case: ' + (err.message.includes('permission-denied') ? 'Insufficient permissions.' : err.message));
-      setIsLoading(false);
-      if (window.gtag) {
-        window.gtag('event', 'submission_failed', {
-          event_category: 'EditCaseForm',
-          event_label: 'Submission Failed: Error',
-          value: err.message,
-        });
+      console.error('Update error:', { message: err.message, code: err.code });
+      if (err.code === 'permission-denied') {
+        console.log('Permission-denied error detected, verifying case update...');
+        // Wait and check if the case was updated
+        setTimeout(async () => {
+          try {
+            const updatedCase = await getCaseById(caseId);
+            if (updatedCase && updatedCase.title === formData.title && updatedCase.userId === user.uid) {
+              console.log('Case updated after verification, proceeding with success flow');
+              setLoadStart(Date.now());
+              setForceLoading(true);
+              if (window.gtag) {
+                window.gtag('event', 'submission_success', {
+                  event_category: 'EditCaseForm',
+                  event_label: 'Case Update Successful (Delayed)',
+                });
+              }
+            } else {
+              console.log('Case not updated after verification');
+              setError('Failed to update case: Insufficient permissions.');
+              setIsLoading(false);
+              if (window.gtag) {
+                window.gtag('event', 'submission_failed', {
+                  event_category: 'EditCaseForm',
+                  event_label: 'Submission Failed: Permissions',
+                  value: err.message,
+                });
+              }
+            }
+          } catch (checkErr) {
+            console.error('Verification error:', { message: checkErr.message, code: checkErr.code });
+            setError('Failed to verify case update: ' + checkErr.message);
+            setIsLoading(false);
+          }
+        }, 1500); // Increased delay to ensure sync
+      } else {
+        setError('Failed to update case: ' + err.message);
+        setIsLoading(false);
+        if (window.gtag) {
+          window.gtag('event', 'submission_failed', {
+            event_category: 'EditCaseForm',
+            event_label: 'Submission Failed: Error',
+            value: err.message,
+          });
+        }
       }
     }
   };
@@ -423,11 +466,13 @@ export default function EditCaseForm({ caseId }) {
       const elapsed = Date.now() - loadStart;
       const remaining = SUBMISSION_LOADING_DURATION - elapsed;
       if (remaining <= 0) {
+        console.log('Navigation triggered after update');
         setForceLoading(false);
         setIsLoading(false);
         router.push('/cases');
       } else {
         const timer = setTimeout(() => {
+          console.log('Navigation triggered after timeout');
           setForceLoading(false);
           setIsLoading(false);
           router.push('/cases');
