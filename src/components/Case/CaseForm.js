@@ -1,4 +1,3 @@
-// src/components/CaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -12,6 +11,7 @@ import StepContent from './StepContent';
 import Navigation from './Navigation';
 import ErrorMessage from './ErrorMessage';
 import LoadingSkeleton from './LoadingSkeleton';
+import { auth } from '../../firebase/config';
 
 export default function CaseForm() {
   const { user, loading: authLoading, error: authError } = useAuth();
@@ -364,6 +364,7 @@ export default function CaseForm() {
     }
     setError('');
     setIsLoading(true);
+    console.log('Submitting case with data:', { userId: user.uid, title: formData.title });
     if (window.gtag) {
       window.gtag('event', 'submission_started', {
         event_category: 'CaseForm',
@@ -371,6 +372,9 @@ export default function CaseForm() {
       });
     }
     try {
+      // Force refresh authentication token
+      await auth.currentUser.getIdToken(true);
+      console.log('Authentication token refreshed for user:', user.uid);
       const caseData = {
         ...formData,
         userId: user.uid,
@@ -380,6 +384,7 @@ export default function CaseForm() {
         thumbnailUrl: formData.mediaUrls[0] || '',
       };
       const caseId = await addCase(caseData);
+      console.log('Case submission successful, ID:', caseId);
       setLoadStart(Date.now());
       setForceLoading(true);
       if (window.gtag) {
@@ -390,14 +395,52 @@ export default function CaseForm() {
         });
       }
     } catch (err) {
-      setError('Failed to submit case: ' + (err.message.includes('permission-denied') ? 'Insufficient permissions.' : err.message));
-      setIsLoading(false);
-      if (window.gtag) {
-        window.gtag('event', 'submission_failed', {
-          event_category: 'CaseForm',
-          event_label: 'Submission Failed: Error',
-          value: err.message,
-        });
+      console.error('Submission error:', { message: err.message, code: err.code });
+      if (err.code === 'permission-denied') {
+        console.log('Permission-denied error detected, verifying case creation...');
+        // Wait and check if the case was added (due to offline persistence)
+        setTimeout(async () => {
+          try {
+            const cases = await getCases(user.uid);
+            const caseExists = cases.some((c) => c.title === formData.title && c.userId === user.uid);
+            if (caseExists) {
+              console.log('Case found after verification, proceeding with success flow');
+              setLoadStart(Date.now());
+              setForceLoading(true);
+              if (window.gtag) {
+                window.gtag('event', 'submission_success', {
+                  event_category: 'CaseForm',
+                  event_label: 'Case Submission Successful (Delayed)',
+                });
+              }
+            } else {
+              console.log('Case not found after verification');
+              setError('Failed to submit case: Insufficient permissions.');
+              setIsLoading(false);
+              if (window.gtag) {
+                window.gtag('event', 'submission_failed', {
+                  event_category: 'CaseForm',
+                  event_label: 'Submission Failed: Permissions',
+                  value: err.message,
+                });
+              }
+            }
+          } catch (checkErr) {
+            console.error('Verification error:', { message: checkErr.message, code: checkErr.code });
+            setError('Failed to verify case submission: ' + checkErr.message);
+            setIsLoading(false);
+          }
+        }, 1500); // Increased delay to ensure sync
+      } else {
+        setError('Failed to submit case: ' + err.message);
+        setIsLoading(false);
+        if (window.gtag) {
+          window.gtag('event', 'submission_failed', {
+            event_category: 'CaseForm',
+            event_label: 'Submission Failed: Error',
+            value: err.message,
+ события);
+        }
       }
     }
   };
@@ -407,11 +450,13 @@ export default function CaseForm() {
       const elapsed = Date.now() - loadStart;
       const remaining = SUBMISSION_LOADING_DURATION - elapsed;
       if (remaining <= 0) {
+        console.log('Navigation triggered after submission');
         setForceLoading(false);
         setIsLoading(false);
         router.push('/cases');
       } else {
         const timer = setTimeout(() => {
+          console.log('Navigation triggered after timeout');
           setForceLoading(false);
           setIsLoading(false);
           router.push('/cases');
@@ -448,7 +493,7 @@ export default function CaseForm() {
     <div className={styles.caseFormWrapper}>
       <div className={styles.caseForm} ref={formContainerRef}>
         <FormHeader />
-        <ProgressBar currentStep={currentStep} stepsLength={steps.length} />
+       overageBar currentStep={currentStep} stepsLength={steps.length} />
         <form onSubmit={handleSubmit}>
           <StepContent
             steps={steps}
