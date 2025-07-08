@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { addCase } from '../../firebase/firestore';
+import { addCase, getCases } from '../../firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
-import SkeletonTheme from 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../../styles/caseForm.module.css';
 import FormHeader from './FormHeader';
 import ProgressBar from './ProgressBar';
@@ -57,84 +56,28 @@ export default function CaseForm() {
       { value: 'Adolescent Medicine', label: 'Adolescent Medicine' },
       { value: 'Allergy and Immunology', label: 'Allergy and Immunology' },
       { value: 'Anesthesiology', label: 'Anesthesiology' },
-      { value: 'Aviation Medicine', label: 'Aviation Medicine' },
-      { value: 'Bacteriology', label: 'Bacteriology' },
-      { value: 'Biomedical Engineering', label: 'Biomedical Engineering' },
-      { value: 'Biostatistics', label: 'Biostatistics' },
       { value: 'Cardiology', label: 'Cardiology' },
-      { value: 'Cardiothoracic Surgery', label: 'Cardiothoracic Surgery' },
-      { value: 'Chemical Pathology', label: 'Chemical Pathology' },
-      { value: 'Child and Adolescent Psychiatry', label: 'Child and Adolescent Psychiatry' },
-      { value: 'Clinical Chemistry', label: 'Clinical Chemistry' },
-      { value: 'Clinical Epidemiology', label: 'Clinical Epidemiology' },
-      { value: 'Clinical Pharmacology', label: 'Clinical Pharmacology' },
-      { value: 'Clinical Psychology', label: 'Clinical Psychology' },
-      { value: 'Clinical Trials', label: 'Clinical Trials' },
-      { value: 'Community Medicine', label: 'Community Medicine' },
-      { value: 'Cytopathology', label: 'Cytopathology' },
       { value: 'Dermatology', label: 'Dermatology' },
-      { value: 'Developmental Pediatrics', label: 'Developmental Pediatrics' },
-      { value: 'Disaster Medicine', label: 'Disaster Medicine' },
-      { value: 'Ear, Nose and Throat (ENT)', label: 'Ear, Nose and Throat (ENT)' },
       { value: 'Emergency Medicine', label: 'Emergency Medicine' },
       { value: 'Endocrinology', label: 'Endocrinology' },
-      { value: 'Epidemiology', label: 'Epidemiology' },
-      { value: 'Family Medicine', label: 'Family Medicine' },
-      { value: 'Forensic Medicine', label: 'Forensic Medicine' },
       { value: 'Gastroenterology', label: 'Gastroenterology' },
-      { value: 'General Practice', label: 'General Practice' },
-      { value: 'Genitourinary Medicine', label: 'Genitourinary Medicine' },
-      { value: 'Geriatrics', label: 'Geriatrics' },
-      { value: 'Health Economics', label: 'Health Economics' },
-      { value: 'Health Informatics', label: 'Health Informatics' },
-      { value: 'Health Policy and Management', label: 'Health Policy and Management' },
+      { value: 'General Surgery', label: 'General Surgery' },
       { value: 'Hematology', label: 'Hematology' },
-      { value: 'Histopathology', label: 'Histopathology' },
-      { value: 'Hyperbaric Medicine', label: 'Hyperbaric Medicine' },
-      { value: 'Immunopathology', label: 'Immunopathology' },
-      { value: 'Infectious Diseases', label: 'Infectious Diseases' },
+      { value: 'Infectious Disease', label: 'Infectious Disease' },
       { value: 'Internal Medicine', label: 'Internal Medicine' },
-      { value: 'Marine Medicine', label: 'Marine Medicine' },
-      { value: 'Maxillofacial Surgery', label: 'Maxillofacial Surgery' },
-      { value: 'Medical Administration', label: 'Medical Administration' },
-      { value: 'Medical Anthropology', label: 'Medical Anthropology' },
-      { value: 'Medical Education', label: 'Medical Education' },
-      { value: 'Medical Ethics', label: 'Medical Ethics' },
-      { value: 'Medical Genetics', label: 'Medical Genetics' },
-      { value: 'Medical Imaging', label: 'Medical Imaging' },
-      { value: 'Medical Microbiology', label: 'Medical Microbiology' },
-      { value: 'Medical Oncology', label: 'Medical Oncology' },
-      { value: 'Medical Toxicology', label: 'Medical Toxicology' },
-      { value: 'Neonatology', label: 'Neonatology' },
       { value: 'Nephrology', label: 'Nephrology' },
       { value: 'Neurology', label: 'Neurology' },
-      { value: 'Neurosurgery', label: 'Neurosurgery' },
-      { value: 'Nuclear Medicine', label: 'Nuclear Medicine' },
       { value: 'Obstetrics and Gynecology', label: 'Obstetrics and Gynecology' },
-      { value: 'Occupational Medicine', label: 'Occupational Medicine' },
+      { value: 'Oncology', label: 'Oncology' },
       { value: 'Ophthalmology', label: 'Ophthalmology' },
       { value: 'Orthopedic Surgery', label: 'Orthopedic Surgery' },
-      { value: 'Pain Medicine', label: 'Pain Medicine' },
-      { value: 'Palliative Care', label: 'Palliative Care' },
-      { value: 'Parasitology', label: 'Parasitology' },
-      { value: 'Pathology', label: 'Pathology' },
+      { value: 'Otolaryngology', label: 'Otolaryngology' },
       { value: 'Pediatrics', label: 'Pediatrics' },
-      { value: 'Plastic Surgery', label: 'Plastic Surgery' },
       { value: 'Psychiatry', label: 'Psychiatry' },
-      { value: 'Public Health', label: 'Public Health' },
       { value: 'Pulmonology', label: 'Pulmonology' },
-      { value: 'Radiation Oncology', label: 'Radiation Oncology' },
       { value: 'Radiology', label: 'Radiology' },
-      { value: 'Rehabilitation Medicine', label: 'Rehabilitation Medicine' },
       { value: 'Rheumatology', label: 'Rheumatology' },
-      { value: 'Sleep Medicine', label: 'Sleep Medicine' },
-      { value: 'Sports Medicine', label: 'Sports Medicine' },
-      { value: 'Surgery', label: 'Surgery' },
-      { value: 'Telemedicine', label: 'Telemedicine' },
-      { value: 'Tropical Medicine', label: 'Tropical Medicine' },
       { value: 'Urology', label: 'Urology' },
-      { value: 'Vascular Surgery', label: 'Vascular Surgery' },
-      { value: 'Virology', label: 'Virology' },
     ]},
     { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
     { name: 'highLevelSummary', label: 'Case Summary', type: 'richtext', placeholder: 'Summarize the case' },
@@ -142,16 +85,45 @@ export default function CaseForm() {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
+  // Load draft from localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'page_view', {
-        page_title: 'Case Form',
-        page_location: window.location.href,
-        page_path: router.asPath,
-      });
+    if (user && user.uid) {
+      const draftKey = `draft_case_${user.uid}`;
+      const savedDraft = localStorage.getItem(draftKey);
+      if (savedDraft) {
+        try {
+          const { formData: savedFormData, currentStep: savedStep, draftTimestamp } = JSON.parse(savedDraft);
+          const draftAge = Date.now() - draftTimestamp;
+          const maxDraftAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+          if (draftAge < maxDraftAge) {
+            setFormData(savedFormData);
+            setCurrentStep(savedStep || 0);
+            console.log('Loaded draft from localStorage:', { draftKey, title: savedFormData.title, draftAge });
+          } else {
+            localStorage.removeItem(draftKey);
+            console.log('Cleared expired draft from localStorage:', { draftKey });
+          }
+        } catch (err) {
+          console.error('Error loading draft:', err);
+        }
+      }
     }
-  }, [router.asPath]);
+  }, [user]);
 
+  // Save form data to localStorage on change
+  useEffect(() => {
+    if (user && user.uid) {
+      const draftKey = `draft_case_${user.uid}`;
+      localStorage.setItem(draftKey, JSON.stringify({ 
+        formData, 
+        currentStep, 
+        draftTimestamp: Date.now() 
+      }));
+      console.log('Saved draft to localStorage:', { draftKey, title: formData.title, currentStep });
+    }
+  }, [formData, currentStep, user]);
+
+  // Cloudinary widget setup
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
@@ -213,7 +185,6 @@ export default function CaseForm() {
           );
         }
       };
-
       return () => {
         if (script.parentNode) {
           script.parentNode.removeChild(script);
@@ -221,6 +192,17 @@ export default function CaseForm() {
       };
     }
   }, [user]);
+
+  // Google Analytics page view
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_title: 'Case Form',
+        page_location: window.location.href,
+        page_path: router.asPath,
+      });
+    }
+  }, [router.asPath]);
 
   const handleChange = (value, name) => {
     if (name === 'specialty') {
@@ -256,6 +238,37 @@ export default function CaseForm() {
         event_label: 'Media Deleted',
         value: deletedUrl,
       });
+    }
+  };
+
+  const clearDraft = () => {
+    if (user && user.uid) {
+      const draftKey = `draft_case_${user.uid}`;
+      localStorage.removeItem(draftKey);
+      setFormData({
+        title: '',
+        presentingComplaint: '',
+        history: '',
+        physicalExam: '',
+        investigations: '',
+        management: '',
+        provisionalDiagnosis: '',
+        hospital: '',
+        referralCenter: '',
+        specialty: [],
+        discussion: '',
+        highLevelSummary: '',
+        references: '',
+        mediaUrls: [],
+      });
+      setCurrentStep(0);
+      console.log('Draft cleared manually:', { draftKey });
+      if (window.gtag) {
+        window.gtag('event', 'draft_cleared', {
+          event_category: 'CaseForm',
+          event_label: 'Draft Cleared Manually',
+        });
+      }
     }
   };
 
@@ -372,7 +385,6 @@ export default function CaseForm() {
       });
     }
     try {
-      // Force refresh authentication token
       await auth.currentUser.getIdToken(true);
       console.log('Authentication token refreshed for user:', user.uid);
       const caseData = {
@@ -385,6 +397,8 @@ export default function CaseForm() {
       };
       const caseId = await addCase(caseData);
       console.log('Case submission successful, ID:', caseId);
+      localStorage.removeItem(`draft_case_${user.uid}`);
+      console.log('Draft cleared from localStorage');
       setLoadStart(Date.now());
       setForceLoading(true);
       if (window.gtag) {
@@ -398,13 +412,13 @@ export default function CaseForm() {
       console.error('Submission error:', { message: err.message, code: err.code });
       if (err.code === 'permission-denied') {
         console.log('Permission-denied error detected, verifying case creation...');
-        // Wait and check if the case was added (due to offline persistence)
         setTimeout(async () => {
           try {
             const cases = await getCases(user.uid);
             const caseExists = cases.some((c) => c.title === formData.title && c.userId === user.uid);
             if (caseExists) {
-              console.log('Case found after verification, proceeding with success flow');
+              console.log('Case found after verification, clearing draft');
+              localStorage.removeItem(`draft_case_${user.uid}`);
               setLoadStart(Date.now());
               setForceLoading(true);
               if (window.gtag) {
@@ -429,8 +443,15 @@ export default function CaseForm() {
             console.error('Verification error:', { message: checkErr.message, code: checkErr.code });
             setError('Failed to verify case submission: ' + checkErr.message);
             setIsLoading(false);
+            if (window.gtag) {
+              window.gtag('event', 'submission_failed', {
+                event_category: 'CaseForm',
+                event_label: 'Submission Failed: Verification Error',
+                value: checkErr.message,
+              });
+            }
           }
-        }, 1500); // Increased delay to ensure sync
+        }, 1500);
       } else {
         setError('Failed to submit case: ' + err.message);
         setIsLoading(false);
@@ -439,7 +460,7 @@ export default function CaseForm() {
             event_category: 'CaseForm',
             event_label: 'Submission Failed: Error',
             value: err.message,
- события);
+          });
         }
       }
     }
@@ -493,7 +514,7 @@ export default function CaseForm() {
     <div className={styles.caseFormWrapper}>
       <div className={styles.caseForm} ref={formContainerRef}>
         <FormHeader />
-       overageBar currentStep={currentStep} stepsLength={steps.length} />
+        <ProgressBar currentStep={currentStep} stepsLength={steps.length} />
         <form onSubmit={handleSubmit}>
           <StepContent
             steps={steps}
@@ -512,6 +533,13 @@ export default function CaseForm() {
             nextStep={nextStep}
             prevStep={prevStep}
           />
+          <button
+            type="button"
+            onClick={clearDraft}
+            className={styles.clearDraftButton}
+          >
+            Clear Draft
+          </button>
           <ErrorMessage error={error} />
         </form>
       </div>
