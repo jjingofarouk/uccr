@@ -49,7 +49,7 @@ export default function EditCaseForm({ caseId }) {
     { name: 'physicalExam', label: 'Physical Examination', type: 'richtext', placeholder: 'Physical exam findings' },
     { name: 'investigations', label: 'Investigations', type: 'richtext', placeholder: 'Investigation results' },
     { name: 'management', label: 'Management', type: 'richtext', placeholder: 'Management plan' },
-    { name: 'provisionalDiagnosis', label: 'Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
+    { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
     { name: 'hospital', label: 'Hospital', type: 'richtext', placeholder: 'Enter hospital name' },
     { name: 'referralCenter', label: 'Referral Center', type: 'richtext', placeholder: 'Enter referral center' },
     { name: 'specialty', label: 'Specialty', type: 'select', options: [
@@ -85,7 +85,6 @@ export default function EditCaseForm({ caseId }) {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
-  // Load case data and draft
   useEffect(() => {
     const fetchCaseData = async () => {
       if (caseId && user && user.uid) {
@@ -107,7 +106,7 @@ export default function EditCaseForm({ caseId }) {
             try {
               const { formData: savedFormData, currentStep: savedStep, draftTimestamp } = JSON.parse(savedDraft);
               const draftAge = Date.now() - draftTimestamp;
-              const maxDraftAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+              const maxDraftAge = 7 * 24 * 60 * 60 * 1000;
               if (draftAge < maxDraftAge) {
                 setFormData(savedFormData);
                 setCurrentStep(savedStep || 0);
@@ -180,7 +179,6 @@ export default function EditCaseForm({ caseId }) {
     fetchCaseData();
   }, [caseId, user]);
 
-  // Save form data to localStorage on change
   useEffect(() => {
     if (user && user.uid && caseId) {
       const draftKey = `draft_case_${user.uid}_${caseId}`;
@@ -193,7 +191,6 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [formData, currentStep, user, caseId]);
 
-  // Cloudinary widget setup
   useEffect(() => {
     if (typeof window !== 'undefined' && user && user.uid) {
       const script = document.createElement('script');
@@ -263,7 +260,6 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [user]);
 
-  // Google Analytics page view
   useEffect(() => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'page_view', {
@@ -339,7 +335,6 @@ export default function EditCaseForm({ caseId }) {
           event_label: 'Draft Cleared Manually',
         });
       }
-      // Reload case data to reset form
       const fetchCaseData = async () => {
         try {
           const caseData = await getCaseById(caseId);
@@ -605,6 +600,7 @@ export default function EditCaseForm({ caseId }) {
             handleDeleteMedia={handleDeleteMedia}
             widgetRef={widgetRef}
             isUploading={isUploading}
+            isEditMode={true}
           />
           <Navigation
             currentStep={currentStep}
