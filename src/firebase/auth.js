@@ -1,4 +1,3 @@
-// src/firebase/auth.js
 import { auth } from './config';
 import { 
   signInWithEmailAndPassword, 
@@ -90,3 +89,6 @@ export const logout = async (retryCount = 2) => {
     return { success: false, error: error.message || 'Unable to sign out' };
   }
 };
+
+// ✅ Export the `auth` object itself
+export { auth };
