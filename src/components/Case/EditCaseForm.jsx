@@ -49,7 +49,7 @@ export default function EditCaseForm({ caseId }) {
     { name: 'physicalExam', label: 'Physical Examination', type: 'richtext', placeholder: 'Physical exam findings' },
     { name: 'investigations', label: 'Investigations', type: 'richtext', placeholder: 'Investigation results' },
     { name: 'management', label: 'Management', type: 'richtext', placeholder: 'Management plan' },
-    { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
+    { name: 'provisionalDiagnosis', label: 'Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
     { name: 'hospital', label: 'Hospital', type: 'richtext', placeholder: 'Enter hospital name' },
     { name: 'referralCenter', label: 'Referral Center', type: 'richtext', placeholder: 'Enter referral center' },
     { name: 'specialty', label: 'Specialty', type: 'select', options: [
