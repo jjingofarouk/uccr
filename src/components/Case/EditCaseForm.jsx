@@ -1,3 +1,4 @@
+// src/components/Case/EditCaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -100,13 +101,32 @@ export default function EditCaseForm({ caseId }) {
             setIsLoading(false);
             return;
           }
+          const initialFormData = {
+            title: caseData.title || '',
+            presentingComplaint: caseData.presentingComplaint || '',
+            history: caseData.history || '',
+            physicalExam: caseData.physicalExam || '',
+            investigations: caseData.investigations || '',
+            management: caseData.management || '',
+            provisionalDiagnosis: caseData.provisionalDiagnosis || '',
+            hospital: caseData.hospital || '',
+            referralCenter: caseData.referralCenter || '',
+            specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
+            discussion: caseData.discussion || '',
+            highLevelSummary: caseData.highLevelSummary || '',
+            references: caseData.references || '',
+            mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+          };
+          setFormData(initialFormData);
+
+          // Check for draft after setting case data
           const draftKey = `draft_case_${user.uid}_${caseId}`;
           const savedDraft = localStorage.getItem(draftKey);
           if (savedDraft) {
             try {
               const { formData: savedFormData, currentStep: savedStep, draftTimestamp } = JSON.parse(savedDraft);
               const draftAge = Date.now() - draftTimestamp;
-              const maxDraftAge = 7 * 24 * 60 * 60 * 1000;
+              const maxDraftAge = 7 * 24 * 60 * 60 * 1000; // 7 days
               if (draftAge < maxDraftAge) {
                 setFormData(savedFormData);
                 setCurrentStep(savedStep || 0);
@@ -114,59 +134,10 @@ export default function EditCaseForm({ caseId }) {
               } else {
                 localStorage.removeItem(draftKey);
                 console.log('Cleared expired draft from localStorage:', { draftKey });
-                setFormData({
-                  title: caseData.title || '',
-                  presentingComplaint: caseData.presentingComplaint || '',
-                  history: caseData.history || '',
-                  physicalExam: caseData.physicalExam || '',
-                  investigations: caseData.investigations || '',
-                  management: caseData.management || '',
-                  provisionalDiagnosis: caseData.provisionalDiagnosis || '',
-                  hospital: caseData.hospital || '',
-                  referralCenter: caseData.referralCenter || '',
-                  specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
-                  discussion: caseData.discussion || '',
-                  highLevelSummary: caseData.highLevelSummary || '',
-                  references: caseData.references || '',
-                  mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-                });
               }
             } catch (err) {
               console.error('Error loading draft:', err);
-              setFormData({
-                title: caseData.title || '',
-                presentingComplaint: caseData.presentingComplaint || '',
-                history: caseData.history || '',
-                physicalExam: caseData.physicalExam || '',
-                investigations: caseData.investigations || '',
-                management: caseData.management || '',
-                provisionalDiagnosis: caseData.provisionalDiagnosis || '',
-                hospital: caseData.hospital || '',
-                referralCenter: caseData.referralCenter || '',
-                specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
-                discussion: caseData.discussion || '',
-                highLevelSummary: caseData.highLevelSummary || '',
-                references: caseData.references || '',
-                mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-              });
             }
-          } else {
-            setFormData({
-              title: caseData.title || '',
-              presentingComplaint: caseData.presentingComplaint || '',
-              history: caseData.history || '',
-              physicalExam: caseData.physicalExam || '',
-              investigations: caseData.investigations || '',
-              management: caseData.management || '',
-              provisionalDiagnosis: caseData.provisionalDiagnosis || '',
-              hospital: caseData.hospital || '',
-              referralCenter: caseData.referralCenter || '',
-              specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
-              discussion: caseData.discussion || '',
-              highLevelSummary: caseData.highLevelSummary || '',
-              references: caseData.references || '',
-              mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-            });
           }
           setIsLoading(false);
         } catch (err) {
@@ -311,23 +282,6 @@ export default function EditCaseForm({ caseId }) {
     if (user && user.uid && caseId) {
       const draftKey = `draft_case_${user.uid}_${caseId}`;
       localStorage.removeItem(draftKey);
-      setFormData({
-        title: '',
-        presentingComplaint: '',
-        history: '',
-        physicalExam: '',
-        investigations: '',
-        management: '',
-        provisionalDiagnosis: '',
-        hospital: '',
-        referralCenter: '',
-        specialty: [],
-        discussion: '',
-        highLevelSummary: '',
-        references: '',
-        mediaUrls: [],
-      });
-      setCurrentStep(0);
       console.log('Draft cleared manually:', { draftKey });
       if (window.gtag) {
         window.gtag('event', 'draft_cleared', {
@@ -335,8 +289,10 @@ export default function EditCaseForm({ caseId }) {
           event_label: 'Draft Cleared Manually',
         });
       }
+      // Reload case data from Firestore
       const fetchCaseData = async () => {
         try {
+          setIsLoading(true);
           const caseData = await getCaseById(caseId);
           if (caseData && caseData.userId === user.uid) {
             setFormData({
@@ -355,10 +311,15 @@ export default function EditCaseForm({ caseId }) {
               references: caseData.references || '',
               mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
             });
+            setCurrentStep(0);
+          } else {
+            setError('Case not found or you do not have permission to edit this case.');
           }
         } catch (err) {
           console.error('Error reloading case data:', err);
           setError('Failed to reload case data: ' + err.message);
+        } finally {
+          setIsLoading(false);
         }
       };
       fetchCaseData();
