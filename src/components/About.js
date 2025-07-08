@@ -1,212 +1,161 @@
 import Head from 'next/head';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Container, Box, Typography } from '@mui/material';
-import { 
-  Target, 
-  Eye, 
-  Stethoscope, 
-  Linkedin, 
-  MessageCircle, 
-  Globe, 
+import { Container } from '@mui/material';
+import {
+  Target,
+  Eye,
+  Stethoscope,
+  Linkedin,
+  MessageCircle,
+  Globe,
   FileText,
-  Phone,
-  Mail,
-  MapPin,
   Users,
-  Heart,
   BookOpen,
-  Award
+  Award,
 } from 'lucide-react';
 import styles from './About.module.css';
 
-const About = () => {
-  // Structured data for MedicalStudy, Person, and Organization
-  const structuredData = [
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      '@context': 'https://schema.org',
-      '@type': 'MedicalStudy',
-      name: 'Uganda Clinical Case Reports',
+      "@type": "MedicalStudy",
+      name: "Uganda Clinical Case Reports",
       description:
-        'UCCR is a collaborative platform for sharing medical case studies, clinical reports, and healthcare research in Uganda, empowering healthcare professionals, medical students, and researchers.',
-      studySubject: 'Clinical Case Reports, Medical Case Studies, Healthcare Collaboration',
+        "UCCR is a collaborative platform for sharing medical case studies, clinical reports, and healthcare research in Uganda, empowering healthcare professionals, medical students, and researchers.",
+      studySubject: "Clinical Case Reports, Medical Case Studies, Healthcare Collaboration",
       studyLocation: {
-        '@type': 'Place',
-        name: 'Uganda',
+        "@type": "Place",
+        name: "Uganda",
         address: {
-          '@type': 'PostalAddress',
-          addressCountry: 'UG',
+          "@type": "PostalAddress",
+          addressCountry: "UG",
         },
       },
       publisher: {
-        '@type': 'Organization',
-        name: 'Uganda Clinical Case Reports',
+        "@type": "Organization",
+        name: "Uganda Clinical Case Reports",
         founder: {
-          '@type': 'Person',
-          name: 'Farouk Jjingo',
-          jobTitle: 'Medical Doctor and Full Stack Developer',
+          "@type": "Person",
+          name: "Farouk Jjingo",
+          jobTitle: "Medical Doctor and Full Stack Developer",
           description:
-            'Farouk Jjingo, a medical doctor and full-stack developer, created UCCR to bridge medical knowledge sharing and healthcare collaboration in Uganda.',
+            "Farouk Jjingo, a medical doctor and full-stack developer, created UCCR to bridge medical knowledge sharing and healthcare collaboration in Uganda.",
         },
       },
       keywords: [
-        'Uganda clinical case reports',
-        'medical case studies Uganda',
-        'healthcare research Uganda',
-        'clinical research platform',
-        'medical collaboration Uganda',
-        'healthcare professionals Uganda',
-        'clinical trials Uganda',
-        'medical education platform',
-        'Uganda medical research',
-        'clinical case archive',
-        'healthcare innovation Uganda',
-        'medical case reports Africa',
-        'clinical data sharing',
-        'Uganda health studies',
-        'medical research East Africa',
-        'healthcare collaboration platform',
-        'clinical case studies Uganda',
-        'medical journals Uganda',
-        'public health Uganda',
-        'healthcare technology Uganda',
-        'medical case study database',
-        'clinical insights Uganda',
-        'health research Africa',
-        'Uganda clinical trials',
-        'medical education Uganda',
-        'healthcare case studies',
-        'Farouk Jjingo medical developer',
-      ],
+        "Uganda clinical case reports",
+        "medical case studies Uganda",
+        "healthcare research Uganda",
+        "clinical research platform",
+        "medical collaboration Uganda",
+        "medical education platform",
+        "Farouk Jjingo medical developer"
+      ]
     },
     {
-      '@context': 'https://schema.org',
-      '@type': 'Person',
-      name: 'Farouk Jjingo',
-      jobTitle: 'Medical Doctor and Full Stack Developer',
+      "@type": "Person",
+      name: "Farouk Jjingo",
+      jobTitle: "Medical Doctor and Full Stack Developer",
       description:
-        'Farouk Jjingo is a medical doctor and full-stack developer specializing in clinical diagnostics and healthcare technology, founder of Uganda Clinical Case Reports.',
+        "Farouk Jjingo is a medical doctor and full-stack developer specializing in clinical diagnostics and healthcare technology.",
       worksFor: {
-        '@type': 'Organization',
-        name: 'Uganda Clinical Case Reports',
+        "@type": "Organization",
+        name: "Uganda Clinical Case Reports"
       },
-      url: 'https://jjingofarouk.xyz',
+      url: "https://jjingofarouk.xyz",
       sameAs: [
-        'https://ug.linkedin.com/in/farouk-jjingo-0341b01a5',
-        'https://wa.me/256751360385',
-      ],
-    },
-  ];
-
-  const contactLinks = [
-    {
-      href: 'https://ug.linkedin.com/in/farouk-jjingo-0341b01a5',
-      Icon: Linkedin,
-      label: 'LinkedIn',
-      value: 'Farouk Jjingo',
-      ariaLabel: 'Farouk Jjingo LinkedIn Profile for Medical and Tech Collaboration',
-      title: 'Connect with Farouk Jjingo on LinkedIn for Healthcare Collaboration'
-    },
-    {
-      href: 'https://wa.me/256751360385',
-      Icon: MessageCircle,
-      label: 'WhatsApp',
-      value: '+256751360385',
-      ariaLabel: 'Contact Farouk Jjingo via WhatsApp for Medical Research',
-      title: 'WhatsApp Farouk Jjingo for Clinical Research Discussions'
-    },
-    {
-      href: 'https://jjingofarouk.xyz',
-      Icon: Globe,
-      label: 'Website',
-      value: 'jjingofarouk.xyz',
-      ariaLabel: 'Farouk Jjingo\'s Website for Healthcare Technology Insights',
-      title: 'Visit Farouk Jjingo\'s Website for Medical and Tech Projects'
-    },
-    {
-      href: '/cases',
-      Icon: FileText,
-      label: 'Case Studies',
-      value: 'Browse Medical Cases',
-      ariaLabel: 'Browse Uganda Medical Case Studies',
-      title: 'Explore Medical Case Studies on UCCR'
+        "https://ug.linkedin.com/in/farouk-jjingo-0341b01a5",
+        "https://wa.me/256751360385"
+      ]
     }
-  ];
+  ]
+};
 
-  const platformFeatures = [
-    {
-      Icon: Stethoscope,
-      title: 'Clinical Excellence',
-      description: 'Advanced diagnostic tools and case management systems'
-    },
-    {
-      Icon: Users,
-      title: 'Collaboration',
-      description: 'Connect with healthcare professionals across Uganda'
-    },
-    {
-      Icon: BookOpen,
-      title: 'Education',
-      description: 'Comprehensive medical education and training resources'
-    },
-    {
-      Icon: Award,
-      title: 'Research',
-      description: 'Cutting-edge medical research and case studies'
-    }
-  ];
+const contactLinks = [
+  {
+    href: 'https://ug.linkedin.com/in/farouk-jjingo-0341b01a5',
+    Icon: Linkedin,
+    label: 'LinkedIn',
+    value: 'Farouk Jjingo',
+  },
+  {
+    href: 'https://wa.me/256751360385',
+    Icon: MessageCircle,
+    label: 'WhatsApp',
+    value: '+256751360385',
+  },
+  {
+    href: 'https://jjingofarouk.xyz',
+    Icon: Globe,
+    label: 'Website',
+    value: 'jjingofarouk.xyz',
+  },
+  {
+    href: '/cases',
+    Icon: FileText,
+    label: 'Case Studies',
+    value: 'Browse Medical Cases',
+  },
+];
 
+const platformFeatures = [
+  {
+    Icon: Stethoscope,
+    title: 'Clinical Excellence',
+    description: 'Advanced diagnostic tools and case management systems',
+  },
+  {
+    Icon: Users,
+    title: 'Collaboration',
+    description: 'Connect with healthcare professionals across Uganda',
+  },
+  {
+    Icon: BookOpen,
+    title: 'Education',
+    description: 'Comprehensive medical education and training resources',
+  },
+  {
+    Icon: Award,
+    title: 'Research',
+    description: 'Cutting-edge medical research and case studies',
+  },
+];
+
+const About = () => {
   return (
     <>
       <Head>
-        <title>
-          About Uganda Clinical Case Reports | Medical Case Studies & Healthcare Collaboration
-        </title>
+        <title>About Uganda Clinical Case Reports | Medical Case Studies & Healthcare Collaboration</title>
         <meta
           name="description"
-          content="Learn about Uganda Clinical Case Reports (UCCR), a platform for medical case studies, clinical research, and healthcare collaboration in Uganda. Founded by Farouk Jjingo, a medical doctor and full-stack developer, UCCR empowers healthcare professionals and students."
+          content="Learn about Uganda Clinical Case Reports (UCCR), a platform for medical case studies, clinical research, and healthcare collaboration in Uganda."
         />
-        <meta
-          name="keywords"
-          content="Uganda clinical case reports, medical case studies Uganda, healthcare research Uganda, clinical research platform, medical collaboration Uganda, healthcare professionals Uganda, clinical trials Uganda, medical education platform, Uganda medical research, clinical case archive, healthcare innovation Uganda, medical case reports Africa, clinical data sharing, Uganda health studies, medical research East Africa, healthcare collaboration platform, clinical case studies Uganda, medical journals Uganda, public health Uganda, healthcare technology Uganda, medical case study database, clinical insights Uganda, health research Africa, Uganda clinical trials, medical education Uganda, healthcare case studies, Farouk Jjingo, medical doctor developer"
-        />
-        <meta name="author" content="Farouk Jjingo, Uganda Clinical Case Reports" />
+        <meta name="author" content="Farouk Jjingo" />
         <meta name="robots" content="index, follow" />
-        <meta
-          property="og:title"
-          content="About Uganda Clinical Case Reports | Medical Case Studies & Healthcare Collaboration"
-        />
-        <meta
-          property="og:description"
-          content="Discover Uganda Clinical Case Reports (UCCR), a platform for sharing medical case studies, clinical research, and healthcare collaboration in Uganda, founded by Farouk Jjingo, a medical doctor and full-stack developer."
-        />
+        <link rel="canonical" href="https://yourwebsite.com/about" />
+
+        {/* OpenGraph */}
+        <meta property="og:title" content="About Uganda Clinical Case Reports" />
+        <meta property="og:description" content="Discover Uganda Clinical Case Reports (UCCR), a platform for medical collaboration and clinical case sharing in Uganda." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://yourwebsite.com/about" />
-        <meta
-          property="og:image"
-          content="https://yourwebsite.com/images/uganda-clinical-case-reports-founder.jpg"
-        />
+        <meta property="og:image" content="https://yourwebsite.com/images/uganda-clinical-case-reports-founder.jpg" />
+
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="About Uganda Clinical Case Reports | Medical Case Studies & Healthcare Collaboration"
+        <meta name="twitter:title" content="About Uganda Clinical Case Reports" />
+        <meta name="twitter:description" content="Explore UCCR, a platform for medical case studies and healthcare collaboration." />
+        <meta name="twitter:image" content="https://yourwebsite.com/images/uganda-clinical-case-reports-founder.jpg" />
+
+        {/* Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <meta
-          name="twitter:description"
-          content="Explore Uganda Clinical Case Reports (UCCR), a platform for medical case studies and healthcare collaboration in Uganda, founded by Farouk Jjingo."
-        />
-        <meta
-          name="twitter:image"
-          content="https://yourwebsite.com/images/uganda-clinical-case-reports-founder.jpg"
-        />
-        <link rel="canonical" href="https://yourwebsite.com/about" />
       </Head>
-      
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
-      
+
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -214,60 +163,39 @@ const About = () => {
       >
         <div className={styles.aboutContainer}>
           <div className={styles.backgroundSurface} />
-          
-          <Container maxWidth="lg">
-            <h1 className={styles.aboutTitle}>
-              About Uganda Clinical Case Reports
-            </h1>
 
+          <Container maxWidth="lg">
+            <h1 className={styles.aboutTitle}>About Uganda Clinical Case Reports</h1>
             <p className={styles.introText}>
-              Uganda Clinical Case Reports (UCCR) is a leading <strong>medical collaboration platform</strong> designed to empower <strong>healthcare professionals</strong>, <strong>medical students</strong>, and <strong>doctors</strong> in Uganda. Share, discuss, and learn from <strong>medical case studies</strong>, <strong>clinical reports</strong>, and <strong>healthcare research</strong> in a secure, structured environment. UCCR promotes <strong>medical education</strong>, <strong>clinical data sharing</strong>, and <strong>healthcare innovation</strong> across <strong>Uganda</strong> and <strong>East Africa</strong>.
+              UCCR empowers healthcare professionals and students in Uganda to share and learn from clinical cases. Built by Farouk Jjingo, UCCR strengthens medical knowledge sharing, education, and innovation.
             </p>
 
+            {/* Mission & Vision Cards */}
             <div className={styles.cardGrid}>
-              <motion.div 
-                whileHover={{ scale: 1.03 }} 
-                transition={{ duration: 0.3 }}
-                className={styles.missionCard}
-              >
-                <div className={styles.cardIconWrapper}>
-                  <Target className={styles.cardIcon} size={32} />
-                </div>
+              <motion.div className={styles.missionCard} whileHover={{ scale: 1.03 }}>
+                <Target size={32} className={styles.cardIcon} />
                 <h2 className={styles.cardTitle}>Our Mission</h2>
                 <p className={styles.cardContent}>
-                  To provide a secure, accessible <strong>clinical research platform</strong> for <strong>healthcare professionals</strong> to share <strong>clinical knowledge</strong>, collaborate on <strong>medical case studies</strong>, and advance <strong>medical education</strong> and <strong>healthcare innovation</strong> in Uganda.
+                  To offer a secure platform for clinical case sharing and foster collaboration among healthcare workers in Uganda.
                 </p>
               </motion.div>
 
-              <motion.div 
-                whileHover={{ scale: 1.03 }} 
-                transition={{ duration: 0.3 }}
-                className={styles.visionCard}
-              >
-                <div className={styles.cardIconWrapper}>
-                  <Eye className={styles.cardIcon} size={32} />
-                </div>
+              <motion.div className={styles.visionCard} whileHover={{ scale: 1.03 }}>
+                <Eye size={32} className={styles.cardIcon} />
                 <h2 className={styles.cardTitle}>Our Vision</h2>
                 <p className={styles.cardContent}>
-                  To bridge the gap in <strong>medical knowledge sharing</strong> by creating a digital <strong>healthcare collaboration platform</strong> where <strong>clinical expertise</strong> and <strong>medical case reports</strong> are accessible to all <strong>healthcare professionals</strong> in <strong>Uganda</strong> and <strong>East Africa</strong>.
+                  To bridge gaps in medical knowledge and foster healthcare collaboration across East Africa.
                 </p>
               </motion.div>
             </div>
 
-            {/* Platform Features Section */}
+            {/* Platform Features */}
             <section className={styles.featuresSection}>
               <h2 className={styles.sectionTitle}>Platform Features</h2>
               <div className={styles.featuresGrid}>
-                {platformFeatures.map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.3 }}
-                    className={styles.featureCard}
-                  >
-                    <div className={styles.featureIconWrapper}>
-                      <feature.Icon className={styles.featureIcon} size={24} />
-                    </div>
+                {platformFeatures.map((feature, i) => (
+                  <motion.div key={i} className={styles.featureCard} whileHover={{ scale: 1.05 }}>
+                    <feature.Icon size={24} className={styles.featureIcon} />
                     <h3 className={styles.featureTitle}>{feature.title}</h3>
                     <p className={styles.featureDescription}>{feature.description}</p>
                   </motion.div>
@@ -275,63 +203,44 @@ const About = () => {
               </div>
             </section>
 
+            {/* Founder Section */}
             <section className={styles.founderSection}>
-              <h2 className={styles.founderTitle}>
-                Meet the Founder: Farouk Jjingo
-              </h2>
+              <h2 className={styles.founderTitle}>Meet the Founder: Farouk Jjingo</h2>
               <p className={styles.founderDescription}>
-                Farouk Jjingo is a visionary <strong>medical doctor</strong> and <strong>full-stack developer</strong> with expertise in <strong>clinical diagnostics</strong>, <strong>healthcare technology</strong>, and <strong>medical research</strong>. He founded UCCR to enhance <strong>medical collaboration</strong>, <strong>clinical case sharing</strong>, and <strong>healthcare education</strong> in Uganda. Combining his skills in <strong>healthcare innovation</strong> and software development, Farouk drives solutions for real-world <strong>healthcare challenges</strong> in <strong>East Africa</strong>.
+                Farouk is a medical doctor and full-stack developer. His vision combines medicine and tech to address real challenges in Uganda’s healthcare system.
               </p>
             </section>
 
+            {/* Contact / Connect Section */}
             <section className={styles.connectSection}>
-              <h2 className={styles.connectTitle}>
-                Connect for Healthcare Collaboration
-              </h2>
-              
+              <h2 className={styles.connectTitle}>Connect for Collaboration</h2>
               <div className={styles.connectContent}>
-                <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
-                  <img
-                    src="/farouk.png"
-                    alt="Farouk Jjingo, Medical Doctor and Full Stack Developer, Founder of Uganda Clinical Case Reports"
-                    loading="lazy"
-                    className={styles.founderImage}
-                  />
-                </motion.div>
-                
-                <div className={styles.connectInfo}>
-                  <p className={styles.connectDescription}>
-                    Farouk Jjingo is available for <strong>healthcare collaboration</strong>, <strong>medical research discussions</strong>, and <strong>clinical platform feedback</strong>. Connect with him to explore <strong>medical case studies</strong>, <strong>healthcare technology</strong>, or <strong>clinical research opportunities</strong>:
-                  </p>
-                  
-                  <div className={styles.contactCard}>
-                    <h3 className={styles.contactCardTitle}>
-                      Get in Touch
-                    </h3>
-                    
-                    <ul className={styles.contactList}>
-                      {contactLinks.map((link, index) => (
-                        <li key={index} className={styles.contactItem}>
-                          <a
-                            href={link.href}
-                            target={link.href.startsWith('http') ? '_blank' : undefined}
-                            rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                            className={styles.contactLink}
-                            aria-label={link.ariaLabel}
-                            title={link.title}
-                          >
-                            <span className={styles.contactIcon}>
-                              <link.Icon size={24} />
-                            </span>
-                            <div className={styles.contactText}>
-                              <span className={styles.contactLabel}>{link.label}</span>
-                              <span className={styles.contactValue}>{link.value}</span>
-                            </div>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <motion.img
+                  src="/farouk.png"
+                  alt="Farouk Jjingo"
+                  className={styles.founderImage}
+                  whileHover={{ scale: 1.03 }}
+                />
+                <div className={styles.contactCard}>
+                  <h3 className={styles.contactCardTitle}>Get in Touch</h3>
+                  <ul className={styles.contactList}>
+                    {contactLinks.map((link, i) => (
+                      <li key={i} className={styles.contactItem}>
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.contactLink}
+                        >
+                          <link.Icon size={24} />
+                          <div className={styles.contactText}>
+                            <span>{link.label}</span>
+                            <span>{link.value}</span>
+                          </div>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </section>
