@@ -23,16 +23,28 @@ export default function AuthPage() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+
     try {
       if (isLogin) {
-        await login(email, password);
-        setLoadStart(Date.now());
-        setForceLoading(true);
+        const result = await login(email, password);
+        if (result.success) {
+          setLoadStart(Date.now());
+          setForceLoading(true);
+        } else {
+          setError(result.error);
+          setIsLoading(false);
+        }
       } else {
-        await signup(email, password, name);
-        router.push('/profile/edit');
+        const result = await signup(email, password, name);
+        if (result.success) {
+          router.push('/profile/edit');
+        } else {
+          setError(result.error);
+          setIsLoading(false);
+        }
       }
     } catch (err) {
+      // Fallback for any unexpected errors
       console.error(`${isLogin ? 'Login' : 'Signup'} error:`, err);
       setError(err.message || `Failed to ${isLogin ? 'log in' : 'sign up'}. Please try again.`);
       setIsLoading(false);
@@ -43,6 +55,7 @@ export default function AuthPage() {
     if (forceLoading && loadStart) {
       const elapsed = Date.now() - loadStart;
       const remaining = LOGIN_LOADING_DURATION - elapsed;
+      
       if (remaining <= 0) {
         setForceLoading(false);
         setIsLoading(false);
@@ -66,6 +79,14 @@ export default function AuthPage() {
     setName('');
   };
 
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+    // Clear error when user starts typing
+    if (error) {
+      setError('');
+    }
+  };
+
   if (isLoading) {
     return <Loading />;
   }
@@ -84,6 +105,7 @@ export default function AuthPage() {
               : 'Sign up to share and explore medical case studies'}
           </p>
         </div>
+
         <form onSubmit={handleSubmit} className={styles.form}>
           {!isLogin && (
             <div className={styles.inputWrapper}>
@@ -92,38 +114,49 @@ export default function AuthPage() {
                 type="text"
                 placeholder="Full Name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={handleInputChange(setName)}
                 required={!isLogin}
                 aria-label="Full Name"
                 className={styles.input}
+                disabled={isLoading}
               />
             </div>
           )}
+
           <div className={styles.inputWrapper}>
             <Mail className={styles.inputIcon} size={20} />
             <input
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleInputChange(setEmail)}
               required
               aria-label="Email"
               className={styles.input}
+              disabled={isLoading}
             />
           </div>
+
           <div className={styles.inputWrapper}>
             <Lock className={styles.inputIcon} size={20} />
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handleInputChange(setPassword)}
               required
               aria-label="Password"
               className={styles.input}
+              disabled={isLoading}
+              minLength={6}
             />
           </div>
-          <button type="submit" className={styles.submitButton}>
+
+          <button 
+            type="submit" 
+            className={styles.submitButton}
+            disabled={isLoading}
+          >
             {isLogin ? (
               <>
                 <LogIn size={20} className={styles.buttonIcon} />
@@ -136,22 +169,34 @@ export default function AuthPage() {
               </>
             )}
           </button>
+
           {error && (
-            <div className={styles.error}>
+            <div className={styles.error} role="alert">
               <AlertCircle size={16} />
               <span>{error}</span>
             </div>
           )}
         </form>
-        <p className={styles.toggleText}>
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <button type="button" onClick={toggleMode} className={styles.toggleButton}>
-            {isLogin ? 'Sign Up' : 'Log In'}
-          </button>
-        </p>
-        <Link href="/forgot-password" className={styles.forgotPassword}>
-          Forgot Password?
-        </Link>
+
+        <div className={styles.footer}>
+          <p className={styles.toggleText}>
+            {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
+            <button 
+              type="button" 
+              onClick={toggleMode} 
+              className={styles.toggleButton}
+              disabled={isLoading}
+            >
+              {isLogin ? 'Sign Up' : 'Log In'}
+            </button>
+          </p>
+
+          {isLogin && (
+            <Link href="/forgot-password" className={styles.forgotPassword}>
+              Forgot Password?
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
