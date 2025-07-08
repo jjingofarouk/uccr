@@ -9,7 +9,7 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
 import Link from '@tiptap/extension-link';
-import LineHeight from '@tiptap/extension-line-height';
+import LineHeight from 'tiptap-extension-line-height';
 
 const TiptapEditor = dynamic(() => Promise.resolve(EditorContent), { ssr: false });
 
@@ -126,10 +126,7 @@ export default function StepContent({
       Link.configure({
         openOnClick: false,
       }),
-      LineHeight.configure({
-        types: ['paragraph', 'heading'],
-        lineHeights: ['1', '1.15', '1.5', '1.75', '2'],
-      }),
+      LineHeight,
     ],
     content: formData[step.name],
     onUpdate: ({ editor }) => handleChange(editor.getHTML(), step.name),
@@ -236,7 +233,7 @@ export default function StepContent({
                               aria-label="Delete media"
                             >
                               <svg
-                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns="http://www.w3.org/200观念/svg"
                                 width="16"
                                 height="16"
                                 viewBox="0 0 24 24"
