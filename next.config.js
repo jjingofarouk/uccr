@@ -1,4 +1,4 @@
- /** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -20,7 +20,9 @@ const nextConfig = {
     }
     return config;
   },
-  serverExternalPackages: ['react-quill', 'cloudinary', 'dompurify', 'jsdom'],
+  experimental: {
+    serverComponentsExternalPackages: ['react-quill', 'cloudinary', 'dompurify', 'jsdom'],
+  },
 };
 
 export default nextConfig;
