@@ -1,5 +1,3 @@
-// components/StepContent.jsx
-
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import styles from '../../styles/caseForm.module.css';
@@ -10,7 +8,6 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
 import Link from '@tiptap/extension-link';
-import LineHeight from 'tiptap-extension-line-height';
 
 const TiptapEditor = dynamic(() => Promise.resolve(EditorContent), { ssr: false });
 
@@ -38,22 +35,9 @@ const TiptapToolbar = ({ editor }) => {
 
       <button onClick={() => editor.chain().focus().toggleBold().run()} className={editor.isActive('bold') ? styles.active : ''}>Bold</button>
       <button onClick={() => editor.chain().focus().toggleItalic().run()} className={editor.isActive('italic') ? styles.active : ''}>Italic</button>
-      <button onClick={() => editor.chain().focus().toggleUnderline().run()} className={editor.isActive('underline') ? styles.active : ''}>Underline</button>
       <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={editor.isActive('orderedList') ? styles.active : ''}>Ordered List</button>
       <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={editor.isActive('bulletList') ? styles.active : ''}>Bullet List</button>
       <button onClick={() => editor.chain().focus().setLink({ href: prompt('Enter URL') || '' }).run()} className={editor.isActive('link') ? styles.active : ''}>Link</button>
-
-      <select
-        onChange={(e) => editor.chain().focus().setLineHeight(e.target.value).run()}
-        value={editor.getAttributes('lineHeight')?.lineHeight || '1'}
-      >
-        <option value="1">1</option>
-        <option value="1.15">1.15</option>
-        <option value="1.25">1.25</option>
-        <option value="1.5">1.5</option>
-        <option value="1.75">1.75</option>
-        <option value="2">2</option>
-      </select>
 
       <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>Insert Table</button>
       <button onClick={() => editor.chain().focus().addRowAfter().run()} disabled={!editor.can().addRowAfter()}>Add Row</button>
@@ -84,7 +68,6 @@ export default function StepContent({
       TableHeader,
       TableCell,
       Link.configure({ openOnClick: false }),
-      LineHeight.configure({ types: ['paragraph', 'heading'] }),
     ],
     content: formData[step.name],
     onUpdate: ({ editor }) => handleChange(editor.getHTML(), step.name),
