@@ -31,12 +31,14 @@ export default function EditCaseForm({ caseId }) {
     references: '',
     mediaUrls: [],
   });
+  const [originalFormData, setOriginalFormData] = useState(null); // Store original case data
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [loadStart, setLoadStart] = useState(null);
   const [forceLoading, setForceLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false); // Track if user made changes
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const formContainerRef = useRef();
@@ -86,6 +88,7 @@ export default function EditCaseForm({ caseId }) {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
+  // Fetch case data on mount
   useEffect(() => {
     const fetchCaseData = async () => {
       if (caseId && user && user.uid) {
@@ -101,7 +104,7 @@ export default function EditCaseForm({ caseId }) {
             setIsLoading(false);
             return;
           }
-          const initialFormData = {
+          const caseFormData = {
             title: caseData.title || '',
             presentingComplaint: caseData.presentingComplaint || '',
             history: caseData.history || '',
@@ -117,9 +120,10 @@ export default function EditCaseForm({ caseId }) {
             references: caseData.references || '',
             mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
           };
-          setFormData(initialFormData);
+          setFormData(caseFormData);
+          setOriginalFormData(caseFormData); // Store original data for comparison
 
-          // Check for draft after setting case data
+          // Check for draft and prompt user
           const draftKey = `draft_case_${user.uid}_${caseId}`;
           const savedDraft = localStorage.getItem(draftKey);
           if (savedDraft) {
@@ -128,15 +132,22 @@ export default function EditCaseForm({ caseId }) {
               const draftAge = Date.now() - draftTimestamp;
               const maxDraftAge = 7 * 24 * 60 * 60 * 1000; // 7 days
               if (draftAge < maxDraftAge) {
-                setFormData(savedFormData);
-                setCurrentStep(savedStep || 0);
-                console.log('Loaded draft from localStorage:', { draftKey, title: savedFormData.title, draftAge });
+                const loadDraft = confirm('A draft exists for this case. Would you like to load it instead of the saved case data?');
+                if (loadDraft) {
+                  setFormData(savedFormData);
+                  setCurrentStep(savedStep || 0);
+                  console.log('Loaded draft from localStorage:', { draftKey, title: savedFormData.title, draftAge });
+                } else {
+                  localStorage.removeItem(draftKey);
+                  console.log('Draft discarded, using case data:', { draftKey });
+                }
               } else {
                 localStorage.removeItem(draftKey);
                 console.log('Cleared expired draft from localStorage:', { draftKey });
               }
             } catch (err) {
               console.error('Error loading draft:', err);
+              localStorage.removeItem(draftKey);
             }
           }
           setIsLoading(false);
@@ -150,8 +161,9 @@ export default function EditCaseForm({ caseId }) {
     fetchCaseData();
   }, [caseId, user]);
 
+  // Save draft only when changes are made
   useEffect(() => {
-    if (user && user.uid && caseId) {
+    if (user && user.uid && caseId && hasChanges) {
       const draftKey = `draft_case_${user.uid}_${caseId}`;
       localStorage.setItem(draftKey, JSON.stringify({ 
         formData, 
@@ -160,8 +172,9 @@ export default function EditCaseForm({ caseId }) {
       }));
       console.log('Saved draft to localStorage:', { draftKey, title: formData.title, currentStep });
     }
-  }, [formData, currentStep, user, caseId]);
+  }, [formData, currentStep, user, caseId, hasChanges]);
 
+  // Cloudinary widget setup
   useEffect(() => {
     if (typeof window !== 'undefined' && user && user.uid) {
       const script = document.createElement('script');
@@ -200,6 +213,7 @@ export default function EditCaseForm({ caseId }) {
                   ...prev,
                   mediaUrls: [...prev.mediaUrls, result.info.secure_url],
                 }));
+                setHasChanges(true); // Mark changes when media is uploaded
                 setIsUploading(false);
                 if (window.gtag) {
                   window.gtag('event', 'media_upload_success', {
@@ -231,6 +245,7 @@ export default function EditCaseForm({ caseId }) {
     }
   }, [user]);
 
+  // Track page view
   useEffect(() => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'page_view', {
@@ -242,6 +257,7 @@ export default function EditCaseForm({ caseId }) {
   }, [router.asPath]);
 
   const handleChange = (value, name) => {
+    setHasChanges(true); // Mark changes when form is edited
     if (name === 'specialty') {
       const selectedOptions = Array.from(value.target.selectedOptions).map((option) => option.value);
       setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
@@ -264,6 +280,7 @@ export default function EditCaseForm({ caseId }) {
   };
 
   const handleDeleteMedia = (index) => {
+    setHasChanges(true); // Mark changes when media is deleted
     const deletedUrl = formData.mediaUrls[index];
     setFormData((prev) => ({
       ...prev,
@@ -289,40 +306,50 @@ export default function EditCaseForm({ caseId }) {
           event_label: 'Draft Cleared Manually',
         });
       }
-      // Reload case data from Firestore
-      const fetchCaseData = async () => {
-        try {
-          setIsLoading(true);
-          const caseData = await getCaseById(caseId);
-          if (caseData && caseData.userId === user.uid) {
-            setFormData({
-              title: caseData.title || '',
-              presentingComplaint: caseData.presentingComplaint || '',
-              history: caseData.history || '',
-              physicalExam: caseData.physicalExam || '',
-              investigations: caseData.investigations || '',
-              management: caseData.management || '',
-              provisionalDiagnosis: caseData.provisionalDiagnosis || '',
-              hospital: caseData.hospital || '',
-              referralCenter: caseData.referralCenter || '',
-              specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
-              discussion: caseData.discussion || '',
-              highLevelSummary: caseData.highLevelSummary || '',
-              references: caseData.references || '',
-              mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-            });
-            setCurrentStep(0);
-          } else {
-            setError('Case not found or you do not have permission to edit this case.');
+      // Reset to original case data
+      if (originalFormData) {
+        setFormData(originalFormData);
+        setCurrentStep(0);
+        setHasChanges(false);
+      } else {
+        // Fallback to fetching case data
+        const fetchCaseData = async () => {
+          try {
+            setIsLoading(true);
+            const caseData = await getCaseById(caseId);
+            if (caseData && caseData.userId === user.uid) {
+              const caseFormData = {
+                title: caseData.title || '',
+                presentingComplaint: caseData.presentingComplaint || '',
+                history: caseData.history || '',
+                physicalExam: caseData.physicalExam || '',
+                investigations: caseData.investigations || '',
+                management: caseData.management || '',
+                provisionalDiagnosis: caseData.provisionalDiagnosis || '',
+                hospital: caseData.hospital || '',
+                referralCenter: caseData.referralCenter || '',
+                specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
+                discussion: caseData.discussion || '',
+                highLevelSummary: caseData.highLevelSummary || '',
+                references: caseData.references || '',
+                mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+              };
+              setFormData(caseFormData);
+              setOriginalFormData(caseFormData);
+              setCurrentStep(0);
+              setHasChanges(false);
+            } else {
+              setError('Case not found or you do not have permission to edit this case.');
+            }
+          } catch (err) {
+            console.error('Error reloading case data:', err);
+            setError('Failed to reload case data: ' + err.message);
+          } finally {
+            setIsLoading(false);
           }
-        } catch (err) {
-          console.error('Error reloading case data:', err);
-          setError('Failed to reload case data: ' + err.message);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchCaseData();
+        };
+        fetchCaseData();
+      }
     }
   };
 
