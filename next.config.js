@@ -20,9 +20,7 @@ const nextConfig = {
     }
     return config;
   },
-  experimental: {
-    serverComponentsExternalPackages: ['react-quill', 'cloudinary', 'dompurify', 'jsdom'],
-  },
+  serverExternalPackages: ['react-quill', 'cloudinary', 'dompurify', 'jsdom'],
 };
 
 export default nextConfig;
