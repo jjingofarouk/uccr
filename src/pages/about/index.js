@@ -1,7 +1,6 @@
-import About from '../../components/About';
-
+// app/about/page.tsx or pages/about.tsx (depending on your structure)
 const AboutPage = () => {
-  return <About />;
+  return <h1>Hi — testing route!</h1>;
 };
 
 export default AboutPage;
