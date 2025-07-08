@@ -1,4 +1,3 @@
-// src/components/Case/EditCaseForm.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -11,6 +10,7 @@ import StepContent from './StepContent';
 import Navigation from './EditNavigation';
 import ErrorMessage from './ErrorMessage';
 import Loading from '../Loading';
+import { auth } from '../../firebase/config';
 
 export default function EditCaseForm({ caseId }) {
   const { user, loading: authLoading, error: authError } = useAuth();
@@ -56,89 +56,33 @@ export default function EditCaseForm({ caseId }) {
       { value: 'Adolescent Medicine', label: 'Adolescent Medicine' },
       { value: 'Allergy and Immunology', label: 'Allergy and Immunology' },
       { value: 'Anesthesiology', label: 'Anesthesiology' },
-      { value: 'Aviation Medicine', label: 'Aviation Medicine' },
-      { value: 'Bacteriology', label: 'Bacteriology' },
-      { value: 'Biomedical Engineering', label: 'Biomedical Engineering' },
-      { value: 'Biostatistics', label: 'Biostatistics' },
       { value: 'Cardiology', label: 'Cardiology' },
-      { value: 'Cardiothoracic Surgery', label: 'Cardiothoracic Surgery' },
-      { value: 'Chemical Pathology', label: 'Chemical Pathology' },
-      { value: 'Child and Adolescent Psychiatry', label: 'Child and Adolescent Psychiatry' },
-      { value: 'Clinical Chemistry', label: 'Clinical Chemistry' },
-      { value: 'Clinical Epidemiology', label: 'Clinical Epidemiology' },
-      { value: 'Clinical Pharmacology', label: 'Clinical Pharmacology' },
-      { value: 'Clinical Psychology', label: 'Clinical Psychology' },
-      { value: 'Clinical Trials', label: 'Clinical Trials' },
-      { value: 'Community Medicine', label: 'Community Medicine' },
-      { value: 'Cytopathology', label: 'Cytopathology' },
       { value: 'Dermatology', label: 'Dermatology' },
-      { value: 'Developmental Pediatrics', label: 'Developmental Pediatrics' },
-      { value: 'Disaster Medicine', label: 'Disaster Medicine' },
-      { value: 'Ear, Nose and Throat (ENT)', label: 'Ear, Nose and Throat (ENT)' },
       { value: 'Emergency Medicine', label: 'Emergency Medicine' },
       { value: 'Endocrinology', label: 'Endocrinology' },
-      { value: 'Epidemiology', label: 'Epidemiology' },
-      { value: 'Family Medicine', label: 'Family Medicine' },
-      { value: 'Forensic Medicine', label: 'Forensic Medicine' },
       { value: 'Gastroenterology', label: 'Gastroenterology' },
-      { value: 'General Practice', label: 'General Practice' },
-      { value: 'Genitourinary Medicine', label: 'Genitourinary Medicine' },
-      { value: 'Geriatrics', label: 'Geriatrics' },
-      { value: 'Health Economics', label: 'Health Economics' },
-      { value: 'Health Informatics', label: 'Health Informatics' },
-      { value: 'Health Policy and Management', label: 'Health Policy and Management' },
+      { value: 'General Surgery', label: 'General Surgery' },
       { value: 'Hematology', label: 'Hematology' },
-      { value: 'Histopathology', label: 'Histopathology' },
-      { value: 'Hyperbaric Medicine', label: 'Hyperbaric Medicine' },
-      { value: 'Immunopathology', label: 'Immunopathology' },
-      { value: 'Infectious Diseases', label: 'Infectious Diseases' },
+      { value: 'Infectious Disease', label: 'Infectious Disease' },
       { value: 'Internal Medicine', label: 'Internal Medicine' },
-      { value: 'Marine Medicine', label: 'Marine Medicine' },
-      { value: 'Maxillofacial Surgery', label: 'Maxillofacial Surgery' },
-      { value: 'Medical Administration', label: 'Medical Administration' },
-      { value: 'Medical Anthropology', label: 'Medical Anthropology' },
-      { value: 'Medical Education', label: 'Medical Education' },
-      { value: 'Medical Ethics', label: 'Medical Ethics' },
-      { value: 'Medical Genetics', label: 'Medical Genetics' },
-      { value: 'Medical Imaging', label: 'Medical Imaging' },
-      { value: 'Medical Microbiology', label: 'Medical Microbiology' },
-      { value: 'Medical Oncology', label: 'Medical Oncology' },
-      { value: 'Medical Toxicology', label: 'Medical Toxicology' },
-      { value: 'Neonatology', label: 'Neonatology' },
       { value: 'Nephrology', label: 'Nephrology' },
       { value: 'Neurology', label: 'Neurology' },
-      { value: 'Neurosurgery', label: 'Neurosurgery' },
-      { value: 'Nuclear Medicine', label: 'Nuclear Medicine' },
       { value: 'Obstetrics and Gynecology', label: 'Obstetrics and Gynecology' },
-      { value: 'Occupational Medicine', label: 'Occupational Medicine' },
+      { value: 'Oncology', label: 'Oncology' },
       { value: 'Ophthalmology', label: 'Ophthalmology' },
       { value: 'Orthopedic Surgery', label: 'Orthopedic Surgery' },
-      { value: 'Pain Medicine', label: 'Pain Medicine' },
-      { value: 'Palliative Care', label: 'Palliative Care' },
-      { value: 'Parasitology', label: 'Parasitology' },
-      { value: 'Pathology', label: 'Pathology' },
+      { value: 'Otolaryngology', label: 'Otolaryngology' },
       { value: 'Pediatrics', label: 'Pediatrics' },
-      { value: 'Plastic Surgery', label: 'Plastic Surgery' },
       { value: 'Psychiatry', label: 'Psychiatry' },
-      { value: 'Public Health', label: 'Public Health' },
       { value: 'Pulmonology', label: 'Pulmonology' },
-      { value: 'Radiation Oncology', label: 'Radiation Oncology' },
       { value: 'Radiology', label: 'Radiology' },
-      { value: 'Rehabilitation Medicine', label: 'Rehabilitation Medicine' },
       { value: 'Rheumatology', label: 'Rheumatology' },
-      { value: 'Sleep Medicine', label: 'Sleep Medicine' },
-      { value: 'Sports Medicine', label: 'Sports Medicine' },
-      { value: 'Surgery', label: 'Surgery' },
-      { value: 'Telemedicine', label: 'Telemedicine' },
-      { value: 'Tropical Medicine', label: 'Tropical Medicine' },
       { value: 'Urology', label: 'Urology' },
-      { value: 'Vascular Surgery', label: 'Vascular Surgery' },
-      { value: 'Virology', label: 'Virology' },
     ]},
     { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
     { name: 'highLevelSummary', label: 'Case Summary', type: 'richtext', placeholder: 'Summarize the case' },
     { name: 'references', label: 'References', type: 'richtext', placeholder: 'List references' },
-    { name: 'mediaUrls', label: 'Upload Media', type: 'media', placeholder: 'Upload media' },
+    { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
   useEffect(() => {
@@ -156,24 +100,77 @@ export default function EditCaseForm({ caseId }) {
             setIsLoading(false);
             return;
           }
-          setFormData({
-            title: caseData.title || '',
-            presentingComplaint: caseData.presentingComplaint || '',
-            history: caseData.history || '',
-            physicalExam: caseData.physicalExam || '',
-            investigations: caseData.investigations || '',
-            management: caseData.management || '',
-            provisionalDiagnosis: caseData.provisionalDiagnosis || '',
-            hospital: caseData.hospital || '',
-            referralCenter: caseData.referralCenter || '',
-            specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
-            discussion: caseData.discussion || '',
-            highLevelSummary: caseData.highLevelSummary || '',
-            references: caseData.references || '',
-            mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
-          });
+          const draftKey = `draft_case_${user.uid}_${caseId}`;
+          const savedDraft = localStorage.getItem(draftKey);
+          if (savedDraft) {
+            try {
+              const { formData: savedFormData, currentStep: savedStep, draftTimestamp } = JSON.parse(savedDraft);
+              const draftAge = Date.now() - draftTimestamp;
+              const maxDraftAge = 7 * 24 * 60 * 60 * 1000;
+              if (draftAge < maxDraftAge) {
+                setFormData(savedFormData);
+                setCurrentStep(savedStep || 0);
+                console.log('Loaded draft from localStorage:', { draftKey, title: savedFormData.title, draftAge });
+              } else {
+                localStorage.removeItem(draftKey);
+                console.log('Cleared expired draft from localStorage:', { draftKey });
+                setFormData({
+                  title: caseData.title || '',
+                  presentingComplaint: caseData.presentingComplaint || '',
+                  history: caseData.history || '',
+                  physicalExam: caseData.physicalExam || '',
+                  investigations: caseData.investigations || '',
+                  management: caseData.management || '',
+                  provisionalDiagnosis: caseData.provisionalDiagnosis || '',
+                  hospital: caseData.hospital || '',
+                  referralCenter: caseData.referralCenter || '',
+                  specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
+                  discussion: caseData.discussion || '',
+                  highLevelSummary: caseData.highLevelSummary || '',
+                  references: caseData.references || '',
+                  mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+                });
+              }
+            } catch (err) {
+              console.error('Error loading draft:', err);
+              setFormData({
+                title: caseData.title || '',
+                presentingComplaint: caseData.presentingComplaint || '',
+                history: caseData.history || '',
+                physicalExam: caseData.physicalExam || '',
+                investigations: caseData.investigations || '',
+                management: caseData.management || '',
+                provisionalDiagnosis: caseData.provisionalDiagnosis || '',
+                hospital: caseData.hospital || '',
+                referralCenter: caseData.referralCenter || '',
+                specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
+                discussion: caseData.discussion || '',
+                highLevelSummary: caseData.highLevelSummary || '',
+                references: caseData.references || '',
+                mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+              });
+            }
+          } else {
+            setFormData({
+              title: caseData.title || '',
+              presentingComplaint: caseData.presentingComplaint || '',
+              history: caseData.history || '',
+              physicalExam: caseData.physicalExam || '',
+              investigations: caseData.investigations || '',
+              management: caseData.management || '',
+              provisionalDiagnosis: caseData.provisionalDiagnosis || '',
+              hospital: caseData.hospital || '',
+              referralCenter: caseData.referralCenter || '',
+              specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
+              discussion: caseData.discussion || '',
+              highLevelSummary: caseData.highLevelSummary || '',
+              references: caseData.references || '',
+              mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+            });
+          }
           setIsLoading(false);
         } catch (err) {
+          console.error('Fetch case error:', { message: err.message, code: err.code });
           setError(`Failed to load case data: ${err.message}`);
           setIsLoading(false);
         }
@@ -181,6 +178,18 @@ export default function EditCaseForm({ caseId }) {
     };
     fetchCaseData();
   }, [caseId, user]);
+
+  useEffect(() => {
+    if (user && user.uid && caseId) {
+      const draftKey = `draft_case_${user.uid}_${caseId}`;
+      localStorage.setItem(draftKey, JSON.stringify({ 
+        formData, 
+        currentStep, 
+        draftTimestamp: Date.now() 
+      }));
+      console.log('Saved draft to localStorage:', { draftKey, title: formData.title, currentStep });
+    }
+  }, [formData, currentStep, user, caseId]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && user && user.uid) {
@@ -243,7 +252,6 @@ export default function EditCaseForm({ caseId }) {
           );
         }
       };
-
       return () => {
         if (script.parentNode) {
           script.parentNode.removeChild(script);
@@ -251,6 +259,16 @@ export default function EditCaseForm({ caseId }) {
       };
     }
   }, [user]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_title: 'Edit Case Form',
+        page_location: window.location.href,
+        page_path: router.asPath,
+      });
+    }
+  }, [router.asPath]);
 
   const handleChange = (value, name) => {
     if (name === 'specialty') {
@@ -286,6 +304,64 @@ export default function EditCaseForm({ caseId }) {
         event_label: 'Media Deleted',
         value: deletedUrl,
       });
+    }
+  };
+
+  const clearDraft = () => {
+    if (user && user.uid && caseId) {
+      const draftKey = `draft_case_${user.uid}_${caseId}`;
+      localStorage.removeItem(draftKey);
+      setFormData({
+        title: '',
+        presentingComplaint: '',
+        history: '',
+        physicalExam: '',
+        investigations: '',
+        management: '',
+        provisionalDiagnosis: '',
+        hospital: '',
+        referralCenter: '',
+        specialty: [],
+        discussion: '',
+        highLevelSummary: '',
+        references: '',
+        mediaUrls: [],
+      });
+      setCurrentStep(0);
+      console.log('Draft cleared manually:', { draftKey });
+      if (window.gtag) {
+        window.gtag('event', 'draft_cleared', {
+          event_category: 'EditCaseForm',
+          event_label: 'Draft Cleared Manually',
+        });
+      }
+      const fetchCaseData = async () => {
+        try {
+          const caseData = await getCaseById(caseId);
+          if (caseData && caseData.userId === user.uid) {
+            setFormData({
+              title: caseData.title || '',
+              presentingComplaint: caseData.presentingComplaint || '',
+              history: caseData.history || '',
+              physicalExam: caseData.physicalExam || '',
+              investigations: caseData.investigations || '',
+              management: caseData.management || '',
+              provisionalDiagnosis: caseData.provisionalDiagnosis || '',
+              hospital: caseData.hospital || '',
+              referralCenter: caseData.referralCenter || '',
+              specialty: Array.isArray(caseData.specialty) ? caseData.specialty : [],
+              discussion: caseData.discussion || '',
+              highLevelSummary: caseData.highLevelSummary || '',
+              references: caseData.references || '',
+              mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+            });
+          }
+        } catch (err) {
+          console.error('Error reloading case data:', err);
+          setError('Failed to reload case data: ' + err.message);
+        }
+      };
+      fetchCaseData();
     }
   };
 
@@ -381,6 +457,7 @@ export default function EditCaseForm({ caseId }) {
     }
     setError('');
     setIsLoading(true);
+    console.log('Updating case with ID:', caseId, 'data:', { userId: user.uid, title: formData.title });
     if (window.gtag) {
       window.gtag('event', 'submission_started', {
         event_category: 'EditCaseForm',
@@ -388,6 +465,8 @@ export default function EditCaseForm({ caseId }) {
       });
     }
     try {
+      await auth.currentUser.getIdToken(true);
+      console.log('Authentication token refreshed for user:', user.uid);
       const caseData = {
         ...formData,
         userId: user.uid,
@@ -396,6 +475,9 @@ export default function EditCaseForm({ caseId }) {
         thumbnailUrl: formData.mediaUrls[0] || '',
       };
       await updateCase(caseId, caseData);
+      console.log('Case update successful, ID:', caseId);
+      localStorage.removeItem(`draft_case_${user.uid}_${caseId}`);
+      console.log('Draft cleared from localStorage');
       setLoadStart(Date.now());
       setForceLoading(true);
       if (window.gtag) {
@@ -406,14 +488,58 @@ export default function EditCaseForm({ caseId }) {
         });
       }
     } catch (err) {
-      setError('Failed to update case: ' + (err.message.includes('permission-denied') ? 'Insufficient permissions.' : err.message));
-      setIsLoading(false);
-      if (window.gtag) {
-        window.gtag('event', 'submission_failed', {
-          event_category: 'EditCaseForm',
-          event_label: 'Submission Failed: Error',
-          value: err.message,
-        });
+      console.error('Update error:', { message: err.message, code: err.code });
+      if (err.code === 'permission-denied') {
+        console.log('Permission-denied error detected, verifying case update...');
+        setTimeout(async () => {
+          try {
+            const updatedCase = await getCaseById(caseId);
+            if (updatedCase && updatedCase.title === formData.title && updatedCase.userId === user.uid) {
+              console.log('Case updated after verification, clearing draft');
+              localStorage.removeItem(`draft_case_${user.uid}_${caseId}`);
+              setLoadStart(Date.now());
+              setForceLoading(true);
+              if (window.gtag) {
+                window.gtag('event', 'submission_success', {
+                  event_category: 'EditCaseForm',
+                  event_label: 'Case Update Successful (Delayed)',
+                });
+              }
+            } else {
+              console.log('Case not updated after verification');
+              setError('Failed to update case: Insufficient permissions.');
+              setIsLoading(false);
+              if (window.gtag) {
+                window.gtag('event', 'submission_failed', {
+                  event_category: 'EditCaseForm',
+                  event_label: 'Submission Failed: Permissions',
+                  value: err.message,
+                });
+              }
+            }
+          } catch (checkErr) {
+            console.error('Verification error:', { message: checkErr.message, code: checkErr.code });
+            setError('Failed to verify case update: ' + checkErr.message);
+            setIsLoading(false);
+            if (window.gtag) {
+              window.gtag('event', 'submission_failed', {
+                event_category: 'EditCaseForm',
+                event_label: 'Submission Failed: Verification Error',
+                value: checkErr.message,
+              });
+            }
+          }
+        }, 1500);
+      } else {
+        setError('Failed to update case: ' + err.message);
+        setIsLoading(false);
+        if (window.gtag) {
+          window.gtag('event', 'submission_failed', {
+            event_category: 'EditCaseForm',
+            event_label: 'Submission Failed: Error',
+            value: err.message,
+          });
+        }
       }
     }
   };
@@ -423,11 +549,13 @@ export default function EditCaseForm({ caseId }) {
       const elapsed = Date.now() - loadStart;
       const remaining = SUBMISSION_LOADING_DURATION - elapsed;
       if (remaining <= 0) {
+        console.log('Navigation triggered after update');
         setForceLoading(false);
         setIsLoading(false);
         router.push('/cases');
       } else {
         const timer = setTimeout(() => {
+          console.log('Navigation triggered after timeout');
           setForceLoading(false);
           setIsLoading(false);
           router.push('/cases');
@@ -438,8 +566,25 @@ export default function EditCaseForm({ caseId }) {
   }, [forceLoading, loadStart, router]);
 
   if (authLoading || isLoading) return <Loading />;
-  if (authError) return <div>Error: {authError}</div>;
-  if (!user) return <div>Please log in to edit a case.</div>;
+  if (authError) {
+    if (window.gtag) {
+      window.gtag('event', 'auth_error', {
+        event_category: 'EditCaseForm',
+        event_label: 'Authentication Error',
+        value: authError,
+      });
+    }
+    return <div>Error: {authError}</div>;
+  }
+  if (!user) {
+    if (window.gtag) {
+      window.gtag('event', 'auth_error', {
+        event_category: 'EditCaseForm',
+        event_label: 'User Not Logged In',
+      });
+    }
+    return <div>Please log in to edit a case.</div>;
+  }
 
   return (
     <div className={styles.caseFormWrapper}>
@@ -455,6 +600,7 @@ export default function EditCaseForm({ caseId }) {
             handleDeleteMedia={handleDeleteMedia}
             widgetRef={widgetRef}
             isUploading={isUploading}
+            isEditMode={true}
           />
           <Navigation
             currentStep={currentStep}
@@ -465,6 +611,13 @@ export default function EditCaseForm({ caseId }) {
             prevStep={prevStep}
             submitText="Update Case"
           />
+          <button
+            type="button"
+            onClick={clearDraft}
+            className={styles.clearDraftButton}
+          >
+            Clear Draft
+          </button>
           <ErrorMessage error={error} />
         </form>
       </div>
