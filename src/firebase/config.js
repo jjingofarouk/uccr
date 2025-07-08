@@ -31,4 +31,3 @@ enableIndexedDbPersistence(db)
 
 console.log('Firebase: Initialized', { auth: !!auth, db: !!db });
 
-
