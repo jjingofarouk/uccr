@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic';
 
 // Dynamically import the AuthPage component with SSR disabled
-const AuthPage = dynamic(() => import('../components/AuthPage'), {
+const AuthPage = dynamic(() => import('../components/auth'), {
   ssr: false,
   loading: () => <div>Loading...</div>
 });
