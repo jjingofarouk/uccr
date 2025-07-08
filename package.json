@@ -2,6 +2,7 @@
   "name": "uccr",
   "version": "0.2.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -42,11 +43,10 @@
     "recharts": "^2.12.7",
     "rss-parser": "^3.13.0",
     "sanitize-html": "^2.13.1",
-    "tiptap-extension-line-height": "^1.0.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.3"
+    "eslint-config-next": "^15.3.3"
   }
 }
