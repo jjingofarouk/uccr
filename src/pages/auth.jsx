@@ -1,3 +1,4 @@
+'use client';
 // src/pages/auth.jsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
