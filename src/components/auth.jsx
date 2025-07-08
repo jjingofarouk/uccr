@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { login, signup } from '../firebase/auth';
 import { Stethoscope, Mail, Lock, User, AlertCircle, LogIn } from 'lucide-react';
-import Loading from '../components/Loading';
-import styles from './AuthPage.module.css';
+import Loading from './Loading';
+import styles from '../pages/AuthPage.module.css';
 import Link from 'next/link';
 
 export default function AuthPage() {
