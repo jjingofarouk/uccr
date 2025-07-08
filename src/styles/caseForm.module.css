@@ -596,3 +596,74 @@
     transition: none;
   }
 }
+
+
+.clearDraftButton {
+  padding: 0.75rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  margin-top: 1rem;
+}
+
+.clearDraftButton:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.clearDraftButton:active {
+  transform: scale(0.98);
+}
+
+.dark-mode .clearDraftButton {
+  color: var(--text);
+  background: var(--background);
+  border-color: var(--border);
+}
+
+.dark-mode .clearDraftButton:hover {
+  background: var(--primary);
+  border-color: var include SVG namespace
+}
+
+@media (max-width: 768px) {
+  .clearDraftButton {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .clearDraftButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .clearDraftButton {
+    background: var(--text);
+    color: var(--background);
+    border: 2px solid var(--text);
+  }
+
+  .clearDraftButton:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clearDraftButton,
+  .clearDraftButton:hover {
+    transition: none;
+  }
+}
