@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Container, Typography, Box, Card, CardContent } from '@mui/material';
 import { ExternalLink } from 'lucide-react';
