@@ -49,7 +49,7 @@ export default function CaseForm() {
     { name: 'physicalExam', label: 'Physical Examination', type: 'richtext', placeholder: 'Physical exam findings' },
     { name: 'investigations', label: 'Investigations', type: 'richtext', placeholder: 'Investigation results' },
     { name: 'management', label: 'Management', type: 'richtext', placeholder: 'Management plan' },
-    { name: 'provisionalDiagnosis', label: 'Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
+    { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
     { name: 'hospital', label: 'Hospital', type: 'richtext', placeholder: 'Enter hospital name' },
     { name: 'referralCenter', label: 'Referral Center', type: 'richtext', placeholder: 'Enter referral center' },
     { name: 'specialty', label: 'Specialty', type: 'select', options: [
@@ -85,7 +85,6 @@ export default function CaseForm() {
     { name: 'mediaUrls', label: 'Upload Media', type: 'media' },
   ];
 
-  // Load draft from localStorage
   useEffect(() => {
     if (user && user.uid) {
       const draftKey = `draft_case_${user.uid}`;
@@ -94,7 +93,7 @@ export default function CaseForm() {
         try {
           const { formData: savedFormData, currentStep: savedStep, draftTimestamp } = JSON.parse(savedDraft);
           const draftAge = Date.now() - draftTimestamp;
-          const maxDraftAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+          const maxDraftAge = 7 * 24 * 60 * 60 * 1000;
           if (draftAge < maxDraftAge) {
             setFormData(savedFormData);
             setCurrentStep(savedStep || 0);
@@ -110,7 +109,6 @@ export default function CaseForm() {
     }
   }, [user]);
 
-  // Save form data to localStorage on change
   useEffect(() => {
     if (user && user.uid) {
       const draftKey = `draft_case_${user.uid}`;
@@ -123,7 +121,6 @@ export default function CaseForm() {
     }
   }, [formData, currentStep, user]);
 
-  // Cloudinary widget setup
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const script = document.createElement('script');
@@ -193,7 +190,6 @@ export default function CaseForm() {
     }
   }, [user]);
 
-  // Google Analytics page view
   useEffect(() => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'page_view', {
