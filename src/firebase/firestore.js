@@ -1,6 +1,6 @@
 // src/firebase/index.js
 import { db } from './config';
-import { auth } from './config';
+import { auth } from './auth';
 import { fetchUserPhotoURL } from './utils';
 import { addCase, getCases, getCaseById, updateCase, deleteCase } from './cases';
 import { addComment, getComments } from './comments';
