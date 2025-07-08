@@ -1,8 +1,7 @@
+// src/components/AuthPage.jsx
 'use client';
-// src/pages/auth.jsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { login, signup } from '../firebase/auth';
 import { Stethoscope, Mail, Lock, User, AlertCircle, LogIn } from 'lucide-react';
 import Loading from './Loading';
 import styles from '../pages/AuthPage.module.css';
@@ -17,15 +16,25 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadStart, setLoadStart] = useState(null);
   const [forceLoading, setForceLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const LOGIN_LOADING_DURATION = 3000; // 3 seconds for post-login loading
+  const LOGIN_LOADING_DURATION = 3000;
 
+  // Ensure component is mounted before doing anything
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Dynamic import of Firebase functions
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
+      // Dynamically import Firebase auth functions
+      const { login, signup } = await import('../firebase/auth');
+      
       if (isLogin) {
         const result = await login(email, password);
         if (result.success) {
@@ -45,7 +54,6 @@ export default function AuthPage() {
         }
       }
     } catch (err) {
-      // Fallback for any unexpected errors
       console.error(`${isLogin ? 'Login' : 'Signup'} error:`, err);
       setError(err.message || `Failed to ${isLogin ? 'log in' : 'sign up'}. Please try again.`);
       setIsLoading(false);
@@ -53,7 +61,7 @@ export default function AuthPage() {
   };
 
   useEffect(() => {
-    if (forceLoading && loadStart) {
+    if (forceLoading && loadStart && mounted) {
       const elapsed = Date.now() - loadStart;
       const remaining = LOGIN_LOADING_DURATION - elapsed;
       
@@ -70,7 +78,7 @@ export default function AuthPage() {
         return () => clearTimeout(timer);
       }
     }
-  }, [forceLoading, loadStart, router]);
+  }, [forceLoading, loadStart, router, mounted]);
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
@@ -82,11 +90,15 @@ export default function AuthPage() {
 
   const handleInputChange = (setter) => (e) => {
     setter(e.target.value);
-    // Clear error when user starts typing
     if (error) {
       setError('');
     }
   };
+
+  // Don't render until mounted
+  if (!mounted) {
+    return <Loading />;
+  }
 
   if (isLoading) {
     return <Loading />;
