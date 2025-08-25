@@ -1,7 +1,7 @@
 .featuredSection {
   width: 100%;
-  max-width: 100%;
-  margin: 1rem;
+  max-width: 1024px; /* Constrain width for laptops */
+  margin: 1rem auto; /* Center the section */
   padding: 1.5rem 1rem;
   box-sizing: border-box;
 }
@@ -18,7 +18,7 @@
 
 .featuredCard {
   width: 100%;
-  max-width: 100%;
+  max-width: 100%; /* Full width within parent */
   margin: 0;
 }
 
@@ -65,12 +65,20 @@
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
-/* Mobile Styles */
+/* Laptop-specific styles */
+@media (max-width: 1280px) {
+  .featuredSection {
+    max-width: 900px; /* Slightly narrower for smaller laptops */
+    padding: 1.25rem 0.75rem;
+  }
+}
+
+/* Tablet and mobile styles */
 @media (max-width: 768px) {
   .featuredSection {
+    max-width: 100%;
     padding: 1rem 0.5rem;
   }
-
   .sectionTitle {
     font-size: 1.375rem;
   }
@@ -80,11 +88,9 @@
   .sectionTitle {
     font-size: 1.25rem;
   }
-
   .emptyText {
     font-size: 0.9rem;
   }
-
   .ctaButtonSecondary {
     width: 100%;
     max-width: 200px;
@@ -97,7 +103,6 @@
   .ctaButtonSecondary {
     transition: none;
   }
-
   .ctaButtonSecondary:hover {
     transform: none;
   }
@@ -107,7 +112,6 @@
   .sectionTitle {
     color: var(--text);
   }
-
   .ctaButtonSecondary {
     border-color: var(--text);
     color: var(--text);

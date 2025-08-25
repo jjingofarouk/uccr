@@ -250,7 +250,7 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 0.75rem;
+    padding: 0;
     min-height: calc(100vh - 56px);
     gap: 1rem;
   }

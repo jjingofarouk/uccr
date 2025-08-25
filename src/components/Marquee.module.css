@@ -6,7 +6,7 @@
   right: 0;
   z-index: 998; /* Below navbar (999) but above content */
   width: 100%;
-  height: 40px; /* Standard height for marquee */
+  height: 30px; /* Standard height for marquee */
   overflow: hidden;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -250,7 +250,7 @@
   
   .marquee span {
     animation: none;
-  }""
+  }
 
   .headlineLink {
     transition: none;
