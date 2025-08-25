@@ -5,6 +5,7 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class", // enables `dark` variant via .dark class
   theme: {
     extend: {
       colors: {
@@ -28,7 +29,8 @@ module.exports = {
       boxShadow: {
         card: "0 1px 3px var(--shadow)",
         cta: "0 4px 14px var(--shadow), 0 2px 4px rgba(13, 148, 136, 0.1)",
-        ctaHover: "0 8px 25px var(--shadow), 0 4px 12px rgba(13, 148, 136, 0.2), 0 0 0 3px rgba(13, 148, 136, 0.1)",
+        ctaHover:
+          "0 8px 25px var(--shadow), 0 4px 12px rgba(13, 148, 136, 0.2), 0 0 0 3px rgba(13, 148, 136, 0.1)",
         ctaActive: "0 2px 8px var(--shadow)",
         stats: "0 4px 12px var(--shadow)",
       },
@@ -52,5 +54,4 @@ module.exports = {
     },
   },
   plugins: [],
-  darkMode: "class",
 };

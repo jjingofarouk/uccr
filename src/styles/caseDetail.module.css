@@ -1,20 +1,17 @@
-/* Root container */
 .container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1rem;
   background: var(--background);
-  min-height: calc(100vh - 76px); /* Adjusted for global navbar height */
+  min-height: calc(100vh - 76px);
   box-sizing: border-box;
   transition: background 0.3s ease;
 }
 
-/* Dark mode for container */
 .dark-mode .container {
-  background: var(--background); /* #121212 in dark mode */
+  background: var(--background);
 }
 
-/* Main content wrapper */
 .caseDetail {
   max-width: 100%;
   margin: 0;
@@ -23,12 +20,10 @@
   transition: color 0.3s ease;
 }
 
-/* Dark mode for caseDetail */
 .dark-mode .caseDetail {
-  color: var(--text); /* #e0e0e0 in dark mode */
+  color: var(--text);
 }
 
-/* Progress bar at the top */
 .progressBar {
   position: fixed;
   top: 0;
@@ -39,10 +34,9 @@
   transition: width 0.3s ease;
 }
 
-/* Table of Contents */
 .toc {
   position: sticky;
-  top: 76px; /* Matches global navbar height */
+  top: 76px;
   width: 220px;
   float: right;
   margin-left: 1.5rem;
@@ -51,17 +45,20 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 2px 8px var(--shadow);
-  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 }
 
-/* Dark mode for TOC */
+.toc.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .dark-mode .toc {
-  background: var(--surface); /* #1e1e1e in dark mode */
-  border-color: var(--border); /* #424242 in dark mode */
+  background: var(--surface);
+  border-color: var(--border);
   box-shadow: 0 2px 8px var(--shadow);
 }
 
-/* TOC title */
 .tocTitle {
   font-family: 'Inter', sans-serif;
   font-size: 1.125rem;
@@ -70,24 +67,20 @@
   margin-bottom: 0.75rem;
 }
 
-/* Dark mode for TOC title */
 .dark-mode .tocTitle {
-  color: var(--text); /* #e0e0e0 in dark mode */
+  color: var(--text);
 }
 
-/* TOC list */
 .tocList {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-/* TOC list items */
 .tocList li {
   margin-bottom: 0.5rem;
 }
 
-/* TOC links */
 .tocLink {
   color: var(--primary);
   text-decoration: none;
@@ -104,14 +97,13 @@
   background: var(--secondary);
 }
 
-/* Dark mode for TOC links */
 .dark-mode .tocLink {
-  color: var(--primary); /* #4db6ac in dark mode */
+  color: var(--primary);
 }
 
 .dark-mode .tocLink:hover {
-  color: var(--primary-hover); /* #80cbc4 in dark mode */
-  background: var(--secondary); /* #00695c in dark mode */
+  color: var(--primary-hover);
+  background: var(--secondary);
 }
 
 .tocLink:focus {
@@ -120,20 +112,17 @@
   border-radius: 6px;
 }
 
-/* Header section */
 .header {
-  margin-bottom: 1.5rem;
-  padding: 0.75rem;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
   transition: border-color 0.3s ease;
 }
 
-/* Dark mode for header */
 .dark-mode .header {
-  border-color: var(--border); /* #424242 in dark mode */
+  border-color: var(--border);
 }
 
-/* Main title */
 .title {
   font-family: 'Inter', sans-serif;
   font-size: clamp(1.75rem, 5vw, 2.5rem);
@@ -144,12 +133,10 @@
   transition: color 0.3s ease;
 }
 
-/* Dark mode for title */
 .dark-mode .title {
-  color: var(--text); /* #e0e0e0 in dark mode */
+  color: var(--text);
 }
 
-/* Meta information (author, date) */
 .meta {
   display: flex;
   flex-wrap: wrap;
@@ -160,19 +147,16 @@
   opacity: 0.85;
 }
 
-/* Dark mode for meta */
 .dark-mode .meta {
   color: var(--text);
 }
 
-/* Author container */
 .author {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-/* Author avatar */
 .avatar {
   border-radius: 50%;
   object-fit: cover;
@@ -182,12 +166,10 @@
   transition: border-color 0.3s ease;
 }
 
-/* Dark mode for avatar */
 .dark-mode .avatar {
   border-color: var(--border);
 }
 
-/* Author name */
 .authorName {
   font-family: 'Inter', sans-serif;
   font-weight: 600;
@@ -201,7 +183,6 @@
   text-decoration: underline;
 }
 
-/* Dark mode for author name */
 .dark-mode .authorName {
   color: var(--primary);
 }
@@ -210,7 +191,6 @@
   color: var(--primary-hover);
 }
 
-/* Date */
 .date {
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
@@ -218,21 +198,18 @@
   opacity: 0.8;
 }
 
-/* Dark mode for date */
 .dark-mode .date {
   color: var(--text);
 }
 
-/* Vote section */
 .voteSection {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 0 0.75rem;
+  margin-bottom: 2rem;
+  padding: 0;
 }
 
-/* Vote button */
 .voteButton {
   display: flex;
   align-items: center;
@@ -264,7 +241,6 @@
   transform: none;
 }
 
-/* Dark mode for vote button */
 .dark-mode .voteButton {
   background: var(--surface);
   border-color: var(--border);
@@ -277,7 +253,6 @@
   color: #ffffff;
 }
 
-/* Vote count */
 .voteCount {
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
@@ -285,12 +260,10 @@
   color: var(--text);
 }
 
-/* Dark mode for vote count */
 .dark-mode .voteCount {
   color: var(--text);
 }
 
-/* Error message */
 .error {
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
@@ -301,13 +274,11 @@
   border-radius: 8px;
 }
 
-/* Dark mode for error */
 .dark-mode .error {
   background: #431f1f;
   color: #f87171;
 }
 
-/* Not specified text */
 .notSpecified {
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
@@ -316,24 +287,20 @@
   font-style: italic;
 }
 
-/* Dark mode for not specified */
 .dark-mode .notSpecified {
   color: var(--text);
 }
 
-/* Error text for rich text rendering */
 .errorText {
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   color: #dc2626;
 }
 
-/* Dark mode for error text */
 .dark-mode .errorText {
   color: #f87171;
 }
 
-/* Retry button for error states */
 .retryButton {
   background: var(--primary);
   color: #ffffff;
@@ -354,7 +321,6 @@
   box-shadow: 0 4px 12px var(--shadow);
 }
 
-/* Dark mode for retry button */
 .dark-mode .retryButton {
   background: var(--primary);
 }
@@ -363,151 +329,63 @@
   background: var(--primary-hover);
 }
 
-/* Controls section for Expand/Collapse All */
-.controlsSection {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1.5rem;
-  padding: 0 0.75rem;
-}
-
-/* Expand/Collapse All button */
-.expandCollapseButton {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--primary) !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
-  text-transform: none !important;
-  border-radius: 12px !important;
-  padding: 0.75rem 1.5rem !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  box-shadow: 0 2px 4px var(--shadow) !important;
-}
-
-.expandCollapseButton:hover {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: #ffffff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px var(--shadow) !important;
-}
-
-/* Dark mode for expand/collapse button */
-.dark-mode .expandCollapseButton {
-  background: var(--surface) !important;
-  border-color: var(--border) !important;
-  color: var(--primary) !important;
-}
-
-.dark-mode .expandCollapseButton:hover {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: #ffffff !important;
-}
-
-/* Main content section */
 .content {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-/* Accordion for collapsible sections */
-.accordion {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px !important;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 8px var(--shadow);
-  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+.section {
+  margin-bottom: 2.5rem;
+  padding: 0;
+  position: relative;
 }
 
-/* Dark mode for accordion */
-.dark-mode .accordion {
-  background: var(--surface); /* #1e1e1e in dark mode */
-  border-color: var(--border); /* #424242 in dark mode */
-  box-shadow: 0 2px 8px var(--shadow); /* Teal-tinted shadow */
+.section:not(:last-child)::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border) 20%, var(--border) 80%, transparent 100%);
+  margin-top: 2rem;
+  opacity: 0.6;
 }
 
-/* Accordion summary */
-.accordionSummary {
-  background: var(--surface);
-  padding: 0.75rem 1.25rem;
-  min-height: 56px !important;
-  transition: background 0.3s ease;
+.dark-mode .section:not(:last-child)::after {
+  background: linear-gradient(90deg, transparent 0%, var(--border) 20%, var(--border) 80%, transparent 100%);
 }
 
-.dark-mode .accordionSummary {
-  background: var(--surface);
-}
-
-/* Ensure MUI content container inherits styles */
-.accordionSummary .MuiAccordionSummary-content {
-  margin: 12px 0 !important;
-  display: flex;
-  align-items: center;
-}
-
-/* Accordion summary hover effect */
-.accordionSummary:hover {
-  background: var(--secondary);
-}
-
-/* Dark mode for accordion summary hover */
-.dark-mode .accordionSummary:hover {
-  background: var(--secondary); /* #00695c in dark mode */
-}
-
-/* Section title within accordion */
 .sectionTitle {
-  font-family: 'Inter', sans-serif !important;
-  font-size: clamp(1rem, 3vw, 1.25rem) !important;
-  font-weight: 600 !important;
-  color: var(--text) !important;
-  margin: 0 !important;
-  line-height: 1.4 !important;
-  transition: color 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.125rem, 3vw, 1.375rem);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
-/* Dark mode for section title */
 .dark-mode .sectionTitle {
-  color: var(--text) !important; /* #e0e0e0 in dark mode */
+  color: var(--text);
 }
 
-/* Accordion details */
-.accordionDetails {
-  padding: 1rem 1.25rem;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  transition: background 0.3s ease, border-color 0.3s ease;
-}
-
-/* Dark mode for accordion details */
-.dark-mode .accordionDetails {
-  background: var(--surface);
-  border-top-color: var(--border);
-}
-
-/* Rich text content */
 .richText {
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
 }
 
-/* Dark mode for rich text */
 .dark-mode .richText {
   color: var(--text);
 }
 
 .richText p {
-  margin: 0 0 0.75rem;
+  margin: 0 0 1rem;
 }
 
 .richText ul,
 .richText ol {
-  margin: 0 0 0.75rem;
+  margin: 0 0 1rem;
   padding-left: 1.5rem;
 }
 
@@ -526,7 +404,6 @@
   text-decoration: underline;
 }
 
-/* Dark mode for rich text links */
 .dark-mode .richText a {
   color: var(--primary);
 }
@@ -535,36 +412,31 @@
   color: var(--primary-hover);
 }
 
-/* Media section */
 .media {
-  margin-bottom: 1.5rem;
-  padding: 0 0.75rem;
+  margin-bottom: 2rem;
+  padding: 0;
 }
 
-/* Media section title */
 .mediaSectionTitle {
-  font-family: 'Inter', sans-serif !important;
-  font-size: clamp(1.125rem, 3vw, 1.5rem) !important;
-  font-weight: 700 !important;
-  color: var(--text) !important;
-  margin: 0 0 1rem !important;
-  line-height: 1.3 !important;
-  transition: color 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.25rem, 3vw, 1.625rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 1.5rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
-/* Dark mode for media section title */
 .dark-mode .mediaSectionTitle {
-  color: var(--text) !important;
+  color: var(--text);
 }
 
-/* Media grid */
 .mediaGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
 }
 
-/* Media images */
 .mediaImage {
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -572,16 +444,18 @@
   height: auto;
   object-fit: contain;
   background: var(--background);
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Dark mode for media image */
+.mediaImage:hover {
+  transform: scale(1.02);
+}
+
 .dark-mode .mediaImage {
   border-color: var(--border);
   background: var(--background);
 }
 
-/* Edit button */
 .editButton {
   display: flex;
   align-items: center;
@@ -597,6 +471,7 @@
   color: var(--text);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 4px var(--shadow);
+  margin-top: 1rem;
 }
 
 .editButton:hover {
@@ -607,7 +482,6 @@
   box-shadow: 0 4px 12px var(--shadow);
 }
 
-/* Dark mode for edit button */
 .dark-mode .editButton {
   background: var(--surface);
   border-color: var(--border);
@@ -620,7 +494,47 @@
   color: #ffffff;
 }
 
-/* Responsive Adjustments */
+.backToTop {
+  position: fixed !important;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  background: var(--primary) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  cursor: pointer;
+  box-shadow: 0 4px 16px var(--shadow) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 999;
+  color: #ffffff !important;
+}
+
+.backToTop:hover {
+  background: var(--primary-hover) !important;
+  transform: translateY(-4px) scale(1.05) !important;
+  box-shadow: 0 8px 24px var(--shadow) !important;
+}
+
+.backToTop:active {
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+.dark-mode .backToTop {
+  background: var(--primary) !important;
+  box-shadow: 0 4px 16px var(--shadow) !important;
+}
+
+.dark-mode .backToTop:hover {
+  background: var(--primary-hover) !important;
+  box-shadow: 0 8px 24px var(--shadow) !important;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 0.75rem;
@@ -649,11 +563,11 @@
   }
 
   .sectionTitle {
-    font-size: clamp(0.95rem, 3vw, 1.125rem) !important;
+    font-size: clamp(1rem, 3vw, 1.25rem);
   }
 
   .mediaSectionTitle {
-    font-size: clamp(1rem, 3vw, 1.25rem) !important;
+    font-size: clamp(1.125rem, 3vw, 1.375rem);
   }
 
   .richText {
@@ -665,29 +579,19 @@
     gap: 0.75rem;
   }
 
-  .controlsSection {
-    justify-content: center;
-  }
-
-  .expandCollapseButton {
-    font-size: 0.875rem !important;
-    padding: 0.5rem 1.25rem !important;
-  }
-
-  .accordionSummary {
-    padding: 0.5rem 1rem;
-    min-height: 48px !important;
-  }
-
-  .accordionDetails {
-    padding: 0.75rem 1rem;
-  }
-
   .voteButton,
   .editButton,
   .retryButton {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+  }
+
+  .backToTop {
+    bottom: 1.5rem !important;
+    right: 1.5rem !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
   }
 }
 
@@ -712,11 +616,11 @@
   }
 
   .sectionTitle {
-    font-size: clamp(0.875rem, 2.5vw, 1rem) !important;
+    font-size: clamp(0.95rem, 2.5vw, 1.125rem);
   }
 
   .mediaSectionTitle {
-    font-size: clamp(0.95rem, 2.5vw, 1.125rem) !important;
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
   }
 
   .richText {
@@ -725,36 +629,36 @@
 
   .voteButton,
   .editButton,
-  .retryButton,
-  .expandCollapseButton {
+  .retryButton {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
   }
 
-  .accordion {
-    border-radius: 10px !important;
+  .backToTop {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
   }
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .progressBar,
   .voteButton,
   .editButton,
   .tocLink,
   .retryButton,
-  .expandCollapseButton,
-  .accordion,
-  .accordionSummary,
-  .accordionDetails {
-    transition: none;
+  .backToTop,
+  .mediaImage {
+    transition: none !important;
   }
 
   .voteButton:hover,
   .editButton:hover,
-  .expandCollapseButton:hover,
-  .tocLink:hover {
-    transform: none;
+  .backToTop:hover,
+  .mediaImage:hover {
+    transform: none !important;
   }
 }
 
@@ -769,14 +673,14 @@
   .voteCount,
   .authorName,
   .date {
-    color: var(--text) !important;
-    background: none !important;
+    color: var(--text);
+    background: none;
   }
 
   .voteButton,
   .editButton,
   .retryButton,
-  .expandCollapseButton {
+  .backToTop {
     border: 2px solid var(--text) !important;
     color: var(--text) !important;
     background: var(--background) !important;
@@ -785,26 +689,25 @@
   .voteButton:hover,
   .editButton:hover,
   .retryButton:hover,
-  .expandCollapseButton:hover {
+  .backToTop:hover {
     background: var(--text) !important;
     color: var(--background) !important;
   }
 
-  .toc,
-  .accordion,
-  .accordionDetails {
-    border-color: var(--text) !important;
+  .toc {
+    border-color: var(--text);
   }
 
   .tocLink {
-    color: var(--text) !important;
+    color: var(--text);
   }
 
   .tocLink:hover {
-    background: var(--surface) !important;
+    background: var(--surface);
   }
 
-  .accordionSummary:hover {
-    background: var(--surface) !important;
+  .section:not(:last-child)::after {
+    background: var(--text);
+    opacity: 0.3;
   }
 }

@@ -120,7 +120,7 @@ const HeroSection = () => {
       }
 
       return () => clearTimeout(timer);
-    }, [words, state, setState, speed, pauseTime, eraseSpeed]);
+    }, [state.text, state.isTyping, state.index, words, speed, pauseTime, eraseSpeed]);
   };
 
   useTypingEffect(archiveWords, archiveState, setArchiveState, 80, 2500, 40);

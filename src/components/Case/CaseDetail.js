@@ -1,4 +1,4 @@
-"use client"; // Ensure client-side rendering
+"use client";
 
 import { useState, useEffect, Component } from 'react';
 import Image from 'next/image';
@@ -6,23 +6,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
-import { Award, ChevronDown, ChevronUp } from 'lucide-react';
+import { Award, ArrowUp } from 'lucide-react';
 import CommentSection from './CommentSection';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import sanitizeHtml from 'sanitize-html';
 import styles from '../../styles/caseDetail.module.css';
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-  Box,
-  Button,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Typography, Box } from '@mui/material';
 
-// Error Boundary Component
 class ErrorBoundary extends Component {
   state = { hasError: false, error: null };
 
@@ -50,7 +41,6 @@ class ErrorBoundary extends Component {
   }
 }
 
-// Google Analytics tracking functions
 const trackEvent = (action, category, label, value) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', action, {
@@ -58,8 +48,6 @@ const trackEvent = (action, category, label, value) => {
       event_label: label,
       value: value,
     });
-  } else {
-    console.warn('gtag not available for tracking:', { action, category, label, value });
   }
 };
 
@@ -74,7 +62,6 @@ const trackPageView = (caseId, title) => {
   }
 };
 
-// Utility function to sanitize and render HTML content
 const renderRichText = (html) => {
   if (!html || typeof html !== 'string') {
     return <Typography className={styles.notSpecified}>Not specified</Typography>;
@@ -91,42 +78,16 @@ const renderRichText = (html) => {
   }
 };
 
-// Utility to safely access data
 const getSafeValue = (value, fallback = 'Not specified') => value || fallback;
 
 export default function CaseDetail({ caseData, isLoading }) {
   const { user } = useAuth();
   const router = useRouter();
   const [error, setError] = useState('');
-  const [expanded, setExpanded] = useState({ summary: true }); // Expand Summary by default
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [allExpanded, setAllExpanded] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [showToc, setShowToc] = useState(true);
 
-  // Debug dark mode
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark-mode');
-    console.log('Dark mode enabled:', isDarkMode, 'CSS variables:', {
-      surface: getComputedStyle(document.documentElement).getPropertyValue('--surface'),
-      text: getComputedStyle(document.documentElement).getPropertyValue('--text'),
-    });
-  }, []);
-
-  // Sections for TOC and collapsible content, with Summary at the top
-  const sections = [
-    { id: 'summary', label: 'Summary', content: getSafeValue(caseData?.highLevelSummary) },
-    { id: 'chiefConcern', label: 'Chief Concern', content: getSafeValue(caseData?.presentingComplaint) },
-    { id: 'specialties', label: 'Specialties', content: getSafeValue(Array.isArray(caseData?.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : null) },
-    { id: 'history', label: 'History', content: getSafeValue(caseData?.history) },
-    { id: 'investigations', label: 'Investigations', content: getSafeValue(caseData?.investigations) },
-    { id: 'management', label: 'Management', content: getSafeValue(caseData?.management) },
-    { id: 'provisionalDiagnosis', label: 'Provisional Diagnosis', content: getSafeValue(caseData?.provisionalDiagnosis) },
-    { id: 'hospital', label: 'Hospital', content: getSafeValue(caseData?.hospital) },
-    { id: 'referralCenter', label: 'Referral Center', content: getSafeValue(caseData?.referralCenter) },
-    { id: 'discussion', label: 'Discussion', content: getSafeValue(caseData?.discussion) },
-    { id: 'references', label: 'References', content: getSafeValue(caseData?.references) },
-  ];
-
-  // Track page view and initialize expanded state
   useEffect(() => {
     if (!caseData || !caseData.id || !caseData.title) {
       console.warn('Invalid caseData in useEffect:', caseData);
@@ -134,67 +95,30 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
     try {
       trackPageView(caseData.id, caseData.title || 'Untitled Case');
-      setExpanded({ summary: true });
-      setAllExpanded(false);
     } catch (err) {
       console.error('Error in page view tracking:', err);
       setError('Failed to load case details.');
     }
   }, [caseData]);
 
-  // Scroll progress
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window === 'undefined') return;
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
       setScrollProgress(progress);
+      setShowBackToTop(window.scrollY > 300);
+      setShowToc(window.scrollY <= 100 && window.innerWidth >= 1024);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    handleScroll(); // Initial check
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
-  // Handle expand/collapse all
-  const handleExpandCollapseAll = () => {
-    try {
-      const newState = !allExpanded;
-      const newExpanded = {};
-      if (newState) {
-        sections.forEach((section) => {
-          newExpanded[section.id] = true;
-        });
-        trackEvent('expand_all_sections', 'Case Section', caseData?.id || 'unknown', 1);
-      } else {
-        trackEvent('collapse_all_sections', 'Case Section', caseData?.id || 'unknown', 1);
-      }
-      setExpanded(newExpanded);
-      setAllExpanded(newState);
-    } catch (err) {
-      console.error('Error in handleExpandCollapseAll:', err);
-      setError('Failed to toggle sections.');
-    }
-  };
-
-  // Handle accordion toggle
-  const handleAccordionChange = (sectionId) => (event, isExpanded) => {
-    try {
-      setExpanded((prev) => ({ ...prev, [sectionId]: isExpanded }));
-      const newExpanded = { ...expanded, [sectionId]: isExpanded };
-      const expandedCount = Object.values(newExpanded).filter(Boolean).length;
-      setAllExpanded(expandedCount === sections.length);
-      if (isExpanded) {
-        trackEvent('expand_section', 'Case Section', `${caseData?.id || 'unknown'}_${sectionId}`, 1);
-        setTimeout(() => {
-          document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }
-    } catch (err) {
-      console.error('Error in handleAccordionChange:', err);
-      setError('Failed to toggle section.');
-    }
-  };
-
-  // Handle vote
   const handleVote = async (type) => {
     if (!user) {
       setError('You must be logged in to vote.');
@@ -211,7 +135,6 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
   };
 
-  // Handle edit
   const handleEditClick = () => {
     try {
       router.push(`/cases/edit/${caseData.id}`);
@@ -222,27 +145,47 @@ export default function CaseDetail({ caseData, isLoading }) {
     }
   };
 
-  // Handle author click
   const handleAuthorClick = (userId) => {
     trackEvent('view_author', 'Profile', userId || 'unknown', 1);
   };
 
-  // Handle media view
   const handleMediaView = (mediaIndex) => {
     trackEvent('view_media', 'Case Media', `${caseData?.id || 'unknown'}_media_${mediaIndex}`, 1);
   };
 
-  // Handle TOC click
   const handleTocClick = (sectionId) => {
     try {
       trackEvent('toc_click', 'Navigation', sectionId, 1);
       document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setExpanded((prev) => ({ ...prev, [sectionId]: true }));
     } catch (err) {
       console.error('Error in handleTocClick:', err);
       setError('Failed to navigate to section.');
     }
   };
+
+  const handleBackToTop = () => {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      trackEvent('back_to_top', 'Navigation', caseData?.id || 'unknown', 1);
+    } catch (err) {
+      console.error('Error in handleBackToTop:', err);
+      setError('Failed to navigate to top.');
+    }
+  };
+
+  const sections = [
+    { id: 'summary', label: 'Summary', content: getSafeValue(caseData?.highLevelSummary) },
+    { id: 'chiefConcern', label: 'Chief Concern', content: getSafeValue(caseData?.presentingComplaint) },
+    { id: 'specialties', label: 'Specialties', content: getSafeValue(Array.isArray(caseData?.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : null) },
+    { id: 'history', label: 'History', content: getSafeValue(caseData?.history) },
+    { id: 'investigations', label: 'Investigations', content: getSafeValue(caseData?.investigations) },
+    { id: 'management', label: 'Management', content: getSafeValue(caseData?.management) },
+    { id: 'provisionalDiagnosis', label: 'Provisional Diagnosis', content: getSafeValue(caseData?.provisionalDiagnosis) },
+    { id: 'hospital', label: 'Hospital', content: getSafeValue(caseData?.hospital) },
+    { id: 'referralCenter', label: 'Referral Center', content: getSafeValue(caseData?.referralCenter) },
+    { id: 'discussion', label: 'Discussion', content: getSafeValue(caseData?.discussion) },
+    { id: 'references', label: 'References', content: getSafeValue(caseData?.references) },
+  ];
 
   if (isLoading) {
     return (
@@ -270,37 +213,43 @@ export default function CaseDetail({ caseData, isLoading }) {
   return (
     <ErrorBoundary>
       <div className={styles.container}>
-        {/* Progress Bar */}
         <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
 
-        {/* Table of Contents */}
-        <Box className={styles.toc}>
-          <Typography variant="h6" className={styles.tocTitle}>
-            Table of Contents
-          </Typography>
-          <ul className={styles.tocList}>
-            {sections.map((section) => (
-              <li key={section.id}>
-                <a
-                  href={`#${section.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleTocClick(section.id);
-                  }}
-                  className={styles.tocLink}
-                >
-                  {section.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </Box>
+        {showToc && (
+          <Box className={styles.toc} id="toc">
+            <Typography variant="h6" className={styles.tocTitle}>
+              Table of Contents
+            </Typography>
+            <ul className={styles.tocList}>
+              {sections.map((section) => (
+                <li key={section.id}>
+                  <a
+                    href={`#${section.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleTocClick(section.id);
+                    }}
+                    className={styles.tocLink}
+                  >
+                    {section.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </Box>
+        )}
 
         <article className={styles.caseDetail}>
           <header className={styles.header}>
-            <Typography variant="h1" className={styles.title}>
+            <Typography 
+              variant="h3" 
+              className={styles.title} 
+              fontWeight="bold" 
+              gutterBottom
+            >
               {renderRichText(getSafeValue(caseData.title))}
             </Typography>
+
             {user && user.uid === caseData.userId && (
               <button
                 onClick={handleEditClick}
@@ -351,50 +300,29 @@ export default function CaseDetail({ caseData, isLoading }) {
             {error && <Typography className={styles.error}>{error}</Typography>}
           </div>
 
-          {/* Expand/Collapse All Button */}
-          <div className={styles.controlsSection}>
-            <Button
-              onClick={handleExpandCollapseAll}
-              className={styles.expandCollapseButton}
-              startIcon={allExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              variant="outlined"
-              size="small"
-            >
-              {allExpanded ? 'Collapse All' : 'Expand All'}
-            </Button>
-          </div>
-
           <section className={styles.content}>
             {sections.map((section) => (
-              <Accordion
-                key={section.id}
-                expanded={expanded[section.id] || false}
-                onChange={handleAccordionChange(section.id)}
-                className={styles.accordion}
-                elevation={0}
-                id={section.id}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls={`${section.id}-content`}
-                  id={`${section.id}-header`}
-                  className={styles.accordionSummary}
+              <div key={section.id} id={section.id} className={styles.section}>
+                <Typography 
+                  className={styles.sectionTitle} 
+                  fontWeight="bold" 
+                  variant="h6"
                 >
-                  <Typography className={styles.sectionTitle}>
-                    {section.label}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails className={styles.accordionDetails}>
-                  {renderRichText(section.content)}
-                </AccordionDetails>
-              </Accordion>
+                  {section.label}
+                </Typography>
+                {renderRichText(section.content)}
+              </div>
             ))}
           </section>
 
           <section className={styles.media}>
-            <Typography variant="h2" className={styles.mediaSectionTitle}>
+            <Typography 
+              variant="h5" 
+              fontWeight="bold"
+            >
               Media
             </Typography>
+
             {Array.isArray(caseData.mediaUrls) && caseData.mediaUrls.length > 0 ? (
               <div className={styles.mediaGrid}>
                 {caseData.mediaUrls.map((url, index) => (
@@ -433,6 +361,16 @@ export default function CaseDetail({ caseData, isLoading }) {
 
           <CommentSection caseId={caseData.id} />
         </article>
+
+        {showBackToTop && (
+          <button
+            onClick={handleBackToTop}
+            className={styles.backToTop}
+            aria-label="Back to top"
+          >
+            <ArrowUp size={20} />
+          </button>
+        )}
       </div>
     </ErrorBoundary>
   );

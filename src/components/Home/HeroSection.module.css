@@ -9,6 +9,8 @@
   overflow: hidden;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  margin: 0;
+  padding: 0;
 }
 
 .heroVideo {
@@ -44,9 +46,11 @@
   position: relative;
   z-index: 3;
   max-width: 900px;
-  padding: 0;
   color: #ffffff;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .heroTitle {
@@ -54,7 +58,7 @@
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0.5rem 1.5rem;
+  margin: 0 0 1.5rem;
   line-height: 1.1;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
@@ -104,6 +108,8 @@
 }
 
 .cursor {
+  display: inline-block;
+  width: 2px;
   color: #60a5fa;
   animation: blink 1s infinite;
   font-weight: normal;
@@ -111,6 +117,8 @@
 }
 
 .cursorResearch {
+  display: inline-block;
+  width: 2px;
   color: #34d399;
   animation: blink 1.2s infinite;
   font-weight: normal;
@@ -118,6 +126,8 @@
 }
 
 .cursorProfessionals {
+  display: inline-block;
+  width: 2px;
   color: #fbbf24;
   animation: blink 0.8s infinite;
   font-weight: normal;
@@ -125,6 +135,8 @@
 }
 
 .cursorLocations {
+  display: inline-block;
+  width: 2px;
   color: #f472b6;
   animation: blink 1.1s infinite;
   font-weight: normal;
@@ -269,9 +281,11 @@
 @media (max-width: 768px) {
   .hero {
     min-height: calc(70vh - 92px);
+    margin: 0;
+    padding: 0;
   }
   .heroContent {
-    padding: 0 0.75rem;
+    padding: 0 1rem;
   }
   .heroTitle {
     font-size: clamp(1.5rem, 4vw, 2rem);
@@ -295,9 +309,11 @@
 @media (max-width: 480px) {
   .hero {
     min-height: calc(60vh - 80px);
+    margin: 0;
+    padding: 0;
   }
   .heroContent {
-    padding: 0 0.5rem;
+    padding: 0 0.75rem;
   }
   .heroTitle {
     font-size: clamp(1.25rem, 4vw, 1.75rem);
