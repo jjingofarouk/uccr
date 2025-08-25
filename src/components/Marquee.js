@@ -13,6 +13,7 @@ const trackEvent = (action, category, label, value) => {
   }
 };
 
+
 const trackHeadlineClick = (headline) => {
   trackEvent('click_headline', 'Medical News', `${headline.source}: ${headline.title}`, 1);
 };
