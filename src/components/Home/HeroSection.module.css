@@ -1,13 +1,14 @@
-/* Hero Section with Video Background */
 .hero {
   position: relative;
-  width: 100vw;
-  margin: 0 calc(-50vw + 50%);
+  width: 100%;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   overflow: hidden;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 
 .heroVideo {
@@ -31,12 +32,10 @@
   z-index: 2;
 }
 
-/* Dark mode overlay adjustments */
 [data-theme='dark'] .heroOverlay {
   background: rgba(0, 0, 0, 0.6);
 }
 
-/* Light mode overlay adjustments */
 [data-theme='light'] .heroOverlay {
   background: rgba(0, 0, 0, 0.4);
 }
@@ -45,12 +44,11 @@
   position: relative;
   z-index: 3;
   max-width: 900px;
-  padding: 0 1rem; /* Removed top/bottom padding */
+  padding: 0 1rem;
   color: #ffffff;
-  margin-top: 0; /* Ensure no top margin */
+  margin: 0 auto;
 }
 
-/* Typography - Clean and Modern */
 .heroTitle {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
@@ -73,7 +71,6 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
-/* Enhanced Typing Text Styles with Better Contrast */
 .typedTextArchive {
   color: #60a5fa;
   display: inline-block;
@@ -106,7 +103,6 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
-/* Cursor Styles with Enhanced Visibility */
 .cursor {
   color: #60a5fa;
   animation: blink 1s infinite;
@@ -135,19 +131,17 @@
   text-shadow: 0 0 4px rgba(244, 114, 182, 0.6);
 }
 
-/* Enhanced Cursor Blinking Animation */
 @keyframes blink {
-  0%, 50% { 
-    opacity: 1; 
+  0%, 50% {
+    opacity: 1;
     transform: scale(1);
   }
-  51%, 100% { 
-    opacity: 0; 
+  51%, 100% {
+    opacity: 0;
     transform: scale(0.95);
   }
 }
 
-/* Button Styles - Following Global Color Scheme */
 .heroButtons {
   display: flex;
   gap: 1rem;
@@ -162,71 +156,66 @@
   gap: 0.5rem;
   background: var(--primary);
   color: #ffffff;
-  padding: 1rem 2rem;
+  padding: 0.875rem 1.75rem;
   border-radius: 12px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid transparent;
-  box-shadow: 0 4px 20px rgba(0, 105, 92, 0.4);
-  text-shadow: none;
+  border: none;
+  box-shadow: 0 4px 14px var(--shadow);
 }
 
 .ctaButtonPrimary:hover {
   background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 77, 64, 0.6);
+  box-shadow: 0 8px 25px var(--shadow);
 }
 
 .ctaButtonSecondary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(77, 182, 172, 0.15);
-  color: var(--primary-light);
-  padding: 1rem 2rem;
-  border: 2px solid var(--primary-light);
+  background: transparent;
+  color: var(--primary);
+  padding: 0.875rem 1.75rem;
+  border: 2px solid var(--primary);
   border-radius: 12px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(77, 182, 172, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .ctaButtonSecondary:hover {
-  background: var(--primary-light);
-  color: var(--primary-dark);
-  border-color: var(--primary-light);
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(77, 182, 172, 0.5);
-  text-shadow: none;
+  box-shadow: 0 8px 25px var(--shadow);
 }
 
-/* Dark Mode Button Adjustments */
 .dark-mode .ctaButtonPrimary,
 [data-theme='dark'] .ctaButtonPrimary {
   background: var(--primary);
-  box-shadow: 0 4px 20px rgba(77, 182, 172, 0.4);
+  box-shadow: 0 4px 14px var(--shadow);
 }
 
 .dark-mode .ctaButtonPrimary:hover,
 [data-theme='dark'] .ctaButtonPrimary:hover {
   background: var(--primary-hover);
-  box-shadow: 0 8px 30px rgba(128, 203, 196, 0.6);
+  box-shadow: 0 8px 25px var(--shadow);
 }
 
 .dark-mode .ctaButtonSecondary,
 [data-theme='dark'] .ctaButtonSecondary {
-  background: rgba(77, 182, 172, 0.1);
+  background: transparent;
   border-color: var(--primary);
-  color: var(--primary-light);
-  box-shadow: 0 4px 20px rgba(77, 182, 172, 0.2);
+  color: var(--primary);
+  box-shadow: none;
 }
 
 .dark-mode .ctaButtonSecondary:hover,
@@ -234,48 +223,44 @@
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary-hover);
-  box-shadow: 0 8px 30px rgba(77, 182, 172, 0.4);
+  box-shadow: 0 8px 25px var(--shadow);
 }
 
-/* Light Mode Button Adjustments */
 :root .ctaButtonPrimary,
 [data-theme='light'] .ctaButtonPrimary {
   background: var(--primary);
-  box-shadow: 0 4px 20px rgba(0, 105, 92, 0.4);
+  box-shadow: 0 4px 14px var(--shadow);
 }
 
 :root .ctaButtonPrimary:hover,
 [data-theme='light'] .ctaButtonPrimary:hover {
   background: var(--primary-hover);
-  box-shadow: 0 8px 30px rgba(0, 77, 64, 0.6);
+  box-shadow: 0 8px 25px var(--shadow);
 }
 
 :root .ctaButtonSecondary,
 [data-theme='light'] .ctaButtonSecondary {
-  background: rgba(77, 182, 172, 0.15);
-  border-color: var(--primary-light);
-  color: var(--primary-light);
-  box-shadow: 0 4px 20px rgba(77, 182, 172, 0.3);
+  background: transparent;
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: none;
 }
 
 :root .ctaButtonSecondary:hover,
 [data-theme='light'] .ctaButtonSecondary:hover {
-  background: var(--primary-light);
-  color: var(--primary-dark);
-  border-color: var(--primary-light);
-  box-shadow: 0 8px 30px rgba(77, 182, 172, 0.5);
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary-hover);
+  box-shadow: 0 8px 25px var(--shadow);
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .heroContent {
     padding: 0 1rem;
   }
-
   .heroTitle {
     font-size: clamp(1.75rem, 4vw, 2.5rem);
   }
-
   .heroSubtitle {
     font-size: clamp(0.9rem, 2vw, 1.1rem);
   }
@@ -283,28 +268,23 @@
 
 @media (max-width: 768px) {
   .hero {
-    min-height: calc(70vh - 92px); /* Adjusted for navbar (56px) + marquee (36px) */
+    min-height: calc(70vh - 92px);
   }
-
   .heroContent {
     padding: 0 0.75rem;
   }
-
   .heroTitle {
     font-size: clamp(1.5rem, 4vw, 2rem);
     margin-bottom: 1rem;
   }
-
   .heroSubtitle {
     font-size: clamp(0.85rem, 2vw, 1rem);
     margin-bottom: 1.5rem;
   }
-
   .heroButtons {
     gap: 0.75rem;
     margin-top: 1.5rem;
   }
-
   .ctaButtonPrimary,
   .ctaButtonSecondary {
     padding: 0.875rem 1.5rem;
@@ -314,28 +294,23 @@
 
 @media (max-width: 480px) {
   .hero {
-    min-height: calc(60vh - 80px); /* Adjusted for navbar (48px) + marquee (32px) */
+    min-height: calc(60vh - 80px);
   }
-
   .heroContent {
     padding: 0 0.5rem;
   }
-
   .heroTitle {
     font-size: clamp(1.25rem, 4vw, 1.75rem);
   }
-
   .heroSubtitle {
     font-size: clamp(0.8rem, 2vw, 0.9rem);
     line-height: 1.6;
   }
-
   .heroButtons {
     flex-direction: column;
     gap: 0.75rem;
     align-items: center;
   }
-
   .ctaButtonPrimary,
   .ctaButtonSecondary {
     width: 100%;
@@ -346,22 +321,18 @@
   }
 }
 
-/* Accessibility & Performance */
 @media (prefers-reduced-motion: reduce) {
   .heroVideo {
     animation-play-state: paused;
   }
-
   .ctaButtonPrimary,
   .ctaButtonSecondary {
     transition: none;
   }
-  
   .ctaButtonPrimary:hover,
   .ctaButtonSecondary:hover {
     transform: none;
   }
-
   .cursor,
   .cursorResearch,
   .cursorProfessionals,
@@ -375,13 +346,11 @@
   .heroOverlay {
     background: rgba(0, 0, 0, 0.8) !important;
   }
-
   .heroTitle,
   .heroSubtitle {
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 1);
   }
-
   .typedTextArchive,
   .typedTextResearch,
   .typedTextProfessionals,
@@ -393,13 +362,11 @@
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 1);
   }
-
   .ctaButtonPrimary {
     background: #000000;
     color: #ffffff;
     border: 2px solid #ffffff;
   }
-
   .ctaButtonSecondary {
     background: rgba(255, 255, 255, 0.9);
     border: 2px solid #ffffff;
@@ -407,36 +374,30 @@
   }
 }
 
-/* Video fallback for slow connections */
 @media (prefers-reduced-data: reduce) {
   .heroVideo {
     display: none;
   }
-  
   .hero {
     background: linear-gradient(135deg, #1e3a8a, #3730a3);
   }
 }
 
-/* Performance optimization for older devices */
 @media (max-width: 480px) and (max-height: 800px) {
   .heroVideo {
     filter: brightness(0.8);
   }
 }
 
-/* Print styles */
 @media print {
   .heroVideo {
     display: none;
   }
-  
   .hero {
     background: #ffffff;
     color: #000000;
     min-height: auto;
   }
-  
   .heroTitle,
   .heroSubtitle {
     color: #000000;

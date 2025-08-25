@@ -118,7 +118,6 @@ export default function HomePage() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = Math.round((scrollTop / scrollHeight) * 100);
-      
       if (scrollPercent > maxScroll) {
         maxScroll = scrollPercent;
         if (scrollPercent >= 25 && maxScroll < 25) {
@@ -132,19 +131,16 @@ export default function HomePage() {
         }
       }
     };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
     const startTime = Date.now();
-    
     const trackTimeOnPage = () => {
       const timeSpent = Math.round((Date.now() - startTime) / 1000);
       trackEvent('timing', 'homepage', 'time_on_page', timeSpent);
     };
-
     window.addEventListener('beforeunload', trackTimeOnPage);
     const interval = setInterval(() => {
       const timeSpent = Math.round((Date.now() - startTime) / 1000);
@@ -152,7 +148,6 @@ export default function HomePage() {
         trackEvent('timing', 'homepage', 'active_time', timeSpent);
       }
     }, 30000);
-
     return () => {
       window.removeEventListener('beforeunload', trackTimeOnPage);
       clearInterval(interval);

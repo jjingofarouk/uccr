@@ -1,29 +1,30 @@
+
 :root {
-  --background: #fafafa; /* Soft off-white for a clean background */
-  --text: #1a1a1a; /* Deep charcoal for readability */
-  --primary: #00695c; /* Hospital dark teal for trust and professionalism */
-  --primary-hover: #004d40; /* Darker teal for hover states */
-  --primary-light: #4db6ac; /* Lighter teal for highlights */
-  --primary-dark: #003d33; /* Deep teal for depth */
-  --secondary: #e0f2f1; /* Pale teal for subtle accents */
-  --border: #e0e0e0; /* Light gray for clean separation */
-  --shadow: rgba(26, 26, 26, 0.1); /* Subtle shadow for depth */
-  --surface: #ffffff; /* Pure white for cards and surfaces */
-  --accent: #0288d1; /* Vibrant blue for key actions */
+  --background: #fafafa;
+  --text: #1a1a1a;
+  --primary: #00695c;
+  --primary-hover: #004d40;
+  --primary-light: #4db6ac;
+  --primary-dark: #003d33;
+  --secondary: #e0f2f1;
+  --border: #e0e0e0;
+  --shadow: rgba(26, 26, 26, 0.1);
+  --surface: #ffffff;
+  --accent: #0288d1;
 }
 
 .dark-mode {
-  --background: #121212; /* Deep black for true dark mode */
-  --text: #e0e0e0; /* Light gray for readable text */
-  --primary: #4db6ac; /* Brighter teal for visibility in dark mode */
-  --primary-hover: #80cbc4; /* Lighter teal for hover states */
-  --primary-light: #b2dfdb; /* Very light teal for highlights */
-  --primary-dark: #00695c; /* Dark teal ties to light mode primary */
-  --secondary: #00695c; /* Muted teal for secondary elements */
-  --border: #424242; /* Dark gray for borders */
-  --shadow: rgba(77, 182, 172, 0.2); /* Subtle teal-tinted shadow */
-  --surface: #1e1e1e; /* Dark surface for cards */
-  --accent: #29b6f6; /* Bright blue for accents, contrasting with teal */
+  --background: #121212;
+  --text: #e0e0e0;
+  --primary: #4db6ac;
+  --primary-hover: #80cbc4;
+  --primary-light: #b2dfdb;
+  --primary-dark: #00695c;
+  --secondary: #00695c;
+  --border: #424242;
+  --shadow: rgba(77, 182, 172, 0.2);
+  --surface: #1e1e1e;
+  --accent: #29b6f6;
 }
 
 html, body {
@@ -47,8 +48,6 @@ main {
   margin-top: 76px;
 }
 
-
-
 .marquee-container {
   margin: 0;
   padding: 0;
@@ -57,7 +56,6 @@ main {
   position: relative;
   z-index: 999;
 }
-
 .container {
   max-width: 1280px;
   margin: 0 auto;

@@ -5,7 +5,6 @@ import { trackClick } from '../../utils/analytics';
 import styles from './HeroSection.module.css';
 
 const HeroSection = () => {
-  // Archive words
   const archiveWords = [
     'medical case studies',
     'clinical reports',
@@ -17,7 +16,6 @@ const HeroSection = () => {
     'treatment protocols'
   ];
 
-  // Research words
   const researchWords = [
     'medical research',
     'clinical data',
@@ -29,7 +27,6 @@ const HeroSection = () => {
     'research publications'
   ];
 
-  // Professionals
   const professionals = [
     'doctors',
     'nurses',
@@ -55,7 +52,6 @@ const HeroSection = () => {
     'medical educators'
   ];
 
-  // Locations
   const locations = [
     'Uganda',
     'East Africa',
@@ -77,17 +73,14 @@ const HeroSection = () => {
     'global health communities'
   ];
 
-  // State for each typing element
   const [archiveState, setArchiveState] = useState({ index: 0, text: '', isTyping: true });
   const [researchState, setResearchState] = useState({ index: 0, text: '', isTyping: true });
   const [professionalsState, setProfessionalsState] = useState({ index: 0, text: '', isTyping: true });
   const [locationsState, setLocationsState] = useState({ index: 0, text: '', isTyping: true });
 
-  // Generic typing effect hook
   const useTypingEffect = (words, state, setState, speed = 80, pauseTime = 2000, eraseSpeed = 40) => {
     useEffect(() => {
       const currentWord = words[state.index];
-      
       if (state.isTyping) {
         if (state.text.length < currentWord.length) {
           const timer = setTimeout(() => {
@@ -126,7 +119,6 @@ const HeroSection = () => {
     }, [words, state, setState, speed, pauseTime, eraseSpeed]);
   };
 
-  // Apply typing effects with different speeds and delays
   useTypingEffect(archiveWords, archiveState, setArchiveState, 80, 2500, 40);
   useTypingEffect(researchWords, researchState, setResearchState, 90, 2000, 45);
   useTypingEffect(professionals, professionalsState, setProfessionalsState, 70, 1800, 35);
