@@ -44,7 +44,7 @@
   position: relative;
   z-index: 3;
   max-width: 900px;
-  padding: 0 1rem;
+  padding: 0;
   color: #ffffff;
   margin: 0 auto;
 }
@@ -178,7 +178,7 @@
   align-items: center;
   gap: 0.5rem;
   background: transparent;
-  color: var(--primary);
+  color: #ffffff;
   padding: 0.875rem 1.75rem;
   border: 2px solid var(--primary);
   border-radius: 12px;
@@ -242,7 +242,7 @@
 [data-theme='light'] .ctaButtonSecondary {
   background: transparent;
   border-color: var(--primary);
-  color: var(--primary);
+  color: #ffffff;
   box-shadow: none;
 }
 

@@ -13,9 +13,15 @@ const HeroSection = () => {
     'diagnostic cases',
     'surgical procedures',
     'patient outcomes',
-    'treatment protocols'
+    'treatment protocols',
+    'ECG cases',
+    'X-ray collections',
+    'pathology reports',
+    'radiology findings',
+    'laboratory analyses',
+    'case series',
+    'disease registries'
   ];
-
   const researchWords = [
     'medical research',
     'clinical data',
@@ -26,7 +32,6 @@ const HeroSection = () => {
     'treatment outcomes',
     'research publications'
   ];
-
   const professionals = [
     'doctors',
     'nurses',
@@ -51,7 +56,6 @@ const HeroSection = () => {
     'clinical pharmacists',
     'medical educators'
   ];
-
   const locations = [
     'Uganda',
     'East Africa',
@@ -80,42 +84,42 @@ const HeroSection = () => {
 
   const useTypingEffect = (words, state, setState, speed = 80, pauseTime = 2000, eraseSpeed = 40) => {
     useEffect(() => {
+      let timer;
       const currentWord = words[state.index];
+
       if (state.isTyping) {
         if (state.text.length < currentWord.length) {
-          const timer = setTimeout(() => {
+          timer = setTimeout(() => {
             setState(prev => ({
               ...prev,
               text: currentWord.substring(0, prev.text.length + 1)
             }));
           }, speed);
-          return () => clearTimeout(timer);
         } else {
-          const timer = setTimeout(() => {
+          timer = setTimeout(() => {
             setState(prev => ({ ...prev, isTyping: false }));
           }, pauseTime);
-          return () => clearTimeout(timer);
         }
       } else {
         if (state.text.length > 0) {
-          const timer = setTimeout(() => {
+          timer = setTimeout(() => {
             setState(prev => ({
               ...prev,
               text: prev.text.substring(0, prev.text.length - 1)
             }));
           }, eraseSpeed);
-          return () => clearTimeout(timer);
         } else {
-          const timer = setTimeout(() => {
+          timer = setTimeout(() => {
             setState(prev => ({
               index: (prev.index + 1) % words.length,
               text: '',
               isTyping: true
             }));
           }, 300);
-          return () => clearTimeout(timer);
         }
       }
+
+      return () => clearTimeout(timer);
     }, [words, state, setState, speed, pauseTime, eraseSpeed]);
   };
 

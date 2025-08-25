@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import CaseCard from '../Case/CaseCard';
 import { trackClick, trackEngagement } from '../../utils/analytics';
-import styles from './SpecialtySection.module.css';
+import styles from '../../pages/Home.module.css';
 
 const SpecialtySection = ({ specialtyCases, featuredSpecialty }) => (
   <section className={styles.specialtySection} aria-labelledby="specialty-title">

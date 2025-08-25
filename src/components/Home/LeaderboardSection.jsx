@@ -6,7 +6,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getTopContributors } from '../../firebase/firestore';
 import { trackClick, trackEngagement } from '../../utils/analytics';
-import styles from './LeaderBoard.module.css';
+import styles from '../../pages/Home.module.css';
 
 const LeaderboardSection = () => {
   const [contributors, setContributors] = useState([]);
