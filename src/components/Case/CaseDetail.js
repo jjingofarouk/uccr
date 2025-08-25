@@ -108,7 +108,7 @@ export default function CaseDetail({ caseData, isLoading }) {
       const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
       setScrollProgress(progress);
       setShowBackToTop(window.scrollY > 300);
-      setShowToc(window.scrollY <= 100 && window.innerWidth >= 1024);
+      setShowToc(window.innerWidth < 1024 || window.scrollY <= 100);
     };
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleScroll);
@@ -217,9 +217,14 @@ export default function CaseDetail({ caseData, isLoading }) {
 
         {showToc && (
           <Box className={`${styles.toc} ${showToc ? '' : styles.hidden}`} id="toc">
-            <Typography variant="h6" className={styles.tocTitle}>
-              Table of Contents
-            </Typography>
+<Typography 
+  variant="h6" 
+  className={styles.tocTitle} 
+  fontWeight="bold"
+>
+  Contents
+</Typography>
+
             <ul className={styles.tocList}>
               {sections.map((section) => (
                 <li key={section.id}>

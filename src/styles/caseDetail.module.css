@@ -35,10 +35,7 @@
 }
 
 .toc {
-  position: sticky;
-  top: 76px;
   width: 220px;
-  float: right;
   margin-left: 1.5rem;
   padding: 1rem;
   background: var(--surface);
@@ -47,6 +44,22 @@
   box-shadow: 0 2px 8px var(--shadow);
   transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
   z-index: 100;
+}
+
+@media (min-width: 1024px) {
+  .toc {
+    position: sticky;
+    top: 76px;
+    float: right;
+  }
+}
+
+@media (max-width: 1023px) {
+  .toc {
+    position: static;
+    width: 100%;
+    margin: 0 0 1.5rem;
+  }
 }
 
 .toc.hidden {
@@ -541,14 +554,6 @@
   .container {
     padding: 0.75rem;
     min-height: calc(100vh - 56px);
-  }
-
-  .toc {
-    position: static;
-    width: 100%;
-    margin: 0 0 1.5rem;
-    float: none;
-    border-radius: 10px;
   }
 
   .tocTitle {
