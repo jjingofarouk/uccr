@@ -216,7 +216,7 @@ export default function CaseDetail({ caseData, isLoading }) {
         <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
 
         {showToc && (
-          <Box className={styles.toc} id="toc">
+          <Box className={`${styles.toc} ${showToc ? '' : styles.hidden}`} id="toc">
             <Typography variant="h6" className={styles.tocTitle}>
               Table of Contents
             </Typography>
@@ -230,6 +230,7 @@ export default function CaseDetail({ caseData, isLoading }) {
                       handleTocClick(section.id);
                     }}
                     className={styles.tocLink}
+                    style={{ pointerEvents: 'auto' }}
                   >
                     {section.label}
                   </a>
