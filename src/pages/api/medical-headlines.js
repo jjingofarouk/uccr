@@ -59,11 +59,6 @@ const sources = {
   "Mayo Clinic": "https://newsnetwork.mayoclinic.org/feed/",
   "BBC Health": "http://feeds.bbci.co.uk/news/health/rss.xml",
   "CNN Health": "http://rss.cnn.com/rss/cnn_health.rss",
-
-  // Removed Source
-  // "Uganda Ministry of Health": "https://www.health.go.ug/rss" (Unconfirmed accessibility, potentially inactive or region-restricted)
-
-  // New Sources Added
   "The New England Journal of Medicine Catalyst": "https://catalyst.nejm.org/rss.xml",
   "American Journal of Public Health": "https://ajph.aphapublications.org/action/showFeed?type=etoc&feed=rss",
   "Health Affairs": "https://www.healthaffairs.org/action/showFeed?type=etoc&feed=rss",

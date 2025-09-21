@@ -73,6 +73,18 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               <Briefcase size={20} className={styles.navIcon} />
               Cases
             </Link>
+            <Link 
+  href="/diagnostics" 
+  onClick={() => {
+    handleNavigationClick('diagnostics');
+    toggleSidebar();
+  }} 
+  className={styles.navLink}
+>
+  <BookOpen size={20} className={styles.navIcon} />
+  Diagnostic Library
+</Link>
+
             {user && (
               <Link 
                 href="/cases/new" 
