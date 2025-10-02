@@ -20,9 +20,9 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     // Apply theme to document and save to localStorage
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark-mode');
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark-mode');
+      document.documentElement.classList.remove('dark');
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
