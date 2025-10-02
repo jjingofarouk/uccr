@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useCases } from '../../hooks/useCases';
@@ -37,10 +39,6 @@ function CasePageContent() {
             <header className={styles.header}>
               <Skeleton height={40} width="80%" />
               <div className={styles.meta}>
-                <div className={styles.author}>
-                  <Skeleton circle width={40} height={40} />
-                  <Skeleton width={100} />
-                </div>
                 <Skeleton width={150} />
               </div>
             </header>

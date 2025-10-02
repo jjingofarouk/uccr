@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { GoogleAnalytics } from '@next/third-parties/google';
@@ -12,7 +14,6 @@ import TrendingSection from '../components/Home/TrendingSection';
 import RecentSection from '../components/Home/RecentSection';
 import SpecialtySection from '../components/Home/SpecialtySection';
 import StatsSection from '../components/Home/StatsSection';
-import LeaderboardSection from '../components/Home/LeaderboardSection';
 import styles from './Home.module.css';
 
 export default function HomePage() {
@@ -202,7 +203,6 @@ export default function HomePage() {
             />
           )}
           <StatsSection />
-          <LeaderboardSection />
         </>
       )}
     </main>

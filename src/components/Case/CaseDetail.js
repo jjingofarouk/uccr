@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Component } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import { addReaction } from '../../firebase/firestore';
@@ -112,7 +111,7 @@ export default function CaseDetail({ caseData, isLoading }) {
     };
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
@@ -143,10 +142,6 @@ export default function CaseDetail({ caseData, isLoading }) {
       console.error('Error in handleEditClick:', err);
       setError('Failed to navigate to edit page.');
     }
-  };
-
-  const handleAuthorClick = (userId) => {
-    trackEvent('view_author', 'Profile', userId || 'unknown', 1);
   };
 
   const handleMediaView = (mediaIndex) => {
@@ -217,14 +212,13 @@ export default function CaseDetail({ caseData, isLoading }) {
 
         {showToc && (
           <Box className={`${styles.toc} ${showToc ? '' : styles.hidden}`} id="toc">
-<Typography 
-  variant="h6" 
-  className={styles.tocTitle} 
-  fontWeight="bold"
->
-  Contents
-</Typography>
-
+            <Typography 
+              variant="h6" 
+              className={styles.tocTitle} 
+              fontWeight="bold"
+            >
+              Contents
+            </Typography>
             <ul className={styles.tocList}>
               {sections.map((section) => (
                 <li key={section.id}>
@@ -266,21 +260,6 @@ export default function CaseDetail({ caseData, isLoading }) {
               </button>
             )}
             <div className={styles.meta}>
-              <div className={styles.author}>
-                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId)}>
-                  <Image
-                    src={caseData.photoURL || '/images/doctor-placeholder.jpg'}
-                    alt={`Profile picture of ${caseData.userName || 'Contributor'}`}
-                    width={40}
-                    height={40}
-                    className={styles.avatar}
-                    onError={(e) => console.error('Author image error:', caseData.photoURL)}
-                  />
-                </Link>
-                <Link href={`/profile/view/${caseData.userId || 'unknown'}`} onClick={() => handleAuthorClick(caseData.userId)}>
-                  <span className={styles.authorName}>{caseData.userName || 'Anonymous'}</span>
-                </Link>
-              </div>
               <time className={styles.date}>
                 {caseData.createdAt
                   ? new Date(caseData.createdAt).toLocaleDateString('en-US', {

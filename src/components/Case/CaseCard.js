@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
 import sanitizeHtml from 'sanitize-html';
@@ -5,7 +7,6 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../../styles/caseCard.module.css';
 
-// Utility function to render and truncate rich text for summary
 const renderRichTextSummary = (html) => {
   if (!html || typeof html !== 'string') return 'Not specified';
   const cleanText = sanitizeHtml(html, {
@@ -15,10 +16,8 @@ const renderRichTextSummary = (html) => {
   return cleanText.length > 100 ? cleanText.slice(0, 100) + '...' : cleanText;
 };
 
-// Utility function to format posted date
 const formatPostedDate = (createdAt) => {
   if (!createdAt) return 'Unknown date';
-  // Handle Firestore Timestamp objects
   const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
   if (isNaN(date.getTime())) return 'Unknown date';
   return date.toLocaleDateString('en-US', {
@@ -28,7 +27,6 @@ const formatPostedDate = (createdAt) => {
   });
 };
 
-// Utility function to render specialty tags
 const renderSpecialtyTags = (specialties) => {
   if (!Array.isArray(specialties) || specialties.length === 0) {
     return <span className={styles.tag}>Not specified</span>;
@@ -65,7 +63,6 @@ export default function CaseCard({ caseData, isLoading }) {
             <Skeleton height={24} width="80%" />
             <Skeleton height={16} count={2} style={{ marginTop: '10px' }} />
             <Skeleton height={16} width="60%" style={{ marginTop: '10px' }} />
-            <Skeleton circle width={24} height={24} style={{ marginTop: '10px' }} />
             <Skeleton height={16} width="40%" style={{ marginTop: '10px' }} />
           </div>
         </div>
@@ -109,17 +106,6 @@ export default function CaseCard({ caseData, isLoading }) {
           <strong>Specialties:</strong> {renderSpecialtyTags(caseData.specialty)}
         </div>
         <p className={styles.postedDate}>{formatPostedDate(caseData.createdAt)}</p>
-        <div className={styles.contributor}>
-          <Image
-            src={caseData.photoURL || '/images/doctor-avatar.jpeg'}
-            alt={`Avatar for ${caseData.userName || 'Contributor'}`}
-            width={24}
-            height={24}
-            className={styles.contributorAvatar}
-            onError={(e) => console.error(`Contributor image error for case ${caseData.id}:`, caseData.photoURL)}
-          />
-          <span>{caseData.userName || 'Anonymous'}</span>
-        </div>
       </div>
     </Link>
   );

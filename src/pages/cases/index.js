@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useMemo, useEffect } from 'react';
 import { useCases } from '../../hooks/useCases';
 import CaseCard from '../../components/Case/CaseCard';
@@ -13,7 +15,6 @@ export default function Cases() {
   const { cases, loading, error } = useCases();
   const [filters, setFilters] = useState({
     specialty: '',
-    author: '',
     hospital: '',
     referralCenter: '',
     dateRange: '',
@@ -28,10 +29,8 @@ export default function Cases() {
   const hospitals = [...new Set(cases.map((caseData) => caseData.hospital).filter(Boolean))];
   const referralCenters = [...new Set(cases.map((caseData) => caseData.referralCenter).filter(Boolean))];
 
-  // Custom sendGAEvent wrapper to check for window
   const sendGAEvent = typeof window !== 'undefined' ? require('@next/third-parties/google').sendGAEvent : () => {};
 
-  // Track page view and time spent on page
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -55,7 +54,6 @@ export default function Cases() {
     };
   }, [cases.length]);
 
-  // Track search/filter usage
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -76,9 +74,6 @@ export default function Cases() {
     const filtered = cases.filter((caseData) => {
       const matchesSpecialty = filters.specialty
         ? Array.isArray(caseData.specialty) && caseData.specialty.includes(filters.specialty)
-        : true;
-      const matchesAuthor = filters.author
-        ? caseData.userName.toLowerCase().includes(filters.author.toLowerCase())
         : true;
       const matchesHospital = filters.hospital ? caseData.hospital === filters.hospital : true;
       const matchesReferralCenter = filters.referralCenter
@@ -103,7 +98,7 @@ export default function Cases() {
       const matchesAwards = filters.awardsMin
         ? (caseData.awards || 0) >= parseInt(filters.awardsMin)
         : true;
-      return matchesSpecialty && matchesAuthor && matchesHospital && matchesReferralCenter && matchesDate && matchesAwards;
+      return matchesSpecialty && matchesHospital && matchesReferralCenter && matchesDate && matchesAwards;
     });
 
     if (typeof window !== 'undefined') {
@@ -213,7 +208,6 @@ export default function Cases() {
     const headers = [
       'Title',
       'Specialties',
-      'Author',
       'Hospital',
       'Referral Center',
       'Awards',
@@ -224,7 +218,6 @@ export default function Cases() {
     const rows = sortedCases.map((caseData) => [
       `"${caseData.title || ''}"`,
       `"${Array.isArray(caseData.specialty) ? caseData.specialty.join(', ') : caseData.specialty || ''}"`,
-      caseData.userName || 'Anonymous',
       caseData.hospital || '',
       caseData.referralCenter || '',
       caseData.awards || 0,
@@ -296,7 +289,6 @@ export default function Cases() {
     }
   };
 
-  // Track errors
   useEffect(() => {
     if (error && typeof window !== 'undefined') {
       sendGAEvent('event', 'exception', {
@@ -310,7 +302,6 @@ export default function Cases() {
     }
   }, [error]);
 
-  // Track loading states
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -339,7 +330,7 @@ export default function Cases() {
           <Skeleton height={40} width={200} />
           <div className={styles.filterSortContainer}>
             <div className={styles.filters}>
-              {[...Array(6)].map((_, index) => (
+              {[...Array(5)].map((_, index) => (
                 <Skeleton key={index} height={40} width={150} />
               ))}
             </div>
@@ -391,21 +382,6 @@ export default function Cases() {
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            name="author"
-            placeholder="Search by author..."
-            value={filters.author}
-            onChange={handleFilterChange}
-            className={styles.filterInput}
-            aria-label="Filter by author"
-            onFocus={() => typeof window !== 'undefined' && sendGAEvent('event', 'focus', {
-              event_category: 'form',
-              event_label: 'author_search',
-              filter: 'author',
-              action: 'search_focused'
-            })}
-          />
           <select
             name="hospital"
             value={filters.hospital}
@@ -643,7 +619,6 @@ export default function Cases() {
               </button>
               <h2>{previewCase.title || 'Untitled Case'}</h2>
               <p><strong>Specialties:</strong> {Array.isArray(previewCase.specialty) ? previewCase.specialty.join(', ') : previewCase.specialty || 'N/A'}</p>
-              <p><strong>Author:</strong> {previewCase.userName || 'Anonymous'}</p>
               <p><strong>Hospital:</strong> {previewCase.hospital || 'N/A'}</p>
               <p><strong>Presenting Complaint:</strong> {previewCase.presentingComplaint || 'N/A'}</p>
               <p><strong>Provisional Diagnosis:</strong> {previewCase.provisionalDiagnosis || 'N/A'}</p>
