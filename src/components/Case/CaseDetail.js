@@ -171,11 +171,10 @@ export default function CaseDetail({ caseData, isLoading }) {
   const sections = [
     { id: 'summary', label: 'Summary', content: getSafeValue(caseData?.highLevelSummary) },
     { id: 'chiefConcern', label: 'Chief Concern', content: getSafeValue(caseData?.presentingComplaint) },
-    { id: 'specialties', label: 'Specialties', content: getSafeValue(Array.isArray(caseData?.specialty) && caseData.specialty.length > 0 ? caseData.specialty.join(', ') : null) },
     { id: 'history', label: 'History', content: getSafeValue(caseData?.history) },
     { id: 'investigations', label: 'Investigations', content: getSafeValue(caseData?.investigations) },
     { id: 'management', label: 'Management', content: getSafeValue(caseData?.management) },
-    { id: 'provisionalDiagnosis', label: 'Provisional Diagnosis', content: getSafeValue(caseData?.provisionalDiagnosis) },
+    { id: 'provisionalDiagnosis', label: 'Diagnosis', content: getSafeValue(caseData?.provisionalDiagnosis) },
     { id: 'hospital', label: 'Hospital', content: getSafeValue(caseData?.hospital) },
     { id: 'referralCenter', label: 'Referral Center', content: getSafeValue(caseData?.referralCenter) },
     { id: 'discussion', label: 'Discussion', content: getSafeValue(caseData?.discussion) },
