@@ -176,7 +176,6 @@ export default function CaseDetail({ caseData, isLoading }) {
     { id: 'management', label: 'Management', content: getSafeValue(caseData?.management) },
     { id: 'provisionalDiagnosis', label: 'Diagnosis', content: getSafeValue(caseData?.provisionalDiagnosis) },
     { id: 'hospital', label: 'Hospital', content: getSafeValue(caseData?.hospital) },
-    { id: 'referralCenter', label: 'Referral Center', content: getSafeValue(caseData?.referralCenter) },
     { id: 'discussion', label: 'Discussion', content: getSafeValue(caseData?.discussion) },
     { id: 'references', label: 'References', content: getSafeValue(caseData?.references) },
   ];
