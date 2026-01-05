@@ -9,17 +9,21 @@ import {
     CheckCircle2,
     Info,
     Stethoscope,
-    Heart
+    Heart,
+    Edit
 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 import CommentSection from '../Case/CommentSection';
 import styles from './ECGDetail.module.css';
 
 const ECGDetail = ({ ecg }) => {
+    const { user } = useAuth();
     const [isRevealed, setIsRevealed] = useState(false);
 
     if (!ecg) return <div className={styles.loading}>Loading ECG case...</div>;
 
     const imageUrl = ecg.mediaUrls?.[0] || ecg.imageUrl || '/images/ecg-placeholder.jpg';
+    const isOwner = user && ecg.userId === user.uid;
 
     return (
         <div className={styles.detailContainer}>
@@ -27,7 +31,14 @@ const ECGDetail = ({ ecg }) => {
                 <Link href="/ecg-learning" className={styles.backButton}>
                     <ArrowLeft size={20} /> Back to Library
                 </Link>
-                <div className={styles.caseBadge}>{ecg.category}</div>
+                <div className={styles.topActions}>
+                    {isOwner && (
+                        <Link href={`/ecg-learning/edit/${ecg.id}`} className={styles.editButton}>
+                            <Edit size={18} /> Edit Case
+                        </Link>
+                    )}
+                    <div className={styles.caseBadge}>{ecg.category}</div>
+                </div>
             </header>
 
             <div className={styles.contentGrid}>

@@ -27,6 +27,33 @@
     opacity: 1;
 }
 
+.topActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.editButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--secondary);
+    color: var(--primary);
+    padding: 6px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid var(--primary-light);
+}
+
+.editButton:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
 .caseBadge {
     background: var(--primary);
     color: white;
@@ -51,15 +78,21 @@
 }
 
 .imageCard {
-    background: var(--surface);
-    border-radius: 24px;
+    background: var(--secondary);
+    border-radius: 12px;
     border: 1px solid var(--border);
     overflow: hidden;
-    box-shadow: 0 20px 40px var(--shadow);
+    box-shadow: 0 10px 30px var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
 }
 
 .ecgImage {
-    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    object-fit: contain;
     display: block;
 }
 

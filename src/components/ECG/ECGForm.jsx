@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { addECG } from '../../firebase/firestore';
+import { addECG, updateECG } from '../../firebase/firestore';
 import styles from '../../styles/ecgForm.module.css';
 import {
     ChevronRight,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
-const ECGForm = () => {
+const ECGForm = ({ initialData, id }) => {
     const { user } = useAuth();
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(0);
@@ -26,21 +26,21 @@ const ECGForm = () => {
     const [error, setError] = useState('');
 
     const [formData, setFormData] = useState({
-        title: '',
-        clinicalContext: '',
-        rate: '',
-        rhythm: '',
-        axis: '',
-        pWave: '',
-        prInterval: '',
-        qrsComplex: '',
-        stSegment: '',
-        tWave: '',
-        qtInterval: '',
-        interpretation: '',
-        teachingPoints: '',
-        category: 'All',
-        mediaUrls: [],
+        title: initialData?.title || '',
+        clinicalContext: initialData?.clinicalContext || '',
+        rate: initialData?.rate || '',
+        rhythm: initialData?.rhythm || '',
+        axis: initialData?.axis || '',
+        pWave: initialData?.pWave || '',
+        prInterval: initialData?.prInterval || '',
+        qrsComplex: initialData?.qrsComplex || '',
+        stSegment: initialData?.stSegment || '',
+        tWave: initialData?.tWave || '',
+        qtInterval: initialData?.qtInterval || '',
+        interpretation: initialData?.interpretation || '',
+        teachingPoints: initialData?.teachingPoints || '',
+        category: initialData?.category || 'All',
+        mediaUrls: initialData?.mediaUrls || [],
     });
 
     const cloudinaryRef = useRef();
@@ -162,10 +162,15 @@ const ECGForm = () => {
                 userName: user.displayName || 'Anonymous',
                 photoURL: user.photoURL || '',
             };
-            await addECG(ecgData);
+
+            if (id) {
+                await updateECG(id, ecgData);
+            } else {
+                await addECG(ecgData);
+            }
             router.push('/ecg-learning');
         } catch (err) {
-            setError('Failed to save ECG case. Please try again.');
+            setError(`Failed to ${id ? 'update' : 'save'} ECG case. Please try again.`);
             setIsLoading(false);
         }
     };
@@ -426,7 +431,7 @@ const ECGForm = () => {
                                 disabled={isLoading || isUploading}
                                 className={`${styles.navButton} ${styles.submitButton}`}
                             >
-                                {isLoading ? 'Saving...' : 'Submit Case'} <CheckCircle2 size={20} style={{ marginLeft: '8px' }} />
+                                {isLoading ? 'Saving...' : (id ? 'Update Case' : 'Submit Case')} <CheckCircle2 size={20} style={{ marginLeft: '8px' }} />
                             </button>
                         )}
                     </div>

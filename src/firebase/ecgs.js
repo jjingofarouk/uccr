@@ -1,6 +1,7 @@
 import { collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, serverTimestamp, query, where, orderBy } from 'firebase/firestore';
 import { db, auth } from './config';
 import { fetchUserPhotoURL } from './utils';
+import { notifyUsersOfCaseChange } from './notifications';
 
 // Using the 'cases' collection but with a caseType for permissions
 const COLLECTION_NAME = 'cases';
@@ -34,6 +35,7 @@ export const addECG = async (ecgData) => {
         };
 
         const docRef = await addDoc(collection(db, COLLECTION_NAME), validatedData);
+        await notifyUsersOfCaseChange(docRef.id, validatedData.title, 'Added', validatedData.userId);
         return docRef.id;
     } catch (error) {
         console.error('Error adding ECG:', error);
@@ -89,6 +91,25 @@ export const getECGById = async (id) => {
         };
     } catch (error) {
         console.error('Error fetching ECG by ID:', error);
+        throw error;
+    }
+};
+
+export const updateECG = async (id, ecgData) => {
+    try {
+        const ecgRef = doc(db, COLLECTION_NAME, id);
+        const validatedData = {
+            ...ecgData,
+            updatedAt: serverTimestamp(),
+        };
+        // Remove fields that shouldn't be updated or are managed by Firebase
+        delete validatedData.id;
+        delete validatedData.createdAt;
+
+        await updateDoc(ecgRef, validatedData);
+        return id;
+    } catch (error) {
+        console.error('Error updating ECG:', error);
         throw error;
     }
 };
