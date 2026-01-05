@@ -1,0 +1,253 @@
+.ecgFormWrapper {
+    min-height: 100vh;
+    padding: 80px 20px 40px;
+    background: var(--background);
+    display: flex;
+    justify-content: center;
+}
+
+.ecgForm {
+    width: 100%;
+    max-width: 900px;
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 40px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 40px var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.ecgForm::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+.formHeader {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.formTitle {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+}
+
+.formSubtitle {
+    color: var(--text);
+    opacity: 0.7;
+    font-size: 1.1rem;
+}
+
+.stepContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.labelIcon {
+    color: var(--primary);
+}
+
+.input,
+.textarea,
+.select {
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--background);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-family: inherit;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--secondary);
+    background: var(--surface);
+}
+
+.textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+}
+
+.navButton {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+}
+
+.prevButton {
+    background: transparent;
+    color: var(--text);
+    border: 2px solid var(--border);
+}
+
+.prevButton:hover {
+    background: var(--secondary);
+    border-color: var(--primary-light);
+}
+
+.nextButton,
+.submitButton {
+    background: var(--primary);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.nextButton:hover,
+.submitButton:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--shadow);
+}
+
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.progressContainer {
+    margin-bottom: 40px;
+}
+
+.progressTrack {
+    height: 8px;
+    background: var(--secondary);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+}
+
+.progressBar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.uploadArea {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--background);
+}
+
+.uploadArea:hover {
+    border-color: var(--primary);
+    background: var(--secondary);
+}
+
+.uploadIcon {
+    color: var(--primary);
+    margin-bottom: 16px;
+}
+
+.previewImage {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.errorBox {
+    padding: 16px;
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-radius: 12px;
+    color: #c53030;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dark .errorBox {
+    background: #2d1a1a;
+    border-color: #5a2020;
+    color: #fc8181;
+}
+
+@media (max-width: 768px) {
+    .ecgForm {
+        padding: 24px;
+        border-radius: 0;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .formTitle {
+        font-size: 1.8rem;
+    }
+}

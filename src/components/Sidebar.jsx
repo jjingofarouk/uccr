@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'; // Added useEffect and useR
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Shield, BookOpen, Heart } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Shield, BookOpen, Heart, Activity } from 'lucide-react';
 import styles from '../styles/navbar.module.css';
 
 export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNavigationClick, handleLogout, logoutError, clearError }) {
@@ -51,47 +51,58 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
             )}
           </div>
           <nav className={styles.sidebarNav}>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               onClick={() => {
                 handleNavigationClick('home');
                 toggleSidebar();
-              }} 
+              }}
               className={styles.navLink}
             >
               <Home size={20} className={styles.navIcon} />
               Home
             </Link>
-            <Link 
-              href="/cases" 
+            <Link
+              href="/cases"
               onClick={() => {
                 handleNavigationClick('cases');
                 toggleSidebar();
-              }} 
+              }}
               className={styles.navLink}
             >
               <Briefcase size={20} className={styles.navIcon} />
               Cases
             </Link>
-            <Link 
-  href="/diagnostics" 
-  onClick={() => {
-    handleNavigationClick('diagnostics');
-    toggleSidebar();
-  }} 
-  className={styles.navLink}
->
-  <BookOpen size={20} className={styles.navIcon} />
-  Diagnostic Library
-</Link>
+            <Link
+              href="/diagnostics"
+              onClick={() => {
+                handleNavigationClick('diagnostics');
+                toggleSidebar();
+              }}
+              className={styles.navLink}
+            >
+              <BookOpen size={20} className={styles.navIcon} />
+              Diagnostic Library
+            </Link>
+            <Link
+              href="/ecg-learning"
+              onClick={() => {
+                handleNavigationClick('ecg_learning');
+                toggleSidebar();
+              }}
+              className={styles.navLink}
+            >
+              <Activity size={20} className={styles.navIcon} />
+              ECG Masterclass
+            </Link>
 
             {user && (
-              <Link 
-                href="/cases/new" 
+              <Link
+                href="/cases/new"
                 onClick={() => {
                   handleNavigationClick('add_case');
                   toggleSidebar();
-                }} 
+                }}
                 className={styles.navLink}
               >
                 <PlusCircle size={20} className={styles.navIcon} />
@@ -99,12 +110,25 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               </Link>
             )}
             {user && (
-              <Link 
-                href="/profile/cases" 
+              <Link
+                href="/ecg-learning/new"
+                onClick={() => {
+                  handleNavigationClick('add_ecg');
+                  toggleSidebar();
+                }}
+                className={styles.navLink}
+              >
+                <PlusCircle size={20} className={styles.navIcon} />
+                Add ECG Case
+              </Link>
+            )}
+            {user && (
+              <Link
+                href="/profile/cases"
                 onClick={() => {
                   handleNavigationClick('my_cases');
                   toggleSidebar();
-                }} 
+                }}
                 className={styles.navLink}
               >
                 <Briefcase size={20} className={styles.navIcon} />
@@ -112,12 +136,12 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               </Link>
             )}
             {user && (
-              <Link 
-                href="/profile" 
+              <Link
+                href="/profile"
                 onClick={() => {
                   handleNavigationClick('profile');
                   toggleSidebar();
-                }} 
+                }}
                 className={styles.navLink}
               >
                 <User size={20} className={styles.navIcon} />
@@ -135,12 +159,12 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               <Inbox size={20} className={styles.navIcon} />
               Inbox
             </Link> */}
-            <Link 
-              href="/about" 
+            <Link
+              href="/about"
               onClick={() => {
                 handleNavigationClick('about');
                 toggleSidebar();
-              }} 
+              }}
               className={styles.navLink}
             >
               <Info size={20} className={styles.navIcon} />
@@ -168,18 +192,18 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
               <Shield size={20} className={styles.navIcon} />
               Privacy
             </Link> */}
-            <Link 
-              href="/apps" 
+            <Link
+              href="/apps"
               onClick={() => {
                 handleNavigationClick('apps');
                 toggleSidebar();
-              }} 
+              }}
               className={styles.navLink}
             >
               <Grid size={20} className={styles.navIcon} />
               Other Apps
             </Link>
-{/*
+            {/*
   <Link 
     href="/support" 
     onClick={() => {
@@ -202,12 +226,12 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
                 Logout
               </button>
             ) : (
-              <Link 
-                href="/auth" 
+              <Link
+                href="/auth"
                 onClick={() => {
                   handleNavigationClick('login');
                   toggleSidebar();
-                }} 
+                }}
                 className={styles.navLink}
               >
                 <LogIn size={20} className={styles.navIcon} />

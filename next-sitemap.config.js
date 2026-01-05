@@ -1,5 +1,5 @@
 module.exports = {
-  siteUrl: 'https://yourdomain.com', // ← change this
+  siteUrl: 'https://www.ugandacasereports.org',
   generateRobotsTxt: true,
   sitemapSize: 5000,
   changefreq: 'weekly',

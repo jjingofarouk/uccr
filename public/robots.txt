@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.ugandacasereports.org
+
+# Sitemaps
+Sitemap: https://www.ugandacasereports.org/sitemap.xml

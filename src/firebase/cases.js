@@ -17,6 +17,7 @@ export const addCase = async (caseData) => {
     ].filter(Boolean);
 
     const validatedCaseData = {
+      caseType: 'clinical', // Default case type
       userId: caseData.userId,
       userName: caseData.userName || 'Anonymous',
       title: String(caseData.title || ''),
@@ -58,34 +59,36 @@ export const getCases = async (uid = null) => {
       q = query(collection(db, 'cases'), where('userId', '==', uid));
     }
     const querySnapshot = await getDocs(q);
-    const casesPromises = querySnapshot.docs.map(async (doc) => {
-      const data = doc.data();
-      const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/photo-placeholder.jpg';
-      return {
-        id: doc.id,
-        userId: data.userId || '',
-        userName: data.userName || 'Anonymous',
-        title: data.title || '',
-        specialty: Array.isArray(data.specialty) ? data.specialty : [],
-        presentingComplaint: data.presentingComplaint || '',
-        history: data.history || '',
-        physicalExam: data.physicalExam || '',
-        investigations: data.investigations || '',
-        provisionalDiagnosis: data.provisionalDiagnosis || '',
-        management: data.management || '',
-        discussion: data.discussion || '',
-        highLevelSummary: data.highLevelSummary || '',
-        references: data.references || '',
-        hospital: data.hospital || '',
-        referralCenter: data.referralCenter || '',
-        mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
-        awards: Number(data.awards) || 0,
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date(),
-        photoURL: photoURL,
-        thumbnailUrl: data.thumbnailUrl || '',
-      };
-    });
+    const casesPromises = querySnapshot.docs
+      .filter((doc) => doc.data().caseType !== 'ecg') // Filter out ECGs in JS
+      .map(async (doc) => {
+        const data = doc.data();
+        const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/photo-placeholder.jpg';
+        return {
+          id: doc.id,
+          userId: data.userId || '',
+          userName: data.userName || 'Anonymous',
+          title: data.title || '',
+          specialty: Array.isArray(data.specialty) ? data.specialty : [],
+          presentingComplaint: data.presentingComplaint || '',
+          history: data.history || '',
+          physicalExam: data.physicalExam || '',
+          investigations: data.investigations || '',
+          provisionalDiagnosis: data.provisionalDiagnosis || '',
+          management: data.management || '',
+          discussion: data.discussion || '',
+          highLevelSummary: data.highLevelSummary || '',
+          references: data.references || '',
+          hospital: data.hospital || '',
+          referralCenter: data.referralCenter || '',
+          mediaUrls: Array.isArray(data.mediaUrls) ? data.mediaUrls : [],
+          awards: Number(data.awards) || 0,
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          updatedAt: data.updatedAt?.toDate?.() || new Date(),
+          photoURL: photoURL,
+          thumbnailUrl: data.thumbnailUrl || '',
+        };
+      });
     const cases = await Promise.all(casesPromises);
     console.log('Retrieved cases:', cases.length, 'for user:', uid || 'all');
     return cases;
@@ -104,6 +107,7 @@ export const getCaseById = async (id) => {
       return null;
     }
     const data = docSnap.data();
+    if (data.caseType === 'ecg') return null; // Distinguish from regular cases
     const photoURL = data.userId ? await fetchUserPhotoURL(data.userId) : '/images/photo-placeholder.jpg';
     const caseData = {
       id: docSnap.id,

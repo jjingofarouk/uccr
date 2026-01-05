@@ -13,6 +13,7 @@ import { getTrendingCases } from './trending';
 import { searchCasesAndUsers } from './search';
 import { getAllSpecialties } from './specialties';
 import { notifyUsersOfCaseChange } from './notifications';
+import { addECG, getECGs, getECGById } from './ecgs';
 
 export {
   db,
@@ -23,6 +24,9 @@ export {
   getCaseById,
   updateCase,
   deleteCase,
+  addECG,
+  getECGs,
+  getECGById,
   addComment,
   getComments,
   getProfile,

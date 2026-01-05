@@ -13,7 +13,6 @@ import FeaturedSection from '../components/Home/FeaturedSection';
 import TrendingSection from '../components/Home/TrendingSection';
 import RecentSection from '../components/Home/RecentSection';
 import SpecialtySection from '../components/Home/SpecialtySection';
-import StatsSection from '../components/Home/StatsSection';
 import styles from './Home.module.css';
 
 export default function HomePage() {
@@ -202,7 +201,6 @@ export default function HomePage() {
               featuredSpecialty={featuredSpecialty}
             />
           )}
-          <StatsSection />
         </>
       )}
     </main>
