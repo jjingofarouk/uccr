@@ -12,21 +12,47 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>Uganda Clinical Case Reports | Medical Case Studies & Insights</title>
-        <meta name="description" content="Explore Uganda Clinical Case Reports (UCCR), a premier archive of medical case studies, clinical research, healthcare insights, and clinical trials from Uganda." />
+        <title>UCCR | Clinical Case Discovery & Research Archive</title>
+        <meta name="description" content="Explore Uganda's premier clinical case archive. Access peer-reviewed research, rare medical findings, and high-yield insights for healthcare professionals." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href="https://www.ugandacasereports.org/" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/uccr.png" />
+        
+        {/* Schema.org Medical SEO Markup */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+             __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "MedicalWebPage",
+              "name": "Uganda Clinical Case Reports (UCCR)",
+              "description": "Medical case studies and clinical research archive from Uganda.",
+              "url": "https://www.ugandacasereports.org/",
+              "audience": {
+                "@type": "MedicalAudience",
+                "audienceType": ["Healthcare Professionals", "Medical Researchers", "Students"]
+              },
+              "medicalSpecialty": ["Cardiology", "Pathology", "Internal Medicine", "Surgery"],
+              "publisher": {
+                "@type": "Organization",
+                "name": "Uganda Clinical Case Reports",
+                "logo": "https://www.ugandacasereports.org/logo.png"
+              }
+            })
+          }}
+        />
+
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Uganda Clinical Case Reports (UCCR) - Medical archive" />
-        <meta property="og:description" content="A growing archive of medical research and case studies from Uganda." />
-        <meta property="og:url" content="https://ugandacasereports.org" />
+        <meta property="og:title" content="Uganda Clinical Case Reports (UCCR)" />
+        <meta property="og:description" content="Medical research and clinical findings from the Ugandan healthcare sector." />
+        <meta property="og:url" content="https://www.ugandacasereports.org/" />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Uganda Clinical Case Reports" />
-        <meta name="twitter:description" content="Medical research and case studies from Uganda." />
+        <meta name="twitter:title" content="UCCR Clinical Archive" />
+        <meta name="twitter:description" content="Explore Uganda's official clinical case repository." />
       </Head>
       <AuthProvider>
         <ThemeProvider>
