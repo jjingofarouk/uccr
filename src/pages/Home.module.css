@@ -278,6 +278,7 @@
   flex-direction: column;
   gap: 1.5rem;
   background: var(--background);
+  min-height: 100vh;
 }
 
 .heroHeader {
@@ -335,9 +336,12 @@
 
 .loadingSection {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 60px);
+  flex: 1;
+  padding: 4rem 2rem;
+  min-height: 60vh;
 }
 
 .errorSection {

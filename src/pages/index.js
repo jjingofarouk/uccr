@@ -213,36 +213,34 @@ export default function HomePage() {
               <h2 className={styles.discoveryTitle}>Advancing Clinical Discovery in Uganda</h2>
               <div className={styles.discoveryText}>
                 <p>
-                  The Uganda Clinical Case Reports (UCCR) is a premier digital repository dedicated to the 
-                  documentation and dissemination of high-yield medical observations and clinical research 
-                  within the Ugandan healthcare ecosystem. Our mission is to provide an open-access platform 
-                  where healthcare professionals, researchers, and medical students can contribute to the 
-                  global body of medical knowledge through detailed, peer-reviewed clinical cases.
+                  Uganda Clinical Case Reports (UCCR) is a premier digital repository dedicated to the
+                  documentation and dissemination of high-yield medical observations and clinical research
+                  within the East African healthcare ecosystem. Our mission is to provide an open-access platform
+                  where healthcare professionals, researchers, and medical students can contribute to the
+                  global body of medical knowledge through detailed peer-reviewed clinical cases.
                 </p>
                 <p>
-                  From rare tropical presentations to innovative surgical techniques, the UCCR archive 
-                  spans across multiple medical specialties including Cardiology, Oncology, Internal Medicine, 
-                  and Public Health. By documenting unique patient outcomes and diagnostic challenges, we 
-                  aim to improve clinical reasoning and healthcare quality across the region.
+                  We cover rare tropical presentations to innovative surgical techniques across multiple medical specialties including Cardiology, Oncology, Internal Medicine,
+                  and Public Health and document unique patient outcomes and diagnostic challenges to improve clinical reasoning and healthcare quality across the region.
                 </p>
                 <h3>Why Peer-Reviewed Case Reports Matter</h3>
                 <p>
-                  Clinical case reports are the backbone of medical discovery. They serve as the first line 
-                   of evidence for new diseases, drug side effects, and atypical presentations. At UCCR, we 
-                   emphasize the importance of data-backed insights and standardized reporting, ensuring that 
-                   every case contributed adds significant value to contemporary medical education.
+                  Clinical case reports are the backbone of medical discovery. They serve as the first line
+                  of evidence for new diseases, drug side effects, and atypical presentations. We
+                  emphasize the importance of data and standardized reporting to ensure that
+                  every case contributed adds significant value to contemporary medical education.
                 </p>
                 <p>
-                  Our <Link href="/search">advanced clinical search engine</Link> allows researchers to filter through 
-                  thousands of data points, identifying patterns in pathology and management strategies that 
-                  can lead to better patient outcomes. Whether you are looking for 
-                  <Link href="/search?specialty=Surgery">surgical case studies</Link> or 
-                  <Link href="/search?specialty=Pediatrics">pediatric research</Link>, UCCR provides the 
+                  Our <Link href="/search">advanced clinical search engine</Link> allows researchers to filter through
+                  thousands of data points to identify patterns in pathology and management strategies that
+                  can lead to better patient outcomes. Looking for
+                  <Link href="/search?specialty=Surgery">surgical case studies</Link> or
+                  <Link href="/search?specialty=Pediatrics">pediatric research</Link>, name it, UCCR provides the
                   evidence-based tools needed for modern clinical practice.
                 </p>
                 <p>
-                  Join our community of medical experts today. <Link href="/auth">Create an account</Link> to start 
-                  contributing your own findings to the repository, or explore our <Link href="/how-it-works">submission guidelines</Link> 
+                  Join our community of medical experts today. <Link href="/auth">Create an account</Link> to start
+                  contributing your own findings to the repository, or explore our <Link href="/how-it-works">submission guidelines</Link>
                   to learn how to prepare your report for peer review and publication in the archive.
                 </p>
               </div>
