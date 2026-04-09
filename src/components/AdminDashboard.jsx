@@ -6,12 +6,7 @@ import { Pencil, Trash2, Download, X, Upload } from 'lucide-react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import CaseCard from './Case/CaseCard';
-import dynamic from 'next/dynamic';
-import { sanitize } from '../utils/sanitize';
-import { v4 as uuidv4 } from 'uuid';
-
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css';
+import EditCaseForm from './Case/EditCaseForm';
 
 function ErrorMessage({ error }) {
   if (!error) return null;
@@ -22,182 +17,14 @@ function ErrorMessage({ error }) {
   );
 }
 
-function FormHeader({ title }) {
-  return <h2 className={styles.formHeader}>{title}</h2>;
-}
-
-function ProgressBar({ currentStep, stepsLength }) {
-  const progress = ((currentStep + 1) / stepsLength) * 100;
-  return (
-    <div className={styles.progressBar}>
-      <div className={styles.progress} style={{ width: `${progress}%` }}></div>
-    </div>
-  );
-}
-
-function StepContent({
-  steps,
-  currentStep,
-  formData,
-  handleChange,
-  handleDeleteMedia,
-  widgetRef,
-  isUploading,
-}) {
-  const step = steps[currentStep];
-  if (step.type === 'richtext') {
-    return (
-      <div className={styles.stepContent}>
-        <label className={styles.label}>{step.label}</label>
-        <ReactQuill
-          value={formData[step.name]}
-          onChange={(value) => handleChange(sanitize(value), step.name)}
-          modules={{
-            toolbar: [
-              [{ header: [1, 2, 3, false] }],
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ list: 'ordered' }, { list: 'bullet' }],
-              ['link', 'image'],
-              ['clean'],
-            ],
-          }}
-          formats={[
-            'header',
-            'bold', 'italic', 'underline', 'strike',
-            'list', 'bullet',
-            'link', 'image',
-          ]}
-          placeholder={step.placeholder}
-          className={styles.quillEditor}
-        />
-      </div>
-    );
-  } else if (step.type === 'select') {
-    return (
-      <div className={styles.stepContent}>
-        <label className={styles.label}>{step.label}</label>
-        <select
-          multiple
-          value={formData[step.name]}
-          onChange={(e) => handleChange(e, step.name)}
-          className={styles.select}
-        >
-          {step.options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  } else if (step.type === 'media') {
-    return (
-      <div className={styles.stepContent}>
-        <label className={styles.label}>{step.label}</label>
-        <button
-          type="button"
-          onClick={() => widgetRef.current?.open()}
-          className={styles.uploadButton}
-          disabled={isUploading}
-        >
-          <Upload size={20} /> {isUploading ? 'Uploading...' : 'Upload Media'}
-        </button>
-        {formData.mediaUrls.length > 0 && (
-          <div className={styles.mediaPreview}>
-            {formData.mediaUrls.map((url, index) => (
-              <div key={index} className={styles.mediaItem}>
-                <img src={url} alt={`Media ${index + 1}`} className={styles.mediaImage} />
-                <button
-                  type="button"
-                  onClick={() => handleDeleteMedia(index)}
-                  className={styles.deleteMediaButton}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-  return null;
-}
-
-function Navigation({
-  currentStep,
-  stepsLength,
-  isUploading,
-  isLoading,
-  nextStep,
-  prevStep,
-  submitText,
-}) {
-  return (
-    <div className={styles.navigation}>
-      {currentStep > 0 && (
-        <button
-          type="button"
-          onClick={prevStep}
-          className={styles.navButton}
-          disabled={isUploading || isLoading}
-        >
-          Previous
-        </button>
-      )}
-      {currentStep < stepsLength - 1 ? (
-        <button
-          type="button"
-          onClick={nextStep}
-          className={styles.navButton}
-          disabled={isUploading || isLoading}
-        >
-          Next
-        </button>
-      ) : (
-        <button
-          type="submit"
-          className={styles.navButton}
-          disabled={isUploading || isLoading}
-        >
-          {isLoading ? 'Saving...' : submitText}
-        </button>
-      )}
-    </div>
-  );
-}
-
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [cases, setCases] = useState([]);
   const [editingCaseId, setEditingCaseId] = useState(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    presentingComplaint: '',
-    history: '',
-    physicalExam: '',
-    investigations: '',
-    management: '',
-    provisionalDiagnosis: '',
-    hospital: '',
-    referralCenter: '',
-    specialty: [],
-    discussion: '',
-    highLevelSummary: '',
-    references: '',
-    mediaUrls: [],
-    userId: '',
-    userName: '',
-    photoURL: '',
-    thumbnailUrl: '',
-    createdAt: null,
-  });
-  const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
   const [filters, setFilters] = useState({
     specialty: '',
     author: '',
@@ -209,118 +36,12 @@ export default function AdminDashboard() {
   const [sortBy, setSortBy] = useState('createdAt-desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const cloudinaryRef = useRef();
-  const widgetRef = useRef();
   const casesPerPage = 10;
   const ADMIN_PASSWORD = 'SecureAdmin2025';
 
   const specialties = [...new Set(cases.flatMap((caseData) => caseData.specialty).filter(Boolean))];
   const hospitals = [...new Set(cases.map((caseData) => caseData.hospital).filter(Boolean))];
   const referralCenters = [...new Set(cases.map((caseData) => caseData.referralCenter).filter(Boolean))];
-
-  const steps = [
-    { name: 'title', label: 'Case Title', type: 'richtext', placeholder: 'Enter case title' },
-    { name: 'presentingComplaint', label: 'Presenting Complaint', type: 'richtext', placeholder: 'Describe the presenting complaint' },
-    { name: 'history', label: 'History', type: 'richtext', placeholder: 'Patient history' },
-    { name: 'physicalExam', label: 'Physical Examination', type: 'richtext', placeholder: 'Physical exam findings' },
-    { name: 'investigations', label: 'Investigations', type: 'richtext', placeholder: 'Investigation results' },
-    { name: 'management', label: 'Management', type: 'richtext', placeholder: 'Management plan' },
-    { name: 'provisionalDiagnosis', label: 'Provisional Diagnosis', type: 'richtext', placeholder: 'Enter provisional diagnosis' },
-    { name: 'hospital', label: 'Hospital', type: 'richtext', placeholder: 'Enter hospital name' },
-    { name: 'referralCenter', label: 'Referral Center', type: 'richtext', placeholder: 'Enter referral center' },
-    {
-      name: 'specialty',
-      label: 'Specialty',
-      type: 'select',
-      options: [
-        { value: 'Adolescent Medicine', label: 'Adolescent Medicine' },
-        { value: 'Allergy and Immunology', label: 'Allergy and Immunology' },
-        { value: 'Anesthesiology', label: 'Anesthesiology' },
-        { value: 'Aviation Medicine', label: 'Aviation Medicine' },
-        { value: 'Bacteriology', label: 'Bacteriology' },
-        { value: 'Biomedical Engineering', label: 'Biomedical Engineering' },
-        { value: 'Biostatistics', label: 'Biostatistics' },
-        { value: 'Cardiology', label: 'Cardiology' },
-        { value: 'Cardiothoracic Surgery', label: 'Cardiothoracic Surgery' },
-        { value: 'Chemical Pathology', label: 'Chemical Pathology' },
-        { value: 'Child and Adolescent Psychiatry', label: 'Child and Adolescent Psychiatry' },
-        { value: 'Clinical Chemistry', label: 'Clinical Chemistry' },
-        { value: 'Clinical Epidemiology', label: 'Clinical Epidemiology' },
-        { value: 'Clinical Pharmacology', label: 'Clinical Pharmacology' },
-        { value: 'Clinical Psychology', label: 'Clinical Psychology' },
-        { value: 'Clinical Trials', label: 'Clinical Trials' },
-        { value: 'Community Medicine', label: 'Community Medicine' },
-        { value: 'Cytopathology', label: 'Cytopathology' },
-        { value: 'Dermatology', label: 'Dermatology' },
-        { value: 'Developmental Pediatrics', label: 'Developmental Pediatrics' },
-        { value: 'Disaster Medicine', label: 'Disaster Medicine' },
-        { value: 'Ear, Nose and Throat (ENT)', label: 'Ear, Nose and Throat (ENT)' },
-        { value: 'Emergency Medicine', label: 'Emergency Medicine' },
-        { value: 'Endocrinology', label: 'Endocrinology' },
-        { value: 'Epidemiology', label: 'Epidemiology' },
-        { value: 'Family Medicine', label: 'Family Medicine' },
-        { value: 'Forensic Medicine', label: 'Forensic Medicine' },
-        { value: 'Gastroenterology', label: 'Gastroenterology' },
-        { value: 'General Practice', label: 'General Practice' },
-        { value: 'Genitourinary Medicine', label: 'Genitourinary Medicine' },
-        { value: 'Geriatrics', label: 'Geriatrics' },
-        { value: 'Health Economics', label: 'Health Economics' },
-        { value: 'Health Informatics', label: 'Health Informatics' },
-        { value: 'Health Policy and Management', label: 'Health Policy and Management' },
-        { value: 'Hematology', label: 'Hematology' },
-        { value: 'Histopathology', label: 'Histopathology' },
-        { value: 'Hyperbaric Medicine', label: 'Hyperbaric Medicine' },
-        { value: 'Immunopathology', label: 'Immunopathology' },
-        { value: 'Infectious Diseases', label: 'Infectious Diseases' },
-        { value: 'Internal Medicine', label: 'Internal Medicine' },
-        { value: 'Marine Medicine', label: 'Marine Medicine' },
-        { value: 'Maxillofacial Surgery', label: 'Maxillofacial Surgery' },
-        { value: 'Medical Administration', label: 'Medical Administration' },
-        { value: 'Medical Anthropology', label: 'Medical Anthropology' },
-        { value: 'Medical Education', label: 'Medical Education' },
-        { value: 'Medical Ethics', label: 'Medical Ethics' },
-        { value: 'Medical Genetics', label: 'Medical Genetics' },
-        { value: 'Medical Imaging', label: 'Medical Imaging' },
-        { value: 'Medical Microbiology', label: 'Medical Microbiology' },
-        { value: 'Medical Oncology', label: 'Medical Oncology' },
-        { value: 'Medical Toxicology', label: 'Medical Toxicology' },
-        { value: 'Neonatology', label: 'Neonatology' },
-        { value: 'Nephrology', label: 'Nephrology' },
-        { value: 'Neurology', label: 'Neurology' },
-        { value: 'Neurosurgery', label: 'Neurosurgery' },
-        { value: 'Nuclear Medicine', label: 'Nuclear Medicine' },
-        { value: 'Obstetrics and Gynecology', label: 'Obstetrics and Gynecology' },
-        { value: 'Occupational Medicine', label: 'Occupational Medicine' },
-        { value: 'Ophthalmology', label: 'Ophthalmology' },
-        { value: 'Orthopedic Surgery', label: 'Orthopedic Surgery' },
-        { value: 'Pain Medicine', label: 'Pain Medicine' },
-        { value: 'Palliative Care', label: 'Palliative Care' },
-        { value: 'Parasitology', label: 'Parasitology' },
-        { value: 'Pathology', label: 'Pathology' },
-        { value: 'Pediatrics', label: 'Pediatrics' },
-        { value: 'Plastic Surgery', label: 'Plastic Surgery' },
-        { value: 'Psychiatry', label: 'Psychiatry' },
-        { value: 'Public Health', label: 'Public Health' },
-        { value: 'Pulmonology', label: 'Pulmonology' },
-        { value: 'Radiation Oncology', label: 'Radiation Oncology' },
-        { value: 'Radiology', label: 'Radiology' },
-        { value: 'Rehabilitation Medicine', label: 'Rehabilitation Medicine' },
-        { value: 'Rheumatology', label: 'Rheumatology' },
-        { value: 'Sleep Medicine', label: 'Sleep Medicine' },
-        { value: 'Sports Medicine', label: 'Sports Medicine' },
-        { value: 'Surgery', label: 'Surgery' },
-        { value: 'Telemedicine', label: 'Telemedicine' },
-        { value: 'Tropical Medicine', label: 'Tropical Medicine' },
-        { value: 'Urology', label: 'Urology' },
-        { value: 'Vascular Surgery', label: 'Vascular Surgery' },
-        { value: 'Virology', label: 'Virology' },
-      ],
-    },
-    { name: 'discussion', label: 'Discussion', type: 'richtext', placeholder: 'Discuss the case' },
-    { name: 'highLevelSummary', label: 'Case Summary', type: 'richtext', placeholder: 'Summarize the case' },
-    { name: 'references', label: 'References', type: 'richtext', placeholder: 'List references' },
-    { name: 'mediaUrls', label: 'Upload Media', type: 'media', placeholder: 'Upload media' },
-  ];
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -349,212 +70,31 @@ export default function AdminDashboard() {
     fetchCases();
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const script = document.createElement('script');
-    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      cloudinaryRef.current = window.cloudinary;
-      if (cloudinaryRef.current) {
-        widgetRef.current = cloudinaryRef.current.createUploadWidget(
-          {
-            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '',
-            uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '',
-            folder: `cases/admin`,
-            sources: ['local', 'camera'],
-            multiple: true,
-            resourceType: 'image',
-            clientAllowedFormats: ['jpg', 'png', 'jpeg'],
-            maxFileSize: 10000000,
-            public_id: `upload_${uuidv4()}`,
-          },
-          (error, result) => {
-            if (result && result.event === 'upload-added') {
-              setIsUploading(true);
-            }
-            if (!error && result && result.event === 'success') {
-              setFormData((prev) => ({
-                ...prev,
-                mediaUrls: [...prev.mediaUrls, result.info.secure_url],
-              }));
-              setIsUploading(false);
-            } else if (error) {
-              setError(error.message || 'Image upload failed. Please try again.');
-              setIsUploading(false);
-            }
-          }
-        );
-      }
-    };
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, []);
-
   const handleEdit = (caseItem) => {
     setEditingCaseId(caseItem.id);
-    setFormData({
-      title: caseItem.title || '',
-      presentingComplaint: caseItem.presentingComplaint || '',
-      history: caseItem.history || '',
-      physicalExam: caseItem.physicalExam || '',
-      investigations: caseItem.investigations || '',
-      management: caseItem.management || '',
-      provisionalDiagnosis: caseItem.provisionalDiagnosis || '',
-      hospital: caseItem.hospital || '',
-      referralCenter: caseItem.referralCenter || '',
-      specialty: Array.isArray(caseItem.specialty) ? caseItem.specialty : [],
-      discussion: caseItem.discussion || '',
-      highLevelSummary: caseItem.highLevelSummary || '',
-      references: caseItem.references || '',
-      mediaUrls: Array.isArray(caseItem.mediaUrls) ? caseItem.mediaUrls : [],
-      userId: caseItem.userId || '',
-      userName: caseItem.userName || 'Anonymous',
-      photoURL: caseItem.photoURL || '',
-      thumbnailUrl: caseItem.thumbnailUrl || '',
-      createdAt: caseItem.createdAt || null,
-    });
-    setCurrentStep(0);
   };
 
-  const handleChange = (value, name) => {
-    if (name === 'specialty') {
-      const selectedOptions = Array.from(value.target.selectedOptions).map((option) => option.value);
-      setFormData((prev) => ({ ...prev, specialty: selectedOptions }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+  
+  
+  
+  
+  
+  
+  const handleCloseEdit = () => {
+    setEditingCaseId(null);
   };
 
-  const handleDeleteMedia = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
-    }));
-  };
-
-  const validateStep = () => {
-    const currentField = steps[currentStep].name;
-    if (currentField === 'mediaUrls' || currentField === 'specialty') return true;
-    const text = formData[currentField].replace(/<[^>]+>/g, '').trim();
-    return text !== '';
-  };
-
-  const nextStep = (e) => {
-    e.preventDefault();
-    if (!validateStep()) {
-      setError('Please fill out the current step before proceeding.');
-      return;
-    }
-    if (isUploading) {
-      setError('Please wait for the upload to complete.');
-      return;
-    }
-    if (currentStep < steps.length - 1) {
-      setError('');
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = (e) => {
-    e.preventDefault();
-    if (currentStep > 0) {
-      setError('');
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (currentStep !== steps.length - 1) {
-      setError('Please complete all steps before submitting.');
-      return;
-    }
-    if (isUploading) {
-      setError('Please wait for the upload to complete before submitting.');
-      return;
-    }
-    const requiredFields = steps
-      .filter((step) => step.type !== 'media' && step.type !== 'select')
-      .map((step) => step.name);
-    const isValid = requiredFields.every((field) => {
-      const text = formData[field].replace(/<[^>]+>/g, '').trim();
-      return text !== '';
-    });
-    if (!isValid) {
-      setError('Please fill out all required fields.');
-      return;
-    }
-    setError('');
-    setIsLoading(true);
+  const handleAdminSuccess = async (updatedCaseData) => {
+    setEditingCaseId(null);
     try {
-      const caseData = {
-        ...formData,
-        thumbnailUrl: formData.mediaUrls[0] || '',
-      };
-      await updateCase(editingCaseId, caseData);
-      setCases(cases.map(c => c.id === editingCaseId ? { ...c, ...caseData } : c));
-      setEditingCaseId(null);
-      setFormData({
-        title: '',
-        presentingComplaint: '',
-        history: '',
-        physicalExam: '',
-        investigations: '',
-        management: '',
-        provisionalDiagnosis: '',
-        hospital: '',
-        referralCenter: '',
-        specialty: [],
-        discussion: '',
-        highLevelSummary: '',
-        references: '',
-        mediaUrls: [],
-        userId: '',
-        userName: '',
-        photoURL: '',
-        thumbnailUrl: '',
-        createdAt: null,
-      });
-      setCurrentStep(0);
+      setIsLoading(true);
+      const allCases = await getCases();
+      setCases(allCases);
     } catch (err) {
-      setError(`Failed to update case: ${err.message}`);
+      setError('Failed to refresh cases.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleCloseEdit = () => {
-    setEditingCaseId(null);
-    setFormData({
-      title: '',
-      presentingComplaint: '',
-      history: '',
-      physicalExam: '',
-      investigations: '',
-      management: '',
-      provisionalDiagnosis: '',
-      hospital: '',
-      referralCenter: '',
-      specialty: [],
-      discussion: '',
-      highLevelSummary: '',
-      references: '',
-      mediaUrls: [],
-      userId: '',
-      userName: '',
-      photoURL: '',
-      thumbnailUrl: '',
-      createdAt: null,
-    });
-    setCurrentStep(0);
-    setError('');
   };
 
   const handleDelete = async (caseId) => {
@@ -915,33 +455,12 @@ export default function AdminDashboard() {
               <X size={24} />
             </button>
             <div className={styles.caseFormWrapper}>
-              <div className={styles.caseForm}>
-                <FormHeader title="Edit Case" />
-                <ProgressBar currentStep={currentStep} stepsLength={steps.length} />
-                <form onSubmit={handleSubmit}>
-                  <div className={styles.stepContentWrapper}>
-                    <StepContent
-                      steps={steps}
-                      currentStep={currentStep}
-                      formData={formData}
-                      handleChange={handleChange}
-                      handleDeleteMedia={handleDeleteMedia}
-                      widgetRef={widgetRef}
-                      isUploading={isUploading}
-                    />
-                  </div>
-                  <Navigation
-                    currentStep={currentStep}
-                    stepsLength={steps.length}
-                    isUploading={isUploading}
-                    isLoading={isLoading}
-                    nextStep={nextStep}
-                    prevStep={prevStep}
-                    submitText="Update Case"
-                  />
-                  <ErrorMessage error={error} />
-                </form>
-              </div>
+              <EditCaseForm 
+                caseId={editingCaseId} 
+                isAdmin={true} 
+                onAdminSuccess={handleAdminSuccess} 
+                onAdminCancel={handleCloseEdit} 
+              />
             </div>
           </div>
         </div>

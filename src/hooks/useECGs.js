@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getECGs, getECGById } from '../firebase/firestore';
+import { getECGs, getECGById } from '../lib/supabase/ecgs';
 
 export const useECGs = () => {
     const [ecgs, setEcgs] = useState([]);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getCases, getCaseById } from '../firebase/firestore';
+import { getCases, getCaseById } from '../lib/supabase/cases';
 
 // In-memory cache
 const casesCache = {};

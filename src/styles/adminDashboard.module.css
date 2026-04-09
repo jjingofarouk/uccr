@@ -375,11 +375,12 @@
   padding: 2rem;
   width: 100%;
   max-width: 900px;
-  height: 600px;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   position: relative;
   box-shadow: 0 6px 16px var(--shadow, rgba(0, 0, 0, 0.2));
+  overflow-y: auto;
 }
 
 .closeButton {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { addCase, getCases } from '../../firebase/firestore';
+import { addCase, getCases } from '../../lib/supabase/cases';
 import { v4 as uuidv4 } from 'uuid';
 import styles from '../../styles/caseForm.module.css';
 import FormHeader from './FormHeader';
@@ -10,7 +10,9 @@ import StepContent from './StepContent';
 import Navigation from './Navigation';
 import ErrorMessage from './ErrorMessage';
 import LoadingSkeleton from './LoadingSkeleton';
-import { auth } from '../../firebase/config';
+import { createClient } from '../../utils/supabase/client';
+
+const supabase = createClient();
 
 export default function CaseForm() {
   const { user, loading: authLoading, error: authError } = useAuth();
@@ -381,8 +383,7 @@ export default function CaseForm() {
       });
     }
     try {
-      await auth.currentUser.getIdToken(true);
-      console.log('Authentication token refreshed for user:', user.uid);
+      console.log('Submitting case to Supabase for user:', user.uid);
       const caseData = {
         ...formData,
         userId: user.uid,

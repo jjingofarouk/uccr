@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
+import { getProfile, updateProfile } from '../../lib/supabase/profiles';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
 import Loading from '../../components/Loading';
 import styles from '../../styles/profileEdit.module.css';
 
 export default function ProfileEdit() {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshProfile } = useAuth();
   const [formData, setFormData] = useState({
     role: '',
     name: '',
@@ -32,6 +31,7 @@ export default function ProfileEdit() {
     otherProfessionalAffiliations: '',
   });
   const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const cloudinaryRef = useRef();
   const widgetRef = useRef();
   const router = useRouter();
@@ -40,38 +40,27 @@ export default function ProfileEdit() {
     if (user && !loading) {
       const fetchProfile = async () => {
         try {
-          const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
-          const data = profileDoc.exists() ? profileDoc.data() : {};
+          const profile = await getProfile(user.uid);
           setFormData({
-            role: data.role || '',
-            name: user.displayName || data.displayName || '',
-            photoUrl: data.photoURL || user.photoURL || '',
-            title: data.title || '',
-            education: data.education || '',
-            institution: data.institution || '',
-            specialty: data.specialty || '',
-            bio: data.bio || '',
-            linkedIn: data.linkedIn || '',
-            xProfile: data.xProfile || '',
-            researchInterests: Array.isArray(data.researchInterests) ? data.researchInterests : [],
-            certifications: Array.isArray(data.certifications) ? data.certifications : [],
-            yearsOfExperience: data.yearsOfExperience || '',
-            professionalAffiliations: Array.isArray(data.professionalAffiliations)
-              ? data.professionalAffiliations
-              : [],
-            levelOfStudy: data.levelOfStudy || '',
-            courseOfStudy: data.courseOfStudy || '',
-            otherResearchInterests: data.researchInterests?.find((i) => i.startsWith('Other:'))
-              ? data.researchInterests.find((i) => i.startsWith('Other:')).replace('Other:', '')
-              : '',
-            otherCertifications: data.certifications?.find((i) => i.startsWith('Other:'))
-              ? data.certifications.find((i) => i.startsWith('Other:')).replace('Other:', '')
-              : '',
-            otherProfessionalAffiliations: data.professionalAffiliations?.find((i) =>
-              i.startsWith('Other:')
-            )
-              ? data.professionalAffiliations.find((i) => i.startsWith('Other:')).replace('Other:', '')
-              : '',
+            role: profile.role || '',
+            name: profile.displayName || user.displayName || '',
+            photoUrl: profile.photoURL || user.photoURL || '',
+            title: profile.title || '',
+            education: profile.education || '',
+            institution: profile.institution || '',
+            specialty: profile.specialty || '',
+            bio: profile.bio || '',
+            linkedIn: profile.linkedIn || '',
+            xProfile: profile.xProfile || '',
+            researchInterests: Array.isArray(profile.researchInterests) ? profile.researchInterests : [],
+            certifications: Array.isArray(profile.certifications) ? profile.certifications : [],
+            yearsOfExperience: profile.yearsOfExperience || '',
+            professionalAffiliations: Array.isArray(profile.professionalAffiliations) ? profile.professionalAffiliations : [],
+            levelOfStudy: profile.levelOfStudy || '',
+            courseOfStudy: profile.courseOfStudy || '',
+            otherResearchInterests: profile.researchInterests?.find((i) => i.startsWith('Other:'))?.replace('Other:', '') || '',
+            otherCertifications: profile.certifications?.find((i) => i.startsWith('Other:'))?.replace('Other:', '') || '',
+            otherProfessionalAffiliations: profile.professionalAffiliations?.find((i) => i.startsWith('Other:'))?.replace('Other:', '') || '',
           });
         } catch (err) {
           setError('Failed to load profile.');
@@ -111,13 +100,7 @@ export default function ProfileEdit() {
               }
             }
           );
-        } else {
-          setError('Failed to initialize image uploader.');
         }
-      };
-
-      script.onerror = () => {
-        setError('Failed to load image uploader.');
       };
 
       return () => {
@@ -133,23 +116,19 @@ export default function ProfileEdit() {
 
   const handleMultiSelectChange = (e, field) => {
     const selectedOptions = Array.from(e.target.selectedOptions).map((option) => option.value);
-    setFormData((prev) => ({
-      ...prev,
-      [field]: selectedOptions,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: selectedOptions }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
-      setError('You must be logged in to update your profile.');
-      return;
-    }
+    if (!user) return setError('You must be logged in.');
+    
+    setIsSaving(true);
     try {
       const profileData = {
         role: formData.role,
-        displayName: formData.name || 'User',
-        photoURL: formData.photoUrl || '/images/doctor-avatar.jpeg',
+        displayName: formData.name,
+        photoURL: formData.photoUrl,
         title: formData.title,
         education: formData.education,
         institution: formData.institution,
@@ -157,38 +136,21 @@ export default function ProfileEdit() {
         bio: formData.bio,
         linkedIn: formData.linkedIn,
         xProfile: formData.xProfile,
-        researchInterests: formData.researchInterests.includes('Other') && formData.otherResearchInterests
-          ? [
-              ...formData.researchInterests.filter((i) => i !== 'Other'),
-              formData.otherResearchInterests ? `Other:${formData.otherResearchInterests}` : null,
-            ].filter(Boolean)
-          : formData.researchInterests,
-        certifications: formData.certifications.includes('Other') && formData.otherCertifications
-          ? [
-              ...formData.certifications.filter((i) => i !== 'Other'),
-              formData.otherCertifications ? `Other:${formData.otherCertifications}` : null,
-            ].filter(Boolean)
-          : formData.certifications,
+        researchInterests: formData.researchInterests,
+        certifications: formData.certifications,
         yearsOfExperience: formData.yearsOfExperience,
-        professionalAffiliations:
-          formData.professionalAffiliations.includes('Other') &&
-          formData.otherProfessionalAffiliations
-            ? [
-                ...formData.professionalAffiliations.filter((i) => i !== 'Other'),
-                formData.otherProfessionalAffiliations
-                  ? `Other:${formData.otherProfessionalAffiliations}`
-                  : null,
-              ].filter(Boolean)
-            : formData.professionalAffiliations,
-        levelOfStudy: formData.role === 'Student' ? formData.levelOfStudy : '',
-        courseOfStudy: formData.role === 'Student' ? formData.courseOfStudy : '',
-        updatedAt: new Date(),
+        professionalAffiliations: formData.professionalAffiliations,
+        levelOfStudy: formData.levelOfStudy,
+        courseOfStudy: formData.courseOfStudy,
       };
-      await setDoc(doc(db, 'profiles', user.uid), profileData, { merge: true });
+
+      await updateProfile(user.uid, profileData);
+      await refreshProfile(); // Trigger instant update in Header/Sidebar
       router.push('/profile');
     } catch (err) {
       setError('Failed to update profile: ' + err.message);
-      console.error('Firestore error:', err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -207,7 +169,6 @@ export default function ProfileEdit() {
             name="role"
             value={formData.role}
             onChange={handleChange}
-            required
           >
             <option value="">Select Role</option>
             <option value="Doctor">Doctor</option>
@@ -265,7 +226,6 @@ export default function ProfileEdit() {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            required
           />
           <label className={styles.label}>Professional Title</label>
           <input
@@ -521,8 +481,8 @@ export default function ProfileEdit() {
             placeholder="Brief bio (e.g., background, expertise)"
           />
         </div>
-        <button type="submit" className={styles.submitButton}>
-          Save Profile
+        <button type="submit" className={styles.submitButton} disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Save Profile'}
         </button>
         {error && <p className={styles.error}>{error}</p>}
       </form>

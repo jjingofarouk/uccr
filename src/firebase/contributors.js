@@ -12,10 +12,11 @@ export const getTopContributors = async (limitCount = 3) => {
       const casesRef = collection(db, 'cases');
       const userCasesQuery = query(casesRef, where('userId', '==', profileDoc.id));
       const casesSnapshot = await getDocs(userCasesQuery);
-      const caseCount = casesSnapshot.size;
-      
+      const clinicalCases = casesSnapshot.docs.filter(doc => doc.data().caseType !== 'ecg');
+      const caseCount = clinicalCases.length;
+
       let totalAwards = 0;
-      casesSnapshot.forEach(doc => {
+      clinicalCases.forEach(doc => {
         const caseData = doc.data();
         totalAwards += Number(caseData.awards) || 0;
       });

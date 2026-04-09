@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react'; // Added useEffect and useR
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Shield, BookOpen, Heart, Activity } from 'lucide-react';
+import { Home, Briefcase, PlusCircle, Grid, Info, User, Inbox, LogOut, LogIn, Shield, BookOpen, Heart, Activity, X } from 'lucide-react';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import styles from '../styles/navbar.module.css';
 
 export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNavigationClick, handleLogout, logoutError, clearError }) {
@@ -37,7 +39,16 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
           <div className={styles.sidebarHeader}>
-            {user && (
+            {loading ? (
+              <div className={styles.userInfo}>
+                <SkeletonTheme baseColor="var(--skeleton-base)" highlightColor="var(--skeleton-highlight)">
+                  <Skeleton circle width={48} height={48} />
+                  <div style={{ marginLeft: '0.75rem', flex: 1 }}>
+                    <Skeleton height={20} width="80%" />
+                  </div>
+                </SkeletonTheme>
+              </div>
+            ) : user ? (
               <div className={styles.userInfo}>
                 <Image
                   src={user.photoURL || '/images/doctor-avatar.jpeg'}
@@ -46,9 +57,9 @@ export default function Sidebar({ isOpen, toggleSidebar, user, loading, handleNa
                   height={48}
                   className={styles.sidebarAvatar}
                 />
-                <span className={styles.userName}>{user.displayName || 'User'}</span>
+                <span className={styles.userName}>{user.displayName || 'Anonymous User'}</span>
               </div>
-            )}
+            ) : null}
           </div>
           <nav className={styles.sidebarNav}>
             <Link

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile } from '../../firebase/firestore';
 import MessageThread from '../../components/Chat/MessageThread';
-import Navbar from '../../components/Navbar';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 
 export default function MessageThreadPage() {
@@ -43,7 +42,6 @@ export default function MessageThreadPage() {
   return (
     <ProtectedRoute>
       <div className="container">
-        <Navbar />
         <MessageThread threadId={chatId} otherUserName={otherUserName} />
       </div>
     </ProtectedRoute>

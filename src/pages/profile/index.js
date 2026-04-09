@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { getProfile } from '../../firebase/firestore';
+import { getProfile } from '../../lib/supabase/profiles';
 import ProfileCard from '../../components/Profile/ProfileCard';
 import ProtectedRoute from '../../components/Auth/ProtectedRoute';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import Head from 'next/head';
 import styles from '../../styles/profile.module.css';
 
 export default function Profile() {
@@ -16,11 +17,11 @@ export default function Profile() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) {
-        setError('Please log in to view your profile.');
-        setLoading(false);
+        // Only set this error if we've finished loading and there's definitely no user
         return;
       }
 
+      setError(''); // Clear any previous errors
       try {
         console.log('Fetching profile for uid:', user.uid);
         const profile = await getProfile(user.uid);
@@ -85,6 +86,10 @@ export default function Profile() {
   return (
     <ProtectedRoute>
       <div className={styles.container}>
+        <Head>
+          <title>{userData?.displayName || 'User'} Profile | UCCR</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Head>
         <ProfileCard userData={userData} />
       </div>
     </ProtectedRoute>

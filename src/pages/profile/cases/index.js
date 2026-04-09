@@ -13,22 +13,24 @@ export default function MyCases() {
 
   if (authLoading || casesLoading) {
     return (
-      <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
-        <div className={styles.container}>
-          <Skeleton height={40} width={200} />
-          <div className={styles['case-list']}>
-            {[...Array(3)].map((_, index) => (
-              <Skeleton key={index} height={200} />
-            ))}
+      <ProtectedRoute>
+        <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
+          <div className={styles.container}>
+            <Skeleton height={40} width={200} />
+            <div className={styles['case-list']}>
+              {[...Array(3)].map((_, index) => (
+                <Skeleton key={index} height={200} />
+              ))}
+            </div>
           </div>
-        </div>
-      </SkeletonTheme>
+        </SkeletonTheme>
+      </ProtectedRoute>
     );
   }
 
-  if (!user) {
-    return <div>Please log in to view your cases.</div>;
-  }
+  // If we aren't loading but there's no user, ProtectedRoute will handle it.
+  // Return null to avoid flickering the "Please log in" message.
+  if (!user) return null;
 
   return (
     <ProtectedRoute>

@@ -8,7 +8,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import Head from 'next/head';
 import styles from './case.module.css';
 
 export default function Cases() {
@@ -359,6 +359,10 @@ export default function Cases() {
 
   return (
     <div className={styles.container}>
+      <Head>
+        <title>Medical Case Archive | Uganda Clinical Case Reports</title>
+        <meta name="description" content="Browse our comprehensive database of medical case reports from Uganda, categorized by specialty and hospital." />
+      </Head>
       <h1 className={styles.title}>All Cases</h1>
       <div className={styles.filterSortContainer}>
         <div className={styles.filters}>

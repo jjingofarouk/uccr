@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../../hooks/useAuth';
-import { getProfile } from '../../../firebase/firestore';
+import { getProfile } from '../../../lib/supabase/profiles';
 import ProfileCard from '../../../components/Profile/ProfileCard';
-import Navbar from '../../../components/Navbar';
 import ProtectedRoute from '../../../components/Auth/ProtectedRoute';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -64,7 +63,6 @@ export default function ProfileView() {
       <ProtectedRoute>
         <SkeletonTheme baseColor="#e0e0e0" highlightColor="#f0f0f0">
           <div className={styles.container}>
-            <Navbar />
             <div className={styles.profileSkeleton}>
               <Skeleton circle width={100} height={100} />
               <Skeleton height={40} width={300} style={{ marginTop: '20px' }} />
@@ -80,7 +78,6 @@ export default function ProfileView() {
     return (
       <ProtectedRoute>
         <div className={styles.container}>
-          <Navbar />
           <div className={styles.error}>{error}</div>
         </div>
       </ProtectedRoute>
@@ -90,7 +87,6 @@ export default function ProfileView() {
   return (
     <ProtectedRoute>
       <div className={styles.container}>
-        <Navbar />
         {profileData && (
           <>
             <ProfileCard userData={profileData} />

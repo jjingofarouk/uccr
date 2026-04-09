@@ -21,6 +21,7 @@ export const searchCasesAndUsers = async (searchTerm) => {
     results.cases = casesSnapshot.docs
       .filter(doc => {
         const data = doc.data();
+        if (data.caseType === 'ecg') return false; // Filter out ECGs
         return Object.values(data).some(value => {
           if (Array.isArray(value)) {
             return value.some(item =>

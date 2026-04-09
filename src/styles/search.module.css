@@ -1,0 +1,585 @@
+.searchPage {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text);
+  padding-bottom: 5rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.searchHeader {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+  position: sticky;
+  top: 76px;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+}
+
+.searchHeaderGrid {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.searchBoxWrapper {
+  flex: 1;
+}
+
+.searchForm {
+  display: flex;
+  align-items: center;
+  background: var(--background);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 0 1.25rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.searchForm:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+}
+
+.searchIcon {
+  color: var(--primary);
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 1rem 1rem;
+  font-size: 1.15rem;
+  color: var(--text);
+  outline: none;
+}
+
+.clearButton {
+  background: var(--border);
+  border: none;
+  color: var(--text-secondary);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.clearButton:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.actionButtonGroup {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.consoleTrigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  padding: 0.85rem 1.75rem;
+  border-radius: 14px;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  position: relative;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.consoleTrigger:hover {
+  border-color: var(--primary);
+  background: var(--background);
+}
+
+.sortOptionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filterTrigger {
+  display: none;
+}
+
+.filterDot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+
+.activeFilters {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.filterBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1.15rem;
+  background: #0f172a;
+  color: #ffffff;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filterBadge svg {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.filterBadge svg:hover {
+  opacity: 1;
+}
+
+.resultsContainer {
+  padding: 1.5rem 0;
+}
+
+.loadingState {
+  text-align: center;
+  padding: 5rem 0;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  margin: 0 auto 2rem;
+  animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--text-secondary);
+  min-height: 40vh;
+}
+
+.minimalHero {
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 1rem;
+}
+
+.recHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.pillGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.recPill {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  padding: 0.35rem 0.95rem;
+  border-radius: 99px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.recPill:hover {
+  border-color: var(--primary);
+  background: var(--background);
+  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15);
+}
+
+.reportCard {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: var(--text);
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  min-height: 200px;
+}
+
+.reportCard:hover {
+  background: var(--background);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -10px var(--shadow);
+}
+
+.reportMain {
+  flex: 1;
+}
+
+.reportTitleRow {
+  margin-bottom: 0.75rem;
+}
+
+.reportTitleRow h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.excerptWrapper {
+  margin-bottom: 0.75rem;
+  min-height: 3.8rem;
+}
+
+.excerpt {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.8;
+}
+
+.highlight {
+  background: #fde047;
+  color: #1a1a1a;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.specialtyPill {
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.reportMetadataGrid {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.metaItem svg {
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+.cardArrow {
+  color: var(--primary);
+  opacity: 0.3;
+  margin-left: 2rem;
+  transition: all 0.3s ease;
+}
+
+.reportCard:hover .cardArrow {
+  opacity: 1;
+  transform: translateX(6px);
+}
+
+/* Filter Modal - Ultra Clean */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 5000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.filterModal {
+  background: var(--background);
+  width: 100%;
+  max-width: 600px;
+  border-radius: 32px 32px 0 0;
+  padding: 2.5rem;
+  box-shadow: 0 -25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.modalHeader button {
+  background: var(--surface);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.filterSection {
+  margin-bottom: 2.5rem;
+}
+
+.filterSection label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.filterSelect {
+  width: 100%;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.typeButton, .activeType {
+  padding: 1rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.typeButton {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  color: var(--text);
+}
+
+.activeType {
+  background: #1e293b;
+  border: 2px solid #1e293b;
+  color: white;
+}
+
+.sortOptions {
+  display: flex;
+  gap: 1rem;
+}
+
+.sortBtn, .activeSort {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sortBtn {
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+
+.activeSort {
+  background: var(--primary);
+  border: 2px solid var(--primary);
+  color: white;
+}
+
+.applyButton {
+  width: 100%;
+  padding: 1.5rem;
+  background: #1e293b;
+  color: white;
+  border: none;
+  border-radius: 18px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.applyButton:active {
+  transform: scale(0.98);
+}
+
+.paginationRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.pageNumbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pageBtn, .pageNumber, .activePage {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.pageBtn {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+
+.pageBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageNumber {
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: var(--text-secondary);
+}
+
+.activePage {
+  background: #1e293b;
+  border: 1.5px solid #1e293b;
+  color: white;
+}
+
+.pageBtn:hover:not(:disabled), .pageNumber:hover {
+  background: var(--background);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .searchHeaderGrid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filterModal {
+    padding: 2rem 1.5rem;
+  }
+  
+  .minimalHero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .reportTitleRow {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .reportMetadataGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .paginationRow {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}

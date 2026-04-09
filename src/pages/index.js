@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import Head from 'next/head';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useCases } from '../hooks/useCases';
@@ -177,7 +177,12 @@ export default function HomePage() {
 
   return (
     <main className={styles.container}>
-      <GoogleAnalytics gaId="G-GLWW8HX76X" />
+      <Head>
+        <title>Uganda Clinical Case Reports | Medical Case Studies & Research</title>
+        <meta name="description" content="A growing archive of medical case studies, clinical research, and healthcare insights from Uganda. Explore medical education and research findings." />
+        <meta name="keywords" content="Medical Research Uganda, Clinical Case Reports, Healthcare Insights Uganda, Clinical Trials Uganda" />
+        <link rel="canonical" href="https://ugandacasereports.org" />
+      </Head>
       <HeroSection />
       {cases.length === 0 ? (
         <section className={styles.emptySection} aria-live="polite">

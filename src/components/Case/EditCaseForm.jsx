@@ -13,7 +13,7 @@ import ErrorMessage from './ErrorMessage';
 import Loading from '../Loading';
 import { auth } from '../../firebase/config';
 
-export default function EditCaseForm({ caseId }) {
+export default function EditCaseForm({ caseId, isAdmin = false, onAdminSuccess, onAdminCancel }) {
   const { user, loading: authLoading, error: authError } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
@@ -91,7 +91,7 @@ export default function EditCaseForm({ caseId }) {
   // Fetch case data on mount
   useEffect(() => {
     const fetchCaseData = async () => {
-      if (caseId && user && user.uid) {
+      if (caseId && (isAdmin || (user && user.uid))) {
         try {
           const caseData = await getCaseById(caseId);
           if (!caseData) {
@@ -99,7 +99,7 @@ export default function EditCaseForm({ caseId }) {
             setIsLoading(false);
             return;
           }
-          if (caseData.userId !== user.uid) {
+          if (!isAdmin && caseData.userId !== user.uid) {
             setError('You do not have permission to edit this case.');
             setIsLoading(false);
             return;
@@ -119,35 +119,40 @@ export default function EditCaseForm({ caseId }) {
             highLevelSummary: caseData.highLevelSummary || '',
             references: caseData.references || '',
             mediaUrls: Array.isArray(caseData.mediaUrls) ? caseData.mediaUrls : [],
+            userId: caseData.userId || '',
+            userName: caseData.userName || '',
+            photoURL: caseData.photoURL || ''
           };
           setFormData(caseFormData);
           setOriginalFormData(caseFormData); // Store original data for comparison
 
-          // Check for draft and prompt user
-          const draftKey = `draft_case_${user.uid}_${caseId}`;
-          const savedDraft = localStorage.getItem(draftKey);
-          if (savedDraft) {
-            try {
-              const { formData: savedFormData, currentStep: savedStep, draftTimestamp } = JSON.parse(savedDraft);
-              const draftAge = Date.now() - draftTimestamp;
-              const maxDraftAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-              if (draftAge < maxDraftAge) {
-                const loadDraft = confirm('A draft exists for this case. Would you like to load it instead of the saved case data?');
-                if (loadDraft) {
-                  setFormData(savedFormData);
-                  setCurrentStep(savedStep || 0);
-                  console.log('Loaded draft from localStorage:', { draftKey, title: savedFormData.title, draftAge });
+          // Check for draft and prompt user (only if not admin)
+          if (!isAdmin) {
+            const draftKey = `draft_case_${user.uid}_${caseId}`;
+            const savedDraft = localStorage.getItem(draftKey);
+            if (savedDraft) {
+              try {
+                const { formData: savedFormData, currentStep: savedStep, draftTimestamp } = JSON.parse(savedDraft);
+                const draftAge = Date.now() - draftTimestamp;
+                const maxDraftAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+                if (draftAge < maxDraftAge) {
+                  const loadDraft = confirm('A draft exists for this case. Would you like to load it instead of the saved case data?');
+                  if (loadDraft) {
+                    setFormData(savedFormData);
+                    setCurrentStep(savedStep || 0);
+                    console.log('Loaded draft from localStorage:', { draftKey, title: savedFormData.title, draftAge });
+                  } else {
+                    localStorage.removeItem(draftKey);
+                    console.log('Draft discarded, using case data:', { draftKey });
+                  }
                 } else {
                   localStorage.removeItem(draftKey);
-                  console.log('Draft discarded, using case data:', { draftKey });
+                  console.log('Cleared expired draft from localStorage:', { draftKey });
                 }
-              } else {
+              } catch (err) {
+                console.error('Error loading draft:', err);
                 localStorage.removeItem(draftKey);
-                console.log('Cleared expired draft from localStorage:', { draftKey });
               }
-            } catch (err) {
-              console.error('Error loading draft:', err);
-              localStorage.removeItem(draftKey);
             }
           }
           setIsLoading(false);
@@ -161,9 +166,9 @@ export default function EditCaseForm({ caseId }) {
     fetchCaseData();
   }, [caseId, user]);
 
-  // Save draft only when changes are made
+  // Save draft only when changes are made (skip for admin)
   useEffect(() => {
-    if (user && user.uid && caseId && hasChanges) {
+    if (!isAdmin && user && user.uid && caseId && hasChanges) {
       const draftKey = `draft_case_${user.uid}_${caseId}`;
       localStorage.setItem(draftKey, JSON.stringify({ 
         formData, 
@@ -172,7 +177,7 @@ export default function EditCaseForm({ caseId }) {
       }));
       console.log('Saved draft to localStorage:', { draftKey, title: formData.title, currentStep });
     }
-  }, [formData, currentStep, user, caseId, hasChanges]);
+  }, [formData, currentStep, user, caseId, hasChanges, isAdmin]);
 
   // Cloudinary widget setup
   useEffect(() => {
@@ -399,7 +404,7 @@ export default function EditCaseForm({ caseId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user || !user.uid) {
+    if (!isAdmin && (!user || !user.uid)) {
       setError('You must be logged in to edit a case.');
       if (window.gtag) {
         window.gtag('event', 'submission_failed', {
@@ -453,19 +458,23 @@ export default function EditCaseForm({ caseId }) {
       });
     }
     try {
-      await auth.currentUser.getIdToken(true);
-      console.log('Authentication token refreshed for user:', user.uid);
+      if (!isAdmin) {
+        await auth.currentUser.getIdToken(true);
+        console.log('Authentication token refreshed for user:', user.uid);
+      }
       const caseData = {
         ...formData,
-        userId: user.uid,
-        userName: user.displayName || 'Anonymous',
-        photoURL: user.photoURL || '',
+        userId: isAdmin ? formData.userId : user.uid,
+        userName: isAdmin ? formData.userName : (user?.displayName || 'Anonymous'),
+        photoURL: isAdmin ? formData.photoURL : (user?.photoURL || ''),
         thumbnailUrl: formData.mediaUrls[0] || '',
       };
       await updateCase(caseId, caseData);
       console.log('Case update successful, ID:', caseId);
-      localStorage.removeItem(`draft_case_${user.uid}_${caseId}`);
-      console.log('Draft cleared from localStorage');
+      if (!isAdmin) {
+        localStorage.removeItem(`draft_case_${user.uid}_${caseId}`);
+        console.log('Draft cleared from localStorage');
+      }
       setLoadStart(Date.now());
       setForceLoading(true);
       if (window.gtag) {
@@ -540,21 +549,29 @@ export default function EditCaseForm({ caseId }) {
         console.log('Navigation triggered after update');
         setForceLoading(false);
         setIsLoading(false);
-        router.push('/cases');
+        if (isAdmin) {
+           onAdminSuccess && onAdminSuccess(formData);
+        } else {
+           router.push('/cases');
+        }
       } else {
         const timer = setTimeout(() => {
           console.log('Navigation triggered after timeout');
           setForceLoading(false);
           setIsLoading(false);
-          router.push('/cases');
+          if (isAdmin) {
+             onAdminSuccess && onAdminSuccess(formData);
+          } else {
+             router.push('/cases');
+          }
         }, remaining);
         return () => clearTimeout(timer);
       }
     }
-  }, [forceLoading, loadStart, router]);
+  }, [forceLoading, loadStart, router, isAdmin, onAdminSuccess, formData]);
 
-  if (authLoading || isLoading) return <Loading />;
-  if (authError) {
+  if (!isAdmin && authLoading || isLoading) return <Loading />;
+  if (!isAdmin && authError) {
     if (window.gtag) {
       window.gtag('event', 'auth_error', {
         event_category: 'EditCaseForm',
@@ -564,7 +581,7 @@ export default function EditCaseForm({ caseId }) {
     }
     return <div>Error: {authError}</div>;
   }
-  if (!user) {
+  if (!isAdmin && !user) {
     if (window.gtag) {
       window.gtag('event', 'auth_error', {
         event_category: 'EditCaseForm',
@@ -606,6 +623,16 @@ export default function EditCaseForm({ caseId }) {
           >
             Clear Draft
           </button>
+          {isAdmin && (
+             <button
+               type="button"
+               onClick={onAdminCancel}
+               className={styles.clearDraftButton}
+               style={{ marginLeft: '10px' }}
+             >
+               Cancel Edit
+             </button>
+          )}
           <ErrorMessage error={error} />
         </form>
       </div>
