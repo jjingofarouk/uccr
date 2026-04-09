@@ -61,15 +61,25 @@ const trackPageView = (caseId, title) => {
   }
 };
 
-const renderRichText = (html) => {
+const renderRichText = (html, highlightQuery) => {
   if (!html || typeof html !== 'string') {
     return <Typography className={styles.notSpecified}>Not specified</Typography>;
   }
   try {
-    const sanitizedHtml = sanitizeHtml(html, {
+    let sanitizedHtml = sanitizeHtml(html, {
       allowedTags: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a', 'h1', 'h2'],
       allowedAttributes: { a: ['href', 'target'] },
     });
+
+    // Apply Highlighting if a query exists
+    if (highlightQuery && highlightQuery.trim().length >= 2) {
+      const escapedQuery = highlightQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedQuery})`, 'gi');
+      sanitizedHtml = sanitizedHtml.replace(regex, (match) => {
+        return `<mark class="clinical-evidence-highlight">${match}</mark>`;
+      });
+    }
+
     return <div className={styles.richText} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
   } catch (err) {
     console.error('Error sanitizing HTML:', err);
@@ -82,6 +92,8 @@ const getSafeValue = (value, fallback = 'Not specified') => value || fallback;
 export default function CaseDetail({ caseData, isLoading }) {
   const { user } = useAuth();
   const router = useRouter();
+  const { h: highlightQuery } = router.query; // Catch the evidence handshake
+
   const [error, setError] = useState('');
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -99,6 +111,20 @@ export default function CaseDetail({ caseData, isLoading }) {
       setError('Failed to load case details.');
     }
   }, [caseData]);
+
+  // Teleport to evidence
+  useEffect(() => {
+    if (highlightQuery && !isLoading && caseData) {
+      // Small timeout to ensure render completion
+      const timer = setTimeout(() => {
+        const firstHighlight = document.querySelector('.clinical-evidence-highlight');
+        if (firstHighlight) {
+          firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightQuery, isLoading, caseData]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -245,7 +271,7 @@ export default function CaseDetail({ caseData, isLoading }) {
               fontWeight="bold" 
               gutterBottom
             >
-              {renderRichText(getSafeValue(caseData.title))}
+              {renderRichText(getSafeValue(caseData.title), highlightQuery)}
             </Typography>
 
             {user && user.uid === caseData.userId && (
@@ -260,12 +286,12 @@ export default function CaseDetail({ caseData, isLoading }) {
             <div className={styles.meta}>
               <time className={styles.date}>
                 {caseData.createdAt
-                  ? new Date(caseData.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : 'Unknown date'}
+                   ? new Date(caseData.createdAt).toLocaleDateString('en-US', {
+                       year: 'numeric',
+                       month: 'long',
+                       day: 'numeric',
+                     })
+                   : 'Unknown date'}
               </time>
             </div>
           </header>
@@ -293,7 +319,7 @@ export default function CaseDetail({ caseData, isLoading }) {
                 >
                   {section.label}
                 </Typography>
-                {renderRichText(section.content)}
+                {renderRichText(section.content, highlightQuery)}
               </div>
             ))}
           </section>

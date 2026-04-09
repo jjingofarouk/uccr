@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { logout } from '../lib/supabase/auth';
-import { getMessages } from '../firebase/firestore';
+// import { getMessages } from '../firebase/firestore'; // Removed Firebase Legacy
 import { Menu, Moon, Sun, Bell, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -12,7 +12,7 @@ import styles from '../styles/navbar.module.css';
 
 import NotificationsModal from './NotificationsDropdown';
 import Sidebar from './Sidebar';
-import { subscribeToNotifications } from '../firebase/notifications';
+// import { subscribeToNotifications } from '../firebase/notifications'; // Removed Firebase Legacy
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
@@ -115,7 +115,6 @@ export default function Navbar() {
   const openSidebar = useCallback(() => {
     setIsSidebarOpen(true);
     setIsNotificationsOpen(false);
-    setIsSearchOpen(false);
     setLogoutError('');
   }, []);
 
@@ -125,7 +124,6 @@ export default function Navbar() {
     setIsSidebarOpen((prev) => {
       if (!prev) {
         setIsNotificationsOpen(false);
-        setIsSearchOpen(false);
         setLogoutError('');
       }
       return !prev;
@@ -136,7 +134,6 @@ export default function Navbar() {
     setIsNotificationsOpen((prev) => {
       if (!prev) {
         setIsSidebarOpen(false);
-        setIsSearchOpen(false);
       }
       return !prev;
     });
@@ -178,28 +175,14 @@ export default function Navbar() {
   const handleNavigationClick = useCallback((_navType) => { }, []);
   const clearError = useCallback(() => setLogoutError(''), []);
 
-  /* ── Unread messages ── */
+  /* ── Unread messages (Supabase Integration Pending) ── */
   useEffect(() => {
-    if (!user) { setUnreadThreads([]); return; }
-    let cancelled = false;
-
-    getMessages(user.uid)
-      .then((threads) => {
-        if (!cancelled) setUnreadThreads(threads.filter((t) => t.lastMessage && !t.read));
-      })
-      .catch((err) => console.error('[Navbar] unread messages:', err));
-
-    return () => { cancelled = true; };
+    // Placeholder for Supabase Notifications
+    setUnreadThreads([]);
+    setUnreadNotifications([]);
   }, [user]);
 
-  /* ── Real-time notifications ── */
-  useEffect(() => {
-    if (!user) { setUnreadNotifications([]); return; }
-    const unsubscribe = subscribeToNotifications(user.uid, setUnreadNotifications);
-    return unsubscribe;
-  }, [user]);
-
-  const unreadCount = unreadThreads.length + unreadNotifications.length;
+  const unreadCount = 0; // Temporarily zeroed after Firebase Exorcism
 
   return (
     <>

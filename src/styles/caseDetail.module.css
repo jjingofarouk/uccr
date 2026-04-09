@@ -718,3 +718,21 @@
     opacity: 0.3;
   }
 }
+
+/* Deep-Link Evidence Highlighting (Scoped for Purity) */
+.richText :global(.clinical-evidence-highlight),
+.title :global(.clinical-evidence-highlight) {
+  background: #fde047 !important; /* Archival Yellow */
+  color: #111827 !important;      /* Deep Ink */
+  padding: 0 4px;
+  border-radius: 4px;
+  font-weight: 800;
+  box-shadow: 0 0 0 2px rgba(253, 224, 71, 0.2);
+  transition: all 0.2s ease;
+}
+
+.richText :global(.clinical-evidence-highlight:hover),
+.title :global(.clinical-evidence-highlight:hover) {
+  background: #facc15 !important; /* Golden Triage */
+  transform: scale(1.05);
+}

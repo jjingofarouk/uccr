@@ -345,7 +345,11 @@ export default function SearchPage() {
                   </div>
                   <div className={styles.grid}>
                     {currentCases.map((report) => (
-                      <Link key={report.id} href={`/cases/${report.id}`} className={styles.reportCard}>
+                      <Link 
+                        key={report.id} 
+                        href={`/cases/${report.id}${searchQuery ? `?h=${encodeURIComponent(searchQuery)}` : ''}`} 
+                        className={styles.reportCard}
+                      >
                         <div className={styles.reportMain}>
                           <div className={styles.reportTitleRow}>
                             <h3>{highlightText(sanitizeTitle(report.title), searchQuery)}</h3>

@@ -1,7 +1,7 @@
 // src/pages/auth.jsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { login, signup } from '../firebase/auth';
+import { login, signup } from '../lib/supabase/auth'; // Migrated from Firebase Legacy
 import { Stethoscope, Mail, Lock, User, AlertCircle, LogIn } from 'lucide-react';
 import Loading from '../components/Loading';
 import styles from './AuthPage.module.css';
@@ -17,7 +17,7 @@ export default function AuthPage() {
   const [loadStart, setLoadStart] = useState(null);
   const [forceLoading, setForceLoading] = useState(false);
   const router = useRouter();
-  const LOGIN_LOADING_DURATION = 3000; // 3 seconds for post-login loading
+  const LOGIN_LOADING_DURATION = 1500; // Snappier loading for Supabase
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,11 +25,15 @@ export default function AuthPage() {
     setIsLoading(true);
     try {
       if (isLogin) {
-        await login(email, password);
+        const res = await login(email, password);
+        if (!res.success) throw new Error(res.error);
+        
         setLoadStart(Date.now());
         setForceLoading(true);
       } else {
-        await signup(email, password, name);
+        const res = await signup(email, password, name);
+        if (!res.success) throw new Error(res.error);
+        
         router.push('/profile/edit');
       }
     } catch (err) {
